@@ -8,6 +8,7 @@ export class BargePanel {
 
     private readonly _panel: vscode.WebviewPanel;
     private readonly _azureService: AzureService;
+    private readonly _extensionUri: vscode.Uri;
     private _disposables: vscode.Disposable[] = [];
 
     public static createOrShow(extensionUri: vscode.Uri, azureService: AzureService) {
@@ -22,7 +23,7 @@ export class BargePanel {
 
         const panel = vscode.window.createWebviewPanel(
             BargePanel.viewType,
-            'bARGE Results',
+            'bARGE - basic Azure Resource Graph Explorer',
             column,
             {
                 enableScripts: true,
@@ -37,6 +38,7 @@ export class BargePanel {
     private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, azureService: AzureService) {
         this._panel = panel;
         this._azureService = azureService;
+        this._extensionUri = extensionUri;
         this._update();
         this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
         this._panel.webview.onDidReceiveMessage(
@@ -63,6 +65,13 @@ export class BargePanel {
 
     public async runQuery(query: string, source: 'file' | 'selection', fileName?: string) {
         try {
+            // Show loading indicator
+            this._panel.webview.postMessage({
+                type: 'queryStart'
+            });
+            
+            this._panel.reveal();
+            
             const result = await this._azureService.runQuery(query);
             
             if (result && result.columns) {
@@ -82,8 +91,6 @@ export class BargePanel {
                 payload: response
             });
             
-            this._panel.reveal();
-            
         } catch (error) {
             const response: QueryResponse = {
                 success: false,
@@ -94,8 +101,6 @@ export class BargePanel {
                 type: 'queryResult',
                 payload: response
             });
-            
-            this._panel.reveal();
         }
     }
 
@@ -153,12 +158,16 @@ export class BargePanel {
     }
 
     private _getHtmlForWebview() {
+        const loadingGifUri = this._panel.webview.asWebviewUri(
+            vscode.Uri.joinPath(this._extensionUri, 'media', 'loadingbarge.gif')
+        );
+
         return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>bARGE Results</title>
+    <title>bARGE - basic Azure Resource Graph Explorer</title>
     <style>
         body {
             font-family: var(--vscode-font-family);
@@ -166,18 +175,29 @@ export class BargePanel {
             color: var(--vscode-foreground);
             background-color: var(--vscode-editor-background);
             margin: 0;
-            padding: 15px;
+            padding: 0;
             height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
-        .header {
+        .table-container {
+            flex: 1;
+            overflow: auto;
+            margin: 15px 15px 0 15px;
+            border: 1px solid var(--vscode-widget-border);
+            border-radius: 4px;
+            min-height: 200px;
+        }
+        .footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--vscode-widget-border);
+            padding: 15px;
+            border-top: 1px solid var(--vscode-widget-border);
+            background-color: var(--vscode-editor-background);
+            flex-shrink: 0;
+            min-height: 40px;
         }
         .results-info {
             font-size: 0.9em;
@@ -195,26 +215,26 @@ export class BargePanel {
         .export-btn:hover {
             background-color: var(--vscode-button-hoverBackground);
         }
-        .table-container {
-            flex: 1;
-            overflow: auto;
-            border: 1px solid var(--vscode-widget-border);
-            border-radius: 4px;
-        }
         .results-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.9em;
+            table-layout: fixed;
         }
         .results-table th {
-            background-color: var(--vscode-editor-widget-background);
+            background-color: var(--vscode-sideBar-background, var(--vscode-editor-background));
             border: 1px solid var(--vscode-widget-border);
             padding: 8px;
             text-align: left;
             position: sticky;
-            top: 0;
+            top: -1px;
             cursor: pointer;
             user-select: none;
+            z-index: 10;
+            min-width: 60px;
+            resize: horizontal;
+            overflow: hidden;
+            position: relative;
         }
         .results-table th:hover {
             background-color: var(--vscode-list-hoverBackground);
@@ -225,13 +245,160 @@ export class BargePanel {
         .results-table th.sorted-desc::after {
             content: ' ↓';
         }
+        .results-table th.dragging {
+            opacity: 0.5;
+            background-color: var(--vscode-list-activeSelectionBackground);
+        }
+        .results-table th.drag-over {
+            border-left: 3px solid var(--vscode-focusBorder);
+        }
+        .resize-handle {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 5px;
+            height: 100%;
+            cursor: col-resize;
+            background: transparent;
+            z-index: 11;
+        }
+        .resize-handle:hover {
+            background-color: var(--vscode-focusBorder);
+        }
         .results-table td {
             border: 1px solid var(--vscode-widget-border);
             padding: 6px 8px;
-            max-width: 300px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+        .results-table td:hover {
+            background-color: var(--vscode-list-hoverBackground);
+        }
+        .results-table td.selected {
+            background-color: var(--vscode-list-activeSelectionBackground) !important;
+            color: var(--vscode-list-activeSelectionForeground);
+        }
+        .results-table td[title] {
+            /* Ensure tooltips are properly displayed */
+            white-space: nowrap;
+        }
+        /* JSON content styling */
+        .results-table td .json-content {
+            font-family: var(--vscode-editor-font-family, 'Consolas', 'Monaco', monospace);
+            color: var(--vscode-textPreformat-foreground);
+        }
+        
+        /* Custom tooltip styling */
+        .custom-tooltip {
+            position: absolute;
+            background: var(--vscode-editorHoverWidget-background);
+            border: 1px solid var(--vscode-editorHoverWidget-border);
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 0.9em;
+            color: var(--vscode-editorHoverWidget-foreground);
+            z-index: 1000;
+            max-width: 400px;
+            max-height: 300px;
+            overflow: auto;
+            white-space: pre-wrap;
+            font-family: var(--vscode-editor-font-family, 'Consolas', 'Monaco', monospace);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.15s ease-in-out;
+        }
+        
+        .custom-tooltip.show {
+            opacity: 1;
+        }
+        
+        .custom-tooltip.json {
+            font-family: var(--vscode-editor-font-family, 'Consolas', 'Monaco', monospace);
+        }
+        
+        /* Custom context menu styling */
+        .custom-context-menu {
+            position: absolute;
+            background: var(--vscode-menu-background);
+            border: 1px solid var(--vscode-menu-border);
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 2000;
+            min-width: 160px;
+            padding: 4px 0;
+            font-size: 0.9em;
+        }
+        
+        .context-menu-item {
+            padding: 8px 16px;
+            cursor: pointer;
+            color: var(--vscode-menu-foreground);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .context-menu-item:hover {
+            background: var(--vscode-menu-selectionBackground);
+            color: var(--vscode-menu-selectionForeground);
+        }
+        
+        .context-menu-item.disabled {
+            color: var(--vscode-disabledForeground);
+            cursor: default;
+        }
+        
+        .context-menu-item.disabled:hover {
+            background: transparent;
+            color: var(--vscode-disabledForeground);
+        }
+        
+        /* Loading indicator styling */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(var(--vscode-editor-background-rgb, 30, 30, 30), 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            backdrop-filter: blur(2px);
+        }
+        
+        .loading-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            color: var(--vscode-foreground);
+            font-size: 0.9em;
+            text-align: center;
+        }
+        
+        .loading-animation {
+            width: 128px;
+            height: 128px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .loading-animation img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .loading-message {
+            font-weight: 500;
+            max-width: 200px;
         }
         .results-table tr:nth-child(even) {
             background-color: var(--vscode-editor-widget-background);
@@ -248,24 +415,78 @@ export class BargePanel {
             border: 1px solid var(--vscode-inputValidation-errorBorder);
             padding: 15px;
             border-radius: 4px;
-            margin: 15px 0;
+            margin: 15px;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div id="resultsInfo" class="results-info">No results yet. Run a query from a .kql file to see results here.</div>
-        <button id="exportBtn" class="export-btn" onclick="exportToCsv()" style="display: none;">Export CSV</button>
-    </div>
-    
     <div id="tableContainer" class="table-container">
         <div class="no-results">No results to display</div>
+    </div>
+    
+    <div class="footer">
+        <div id="resultsInfo" class="results-info">No results yet. Run a query from a .kql file to see results here.</div>
+        <button id="exportBtn" class="export-btn" onclick="exportToCsv()" style="display: none;">Export CSV</button>
     </div>
 
     <script>
         const vscode = acquireVsCodeApi();
+        const loadingGifUri = '${loadingGifUri}';
         let currentResults = null;
         let sortState = { column: null, direction: null };
+
+        function escapeHtml(text) {
+            if (typeof text !== 'string') {
+                text = String(text);
+            }
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatCellValue(cell) {
+            if (cell === null || cell === undefined) {
+                return { displayValue: '<em style="color: var(--vscode-descriptionForeground);">null</em>', tooltipValue: 'null' };
+            }
+            
+            if (typeof cell === 'object') {
+                try {
+                    // Format JSON with proper indentation for tooltip
+                    const jsonString = JSON.stringify(cell, null, 2);
+                    
+                    // Create a compact display version for the cell
+                    const compactJson = JSON.stringify(cell);
+                    
+                    // Truncate display if too long
+                    const maxDisplayLength = 100;
+                    let displayValue = compactJson.length > maxDisplayLength 
+                        ? compactJson.substring(0, maxDisplayLength) + '...' 
+                        : compactJson;
+                    
+                    // Add JSON styling
+                    displayValue = \`<span class="json-content">\${escapeHtml(displayValue)}</span>\`;
+                    
+                    return {
+                        displayValue: displayValue,
+                        tooltipValue: jsonString
+                    };
+                } catch (error) {
+                    // If JSON.stringify fails, fall back to string conversion
+                    const stringValue = String(cell);
+                    return {
+                        displayValue: escapeHtml(stringValue),
+                        tooltipValue: stringValue
+                    };
+                }
+            }
+            
+            // For non-object values, use as-is
+            const stringValue = String(cell);
+            return {
+                displayValue: escapeHtml(stringValue),
+                tooltipValue: stringValue
+            };
+        }
 
         function displayResults(result) {
             currentResults = result;
@@ -290,22 +511,373 @@ export class BargePanel {
             result.columns.forEach((col, index) => {
                 const sortClass = sortState.column === index ? 
                     (sortState.direction === 'asc' ? 'sorted-asc' : 'sorted-desc') : '';
-                tableHtml += \`<th class="\${sortClass}" onclick="sortTable(\${index})" title="\${col.name}">\${col.name}</th>\`;
+                tableHtml += \`<th class="\${sortClass}" 
+                    draggable="true" 
+                    data-col-index="\${index}" 
+                    onclick="handleHeaderClick(event, \${index})" 
+                    ondragstart="handleDragStart(event, \${index})"
+                    ondragover="handleDragOver(event)"
+                    ondrop="handleDrop(event, \${index})"
+                    ondragend="handleDragEnd(event)"
+                    style="width: \${col.width || 'auto'};"
+                    title="\${col.name}">
+                    <span class="header-text">\${col.name}</span>
+                    <div class="resize-handle" onmousedown="startResize(event, \${index})"></div>
+                </th>\`;
             });
             
             tableHtml += '</tr></thead><tbody>';
             
-            result.data.forEach(row => {
+            result.data.forEach((row, rowIndex) => {
                 tableHtml += '<tr>';
-                row.forEach(cell => {
-                    const cellValue = cell !== null && cell !== undefined ? String(cell) : '';
-                    tableHtml += \`<td title="\${cellValue}">\${cellValue}</td>\`;
+                row.forEach((cell, cellIndex) => {
+                    const { displayValue, tooltipValue } = formatCellValue(cell);
+                    // Store tooltip data as data attribute - tooltipValue is already safe
+                    tableHtml += \`<td data-tooltip="\${tooltipValue.replace(/"/g, '&quot;')}" onclick="selectCell(this, \${rowIndex}, \${cellIndex})" onmouseenter="showCustomTooltip(event, this)" onmouseleave="hideCustomTooltip()" data-row="\${rowIndex}" data-col="\${cellIndex}">\${displayValue}</td>\`;
                 });
                 tableHtml += '</tr>';
             });
             
             tableHtml += '</tbody></table>';
             tableContainer.innerHTML = tableHtml;
+            
+            // Add context menu event listener to the table
+            const table = tableContainer.querySelector('.results-table');
+            if (table) {
+                table.addEventListener('contextmenu', handleTableContextMenu);
+            }
+        }
+
+        // Loading indicator functionality
+        const loadingMessages = [
+            "Finding Azure treasures...",
+            "Sailing the cloudy seas...",
+            "Mapping uncharted resources…",
+            "Charting resource providers...",
+            "Plundering key vaults...",
+            "Investigating secrets...",
+            "Exploring landing zones...",
+            "Following routes...",
+            "Opening route maps...",
+            "Digging for hidden properties...",
+            "Navigating configuration drift..."
+        ];
+
+        function getRandomLoadingMessage() {
+            return loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
+        }
+
+        function showLoadingIndicator() {
+            const tableContainer = document.getElementById('tableContainer');
+            if (!tableContainer) return;
+            
+            // Remove any existing loading overlay
+            hideLoadingIndicator();
+            
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.className = 'loading-overlay';
+            loadingOverlay.id = 'loadingOverlay';
+            
+            const randomMessage = getRandomLoadingMessage();
+            
+            loadingOverlay.innerHTML = \`
+                <div class="loading-content">
+                    <div class="loading-animation">
+                        <img src="\${loadingGifUri}" alt="Loading..." />
+                    </div>
+                    <div class="loading-message">\${randomMessage}</div>
+                </div>
+            \`;
+            
+            tableContainer.style.position = 'relative';
+            tableContainer.appendChild(loadingOverlay);
+        }
+
+        function hideLoadingIndicator() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay) {
+                loadingOverlay.remove();
+            }
+        }
+
+        // Custom tooltip functionality
+        let customTooltip = null;
+        let tooltipTimeout = null;
+
+        function createTooltip() {
+            if (!customTooltip) {
+                customTooltip = document.createElement('div');
+                customTooltip.className = 'custom-tooltip';
+                document.body.appendChild(customTooltip);
+            }
+            return customTooltip;
+        }
+
+        function showCustomTooltip(event, element) {
+            const tooltip = createTooltip();
+            const tooltipText = element.getAttribute('data-tooltip');
+            
+            if (!tooltipText || tooltipText === element.textContent.trim()) {
+                // Don't show tooltip if content is the same as display or empty
+                hideCustomTooltip();
+                return;
+            }
+            
+            // Clear any existing timeout
+            if (tooltipTimeout) {
+                clearTimeout(tooltipTimeout);
+                tooltipTimeout = null;
+            }
+            
+            tooltip.textContent = tooltipText;
+            
+            // Add JSON class if content looks like JSON
+            if (tooltipText.trim().startsWith('{') || tooltipText.trim().startsWith('[')) {
+                tooltip.classList.add('json');
+            } else {
+                tooltip.classList.remove('json');
+            }
+            
+            // Position tooltip
+            positionTooltip(event, tooltip);
+            
+            // Show tooltip immediately
+            tooltip.classList.add('show');
+        }
+
+        function positionTooltip(event, tooltip) {
+            const mouseX = event.clientX;
+            const mouseY = event.clientY;
+            const offset = 10;
+            
+            // Get viewport dimensions
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            
+            // Set initial position to measure tooltip dimensions
+            tooltip.style.left = '0px';
+            tooltip.style.top = '0px';
+            
+            // Get tooltip dimensions
+            const tooltipRect = tooltip.getBoundingClientRect();
+            const tooltipWidth = tooltipRect.width;
+            const tooltipHeight = tooltipRect.height;
+            
+            // Calculate optimal position
+            let left = mouseX + offset;
+            let top = mouseY + offset;
+            
+            // Adjust if tooltip would go off-screen to the right
+            if (left + tooltipWidth > viewportWidth) {
+                left = mouseX - tooltipWidth - offset;
+            }
+            
+            // Adjust if tooltip would go off-screen to the bottom
+            if (top + tooltipHeight > viewportHeight) {
+                top = mouseY - tooltipHeight - offset;
+            }
+            
+            // Ensure tooltip doesn't go off-screen to the left or top
+            left = Math.max(offset, left);
+            top = Math.max(offset, top);
+            
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = top + 'px';
+        }
+
+        function hideCustomTooltip() {
+            if (customTooltip) {
+                customTooltip.classList.remove('show');
+                
+                // Remove tooltip after transition
+                tooltipTimeout = setTimeout(() => {
+                    if (customTooltip && !customTooltip.classList.contains('show')) {
+                        customTooltip.textContent = '';
+                    }
+                }, 150); // Match transition duration
+            }
+        }
+
+        // Update mouse position for tooltip repositioning
+        document.addEventListener('mousemove', function(event) {
+            if (customTooltip && customTooltip.classList.contains('show')) {
+                positionTooltip(event, customTooltip);
+            }
+        });
+
+        // Custom context menu functionality
+        let customContextMenu = null;
+
+        function handleTableContextMenu(event) {
+            event.preventDefault();
+            
+            // Hide any existing context menu
+            hideContextMenu();
+            
+            // Hide tooltip when showing context menu
+            hideCustomTooltip();
+            
+            // Create context menu
+            const contextMenu = createContextMenu();
+            
+            // Position and show context menu
+            positionContextMenu(event, contextMenu);
+            
+            // Add click outside listener to close menu
+            setTimeout(() => {
+                document.addEventListener('click', hideContextMenu, { once: true });
+            }, 0);
+        }
+
+        function createContextMenu() {
+            if (customContextMenu) {
+                document.body.removeChild(customContextMenu);
+            }
+            
+            customContextMenu = document.createElement('div');
+            customContextMenu.className = 'custom-context-menu';
+            
+            const hasSelection = selectedCells.size > 0;
+            
+            // Copy option
+            const copyItem = document.createElement('div');
+            copyItem.className = \`context-menu-item \${hasSelection ? '' : 'disabled'}\`;
+            copyItem.innerHTML = '<span>Copy</span>';
+            copyItem.addEventListener('click', () => {
+                if (hasSelection) {
+                    copySelectedCells();
+                    hideContextMenu();
+                }
+            });
+            
+            // Copy with headers option
+            const copyWithHeadersItem = document.createElement('div');
+            copyWithHeadersItem.className = \`context-menu-item \${hasSelection ? '' : 'disabled'}\`;
+            copyWithHeadersItem.innerHTML = '<span>Copy with Headers</span>';
+            copyWithHeadersItem.addEventListener('click', () => {
+                if (hasSelection) {
+                    copySelectedCellsWithHeaders();
+                    hideContextMenu();
+                }
+            });
+            
+            customContextMenu.appendChild(copyItem);
+            customContextMenu.appendChild(copyWithHeadersItem);
+            
+            document.body.appendChild(customContextMenu);
+            return customContextMenu;
+        }
+
+        function positionContextMenu(event, menu) {
+            const mouseX = event.clientX;
+            const mouseY = event.clientY;
+            
+            // Get viewport dimensions
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            
+            // Set initial position to measure menu dimensions
+            menu.style.left = '0px';
+            menu.style.top = '0px';
+            menu.style.visibility = 'hidden';
+            menu.style.display = 'block';
+            
+            const menuRect = menu.getBoundingClientRect();
+            const menuWidth = menuRect.width;
+            const menuHeight = menuRect.height;
+            
+            // Calculate position
+            let left = mouseX;
+            let top = mouseY;
+            
+            // Adjust if menu would go off-screen
+            if (left + menuWidth > viewportWidth) {
+                left = mouseX - menuWidth;
+            }
+            
+            if (top + menuHeight > viewportHeight) {
+                top = mouseY - menuHeight;
+            }
+            
+            // Ensure menu doesn't go off-screen
+            left = Math.max(0, left);
+            top = Math.max(0, top);
+            
+            menu.style.left = left + 'px';
+            menu.style.top = top + 'px';
+            menu.style.visibility = 'visible';
+        }
+
+        function hideContextMenu() {
+            if (customContextMenu) {
+                document.body.removeChild(customContextMenu);
+                customContextMenu = null;
+            }
+        }
+
+        function copySelectedCellsWithHeaders() {
+            if (selectedCells.size === 0) return;
+            
+            // Get all selected cells with their positions
+            const cellData = [];
+            selectedCells.forEach(cellKey => {
+                const [row, col] = cellKey.split('-').map(Number);
+                if (currentResults && currentResults.data[row] && currentResults.data[row][col] !== undefined) {
+                    cellData.push({
+                        row,
+                        col,
+                        value: currentResults.data[row][col] || ''
+                    });
+                }
+            });
+            
+            if (cellData.length === 0) return;
+            
+            // Sort by row then by column
+            cellData.sort((a, b) => a.row - b.row || a.col - b.col);
+            
+            // Get unique columns and their headers
+            const uniqueCols = [...new Set(cellData.map(cell => cell.col))].sort((a, b) => a - b);
+            const headers = uniqueCols.map(colIndex => {
+                return currentResults && currentResults.columns[colIndex] 
+                    ? currentResults.columns[colIndex].name 
+                    : \`Column \${colIndex}\`;
+            });
+            
+            // Group by rows
+            const rowGroups = {};
+            cellData.forEach(cell => {
+                if (!rowGroups[cell.row]) {
+                    rowGroups[cell.row] = {};
+                }
+                // Format the cell value for copying
+                let copyValue = cell.value;
+                if (typeof copyValue === 'object' && copyValue !== null) {
+                    copyValue = JSON.stringify(copyValue);
+                }
+                rowGroups[cell.row][cell.col] = copyValue || '';
+            });
+            
+            // Create header row
+            const headerRow = headers.join('\\t');
+            
+            // Create data rows
+            const rows = Object.keys(rowGroups).sort((a, b) => Number(a) - Number(b));
+            const dataRows = rows.map(rowIndex => {
+                const row = rowGroups[rowIndex];
+                return uniqueCols.map(colIndex => String(row[colIndex] || '')).join('\\t');
+            });
+            
+            // Combine header and data
+            const copyText = [headerRow, ...dataRows].join('\\n');
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(copyText).then(() => {
+                showCopyFeedback('with headers');
+            }).catch(err => {
+                console.error('Failed to copy to clipboard:', err);
+                fallbackCopyTextToClipboard(copyText);
+            });
         }
 
         function sortTable(columnIndex) {
@@ -358,6 +930,357 @@ export class BargePanel {
             }
         }
 
+        let selectedCells = new Set();
+        let isSelecting = false;
+        let selectionStart = null;
+
+        function selectCell(cellElement, row, col) {
+            if (event.ctrlKey || event.metaKey) {
+                // Ctrl/Cmd click for multi-select
+                toggleCellSelection(cellElement, row, col);
+            } else if (event.shiftKey && selectionStart) {
+                // Shift click for range selection
+                selectRange(selectionStart.row, selectionStart.col, row, col);
+            } else {
+                // Regular click - clear previous selection and select this cell
+                clearSelection();
+                toggleCellSelection(cellElement, row, col);
+                selectionStart = { row, col };
+            }
+        }
+
+        function toggleCellSelection(cellElement, row, col) {
+            const cellKey = \`\${row}-\${col}\`;
+            if (selectedCells.has(cellKey)) {
+                selectedCells.delete(cellKey);
+                cellElement.classList.remove('selected');
+            } else {
+                selectedCells.add(cellKey);
+                cellElement.classList.add('selected');
+            }
+        }
+
+        function selectRange(startRow, startCol, endRow, endCol) {
+            clearSelection();
+            
+            const minRow = Math.min(startRow, endRow);
+            const maxRow = Math.max(startRow, endRow);
+            const minCol = Math.min(startCol, endCol);
+            const maxCol = Math.max(startCol, endCol);
+            
+            for (let r = minRow; r <= maxRow; r++) {
+                for (let c = minCol; c <= maxCol; c++) {
+                    const cellElement = document.querySelector(\`td[data-row="\${r}"][data-col="\${c}"]\`);
+                    if (cellElement) {
+                        const cellKey = \`\${r}-\${c}\`;
+                        selectedCells.add(cellKey);
+                        cellElement.classList.add('selected');
+                    }
+                }
+            }
+        }
+
+        function clearSelection() {
+            selectedCells.clear();
+            document.querySelectorAll('.results-table td.selected').forEach(cell => {
+                cell.classList.remove('selected');
+            });
+        }
+
+        // Add keyboard support for cell selection
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                clearSelection();
+                hideContextMenu(); // Also hide context menu on Escape
+            } else if ((event.ctrlKey || event.metaKey) && event.key === 'a') {
+                // Ctrl/Cmd+A to select all cells
+                event.preventDefault();
+                selectAllCells();
+            } else if ((event.ctrlKey || event.metaKey) && event.key === 'c') {
+                // Ctrl/Cmd+C to copy selected cells
+                event.preventDefault();
+                copySelectedCells();
+            }
+        });
+
+        function copySelectedCells() {
+            if (selectedCells.size === 0) return;
+            
+            // Get all selected cells with their positions
+            const cellData = [];
+            selectedCells.forEach(cellKey => {
+                const [row, col] = cellKey.split('-').map(Number);
+                const cellElement = document.querySelector(\`td[data-row="\${row}"][data-col="\${col}"]\`);
+                if (cellElement && currentResults && currentResults.data[row] && currentResults.data[row][col] !== undefined) {
+                    cellData.push({
+                        row,
+                        col,
+                        value: currentResults.data[row][col] || ''
+                    });
+                }
+            });
+            
+            if (cellData.length === 0) return;
+            
+            // Sort by row then by column
+            cellData.sort((a, b) => a.row - b.row || a.col - b.col);
+            
+            // Group by rows and create tab-separated text
+            const rowGroups = {};
+            cellData.forEach(cell => {
+                if (!rowGroups[cell.row]) {
+                    rowGroups[cell.row] = {};
+                }
+                // Format the cell value for copying (use raw value for objects, formatted for display)
+                let copyValue = cell.value;
+                if (typeof copyValue === 'object' && copyValue !== null) {
+                    copyValue = JSON.stringify(copyValue);
+                }
+                rowGroups[cell.row][cell.col] = copyValue || '';
+            });
+            
+            // Convert to tab-separated format
+            const rows = Object.keys(rowGroups).sort((a, b) => Number(a) - Number(b));
+            const copyText = rows.map(rowIndex => {
+                const row = rowGroups[rowIndex];
+                const cols = Object.keys(row).sort((a, b) => Number(a) - Number(b));
+                
+                // If it's a single row selection, just join the values with tabs
+                if (rows.length === 1) {
+                    return cols.map(colIndex => String(row[colIndex] || '')).join('\\t');
+                }
+                
+                // For multiple rows, we need to handle gaps in column selection
+                const minCol = Math.min(...cols.map(Number));
+                const maxCol = Math.max(...cols.map(Number));
+                const rowData = [];
+                
+                for (let i = minCol; i <= maxCol; i++) {
+                    rowData.push(String(row[i] || ''));
+                }
+                
+                return rowData.join('\\t');
+            }).join('\\n');
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(copyText).then(() => {
+                // Visual feedback that copy was successful
+                showCopyFeedback();
+            }).catch(err => {
+                console.error('Failed to copy to clipboard:', err);
+                // Fallback for older browsers
+                fallbackCopyTextToClipboard(copyText);
+            });
+        }
+        
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showCopyFeedback();
+            } catch (err) {
+                console.error('Fallback copy failed:', err);
+            }
+            
+            document.body.removeChild(textArea);
+        }
+        
+        function showCopyFeedback(type = '') {
+            // Create temporary visual feedback
+            const feedback = document.createElement('div');
+            const cellCount = selectedCells.size;
+            const typeText = type ? \` \${type}\` : '';
+            feedback.textContent = \`Copied \${cellCount} cell\${cellCount === 1 ? '' : 's'}\${typeText}\`;
+            feedback.style.position = 'fixed';
+            feedback.style.top = '10px';
+            feedback.style.right = '10px';
+            feedback.style.background = 'var(--vscode-notifications-background)';
+            feedback.style.color = 'var(--vscode-notifications-foreground)';
+            feedback.style.padding = '8px 12px';
+            feedback.style.borderRadius = '4px';
+            feedback.style.border = '1px solid var(--vscode-notifications-border)';
+            feedback.style.fontSize = '0.9em';
+            feedback.style.zIndex = '1000';
+            feedback.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+            
+            document.body.appendChild(feedback);
+            
+            // Remove after 2 seconds
+            setTimeout(() => {
+                if (feedback.parentNode) {
+                    document.body.removeChild(feedback);
+                }
+            }, 2000);
+        }
+
+        function selectAllCells() {
+            clearSelection();
+            document.querySelectorAll('.results-table td[data-row]').forEach(cell => {
+                const row = cell.getAttribute('data-row');
+                const col = cell.getAttribute('data-col');
+                const cellKey = \`\${row}-\${col}\`;
+                selectedCells.add(cellKey);
+                cell.classList.add('selected');
+            });
+        }
+
+        // Column resizing functionality
+        let isResizing = false;
+        let currentResizeColumn = null;
+        let startX = 0;
+        let startWidth = 0;
+
+        function startResize(event, columnIndex) {
+            event.stopPropagation();
+            event.preventDefault();
+            
+            isResizing = true;
+            currentResizeColumn = columnIndex;
+            startX = event.clientX;
+            
+            const th = event.target.closest('th');
+            startWidth = th.offsetWidth;
+            
+            document.addEventListener('mousemove', handleResize);
+            document.addEventListener('mouseup', stopResize);
+            
+            // Prevent text selection during resize
+            document.body.style.userSelect = 'none';
+        }
+
+        function handleResize(event) {
+            if (!isResizing || currentResizeColumn === null) return;
+            
+            const diff = event.clientX - startX;
+            const newWidth = Math.max(60, startWidth + diff); // Minimum width of 60px
+            
+            const th = document.querySelector(\`th[data-col-index="\${currentResizeColumn}"]\`);
+            if (th) {
+                th.style.width = newWidth + 'px';
+                
+                // Store the width in our data
+                if (currentResults && currentResults.columns[currentResizeColumn]) {
+                    currentResults.columns[currentResizeColumn].width = newWidth + 'px';
+                }
+            }
+        }
+
+        function stopResize() {
+            isResizing = false;
+            currentResizeColumn = null;
+            document.removeEventListener('mousemove', handleResize);
+            document.removeEventListener('mouseup', stopResize);
+            document.body.style.userSelect = '';
+        }
+
+        // Column drag and drop functionality
+        let draggedColumn = null;
+
+        function handleHeaderClick(event, columnIndex) {
+            // Only sort if we're not clicking on the resize handle
+            if (!event.target.classList.contains('resize-handle')) {
+                sortTable(columnIndex);
+            }
+        }
+
+        function handleDragStart(event, columnIndex) {
+            // Don't start drag if we're on the resize handle
+            if (event.target.classList.contains('resize-handle')) {
+                event.preventDefault();
+                return;
+            }
+            
+            draggedColumn = columnIndex;
+            event.target.classList.add('dragging');
+            
+            // Set drag data
+            event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData('text/html', event.target.outerHTML);
+        }
+
+        function handleDragOver(event) {
+            if (draggedColumn === null) return;
+            
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'move';
+            
+            const th = event.target.closest('th');
+            if (th && th !== event.target.closest('table').querySelector('.dragging')) {
+                // Remove previous drag-over classes
+                document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+                th.classList.add('drag-over');
+            }
+        }
+
+        function handleDrop(event, targetColumnIndex) {
+            event.preventDefault();
+            
+            if (draggedColumn === null || draggedColumn === targetColumnIndex) {
+                return;
+            }
+            
+            // Reorder the columns in our data
+            reorderColumn(draggedColumn, targetColumnIndex);
+            
+            // Clear drag states
+            document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+        }
+
+        function handleDragEnd(event) {
+            event.target.classList.remove('dragging');
+            document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+            draggedColumn = null;
+        }
+
+        function reorderColumn(fromIndex, toIndex) {
+            if (!currentResults || !currentResults.columns || !currentResults.data) return;
+            
+            // Reorder columns metadata
+            const columns = [...currentResults.columns];
+            const [movedColumn] = columns.splice(fromIndex, 1);
+            columns.splice(toIndex, 0, movedColumn);
+            
+            // Reorder data
+            const data = currentResults.data.map(row => {
+                const newRow = [...row];
+                const [movedCell] = newRow.splice(fromIndex, 1);
+                newRow.splice(toIndex, 0, movedCell);
+                return newRow;
+            });
+            
+            // Update our current results
+            currentResults = {
+                ...currentResults,
+                columns,
+                data
+            };
+            
+            // Update sort state if needed
+            if (sortState.column !== null) {
+                if (sortState.column === fromIndex) {
+                    sortState.column = toIndex;
+                } else if (fromIndex < toIndex && sortState.column > fromIndex && sortState.column <= toIndex) {
+                    sortState.column--;
+                } else if (fromIndex > toIndex && sortState.column >= toIndex && sortState.column < fromIndex) {
+                    sortState.column++;
+                }
+            }
+            
+            // Clear selection since column indices have changed
+            clearSelection();
+            
+            // Re-render the table
+            displayResults(currentResults);
+        }
+
         function displayError(error) {
             const tableContainer = document.getElementById('tableContainer');
             const resultsInfo = document.getElementById('resultsInfo');
@@ -371,7 +1294,11 @@ export class BargePanel {
         window.addEventListener('message', event => {
             const message = event.data;
             switch (message.type) {
+                case 'queryStart':
+                    showLoadingIndicator();
+                    break;
                 case 'queryResult':
+                    hideLoadingIndicator();
                     if (message.payload.success) {
                         displayResults(message.payload.data);
                     } else {
