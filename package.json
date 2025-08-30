@@ -14,10 +14,86 @@
   "contributes": {
     "commands": [
       {
-        "command": "barge-vscode.helloWorld",
-        "title": "Hello World"
+        "command": "barge.openExplorer",
+        "title": "Open Azure Resource Graph Explorer",
+        "category": "bARGE"
+      },
+      {
+        "command": "barge.runQuery",
+        "title": "Run ARG Query",
+        "category": "bARGE"
+      },
+      {
+        "command": "barge.runQueryFromFile",
+        "title": "Run Query from Current File",
+        "category": "bARGE"
+      },
+      {
+        "command": "barge.runQueryFromSelection",
+        "title": "Run Selected Query",
+        "category": "bARGE"
       }
-    ]
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "barge.openExplorer",
+          "title": "bARGE: Open Azure Resource Graph Explorer"
+        },
+        {
+          "command": "barge.runQueryFromFile",
+          "title": "bARGE: Run Query from Current File",
+          "when": "editorLangId == kql || resourceExtname == .kql"
+        },
+        {
+          "command": "barge.runQueryFromSelection",
+          "title": "bARGE: Run Selected Query",
+          "when": "editorHasSelection && (editorLangId == kql || resourceExtname == .kql)"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "barge.runQueryFromFile",
+          "title": "bARGE: Run Query from File",
+          "when": "resourceExtname == .kql",
+          "group": "barge@1"
+        },
+        {
+          "command": "barge.runQueryFromSelection",
+          "title": "bARGE: Run Selected Query",
+          "when": "editorHasSelection && resourceExtname == .kql",
+          "group": "barge@2"
+        }
+      ]
+    },
+    "languages": [
+      {
+        "id": "kql",
+        "aliases": [
+          "KQL",
+          "Kusto Query Language"
+        ],
+        "extensions": [
+          ".kql"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "configuration": {
+      "title": "bARGE",
+      "properties": {
+        "barge.defaultSubscription": {
+          "type": "string",
+          "default": "",
+          "description": "Default Azure subscription ID to use for queries"
+        },
+        "barge.autoAuthenticate": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically authenticate with Azure on extension activation"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
@@ -34,16 +110,24 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.103.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
+    "@types/uuid": "^10.0.0",
+    "@types/vscode": "^1.103.0",
     "@typescript-eslint/eslint-plugin": "^8.39.0",
     "@typescript-eslint/parser": "^8.39.0",
-    "eslint": "^9.32.0",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2",
     "esbuild": "^0.25.8",
+    "eslint": "^9.32.0",
     "npm-run-all": "^4.1.5",
     "typescript": "^5.9.2",
-    "@vscode/test-cli": "^0.0.11",
-    "@vscode/test-electron": "^2.5.2"
+    "uuid": "^11.1.0"
+  },
+  "dependencies": {
+    "@azure/arm-resourcegraph": "^4.2.1",
+    "@azure/arm-subscriptions": "^5.1.0",
+    "@azure/identity": "^4.11.1",
+    "@azure/msal-node": "^3.7.3"
   }
 }
