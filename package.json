@@ -14,31 +14,37 @@
   "contributes": {
     "commands": [
       {
-        "command": "barge.openExplorer",
-        "title": "Open Azure Resource Graph Explorer",
-        "category": "bARGE"
-      },
-      {
-        "command": "barge.runQuery",
-        "title": "Run ARG Query",
+        "command": "barge.openResults",
+        "title": "bARGE: Open Results Panel",
         "category": "bARGE"
       },
       {
         "command": "barge.runQueryFromFile",
-        "title": "Run Query from Current File",
+        "title": "bARGE: Run Query from Current File",
         "category": "bARGE"
       },
       {
         "command": "barge.runQueryFromSelection",
-        "title": "Run Selected Query",
+        "title": "bARGE: Run Selected Query",
+        "category": "bARGE"
+      },
+      {
+        "command": "barge.setScope",
+        "title": "bARGE: Set Query Scope",
+        "category": "bARGE"
+      },
+      {
+        "command": "barge.exportResults",
+        "title": "bARGE: Export Results to CSV",
         "category": "bARGE"
       }
     ],
+
     "menus": {
       "commandPalette": [
         {
-          "command": "barge.openExplorer",
-          "title": "bARGE: Open Azure Resource Graph Explorer"
+          "command": "barge.openResults",
+          "title": "bARGE: Open Results Panel"
         },
         {
           "command": "barge.runQueryFromFile",
@@ -49,6 +55,10 @@
           "command": "barge.runQueryFromSelection",
           "title": "bARGE: Run Selected Query",
           "when": "editorHasSelection && (editorLangId == kql || resourceExtname == .kql)"
+        },
+        {
+          "command": "barge.setScope",
+          "title": "bARGE: Set Query Scope"
         }
       ],
       "editor/context": [

@@ -1,8 +1,8 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { BargePanel } from './bargePanel';
 import { AzureService } from './azureService';
+import { BargePanel } from './bargePanel';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -14,20 +14,9 @@ export function activate(context: vscode.ExtensionContext) {
 	// Initialize Azure service
 	const azureService = new AzureService();
 
-	// Register command to open the bARGE explorer
-	const openExplorerCommand = vscode.commands.registerCommand('barge.openExplorer', () => {
+	// Register command to open results panel
+	const openResultsCommand = vscode.commands.registerCommand('barge.openResults', () => {
 		BargePanel.createOrShow(context.extensionUri, azureService);
-	});
-
-	// Register command to run a query (this can be used later for keyboard shortcuts or other triggers)
-	const runQueryCommand = vscode.commands.registerCommand('barge.runQuery', async () => {
-		// If panel is open, focus it and potentially run the current query
-		if (BargePanel.currentPanel) {
-			BargePanel.currentPanel.reveal();
-		} else {
-			// Open panel if not already open
-			BargePanel.createOrShow(context.extensionUri, azureService);
-		}
 	});
 
 	// Register command to run query from current file
@@ -68,25 +57,49 @@ export function activate(context: vscode.ExtensionContext) {
 		await runQueryInPanel(query, 'selection', activeEditor.document.fileName);
 	});
 
+	// Register scope setting command
+	const setScopeCommand = vscode.commands.registerCommand('barge.setScope', async () => {
+		if (!azureService.isAuthenticated()) {
+			const authResult = await azureService.authenticate();
+			if (!authResult) {
+				vscode.window.showErrorMessage('Authentication failed. Cannot set scope.');
+				return;
+			}
+		}
+		await azureService.setScope();
+	});
+
 	// Helper function to run query in panel
 	async function runQueryInPanel(query: string, source: 'file' | 'selection', fileName?: string) {
-		// Open panel if not already open
-		if (!BargePanel.currentPanel) {
-			BargePanel.createOrShow(context.extensionUri, azureService);
-		}
+		try {
+			// Ensure authentication
+			if (!azureService.isAuthenticated()) {
+				const authResult = await azureService.authenticate();
+				if (!authResult) {
+					vscode.window.showErrorMessage('Authentication failed');
+					return;
+				}
+			}
 
-		// Send query to panel
-		if (BargePanel.currentPanel) {
-			BargePanel.currentPanel.runFileQuery(query, source, fileName);
+			// Create or show the panel
+			BargePanel.createOrShow(context.extensionUri, azureService);
+			
+			// Run the query
+			if (BargePanel.currentPanel) {
+				await BargePanel.currentPanel.runQuery(query, source, fileName);
+			}
+			
+		} catch (error) {
+			vscode.window.showErrorMessage(`Query execution failed: ${error}`);
 		}
 	}
 
 	// Add commands to subscriptions for proper cleanup
 	context.subscriptions.push(
-		openExplorerCommand, 
-		runQueryCommand, 
+		openResultsCommand,
 		runQueryFromFileCommand, 
-		runQueryFromSelectionCommand
+		runQueryFromSelectionCommand,
+		setScopeCommand
 	);
 
 	// Auto-authenticate if configured

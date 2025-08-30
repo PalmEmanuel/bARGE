@@ -2,12 +2,13 @@ import { DefaultAzureCredential, InteractiveBrowserCredential } from '@azure/ide
 import { ResourceGraphClient } from '@azure/arm-resourcegraph';
 import { SubscriptionClient } from '@azure/arm-subscriptions';
 import * as vscode from 'vscode';
-import { AzureSubscription, QueryResult, ColumnDefinition } from './types';
+import { AzureSubscription, QueryResult, ColumnDefinition, AuthScope } from './types';
 
 export class AzureService {
     private credential: DefaultAzureCredential | InteractiveBrowserCredential | null = null;
     private resourceGraphClient: ResourceGraphClient | null = null;
     private subscriptionClient: SubscriptionClient | null = null;
+    private currentScope: AuthScope = { type: 'tenant' }; // Default to tenant scope
 
     constructor() {}
 
@@ -79,19 +80,34 @@ export class AzureService {
         }
     }
 
-    async runQuery(query: string, subscriptionIds: string[]): Promise<QueryResult> {
-        console.log('runQuery called with:', { query, subscriptionIds });
+    async runQuery(query: string, subscriptionIds?: string[]): Promise<QueryResult> {
+        console.log('runQuery called with:', { query, subscriptionIds, currentScope: this.currentScope });
         this.validateAuthentication();
+
+        const startTime = Date.now();
+
+        // Use current scope settings
+        const effectiveSubscriptions = this.currentScope.type === 'tenant' ? undefined : (subscriptionIds || this.currentScope.subscriptions);
 
         try {
             // Try the REST API approach first to avoid AbortSignal issues
-            return await this.runQueryViaRestApi(query, subscriptionIds);
+            const result = await this.runQueryViaRestApi(query, effectiveSubscriptions);
+            const executionTime = Date.now() - startTime;
+            return {
+                ...result,
+                executionTimeMs: executionTime
+            };
         } catch (restError) {
             console.log('REST API failed, trying SDK approach:', restError);
             
             // Fallback to SDK approach
             try {
-                return await this.runQueryViaSdk(query, subscriptionIds);
+                const result = await this.runQueryViaSdk(query, effectiveSubscriptions);
+                const executionTime = Date.now() - startTime;
+                return {
+                    ...result,
+                    executionTimeMs: executionTime
+                };
             } catch (sdkError) {
                 console.error('Both REST API and SDK failed');
                 console.error('REST Error:', restError);
@@ -101,17 +117,21 @@ export class AzureService {
         }
     }
 
-    private async runQueryViaRestApi(query: string, subscriptionIds: string[]): Promise<QueryResult> {
+    private async runQueryViaRestApi(query: string, subscriptionIds?: string[]): Promise<QueryResult> {
         console.log('Trying REST API approach...');
         
         // Get access token from credential
         const tokenResponse = await this.credential!.getToken('https://management.azure.com/.default');
         const accessToken = tokenResponse.token;
         
-        const requestBody = {
-            query: query,
-            subscriptions: subscriptionIds
+        const requestBody: any = {
+            query: query
         };
+
+        // Only add subscriptions if we're in subscription scope
+        if (subscriptionIds && subscriptionIds.length > 0) {
+            requestBody.subscriptions = subscriptionIds;
+        }
 
         console.log('Making REST API call with:', requestBody);
 
@@ -170,14 +190,18 @@ export class AzureService {
         };
     }
 
-    private async runQueryViaSdk(query: string, subscriptionIds: string[]): Promise<QueryResult> {
+    private async runQueryViaSdk(query: string, subscriptionIds?: string[]): Promise<QueryResult> {
         console.log('Trying SDK approach...');
         
         // Use the simplest possible API call format
-        const queryRequest = {
-            query: query,
-            subscriptions: subscriptionIds
+        const queryRequest: any = {
+            query: query
         };
+
+        // Only add subscriptions if we're in subscription scope
+        if (subscriptionIds && subscriptionIds.length > 0) {
+            queryRequest.subscriptions = subscriptionIds;
+        }
 
         console.log('About to call resourceGraphClient.resources with:', queryRequest);
 
@@ -248,6 +272,54 @@ export class AzureService {
         });
 
         return { columns, rows };
+    }
+
+    public async setScope(): Promise<void> {
+        try {
+            const subscriptions = await this.getSubscriptions();
+            
+            // Create quick pick items
+            const items: vscode.QuickPickItem[] = [
+                {
+                    label: 'Tenant Scope',
+                    description: 'Query across all subscriptions in the tenant',
+                    detail: 'Recommended for most queries'
+                },
+                ...subscriptions.map(sub => ({
+                    label: sub.displayName,
+                    description: sub.subscriptionId,
+                    detail: `Subscription scope`
+                }))
+            ];
+
+            const selected = await vscode.window.showQuickPick(items, {
+                placeHolder: 'Select query scope',
+                title: 'bARGE: Set Query Scope'
+            });
+
+            if (selected) {
+                if (selected.label === 'Tenant Scope') {
+                    this.currentScope = { type: 'tenant' };
+                    vscode.window.showInformationMessage('Scope set to: Tenant (all subscriptions)');
+                } else {
+                    const subscription = subscriptions.find(sub => sub.displayName === selected.label);
+                    if (subscription) {
+                        this.currentScope = { 
+                            type: 'subscription',
+                            subscriptions: [subscription.subscriptionId]
+                        };
+                        vscode.window.showInformationMessage(`Scope set to: ${selected.label}`);
+                    }
+                }
+                console.log('Scope changed to:', this.currentScope);
+            }
+        } catch (error) {
+            vscode.window.showErrorMessage(`Failed to set scope: ${error}`);
+        }
+    }
+
+    public getCurrentScope(): AuthScope {
+        return this.currentScope;
     }
 
     isAuthenticated(): boolean {

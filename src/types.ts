@@ -8,6 +8,7 @@ export interface QueryResult {
     totalRecords: number;
     query: string;
     timestamp: string;
+    executionTimeMs?: number;
 }
 
 export interface ColumnDefinition {
@@ -23,13 +24,19 @@ export interface AzureSubscription {
 
 export interface QueryRequest {
     query: string;
-    subscriptions: string[];
+    subscriptions?: string[];
+    managementGroups?: string[];
 }
 
 export interface QueryResponse {
     success: boolean;
     data?: QueryResult;
     error?: string;
+}
+
+export interface AuthScope {
+    type: 'tenant' | 'subscription';
+    subscriptions?: string[];
 }
 
 export interface WebviewMessage {
