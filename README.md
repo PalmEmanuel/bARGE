@@ -6,13 +6,12 @@ bARGE is a VS Code extension that brings Azure Resource Graph querying capabilit
 
 ## Features
 
-- **Interactive Query Interface**: Write and execute KQL (Kusto Query Language) queries against Azure Resource Graph
-- **Table View**: View results in a sortable, interactive table format
-- **Side-by-side Layout**: Query editor and results table in the same panel for efficient workflow
-- **Client-side Sorting**: Sort results by any column without re-running queries
-- **CSV Export**: Export query results to CSV files for further analysis
-- **Azure Authentication**: Seamless integration with Azure authentication (Azure CLI, browser-based, etc.)
-- **Multi-subscription Support**: Query across different Azure subscriptions
+- **Flexible Data Grid**: Excel-like table with column resizing, reordering, and sticky headers
+- **Exploring Results**: Click, drag, and keyboard navigation with multi-cell selection support
+- **Copying Options**: Right-click to copy cells, selections, or formatted JSON
+- **Querying**: Run queries directly from `.kql` files in your workspace, or from selected text
+- **Scope Management**: Query across your tenant or specific subscriptions
+- **Authentication**: Seamless integration with VS Code's Azure authentication
 
 ## Getting Started
 
@@ -31,26 +30,23 @@ bARGE is a VS Code extension that brings Azure Resource Graph querying capabilit
 
 ### Usage
 
-1. **Open bARGE Explorer**
-   - Open Command Palette (`Cmd+Shift+P` / `Ctrl+Shift+P`)
-   - Run `bARGE: Open Azure Resource Graph Explorer`
+1. **Authenticate with Azure**
+   - Run `az login` in your terminal, or
+   - Use VS Code's built-in Azure authentication
 
-2. **Authenticate with Azure**
-   - Click "Authenticate with Azure" in the panel
-   - The extension will try Azure CLI credentials first, then browser authentication if needed
+2. **Run queries:**
+   - **From a .kql file**: Open the file and right click to run `bARGE: Run Query from Current File`
+   - **From selected text**: Select KQL text and right click to run `bARGE: Run Selected Query text`  
+   - **Open the panel**: Run `bARGE: Open bARGE Results Panel` to view previous results
 
-3. **Select Subscription**
-   - Choose your Azure subscription from the dropdown
-   - Use "Refresh" to reload available subscriptions
+3. **Set your scope** (optional):
+   - Run `bARGE: Set Query Scope` to choose subscription or tenant querying scope
 
-4. **Write and Execute Queries**
-   - Enter your KQL query in the text area
-   - Click "Run Query" to execute
-   - Results appear in the table below
-
-5. **Interact with Results**
-   - Click column headers to sort data
-   - Click "Export to CSV" to save results
+4. **Interact with results:**
+   - Resize and reorder columns by dragging
+   - Select cells and copy data to Excel or other tools
+   - Click JSON objects to view formatted content
+   - Export results to CSV using the export button in the results panel
 
 ## Example Queries
 
@@ -101,8 +97,10 @@ The extension supports the following configuration options in VS Code settings:
 
 ## Commands
 
-- `barge.openExplorer`: Open Azure Resource Graph Explorer
-- `barge.runQuery`: Focus the bARGE panel (or open if not already open)
+- `barge.openResults`: Open bARGE Results Panel
+- `barge.runQueryFromFile`: Run Query from Current File (works with .kql files)
+- `barge.runQueryFromSelection`: Run Selected Query text
+- `barge.setScope`: Set Query Scope (subscription, management group, or tenant)
 
 ## Development
 
@@ -157,74 +155,4 @@ If you encounter authentication problems:
 
 - [Azure Resource Graph Documentation](https://docs.microsoft.com/en-us/azure/governance/resource-graph/)
 - [KQL (Kusto Query Language) Reference](https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/)
-- [Azure Resource Graph Sample Queries](https://docs.microsoft.com/en-us/azure/governance/resource-graph/samples/starter)ode README
-
-This is the README for your extension "barge-vscode". After writing up a brief description, we recommend including the following sections.
-
-## Features
-
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
-
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
-
-## Requirements
-
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
-
-## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-- `myExtension.enable`: Enable/disable this extension.
-- `myExtension.thing`: Set to `blah` to do something.
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-- [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-- Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-- Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-- Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-- [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-- [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+- [Azure Resource Graph Sample Queries](https://docs.microsoft.com/en-us/azure/governance/resource-graph/samples/starter)
