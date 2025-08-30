@@ -3,6 +3,29 @@
   "displayName": "bARGE",
   "description": "bARGE is a basic Azure Resource Graph Explorer for VS Code.",
   "version": "0.0.1",
+  "publisher": "PalmEmanuel",
+  "icon": "media/bARGE-small.png",
+  "author": {
+    "name": "Emanuel Palm",
+    "url": "https://github.com/PalmEmanuel"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PalmEmanuel/bARGE.git"
+  },
+  "bugs": {
+    "url": "https://github.com/PalmEmanuel/bARGE/issues"
+  },
+  "homepage": "https://github.com/PalmEmanuel/bARGE#readme",
+  "keywords": [
+    "azure",
+    "resource graph",
+    "kql",
+    "kusto",
+    "query",
+    "explorer"
+  ],
   "engines": {
     "vscode": "^1.103.0"
   },

@@ -1,5 +1,7 @@
 # bARGE - basic Azure Resource Graph Explorer
 
+<img src="./media/bARGE.png" width="256">
+
 bARGE is a VS Code extension that brings Azure Resource Graph querying capabilities directly into your development environment, similar to the Azure Portal's Resource Graph Explorer.
 
 ## Features
