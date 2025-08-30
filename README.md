@@ -115,13 +115,6 @@ npm run watch
 
 Then press `F5` in VS Code to launch the Extension Development Host.
 
-### Project Structure
-
-- `src/extension.ts` - Main extension entry point
-- `src/bargePanel.ts` - Webview panel implementation
-- `src/azureService.ts` - Azure Resource Graph API integration
-- `src/types.ts` - TypeScript type definitions
-
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
