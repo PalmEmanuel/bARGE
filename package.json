@@ -32,11 +32,6 @@
         "command": "barge.setScope",
         "title": "bARGE: Set Query Scope",
         "category": "bARGE"
-      },
-      {
-        "command": "barge.exportResults",
-        "title": "bARGE: Export Results to CSV",
-        "category": "bARGE"
       }
     ],
 

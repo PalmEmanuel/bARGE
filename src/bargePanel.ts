@@ -12,19 +12,17 @@ export class BargePanel {
     private _disposables: vscode.Disposable[] = [];
 
     public static createOrShow(extensionUri: vscode.Uri, azureService: AzureService) {
-        const column = vscode.window.activeTextEditor
-            ? vscode.ViewColumn.Beside
-            : vscode.ViewColumn.One;
-
         if (BargePanel.currentPanel) {
-            BargePanel.currentPanel._panel.reveal(column);
+            // Don't force repositioning - just reveal where it currently is
+            BargePanel.currentPanel._panel.reveal();
             return;
         }
 
+        // Create panel in bottom area by default
         const panel = vscode.window.createWebviewPanel(
             BargePanel.viewType,
             'bARGE - basic Azure Resource Graph Explorer',
-            column,
+            { viewColumn: vscode.ViewColumn.Active, preserveFocus: false },
             {
                 enableScripts: true,
                 localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'media')],
@@ -33,6 +31,9 @@ export class BargePanel {
         );
 
         BargePanel.currentPanel = new BargePanel(panel, extensionUri, azureService);
+        
+        // Move to bottom panel after creation
+        vscode.commands.executeCommand('workbench.action.moveEditorToBelowGroup');
     }
 
     private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, azureService: AzureService) {
@@ -234,7 +235,6 @@ export class BargePanel {
             min-width: 60px;
             resize: horizontal;
             overflow: hidden;
-            position: relative;
         }
         .results-table th:hover {
             background-color: var(--vscode-list-hoverBackground);
@@ -311,6 +311,14 @@ export class BargePanel {
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.15s ease-in-out;
+        }
+        
+        .custom-tooltip.interactive {
+            pointer-events: auto;
+            user-select: text;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
         }
         
         .custom-tooltip.show {
@@ -533,7 +541,7 @@ export class BargePanel {
                 row.forEach((cell, cellIndex) => {
                     const { displayValue, tooltipValue } = formatCellValue(cell);
                     // Store tooltip data as data attribute - tooltipValue is already safe
-                    tableHtml += \`<td data-tooltip="\${tooltipValue.replace(/"/g, '&quot;')}" onclick="selectCell(this, \${rowIndex}, \${cellIndex})" onmouseenter="showCustomTooltip(event, this)" onmouseleave="hideCustomTooltip()" data-row="\${rowIndex}" data-col="\${cellIndex}">\${displayValue}</td>\`;
+                    tableHtml += \`<td data-tooltip="\${tooltipValue.replace(/"/g, '&quot;')}" onclick="selectCell(this, \${rowIndex}, \${cellIndex})" onmouseenter="showCustomTooltip(event, this)" onmouseleave="hideCustomTooltipDelayed()" data-row="\${rowIndex}" data-col="\${cellIndex}">\${displayValue}</td>\`;
                 });
                 tableHtml += '</tr>';
             });
@@ -603,30 +611,61 @@ export class BargePanel {
         // Custom tooltip functionality
         let customTooltip = null;
         let tooltipTimeout = null;
+        let hideTooltipTimeout = null;
 
         function createTooltip() {
             if (!customTooltip) {
                 customTooltip = document.createElement('div');
                 customTooltip.className = 'custom-tooltip';
+                
+                // Add mouse events to tooltip for interactivity
+                customTooltip.addEventListener('mouseenter', function() {
+                    // Cancel any pending hide when mouse enters tooltip
+                    if (hideTooltipTimeout) {
+                        clearTimeout(hideTooltipTimeout);
+                        hideTooltipTimeout = null;
+                    }
+                });
+                
+                customTooltip.addEventListener('mouseleave', function() {
+                    // Hide tooltip when mouse leaves tooltip
+                    hideCustomTooltipDelayed();
+                });
+                
+                // Prevent our table context menu from showing when right-clicking inside tooltip
+                customTooltip.addEventListener('contextmenu', function(e) {
+                    e.stopPropagation();
+                    // Let the browser handle text selection context menu normally
+                });
+                
                 document.body.appendChild(customTooltip);
             }
             return customTooltip;
         }
 
         function showCustomTooltip(event, element) {
+            // Don't show tooltip if context menu is visible
+            if (contextMenuVisible) {
+                return;
+            }
+            
             const tooltip = createTooltip();
             const tooltipText = element.getAttribute('data-tooltip');
             
-            if (!tooltipText || tooltipText === element.textContent.trim()) {
-                // Don't show tooltip if content is the same as display or empty
+            if (!tooltipText || tooltipText.trim() === '') {
+                // Don't show tooltip if content is empty
                 hideCustomTooltip();
                 return;
             }
             
-            // Clear any existing timeout
+            // Clear any existing timeouts
             if (tooltipTimeout) {
                 clearTimeout(tooltipTimeout);
                 tooltipTimeout = null;
+            }
+            if (hideTooltipTimeout) {
+                clearTimeout(hideTooltipTimeout);
+                hideTooltipTimeout = null;
             }
             
             tooltip.textContent = tooltipText;
@@ -643,12 +682,24 @@ export class BargePanel {
             
             // Show tooltip immediately
             tooltip.classList.add('show');
+            
+            // Check if tooltip has scrollable content (vertical or horizontal) and make it interactive
+            setTimeout(() => {
+                const hasVerticalScroll = tooltip.scrollHeight > tooltip.clientHeight;
+                const hasHorizontalScroll = tooltip.scrollWidth > tooltip.clientWidth;
+                
+                if (hasVerticalScroll || hasHorizontalScroll) {
+                    tooltip.classList.add('interactive');
+                } else {
+                    tooltip.classList.remove('interactive');
+                }
+            }, 0);
         }
 
         function positionTooltip(event, tooltip) {
             const mouseX = event.clientX;
             const mouseY = event.clientY;
-            const offset = 10;
+            const offset = 5; // Reduced offset for closer positioning
             
             // Get viewport dimensions
             const viewportWidth = window.innerWidth;
@@ -663,23 +714,27 @@ export class BargePanel {
             const tooltipWidth = tooltipRect.width;
             const tooltipHeight = tooltipRect.height;
             
-            // Calculate optimal position
+            // Start with position above and to the right of cursor
             let left = mouseX + offset;
-            let top = mouseY + offset;
+            let top = mouseY - tooltipHeight - offset;
+            
+            // If tooltip would go off-screen at the top, position below cursor
+            if (top < offset) {
+                top = mouseY + offset;
+            }
             
             // Adjust if tooltip would go off-screen to the right
             if (left + tooltipWidth > viewportWidth) {
                 left = mouseX - tooltipWidth - offset;
             }
             
-            // Adjust if tooltip would go off-screen to the bottom
-            if (top + tooltipHeight > viewportHeight) {
-                top = mouseY - tooltipHeight - offset;
-            }
-            
-            // Ensure tooltip doesn't go off-screen to the left or top
+            // Ensure tooltip doesn't go off-screen to the left
             left = Math.max(offset, left);
-            top = Math.max(offset, top);
+            
+            // Final check for bottom edge
+            if (top + tooltipHeight > viewportHeight) {
+                top = viewportHeight - tooltipHeight - offset;
+            }
             
             tooltip.style.left = left + 'px';
             tooltip.style.top = top + 'px';
@@ -688,6 +743,7 @@ export class BargePanel {
         function hideCustomTooltip() {
             if (customTooltip) {
                 customTooltip.classList.remove('show');
+                customTooltip.classList.remove('interactive');
                 
                 // Remove tooltip after transition
                 tooltipTimeout = setTimeout(() => {
@@ -697,25 +753,60 @@ export class BargePanel {
                 }, 150); // Match transition duration
             }
         }
+        
+        function hideCustomTooltipDelayed() {
+            // Add a small delay to allow mouse to move from cell to tooltip
+            hideTooltipTimeout = setTimeout(() => {
+                hideCustomTooltip();
+            }, 100);
+        }
 
-        // Update mouse position for tooltip repositioning
+        // Update mouse position for tooltip repositioning (but not for interactive tooltips)
         document.addEventListener('mousemove', function(event) {
-            if (customTooltip && customTooltip.classList.contains('show')) {
+            if (customTooltip && customTooltip.classList.contains('show') && !customTooltip.classList.contains('interactive')) {
                 positionTooltip(event, customTooltip);
             }
         });
 
         // Custom context menu functionality
         let customContextMenu = null;
+        let rightClickedCell = null; // Track the cell that was right-clicked
+        let contextMenuVisible = false; // Track if context menu is showing
 
         function handleTableContextMenu(event) {
             event.preventDefault();
             
-            // Hide any existing context menu
-            hideContextMenu();
+            // Find the cell that was right-clicked
+            const target = event.target.closest('td');
+            
+            if (!target) return;
+            
+            // Get row and column from data attributes
+            const rowAttr = target.getAttribute('data-row');
+            const colAttr = target.getAttribute('data-col');
+            
+            if (rowAttr === null || colAttr === null) return;
+            
+            const row = parseInt(rowAttr);
+            const col = parseInt(colAttr);
+            
+            if (isNaN(row) || isNaN(col)) return;
+            
+            // Store the right-clicked cell info
+            rightClickedCell = {
+                element: target,
+                row: row,
+                col: col
+            };
             
             // Hide tooltip when showing context menu
             hideCustomTooltip();
+            
+            // Hide any existing context menu (but do this BEFORE creating new one to preserve rightClickedCell)
+            if (customContextMenu) {
+                document.body.removeChild(customContextMenu);
+                customContextMenu = null;
+            }
             
             // Create context menu
             const contextMenu = createContextMenu();
@@ -723,10 +814,20 @@ export class BargePanel {
             // Position and show context menu
             positionContextMenu(event, contextMenu);
             
+            // Set flag that context menu is visible
+            contextMenuVisible = true;
+            
             // Add click outside listener to close menu
             setTimeout(() => {
                 document.addEventListener('click', hideContextMenu, { once: true });
+                document.addEventListener('keydown', handleContextMenuKeydown, { once: true });
             }, 0);
+        }
+        
+        function handleContextMenuKeydown(event) {
+            if (event.key === 'Escape') {
+                hideContextMenu();
+            }
         }
 
         function createContextMenu() {
@@ -737,32 +838,114 @@ export class BargePanel {
             customContextMenu = document.createElement('div');
             customContextMenu.className = 'custom-context-menu';
             
-            const hasSelection = selectedCells.size > 0;
+            // Prevent clicks on the menu itself from closing it
+            customContextMenu.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
             
-            // Copy option
+            // Check if we have a valid right-clicked cell
+            let hasValidRightClick = false;
+            let hasJsonCell = false;
+            let rightClickedCellKey = null;
+            let cellIsNull = false;
+            
+            if (rightClickedCell && currentResults && currentResults.data) {
+                const { row, col } = rightClickedCell;
+                
+                if (currentResults.data[row] && currentResults.data[row][col] !== undefined) {
+                    const cellValue = currentResults.data[row][col];
+                    cellIsNull = cellValue === null || cellValue === undefined;
+                    hasValidRightClick = !cellIsNull; // Only valid if not null
+                    rightClickedCellKey = \`\${row}-\${col}\`;
+                    if (typeof cellValue === 'object' && cellValue !== null) {
+                        hasJsonCell = true;
+                    }
+                }
+            }
+            
+            // Check if right-clicked cell is part of current selection
+            const hasSelection = selectedCells.size > 0;
+            const rightClickedSelectedCell = hasSelection && rightClickedCellKey && selectedCells.has(rightClickedCellKey);
+            
+            // Check if any selected cells contain JSON (for formatted copy option)
+            let hasSelectedJsonCells = false;
+            if (hasSelection) {
+                selectedCells.forEach(cellKey => {
+                    const [row, col] = cellKey.split('-').map(Number);
+                    if (currentResults && currentResults.data && currentResults.data[row] && currentResults.data[row][col] !== undefined) {
+                        const cellValue = currentResults.data[row][col];
+                        if (typeof cellValue === 'object' && cellValue !== null) {
+                            hasSelectedJsonCells = true;
+                        }
+                    }
+                });
+            }
+            
+            // Copy single cell option (disabled if cell is null)
             const copyItem = document.createElement('div');
-            copyItem.className = \`context-menu-item \${hasSelection ? '' : 'disabled'}\`;
-            copyItem.innerHTML = '<span>Copy</span>';
+            copyItem.className = \`context-menu-item \${hasValidRightClick ? '' : 'disabled'}\`;
+            copyItem.innerHTML = cellIsNull ? '<span>Copy</span>' : '<span>Copy</span>';
             copyItem.addEventListener('click', () => {
-                if (hasSelection) {
+                if (hasValidRightClick) {
+                    copyRightClickedCell();
+                    hideContextMenu();
+                }
+            });
+            
+            // Copy selection option (only if right-clicked on a selected cell and there are multiple selected)
+            let copySelectionItem = null;
+            if (rightClickedSelectedCell && hasSelection && selectedCells.size > 1) {
+                copySelectionItem = document.createElement('div');
+                copySelectionItem.className = 'context-menu-item';
+                copySelectionItem.innerHTML = \`<span>Copy Selection (\${selectedCells.size} cells)</span>\`;
+                copySelectionItem.addEventListener('click', () => {
                     copySelectedCells();
                     hideContextMenu();
-                }
-            });
+                });
+            }
             
-            // Copy with headers option
-            const copyWithHeadersItem = document.createElement('div');
-            copyWithHeadersItem.className = \`context-menu-item \${hasSelection ? '' : 'disabled'}\`;
-            copyWithHeadersItem.innerHTML = '<span>Copy with Headers</span>';
-            copyWithHeadersItem.addEventListener('click', () => {
-                if (hasSelection) {
+            // Copy with headers option (only if right-clicked on a selected cell with multiple selections)
+            let copyWithHeadersItem = null;
+            if (rightClickedSelectedCell && hasSelection && selectedCells.size > 1) {
+                copyWithHeadersItem = document.createElement('div');
+                copyWithHeadersItem.className = 'context-menu-item';
+                copyWithHeadersItem.innerHTML = '<span>Copy Selection with Headers</span>';
+                copyWithHeadersItem.addEventListener('click', () => {
                     copySelectedCellsWithHeaders();
                     hideContextMenu();
-                }
-            });
+                });
+            }
             
+            // Copy formatted option for single cell (only show if right-clicked cell contains JSON AND not in multi-selection context)
+            let copyFormattedItem = null;
+            if (hasJsonCell && !(rightClickedSelectedCell && selectedCells.size > 1)) {
+                copyFormattedItem = document.createElement('div');
+                copyFormattedItem.className = 'context-menu-item';
+                copyFormattedItem.innerHTML = '<span>Copy Formatted</span>';
+                copyFormattedItem.addEventListener('click', () => {
+                    copyRightClickedCellFormatted();
+                    hideContextMenu();
+                });
+            }
+            
+            // Copy selection formatted option - REMOVED per user request
+            // Don't show formatted option for multi-cell selections
+            let copySelectionFormattedItem = null;
+            
+            // Add all menu items
             customContextMenu.appendChild(copyItem);
-            customContextMenu.appendChild(copyWithHeadersItem);
+            if (copySelectionItem) {
+                customContextMenu.appendChild(copySelectionItem);
+            }
+            if (copyWithHeadersItem) {
+                customContextMenu.appendChild(copyWithHeadersItem);
+            }
+            if (copyFormattedItem) {
+                customContextMenu.appendChild(copyFormattedItem);
+            }
+            if (copySelectionFormattedItem) {
+                customContextMenu.appendChild(copySelectionFormattedItem);
+            }
             
             document.body.appendChild(customContextMenu);
             return customContextMenu;
@@ -813,6 +996,12 @@ export class BargePanel {
                 document.body.removeChild(customContextMenu);
                 customContextMenu = null;
             }
+            // Reset the right-clicked cell when menu is actually hidden
+            rightClickedCell = null;
+            // Reset context menu visibility flag
+            contextMenuVisible = false;
+            // Remove any lingering event listeners
+            document.removeEventListener('keydown', handleContextMenuKeydown);
         }
 
         function copySelectedCellsWithHeaders() {
@@ -877,6 +1066,116 @@ export class BargePanel {
             }).catch(err => {
                 console.error('Failed to copy to clipboard:', err);
                 fallbackCopyTextToClipboard(copyText);
+            });
+        }
+
+        function copySelectedCellsFormatted() {
+            if (selectedCells.size === 0) return;
+            
+            // Get all selected cells with their positions
+            const cellData = [];
+            selectedCells.forEach(cellKey => {
+                const [row, col] = cellKey.split('-').map(Number);
+                if (currentResults && currentResults.data[row] && currentResults.data[row][col] !== undefined) {
+                    cellData.push({
+                        row,
+                        col,
+                        value: currentResults.data[row][col] || ''
+                    });
+                }
+            });
+            
+            if (cellData.length === 0) return;
+            
+            // Sort by row then by column
+            cellData.sort((a, b) => a.row - b.row || a.col - b.col);
+            
+            // Format cells for copying - use formatted JSON for objects, regular text for others
+            const formattedCells = cellData.map(cell => {
+                let copyValue = cell.value;
+                if (typeof copyValue === 'object' && copyValue !== null) {
+                    // Use formatted JSON (like in tooltip) for objects
+                    try {
+                        copyValue = JSON.stringify(copyValue, null, 2);
+                    } catch (error) {
+                        copyValue = String(copyValue);
+                    }
+                } else {
+                    copyValue = String(copyValue || '');
+                }
+                return copyValue;
+            });
+            
+            // Join with newlines for multi-cell selection, or just return single cell
+            const copyText = formattedCells.join('\\n\\n');
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(copyText).then(() => {
+                showCopyFeedback('formatted');
+            }).catch(err => {
+                console.error('Failed to copy to clipboard:', err);
+                fallbackCopyTextToClipboard(copyText);
+            });
+        }
+
+        function copyRightClickedCell() {
+            if (!rightClickedCell || !currentResults || !currentResults.data ||
+                isNaN(rightClickedCell.row) || isNaN(rightClickedCell.col) ||
+                rightClickedCell.row < 0 || rightClickedCell.col < 0 ||
+                rightClickedCell.row >= currentResults.data.length ||
+                rightClickedCell.col >= (currentResults.data[rightClickedCell.row] || []).length) {
+                return;
+            }
+            
+            const cellValue = currentResults.data[rightClickedCell.row][rightClickedCell.col];
+            let copyValue = cellValue;
+            
+            // Format the cell value for copying
+            if (typeof copyValue === 'object' && copyValue !== null) {
+                copyValue = JSON.stringify(copyValue);
+            } else {
+                copyValue = String(copyValue || '');
+            }
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(copyValue).then(() => {
+                showCopyFeedback('');
+            }).catch(err => {
+                console.error('Failed to copy to clipboard:', err);
+                fallbackCopyTextToClipboard(copyValue);
+            });
+        }
+
+        function copyRightClickedCellFormatted() {
+            if (!rightClickedCell || !currentResults || !currentResults.data ||
+                isNaN(rightClickedCell.row) || isNaN(rightClickedCell.col) ||
+                rightClickedCell.row < 0 || rightClickedCell.col < 0 ||
+                rightClickedCell.row >= currentResults.data.length ||
+                rightClickedCell.col >= (currentResults.data[rightClickedCell.row] || []).length) {
+                return;
+            }
+            
+            const cellValue = currentResults.data[rightClickedCell.row][rightClickedCell.col];
+            let copyValue = cellValue;
+            
+            // Format the cell value for copying
+            if (typeof copyValue === 'object' && copyValue !== null) {
+                // Use formatted JSON (like in tooltip) for objects
+                try {
+                    copyValue = JSON.stringify(copyValue, null, 2);
+                } catch (error) {
+                    copyValue = String(copyValue);
+                }
+            } else {
+                copyValue = String(copyValue || '');
+            }
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(copyValue).then(() => {
+                showCopyFeedback('formatted');
+            }).catch(err => {
+                console.error('Failed to copy to clipboard:', err);
+                fallbackCopyTextToClipboard(copyValue);
             });
         }
 
