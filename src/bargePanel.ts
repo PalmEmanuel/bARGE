@@ -2083,12 +2083,33 @@ export class BargePanel {
         // Details panel functionality
         let currentDetailRowIndex = -1;
         
+        function selectEntireRow(rowIndex) {
+            if (!currentResults || !currentResults.columns || rowIndex < 0) {
+                return;
+            }
+            
+            clearSelection();
+            
+            // Select all cells in the row (excluding the details button column which is at index -1)
+            for (let colIndex = 0; colIndex < currentResults.columns.length; colIndex++) {
+                const cellElement = document.querySelector('td[data-row="' + rowIndex + '"][data-col="' + colIndex + '"]');
+                if (cellElement) {
+                    const cellKey = rowIndex + '-' + colIndex;
+                    selectedCells.add(cellKey);
+                    cellElement.classList.add('selected');
+                }
+            }
+        }
+        
         function showRowDetails(rowIndex) {
             if (!currentResults || !currentResults.data || rowIndex < 0 || rowIndex >= currentResults.data.length) {
                 return;
             }
             
             currentDetailRowIndex = rowIndex;
+            
+            // Select the entire row when showing details
+            selectEntireRow(rowIndex);
             
             const detailsPanel = document.getElementById('detailsPanel');
             const tableContainer = document.getElementById('tableContainer');
