@@ -366,53 +366,122 @@ export class BargePanel {
             white-space: pre-wrap; /* Preserve formatting but allow wrapping */
         }
         .detail-button {
-            background: var(--vscode-button-background);
-            color: var(--vscode-button-foreground);
+            background: transparent;
+            color: var(--vscode-descriptionForeground);
             border: none;
-            width: 24px;
-            height: 24px;
-            border-radius: 4px;
+            width: 28px;
+            height: 28px;
+            border-radius: 3px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 12px;
-            transition: background-color 0.2s ease;
+            transition: all 0.2s ease;
+            opacity: 0.6;
+            margin: auto;
         }
         .detail-button:hover {
-            background-color: var(--vscode-button-hoverBackground);
+            color: var(--vscode-foreground);
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        .detail-button:active {
+            background-color: var(--vscode-list-activeSelectionBackground);
+            transform: scale(0.95);
+        }
+        .detail-button.active {
+            color: var(--vscode-focusBorder);
+            opacity: 1;
+        }
+        .detail-button svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
         }
         .detail-button-cell {
-            width: 40px !important;
+            width: 36px !important;
+            min-width: 36px !important;
+            max-width: 36px !important;
             text-align: center;
-            padding: 4px !important;
-            border-right: 2px solid var(--vscode-widget-border) !important;
+            padding: 2px !important;
+            vertical-align: middle;
+            position: relative;
+        }
+        th.detail-button-cell {
+            cursor: default !important;
+            user-select: none !important;
+            position: relative !important;
+            pointer-events: auto !important;
+        }
+        th.detail-button-cell::after {
+            display: none !important;
+        }
+        th.detail-button-cell::before {
+            display: none !important;
+        }
+        th.detail-button-cell .resize-handle {
+            display: none !important;
+        }
+        th.detail-button-cell:hover::after {
+            display: none !important;
+        }
+        th.detail-button-cell * {
+            pointer-events: none !important;
+        }
+        th.detail-button-cell {
+            overflow: hidden !important;
+        }
+        .detail-button-cell:hover {
+            background-color: transparent !important;
         }
         .json-viewer {
             font-family: var(--vscode-editor-font-family, 'Consolas', 'Monaco', monospace);
             font-size: 0.9em;
             line-height: 1.4;
             color: var(--vscode-editor-foreground);
+            padding: 4px;
         }
         .json-property {
-            margin: 8px 0;
+            margin: 0;
+            padding: 8px 4px;
+            border-bottom: 1px solid var(--vscode-widget-border);
+            transition: background-color 0.2s ease;
+        }
+        .json-property:last-child {
+            border-bottom: none;
+        }
+        .json-property:hover {
+            background-color: rgba(255, 255, 255, 0.03);
         }
         .json-key {
             color: var(--vscode-symbolIcon-propertyForeground, #9cdcfe);
             font-weight: 600;
-            margin-right: 8px;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            display: block;
+            opacity: 0.8;
         }
         .json-value {
             color: var(--vscode-editor-foreground);
+            font-size: 0.95em;
+            line-height: 1.3;
+            word-wrap: break-word;
+            display: block;
         }
         .json-value.string {
             color: var(--vscode-symbolIcon-stringForeground, #ce9178);
+            font-style: normal;
         }
         .json-value.number {
             color: var(--vscode-symbolIcon-numberForeground, #b5cea8);
+            font-weight: 500;
         }
         .json-value.boolean {
             color: var(--vscode-symbolIcon-booleanForeground, #569cd6);
+            font-weight: 500;
         }
         .json-value.null {
             color: var(--vscode-symbolIcon-nullForeground, #808080);
@@ -420,6 +489,13 @@ export class BargePanel {
         }
         .json-value.object {
             color: var(--vscode-editor-foreground);
+            background-color: var(--vscode-textCodeBlock-background);
+            padding: 8px;
+            border-radius: 4px;
+            font-family: var(--vscode-editor-font-family, 'Consolas', 'Monaco', monospace);
+            font-size: 0.85em;
+            border-left: 3px solid var(--vscode-widget-border);
+            margin-top: 4px;
         }
         .footer {
             display: flex;
@@ -783,7 +859,12 @@ export class BargePanel {
             let tableHtml = '<table class="results-table"><thead><tr>';
             
             // Add details button column header
-            tableHtml += '<th class="detail-button-cell" style="width: 40px;" title="Details">📋</th>';
+            tableHtml += '<th class="detail-button-cell" style="width: 36px; cursor: default; text-align: center; padding: 0;" title="Row Details" draggable="false" ondragstart="return false;">' +
+                '<svg viewBox="0 0 16 16" style="width: 18px; height: 18px; fill: var(--vscode-descriptionForeground); opacity: 0.7; vertical-align: middle; margin: 0;">' +
+                '<circle cx="6.5" cy="6.5" r="4" fill="none" stroke="currentColor" stroke-width="1.5"/>' +
+                '<path d="m9.5 9.5 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
+                '</svg>' +
+                '</th>';
             
             result.columns.forEach((col, index) => {
                 const sortClass = sortState.column === index ? 
@@ -808,9 +889,17 @@ export class BargePanel {
             result.data.forEach((row, rowIndex) => {
                 tableHtml += '<tr>';
                 
-                // Add details button cell
+                // Add details button cell  
+                const circleIcon = (currentDetailRowIndex === rowIndex) ? 
+                    '<circle cx="8" cy="8" r="5" fill="currentColor"/>' :
+                    '<circle cx="8" cy="8" r="5" fill="none" stroke="currentColor" stroke-width="2"/>';
+                
                 tableHtml += '<td class="detail-button-cell">' +
-                    '<button class="detail-button" onclick="showRowDetails(' + rowIndex + ')" title="Show details">📄</button>' +
+                    '<button class="detail-button' + (currentDetailRowIndex === rowIndex ? ' active' : '') + '" onclick="showRowDetails(' + rowIndex + ')" title="View row details">' +
+                    '<svg viewBox="0 0 16 16">' +
+                    circleIcon +
+                    '</svg>' +
+                    '</button>' +
                 '</td>';
                 
                 row.forEach((cell, cellIndex) => {
@@ -829,6 +918,11 @@ export class BargePanel {
             
             tableHtml += '</tbody></table>';
             tableContainer.innerHTML = tableHtml;
+            
+            // Update detail button states after table regeneration
+            setTimeout(() => {
+                updateDetailButtonStates();
+            }, 0);
             
             // Add context menu event listener to the table
             const table = tableContainer.querySelector('.results-table');
@@ -2205,6 +2299,32 @@ export class BargePanel {
         let currentDetailRowIndex = -1;
         let currentDetailRowData = null;
         
+        function updateDetailButtonStates() {
+            const buttons = document.querySelectorAll('.detail-button');
+            buttons.forEach((button, index) => {
+                const isActive = currentDetailRowIndex === index;
+                const svg = button.querySelector('svg');
+                if (svg) {
+                    const circle = svg.querySelector('circle');
+                    if (circle) {
+                        if (isActive) {
+                            circle.setAttribute('fill', 'currentColor');
+                            circle.removeAttribute('stroke');
+                            circle.removeAttribute('stroke-width');
+                            circle.setAttribute('r', '5');
+                            button.classList.add('active');
+                        } else {
+                            circle.setAttribute('fill', 'none');
+                            circle.setAttribute('stroke', 'currentColor');
+                            circle.setAttribute('stroke-width', '2');
+                            circle.setAttribute('r', '5');
+                            button.classList.remove('active');
+                        }
+                    }
+                }
+            });
+        }
+        
         function selectEntireRow(rowIndex) {
             if (!currentResults || !currentResults.columns || rowIndex < 0) {
                 return;
@@ -2230,6 +2350,9 @@ export class BargePanel {
             
             currentDetailRowIndex = rowIndex;
             currentDetailRowData = currentResults.data[rowIndex];
+            
+            // Update button states to show active state
+            updateDetailButtonStates();
             
             // Select the entire row when showing details
             selectEntireRow(rowIndex);
@@ -2299,6 +2422,9 @@ export class BargePanel {
             
             currentDetailRowIndex = -1;
             currentDetailRowData = null;
+            
+            // Update button states to remove active state
+            updateDetailButtonStates();
         }
         
         function updateDetailsAfterSort() {
@@ -2390,25 +2516,26 @@ export class BargePanel {
             Object.keys(obj).forEach(key => {
                 const value = obj[key];
                 html += '<div class="json-property">';
-                html += '<span class="json-key">' + escapeHtml(key) + ':</span>';
+                html += '<div class="json-key">' + escapeHtml(key) + '</div>';
                 
                 if (value === null || value === undefined) {
-                    html += '<span class="json-value null">null</span>';
+                    html += '<div class="json-value null">null</div>';
                 } else if (typeof value === 'string') {
-                    html += '<span class="json-value string">"' + escapeHtml(value) + '"</span>';
+                    // Remove quotes for cleaner display, since we're in boxes now
+                    html += '<div class="json-value string">' + escapeHtml(value) + '</div>';
                 } else if (typeof value === 'number') {
-                    html += '<span class="json-value number">' + value + '</span>';
+                    html += '<div class="json-value number">' + value + '</div>';
                 } else if (typeof value === 'boolean') {
-                    html += '<span class="json-value boolean">' + value + '</span>';
+                    html += '<div class="json-value boolean">' + value + '</div>';
                 } else if (typeof value === 'object') {
                     try {
                         const jsonString = JSON.stringify(value, null, 2);
                         html += '<pre class="json-value object">' + escapeHtml(jsonString) + '</pre>';
                     } catch (error) {
-                        html += '<span class="json-value object">' + escapeHtml(String(value)) + '</span>';
+                        html += '<div class="json-value object">' + escapeHtml(String(value)) + '</div>';
                     }
                 } else {
-                    html += '<span class="json-value">' + escapeHtml(String(value)) + '</span>';
+                    html += '<div class="json-value">' + escapeHtml(String(value)) + '</div>';
                 }
                 
                 html += '</div>';
