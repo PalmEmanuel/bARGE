@@ -1769,8 +1769,18 @@ export class BargePanel {
         // Add keyboard support for cell selection
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
-                clearSelection();
-                hideContextMenu(); // Also hide context menu on Escape
+                // Close details panel if open, otherwise clear selection
+                if (currentDetailRowIndex >= 0) {
+                    closeDetails();
+                } else {
+                    clearSelection();
+                    hideContextMenu(); // Also hide context menu on Escape
+                }
+            } else if (currentDetailRowIndex >= 0 && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
+                // Navigate details panel with arrow keys when it's open
+                event.preventDefault();
+                const direction = event.key === 'ArrowUp' ? -1 : 1;
+                navigateDetails(direction);
             } else if ((event.ctrlKey || event.metaKey) && event.key === 'a') {
                 // Ctrl/Cmd+A to select all cells
                 event.preventDefault();
@@ -2083,10 +2093,16 @@ export class BargePanel {
             const detailsPanel = document.getElementById('detailsPanel');
             const tableContainer = document.getElementById('tableContainer');
             const detailsContent = document.getElementById('detailsContent');
+            const detailsTitle = document.querySelector('.details-title');
             
             // Show the details panel
             detailsPanel.style.display = 'flex';
             tableContainer.classList.add('with-details');
+            
+            // Update title to show current row
+            const rowNumber = rowIndex + 1;
+            const totalRows = currentResults.data.length;
+            detailsTitle.textContent = 'Row ' + rowNumber + ' of ' + totalRows;
             
             // Update navigation buttons
             updateDetailsNavigation();
