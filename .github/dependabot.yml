@@ -17,7 +17,6 @@ updates:
       include: "scope"
     labels:
       - "dependencies"
-      - "npm"
 
   # Enable version updates for GitHub Actions
   - package-ecosystem: "github-actions"
@@ -36,4 +35,3 @@ updates:
       include: "scope"
     labels:
       - "dependencies"
-      - "github-actions"
