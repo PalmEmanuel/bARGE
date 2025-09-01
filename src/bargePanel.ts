@@ -1080,10 +1080,11 @@ export class BargePanel {
             }
             // If multiple cells selected and right-clicked on one of them, keep current selection
             
-            // Hide tooltip when showing context menu
+            // Hide tooltip and its context menu when showing cell context menu
             hideCustomTooltip();
+            hideTooltipContextMenu();
             
-            // Hide any existing context menu
+            // Hide any existing cell context menu
             if (customContextMenu) {
                 document.body.removeChild(customContextMenu);
                 customContextMenu = null;
