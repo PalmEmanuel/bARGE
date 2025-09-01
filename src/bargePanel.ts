@@ -1065,11 +1065,20 @@ export class BargePanel {
                 col: col
             };
             
-            // Simple selection logic: if we don't have multiple cells selected,
-            // make sure the right-clicked cell is selected before showing menu
+            // Smart selection logic
+            const cellKey = row + '-' + col;
+            const isRightClickedCellSelected = selectedCells.has(cellKey);
+            
             if (selectedCells.size <= 1) {
-                selectCell(target, row, col); // target is the cellElement
+                // If we have 0 or 1 cells selected, select the right-clicked cell
+                selectCell(target, row, col);
+            } else if (selectedCells.size > 1 && !isRightClickedCellSelected) {
+                // If we have multiple cells selected but right-clicked outside the selection,
+                // clear selection and select just the right-clicked cell
+                clearSelection();
+                selectCell(target, row, col);
             }
+            // If multiple cells selected and right-clicked on one of them, keep current selection
             
             // Hide tooltip when showing context menu
             hideCustomTooltip();
