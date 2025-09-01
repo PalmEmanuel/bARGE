@@ -182,6 +182,12 @@ export class BargePanel {
             flex-direction: column;
             overflow: hidden;
         }
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: row;
+            overflow: hidden;
+        }
         .table-container {
             flex: 1;
             overflow: auto;
@@ -189,6 +195,126 @@ export class BargePanel {
             border: 1px solid var(--vscode-widget-border);
             border-radius: 4px;
             min-height: 200px;
+            transition: margin-right 0.3s ease;
+        }
+        .table-container.with-details {
+            margin-right: 5px;
+        }
+        .details-panel {
+            width: 400px;
+            background-color: var(--vscode-sideBar-background);
+            border-left: 1px solid var(--vscode-widget-border);
+            margin: 15px 15px 0 0;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        .details-panel.hidden {
+            transform: translateX(100%);
+        }
+        .details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--vscode-widget-border);
+            background-color: var(--vscode-editor-widget-background);
+            flex-shrink: 0;
+        }
+        .details-title {
+            font-weight: 600;
+            font-size: 1.1em;
+            color: var(--vscode-foreground);
+        }
+        .details-navigation {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+        .nav-btn, .close-btn {
+            background-color: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: background-color 0.2s ease;
+        }
+        .nav-btn:hover:not(:disabled), .close-btn:hover {
+            background-color: var(--vscode-button-hoverBackground);
+        }
+        .nav-btn:disabled {
+            background-color: var(--vscode-button-secondaryBackground);
+            color: var(--vscode-disabledForeground);
+            cursor: not-allowed;
+        }
+        .details-content {
+            flex: 1;
+            overflow: auto;
+            padding: 16px;
+        }
+        .detail-button {
+            background: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: background-color 0.2s ease;
+        }
+        .detail-button:hover {
+            background-color: var(--vscode-button-hoverBackground);
+        }
+        .detail-button-cell {
+            width: 40px !important;
+            text-align: center;
+            padding: 4px !important;
+            border-right: 2px solid var(--vscode-widget-border) !important;
+        }
+        .json-viewer {
+            font-family: var(--vscode-editor-font-family, 'Consolas', 'Monaco', monospace);
+            font-size: 0.9em;
+            line-height: 1.4;
+            color: var(--vscode-editor-foreground);
+        }
+        .json-property {
+            margin: 8px 0;
+        }
+        .json-key {
+            color: var(--vscode-symbolIcon-propertyForeground, #9cdcfe);
+            font-weight: 600;
+            margin-right: 8px;
+        }
+        .json-value {
+            color: var(--vscode-editor-foreground);
+        }
+        .json-value.string {
+            color: var(--vscode-symbolIcon-stringForeground, #ce9178);
+        }
+        .json-value.number {
+            color: var(--vscode-symbolIcon-numberForeground, #b5cea8);
+        }
+        .json-value.boolean {
+            color: var(--vscode-symbolIcon-booleanForeground, #569cd6);
+        }
+        .json-value.null {
+            color: var(--vscode-symbolIcon-nullForeground, #808080);
+            font-style: italic;
+        }
+        .json-value.object {
+            color: var(--vscode-editor-foreground);
         }
         .footer {
             display: flex;
@@ -428,8 +554,30 @@ export class BargePanel {
     </style>
 </head>
 <body>
-    <div id="tableContainer" class="table-container">
-        <div class="no-results">No results to display</div>
+    <div class="main-content">
+        <div id="tableContainer" class="table-container">
+            <div class="no-results">No results to display</div>
+        </div>
+        
+        <div id="detailsPanel" class="details-panel" style="display: none;">
+            <div class="details-header">
+                <div class="details-title">Row Details</div>
+                <div class="details-navigation">
+                    <button id="detailsPrevBtn" class="nav-btn" onclick="navigateDetails(-1)" title="Previous row">
+                        <span>↑</span>
+                    </button>
+                    <button id="detailsNextBtn" class="nav-btn" onclick="navigateDetails(1)" title="Next row">
+                        <span>↓</span>
+                    </button>
+                    <button id="detailsCloseBtn" class="close-btn" onclick="closeDetails()" title="Close details">
+                        <span>×</span>
+                    </button>
+                </div>
+            </div>
+            <div id="detailsContent" class="details-content">
+                <!-- Details content will be populated by JavaScript -->
+            </div>
+        </div>
     </div>
     
     <div class="footer">
@@ -516,6 +664,9 @@ export class BargePanel {
             
             let tableHtml = '<table class="results-table"><thead><tr>';
             
+            // Add details button column header
+            tableHtml += '<th class="detail-button-cell" style="width: 40px;" title="Details">📋</th>';
+            
             result.columns.forEach((col, index) => {
                 const sortClass = sortState.column === index ? 
                     (sortState.direction === 'asc' ? 'sorted-asc' : 'sorted-desc') : '';
@@ -538,6 +689,12 @@ export class BargePanel {
             
             result.data.forEach((row, rowIndex) => {
                 tableHtml += '<tr>';
+                
+                // Add details button cell
+                tableHtml += '<td class="detail-button-cell">' +
+                    '<button class="detail-button" onclick="showRowDetails(' + rowIndex + ')" title="Show details">📄</button>' +
+                '</td>';
+                
                 row.forEach((cell, cellIndex) => {
                     const { displayValue, tooltipValue } = formatCellValue(cell);
                     // Store tooltip data as data attribute - tooltipValue is already safe
@@ -1911,6 +2068,125 @@ export class BargePanel {
             tableContainer.innerHTML = '<div class="error">Error: ' + error + '</div>';
             resultsInfo.textContent = 'Query failed';
             exportBtn.style.display = 'none';
+        }
+
+        // Details panel functionality
+        let currentDetailRowIndex = -1;
+        
+        function showRowDetails(rowIndex) {
+            if (!currentResults || !currentResults.data || rowIndex < 0 || rowIndex >= currentResults.data.length) {
+                return;
+            }
+            
+            currentDetailRowIndex = rowIndex;
+            
+            const detailsPanel = document.getElementById('detailsPanel');
+            const tableContainer = document.getElementById('tableContainer');
+            const detailsContent = document.getElementById('detailsContent');
+            
+            // Show the details panel
+            detailsPanel.style.display = 'flex';
+            tableContainer.classList.add('with-details');
+            
+            // Update navigation buttons
+            updateDetailsNavigation();
+            
+            // Generate and display the row details
+            const rowData = generateRowObject(rowIndex);
+            const jsonHtml = formatAsJsonViewer(rowData);
+            detailsContent.innerHTML = jsonHtml;
+        }
+        
+        function closeDetails() {
+            const detailsPanel = document.getElementById('detailsPanel');
+            const tableContainer = document.getElementById('tableContainer');
+            
+            detailsPanel.style.display = 'none';
+            tableContainer.classList.remove('with-details');
+            
+            currentDetailRowIndex = -1;
+        }
+        
+        function navigateDetails(direction) {
+            if (!currentResults || !currentResults.data) {
+                return;
+            }
+            
+            const newIndex = currentDetailRowIndex + direction;
+            
+            if (newIndex >= 0 && newIndex < currentResults.data.length) {
+                showRowDetails(newIndex);
+            }
+        }
+        
+        function updateDetailsNavigation() {
+            const prevBtn = document.getElementById('detailsPrevBtn');
+            const nextBtn = document.getElementById('detailsNextBtn');
+            
+            if (!currentResults || !currentResults.data) {
+                prevBtn.disabled = true;
+                nextBtn.disabled = true;
+                return;
+            }
+            
+            prevBtn.disabled = currentDetailRowIndex <= 0;
+            nextBtn.disabled = currentDetailRowIndex >= currentResults.data.length - 1;
+        }
+        
+        function generateRowObject(rowIndex) {
+            if (!currentResults || !currentResults.columns || !currentResults.data || 
+                rowIndex < 0 || rowIndex >= currentResults.data.length) {
+                return {};
+            }
+            
+            const row = currentResults.data[rowIndex];
+            const rowObject = {};
+            
+            currentResults.columns.forEach((column, colIndex) => {
+                if (colIndex < row.length) {
+                    rowObject[column.name] = row[colIndex];
+                }
+            });
+            
+            return rowObject;
+        }
+        
+        function formatAsJsonViewer(obj) {
+            if (!obj || typeof obj !== 'object') {
+                return '<div class="json-viewer">No data available</div>';
+            }
+            
+            let html = '<div class="json-viewer">';
+            
+            Object.keys(obj).forEach(key => {
+                const value = obj[key];
+                html += '<div class="json-property">';
+                html += '<span class="json-key">' + escapeHtml(key) + ':</span>';
+                
+                if (value === null || value === undefined) {
+                    html += '<span class="json-value null">null</span>';
+                } else if (typeof value === 'string') {
+                    html += '<span class="json-value string">"' + escapeHtml(value) + '"</span>';
+                } else if (typeof value === 'number') {
+                    html += '<span class="json-value number">' + value + '</span>';
+                } else if (typeof value === 'boolean') {
+                    html += '<span class="json-value boolean">' + value + '</span>';
+                } else if (typeof value === 'object') {
+                    try {
+                        const jsonString = JSON.stringify(value, null, 2);
+                        html += '<pre class="json-value object">' + escapeHtml(jsonString) + '</pre>';
+                    } catch (error) {
+                        html += '<span class="json-value object">' + escapeHtml(String(value)) + '</span>';
+                    }
+                } else {
+                    html += '<span class="json-value">' + escapeHtml(String(value)) + '</span>';
+                }
+                
+                html += '</div>';
+            });
+            
+            html += '</div>';
+            return html;
         }
 
         window.addEventListener('message', event => {
