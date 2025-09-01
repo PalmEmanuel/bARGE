@@ -2,7 +2,7 @@
   "name": "barge-vscode",
   "displayName": "bARGE - basic Azure Resource Graph Explorer",
   "description": "bARGE is a basic Azure Resource Graph Explorer for VS Code.",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "publisher": "PalmEmanuel",
   "icon": "media/bARGE-small.png",
   "author": {
@@ -154,7 +154,7 @@
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
     "@types/uuid": "^10.0.0",
-    "@types/vscode": "^1.103.0",
+    "@types/vscode": "^1.74.0",
     "@typescript-eslint/eslint-plugin": "^8.39.0",
     "@typescript-eslint/parser": "^8.39.0",
     "@vscode/test-cli": "^0.0.11",
