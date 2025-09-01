@@ -2,7 +2,7 @@
   "name": "barge-vscode",
   "displayName": "bARGE - basic Azure Resource Graph Explorer",
   "description": "bARGE is a basic Azure Resource Graph Explorer for VS Code.",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "publisher": "PalmEmanuel",
   "icon": "media/bARGE-small.png",
   "author": {
@@ -28,7 +28,7 @@
     "arg"
   ],
   "engines": {
-    "vscode": "^1.103.0"
+    "vscode": "^1.74.0"
   },
   "categories": [
     "Other"
