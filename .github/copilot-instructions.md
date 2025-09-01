@@ -7,7 +7,7 @@ Always reference these instructions first and fallback to search or bash command
 ## Working Effectively
 
 ### Bootstrap and Build
-- Install dependencies: `npm install` -- takes 16 seconds. NEVER CANCEL.
+- Install dependencies: `npm install` -- takes 16 seconds. NEVER CANCEL - may appear to hang but is downloading dependencies.
 - Check TypeScript types: `npm run check-types` -- takes 3 seconds.
 - Run linting: `npm run lint` -- takes 1 second.
 - Full compile: `npm run compile` -- takes 4-5 seconds.
