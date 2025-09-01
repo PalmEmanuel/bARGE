@@ -166,7 +166,6 @@
     "uuid": "^11.1.0"
   },
   "dependencies": {
-    "@azure/arm-resourcegraph": "^4.2.1",
     "@azure/arm-subscriptions": "^5.1.0",
     "@azure/identity": "^4.11.1",
     "@azure/msal-node": "^3.7.3"

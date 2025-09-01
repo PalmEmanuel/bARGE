@@ -87,8 +87,6 @@ export class BargePanel {
                 data: result
             };
             
-            console.log('Sending query result to webview - success:', response.success, 'hasData:', !!result, 'columns:', result?.columns?.length, 'rows:', result?.data?.length);
-            
             this._panel.webview.postMessage({
                 type: 'queryResult',
                 payload: response
