@@ -87,6 +87,8 @@ export class BargePanel {
                 data: result
             };
             
+            console.log('Sending query result to webview - success:', response.success, 'hasData:', !!result, 'columns:', result?.columns?.length, 'rows:', result?.data?.length);
+            
             this._panel.webview.postMessage({
                 type: 'queryResult',
                 payload: response
@@ -185,31 +187,133 @@ export class BargePanel {
         .main-content {
             flex: 1;
             display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Adaptive layout classes */
+        .content-wrapper.layout-horizontal {
             flex-direction: row;
+        }
+        .content-wrapper.layout-vertical {
+            flex-direction: column;
+        }
+        
+        /* Table section */
+        .table-section {
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
         }
         .table-container {
             flex: 1;
             overflow: auto;
-            margin: 15px 15px 0 15px;
+            margin: 15px;
             border: 1px solid var(--vscode-widget-border);
             border-radius: 4px;
             min-height: 200px;
-            transition: margin-right 0.3s ease;
         }
-        .table-container.with-details {
-            margin-right: 5px;
+        
+        /* Details section */
+        .details-section {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
         .details-panel {
-            width: 400px;
+            flex: 1;
             background-color: var(--vscode-sideBar-background);
-            border-left: 1px solid var(--vscode-widget-border);
-            margin: 15px 15px 0 0;
+            border: 1px solid var(--vscode-widget-border);
             border-radius: 4px;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            transition: transform 0.3s ease;
+            margin: 15px;
+        }
+        
+        /* Horizontal layout (side-by-side) */
+        .content-wrapper.layout-horizontal .table-section {
+            flex: 2;
+            min-width: 300px;
+        }
+        .content-wrapper.layout-horizontal .table-container {
+            margin-right: 8px;
+        }
+        .content-wrapper.layout-horizontal .details-section {
+            flex: 1;
+            min-width: 250px;
+        }
+        .content-wrapper.layout-horizontal .details-panel {
+            margin-left: 8px;
+        }
+        
+        /* Vertical layout (stacked) */
+        .content-wrapper.layout-vertical .table-section {
+            flex: 2;
+            min-height: 200px;
+        }
+        .content-wrapper.layout-vertical .table-container {
+            margin-bottom: 8px;
+        }
+        .content-wrapper.layout-vertical .details-section {
+            flex: 1;
+            min-height: 150px;
+        }
+        .content-wrapper.layout-vertical .details-panel {
+            margin-top: 8px;
+        }
+        
+        /* Resize handle - positioned absolutely between sections */
+        #resizeHandle.resize-handle {
+            position: absolute;
+            background-color: var(--vscode-panel-border, var(--vscode-widget-border, #3c3c3c));
+            transition: background-color 0.2s ease, opacity 0.2s ease;
+            z-index: 100;
+            opacity: 0.8;
+            border-radius: 3px;
+        }
+        #resizeHandle.resize-handle:hover {
+            background-color: var(--vscode-focusBorder, #007ACC);
+            opacity: 1;
+        }
+        #resizeHandle.resize-handle:active {
+            background-color: var(--vscode-focusBorder, #007ACC);
+            opacity: 1;
+        }
+        #resizeHandle.resize-handle.dragging {
+            transition: none; /* Remove all transitions while dragging */
+        }
+        
+        /* Horizontal layout resize handle (vertical divider) */
+        .content-wrapper.layout-horizontal #resizeHandle.resize-handle {
+            width: 6px;
+            height: 95%;
+            top: 2.5%;
+            cursor: ew-resize;
+        }
+        
+        /* Vertical layout resize handle (horizontal divider) */
+        .content-wrapper.layout-vertical #resizeHandle.resize-handle {
+            width: 95%;
+            height: 6px;
+            cursor: ns-resize;
+        }
+        .resize-handle:hover {
+            background-color: var(--vscode-focusBorder);
+        }
+        
+        .details-panel.hidden {
+            transform: translateX(100%);
+        }
+        .main-content.vertical-layout .details-panel.hidden {
+            transform: translateY(100%);
         }
         .details-panel.hidden {
             transform: translateX(100%);
@@ -259,6 +363,9 @@ export class BargePanel {
             flex: 1;
             overflow: auto;
             padding: 16px;
+            min-width: 0; /* Allow shrinking below content width */
+            word-wrap: break-word; /* Break long words */
+            white-space: pre-wrap; /* Preserve formatting but allow wrapping */
         }
         .detail-button {
             background: var(--vscode-button-background);
@@ -320,11 +427,11 @@ export class BargePanel {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px;
+            padding: 8px 15px;
             border-top: 1px solid var(--vscode-widget-border);
             background-color: var(--vscode-editor-background);
             flex-shrink: 0;
-            min-height: 40px;
+            min-height: 30px;
         }
         .results-info {
             font-size: 0.9em;
@@ -383,7 +490,7 @@ export class BargePanel {
             top: 0;
             right: 0;
             width: 5px;
-            height: 100%;
+            height: 95%;
             cursor: col-resize;
             background: transparent;
             z-index: 11;
@@ -542,6 +649,11 @@ export class BargePanel {
             padding: 40px;
             color: var(--vscode-descriptionForeground);
             font-style: italic;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
         }
         .error {
             color: var(--vscode-errorForeground);
@@ -554,34 +666,42 @@ export class BargePanel {
     </style>
 </head>
 <body>
-    <div class="main-content">
-        <div id="tableContainer" class="table-container">
-            <div class="no-results">No results to display</div>
-        </div>
-        
-        <div id="detailsPanel" class="details-panel" style="display: none;">
-            <div class="details-header">
-                <div class="details-title">Row Details</div>
-                <div class="details-navigation">
-                    <button id="detailsPrevBtn" class="nav-btn" onclick="navigateDetails(-1)" title="Previous row">
-                        <span>↑</span>
-                    </button>
-                    <button id="detailsNextBtn" class="nav-btn" onclick="navigateDetails(1)" title="Next row">
-                        <span>↓</span>
-                    </button>
-                    <button id="detailsCloseBtn" class="close-btn" onclick="closeDetails()" title="Close details">
-                        <span>×</span>
-                    </button>
+    <div class="main-content" id="mainContent">
+        <div class="content-wrapper" id="contentWrapper">
+            <div class="table-section" id="tableSection">
+                <div id="tableContainer" class="table-container">
+                    <div class="no-results">No results to display</div>
                 </div>
             </div>
-            <div id="detailsContent" class="details-content">
-                <!-- Details content will be populated by JavaScript -->
+            
+            <div id="resizeHandle" class="resize-handle" style="display: none;"></div>
+            
+            <div class="details-section" id="detailsSection" style="display: none;">
+                <div id="detailsPanel" class="details-panel">
+                    <div class="details-header">
+                        <div class="details-title">Row Details</div>
+                        <div class="details-navigation">
+                            <button id="detailsPrevBtn" class="nav-btn" onclick="navigateDetails(-1)" title="Previous row">
+                                <span>↑</span>
+                            </button>
+                            <button id="detailsNextBtn" class="nav-btn" onclick="navigateDetails(1)" title="Next row">
+                                <span>↓</span>
+                            </button>
+                            <button id="detailsCloseBtn" class="close-btn" onclick="closeDetails()" title="Close details">
+                                <span>×</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="detailsContent" class="details-content">
+                        <!-- Details content will be populated by JavaScript -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     
     <div class="footer">
-        <div id="resultsInfo" class="results-info">No results yet. Run a query from a .kql file to see results here.</div>
+        <div id="resultsInfo" class="results-info">No results yet. Run a query to see results here.</div>
         <button id="exportBtn" class="export-btn" onclick="exportToCsv()" style="display: none;">Export CSV</button>
     </div>
 
@@ -739,8 +859,8 @@ export class BargePanel {
         }
 
         function showLoadingIndicator() {
-            const tableContainer = document.getElementById('tableContainer');
-            if (!tableContainer) return;
+            const contentWrapper = document.getElementById('contentWrapper');
+            if (!contentWrapper) return;
             
             // Remove any existing loading overlay
             hideLoadingIndicator();
@@ -759,8 +879,8 @@ export class BargePanel {
                     '<div class="loading-message">' + randomMessage + '</div>' +
                 '</div>';
             
-            tableContainer.style.position = 'relative';
-            tableContainer.appendChild(loadingOverlay);
+            contentWrapper.style.position = 'relative';
+            contentWrapper.appendChild(loadingOverlay);
         }
 
         function hideLoadingIndicator() {
@@ -2116,14 +2236,42 @@ export class BargePanel {
             // Select the entire row when showing details
             selectEntireRow(rowIndex);
             
-            const detailsPanel = document.getElementById('detailsPanel');
-            const tableContainer = document.getElementById('tableContainer');
+            const contentWrapper = document.getElementById('contentWrapper');
+            const detailsSection = document.getElementById('detailsSection');
+            const tableSection = document.getElementById('tableSection');
+            const resizeHandle = document.getElementById('resizeHandle');
             const detailsContent = document.getElementById('detailsContent');
             const detailsTitle = document.querySelector('.details-title');
             
-            // Show the details panel
-            detailsPanel.style.display = 'flex';
-            tableContainer.classList.add('with-details');
+            // Detect and set layout
+            detectAndSetLayout();
+            
+            // Show the details section and resize handle
+            detailsSection.style.display = 'flex';
+            resizeHandle.style.display = 'block';
+            
+            // Set initial flex values for 2:1 ratio (table:details)
+            if (tableSection && detailsSection) {
+                tableSection.style.flex = '2 1 0';
+                detailsSection.style.flex = '1 1 0';
+            }
+            
+            // Set initial resize handle position
+            setTimeout(() => {
+                const resizeHandle = document.getElementById('resizeHandle');
+                if (resizeHandle) {
+                    if (currentLayout === 'horizontal') {
+                        resizeHandle.style.left = '66.666%';
+                        resizeHandle.style.top = '2.5%'; // Account for 95% height with 2.5% margin
+                    } else {
+                        resizeHandle.style.top = 'calc(66.666% - 3px)';
+                        resizeHandle.style.left = '2.5%'; // Account for 95% width with 2.5% margin
+                    }
+                }
+            }, 0);
+            
+            // Initialize resizing if not already done
+            initializeResizing();
             
             // Update title to show current row
             const rowNumber = rowIndex + 1;
@@ -2140,11 +2288,16 @@ export class BargePanel {
         }
         
         function closeDetails() {
-            const detailsPanel = document.getElementById('detailsPanel');
-            const tableContainer = document.getElementById('tableContainer');
+            const detailsSection = document.getElementById('detailsSection');
+            const resizeHandle = document.getElementById('resizeHandle');
+            const tableSection = document.getElementById('tableSection');
             
-            detailsPanel.style.display = 'none';
-            tableContainer.classList.remove('with-details');
+            detailsSection.style.display = 'none';
+            resizeHandle.style.display = 'none';
+            
+            // Reset flex values
+            if (tableSection) tableSection.style.flex = '';
+            if (detailsSection) detailsSection.style.flex = '';
             
             currentDetailRowIndex = -1;
             currentDetailRowData = null;
@@ -2283,6 +2436,141 @@ export class BargePanel {
                     break;
             }
         });
+
+        // Layout and resizing functionality
+        let isResizingPanel = false;
+        let resizeInitialized = false;
+        let currentLayout = 'horizontal'; // 'horizontal' or 'vertical'
+
+        function detectAndSetLayout() {
+            const contentWrapper = document.getElementById('contentWrapper');
+            if (!contentWrapper) return;
+            
+            const rect = contentWrapper.getBoundingClientRect();
+            const aspectRatio = rect.width / rect.height;
+            
+            // Use horizontal layout if width is significantly larger than height
+            const newLayout = aspectRatio > 1.2 ? 'horizontal' : 'vertical';
+            
+            if (newLayout !== currentLayout) {
+                currentLayout = newLayout;
+                updateLayoutClasses();
+            }
+        }
+
+        function updateLayoutClasses() {
+            const contentWrapper = document.getElementById('contentWrapper');
+            const resizeHandle = document.getElementById('resizeHandle');
+            if (!contentWrapper || !resizeHandle) return;
+            
+            contentWrapper.classList.remove('layout-horizontal', 'layout-vertical');
+            contentWrapper.classList.add('layout-' + currentLayout);
+            
+            // Reset any custom flex values when switching layouts
+            const tableSection = document.getElementById('tableSection');
+            const detailsSection = document.getElementById('detailsSection');
+            if (tableSection) tableSection.style.flex = '2 1 0';
+            if (detailsSection) detailsSection.style.flex = '1 1 0';
+            
+            // Position resize handle at 2:1 ratio
+            if (currentLayout === 'horizontal') {
+                resizeHandle.style.left = '66.666%';
+                resizeHandle.style.top = '2.5%'; // Account for 95% height with 2.5% margin
+            } else {
+                resizeHandle.style.top = 'calc(66.666% - 3px)'; // Account for handle height
+                resizeHandle.style.left = '2.5%'; // Account for 95% width with 2.5% margin
+            }
+        }
+
+        function initializeResizing() {
+            if (resizeInitialized) return;
+            resizeInitialized = true;
+            
+            const resizeHandle = document.getElementById('resizeHandle');
+            if (!resizeHandle) return;
+
+            resizeHandle.addEventListener('mousedown', startResizing);
+            
+            // Add window resize listener for layout detection
+            window.addEventListener('resize', detectAndSetLayout);
+        }
+
+        function startResizing(event) {
+            event.preventDefault();
+            isResizingPanel = true;
+            
+            const resizeHandle = document.getElementById('resizeHandle');
+            if (resizeHandle) {
+                resizeHandle.classList.add('dragging');
+            }
+            
+            const cursor = currentLayout === 'horizontal' ? 'ew-resize' : 'ns-resize';
+            document.body.style.cursor = cursor;
+            document.body.style.userSelect = 'none';
+            
+            document.addEventListener('mousemove', handleResizing);
+            document.addEventListener('mouseup', stopResizing);
+        }
+
+        function handleResizing(event) {
+            if (!isResizingPanel) return;
+            
+            const contentWrapper = document.getElementById('contentWrapper');
+            const tableSection = document.getElementById('tableSection');
+            const detailsSection = document.getElementById('detailsSection');
+            const resizeHandle = document.getElementById('resizeHandle');
+            
+            if (!contentWrapper || !tableSection || !detailsSection || !resizeHandle) return;
+            
+            const wrapperRect = contentWrapper.getBoundingClientRect();
+            
+            if (currentLayout === 'horizontal') {
+                // Horizontal layout - vertical divider
+                const mouseX = event.clientX;
+                const relativeX = mouseX - wrapperRect.left;
+                const percentage = Math.max(20, Math.min(80, (relativeX / wrapperRect.width) * 100));
+                
+                const tablePercentage = percentage;
+                const detailsPercentage = 100 - percentage;
+                
+                tableSection.style.flex = tablePercentage + ' 1 0';
+                detailsSection.style.flex = detailsPercentage + ' 1 0';
+                
+                // Update resize handle position
+                resizeHandle.style.left = percentage + '%';
+                resizeHandle.style.top = '2.5%'; // Account for 95% height with 2.5% margin
+            } else {
+                // Vertical layout - horizontal divider
+                const mouseY = event.clientY;
+                const relativeY = mouseY - wrapperRect.top;
+                const percentage = Math.max(20, Math.min(80, (relativeY / wrapperRect.height) * 100));
+                
+                const tablePercentage = percentage;
+                const detailsPercentage = 100 - percentage;
+                
+                tableSection.style.flex = tablePercentage + ' 1 0';
+                detailsSection.style.flex = detailsPercentage + ' 1 0';
+                
+                // Update resize handle position
+                resizeHandle.style.top = 'calc(' + percentage + '% - 3px)'; // Account for handle height
+                resizeHandle.style.left = '2.5%'; // Account for 95% width with 2.5% margin
+            }
+        }
+
+        function stopResizing() {
+            isResizingPanel = false;
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+            
+            const resizeHandle = document.getElementById('resizeHandle');
+            if (resizeHandle) {
+                resizeHandle.classList.remove('dragging');
+            }
+            
+            document.removeEventListener('mousemove', handleResizing);
+            document.removeEventListener('mouseup', stopResizing);
+        }
+        
     </script>
 </body>
 </html>`;
