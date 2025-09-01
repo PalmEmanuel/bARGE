@@ -182,23 +182,330 @@ export class BargePanel {
             flex-direction: column;
             overflow: hidden;
         }
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Adaptive layout classes */
+        .content-wrapper.layout-horizontal {
+            flex-direction: row;
+        }
+        .content-wrapper.layout-vertical {
+            flex-direction: column;
+        }
+        
+        /* Table section */
+        .table-section {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
         .table-container {
             flex: 1;
             overflow: auto;
-            margin: 15px 15px 0 15px;
+            margin: 15px;
             border: 1px solid var(--vscode-widget-border);
             border-radius: 4px;
             min-height: 200px;
+        }
+        
+        /* Details section */
+        .details-section {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .details-panel {
+            flex: 1;
+            background-color: var(--vscode-sideBar-background);
+            border: 1px solid var(--vscode-widget-border);
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            margin: 15px;
+        }
+        
+        /* Horizontal layout (side-by-side) */
+        .content-wrapper.layout-horizontal .table-section {
+            flex: 2;
+            min-width: 300px;
+        }
+        .content-wrapper.layout-horizontal .table-container {
+            margin-right: 8px;
+        }
+        .content-wrapper.layout-horizontal .details-section {
+            flex: 1;
+            min-width: 250px;
+        }
+        .content-wrapper.layout-horizontal .details-panel {
+            margin-left: 8px;
+        }
+        
+        /* Vertical layout (stacked) */
+        .content-wrapper.layout-vertical .table-section {
+            flex: 2;
+            min-height: 200px;
+        }
+        .content-wrapper.layout-vertical .table-container {
+            margin-bottom: 8px;
+        }
+        .content-wrapper.layout-vertical .details-section {
+            flex: 1;
+            min-height: 150px;
+        }
+        .content-wrapper.layout-vertical .details-panel {
+            margin-top: 8px;
+        }
+        
+        /* Resize handle - positioned absolutely between sections */
+        #resizeHandle.resize-handle {
+            position: absolute;
+            background-color: var(--vscode-panel-border, var(--vscode-widget-border, #3c3c3c));
+            transition: background-color 0.2s ease, opacity 0.2s ease;
+            z-index: 100;
+            opacity: 0.8;
+            border-radius: 3px;
+        }
+        #resizeHandle.resize-handle:hover {
+            background-color: var(--vscode-focusBorder, #007ACC);
+            opacity: 1;
+        }
+        #resizeHandle.resize-handle:active {
+            background-color: var(--vscode-focusBorder, #007ACC);
+            opacity: 1;
+        }
+        #resizeHandle.resize-handle.dragging {
+            transition: none; /* Remove all transitions while dragging */
+        }
+        
+        /* Horizontal layout resize handle (vertical divider) */
+        .content-wrapper.layout-horizontal #resizeHandle.resize-handle {
+            width: 6px;
+            height: 95%;
+            top: 2.5%;
+            cursor: ew-resize;
+        }
+        
+        /* Vertical layout resize handle (horizontal divider) */
+        .content-wrapper.layout-vertical #resizeHandle.resize-handle {
+            width: 95%;
+            height: 6px;
+            cursor: ns-resize;
+        }
+        .resize-handle:hover {
+            background-color: var(--vscode-focusBorder);
+        }
+        
+        .details-panel.hidden {
+            transform: translateX(100%);
+        }
+        .main-content.vertical-layout .details-panel.hidden {
+            transform: translateY(100%);
+        }
+        .details-panel.hidden {
+            transform: translateX(100%);
+        }
+        .details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--vscode-widget-border);
+            background-color: var(--vscode-editor-widget-background);
+            flex-shrink: 0;
+        }
+        .details-title {
+            font-weight: 600;
+            font-size: 1.1em;
+            color: var(--vscode-foreground);
+        }
+        .details-navigation {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+        .nav-btn, .close-btn {
+            background-color: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: background-color 0.2s ease;
+        }
+        .nav-btn:hover:not(:disabled), .close-btn:hover {
+            background-color: var(--vscode-button-hoverBackground);
+        }
+        .nav-btn:disabled {
+            background-color: var(--vscode-button-secondaryBackground);
+            color: var(--vscode-disabledForeground);
+            cursor: not-allowed;
+        }
+        .details-content {
+            flex: 1;
+            overflow: auto;
+            padding: 16px;
+            min-width: 0; /* Allow shrinking below content width */
+            word-wrap: break-word; /* Break long words */
+            white-space: pre-wrap; /* Preserve formatting but allow wrapping */
+        }
+        .detail-button {
+            background: transparent;
+            color: var(--vscode-descriptionForeground);
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 3px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s ease;
+            opacity: 0.6;
+            margin: auto;
+        }
+        .detail-button:hover {
+            color: var(--vscode-foreground);
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        .detail-button:active {
+            background-color: var(--vscode-list-activeSelectionBackground);
+            transform: scale(0.95);
+        }
+        .detail-button.active {
+            color: var(--vscode-focusBorder);
+            opacity: 1;
+        }
+        .detail-button svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+        .detail-button-cell {
+            width: 36px !important;
+            min-width: 36px !important;
+            max-width: 36px !important;
+            text-align: center;
+            padding: 2px !important;
+            vertical-align: middle;
+            position: relative;
+        }
+        th.detail-button-cell {
+            cursor: default !important;
+            user-select: none !important;
+            position: relative !important;
+            pointer-events: auto !important;
+        }
+        th.detail-button-cell::after {
+            display: none !important;
+        }
+        th.detail-button-cell::before {
+            display: none !important;
+        }
+        th.detail-button-cell .resize-handle {
+            display: none !important;
+        }
+        th.detail-button-cell:hover::after {
+            display: none !important;
+        }
+        th.detail-button-cell * {
+            pointer-events: none !important;
+        }
+        th.detail-button-cell {
+            overflow: hidden !important;
+        }
+        .detail-button-cell:hover {
+            background-color: transparent !important;
+        }
+        .json-viewer {
+            font-family: var(--vscode-editor-font-family, 'Consolas', 'Monaco', monospace);
+            font-size: 0.9em;
+            line-height: 1.4;
+            color: var(--vscode-editor-foreground);
+            padding: 4px;
+        }
+        .json-property {
+            margin: 0;
+            padding: 8px 4px;
+            border-bottom: 1px solid var(--vscode-widget-border);
+            transition: background-color 0.2s ease;
+        }
+        .json-property:last-child {
+            border-bottom: none;
+        }
+        .json-property:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+        .json-key {
+            color: var(--vscode-symbolIcon-propertyForeground, #9cdcfe);
+            font-weight: 600;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            display: block;
+            opacity: 0.8;
+        }
+        .json-value {
+            color: var(--vscode-editor-foreground);
+            font-size: 0.95em;
+            line-height: 1.3;
+            word-wrap: break-word;
+            display: block;
+        }
+        .json-value.string {
+            color: var(--vscode-symbolIcon-stringForeground, #ce9178);
+            font-style: normal;
+        }
+        .json-value.number {
+            color: var(--vscode-symbolIcon-numberForeground, #b5cea8);
+            font-weight: 500;
+        }
+        .json-value.boolean {
+            color: var(--vscode-symbolIcon-booleanForeground, #569cd6);
+            font-weight: 500;
+        }
+        .json-value.null {
+            color: var(--vscode-symbolIcon-nullForeground, #808080);
+            font-style: italic;
+        }
+        .json-value.object {
+            color: var(--vscode-editor-foreground);
+            background-color: var(--vscode-textCodeBlock-background);
+            padding: 8px;
+            border-radius: 4px;
+            font-family: var(--vscode-editor-font-family, 'Consolas', 'Monaco', monospace);
+            font-size: 0.85em;
+            border-left: 3px solid var(--vscode-widget-border);
+            margin-top: 4px;
         }
         .footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px;
+            padding: 8px 15px;
             border-top: 1px solid var(--vscode-widget-border);
             background-color: var(--vscode-editor-background);
             flex-shrink: 0;
-            min-height: 40px;
+            min-height: 30px;
         }
         .results-info {
             font-size: 0.9em;
@@ -257,7 +564,7 @@ export class BargePanel {
             top: 0;
             right: 0;
             width: 5px;
-            height: 100%;
+            height: 95%;
             cursor: col-resize;
             background: transparent;
             z-index: 11;
@@ -416,6 +723,11 @@ export class BargePanel {
             padding: 40px;
             color: var(--vscode-descriptionForeground);
             font-style: italic;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
         }
         .error {
             color: var(--vscode-errorForeground);
@@ -428,12 +740,42 @@ export class BargePanel {
     </style>
 </head>
 <body>
-    <div id="tableContainer" class="table-container">
-        <div class="no-results">No results to display</div>
+    <div class="main-content" id="mainContent">
+        <div class="content-wrapper" id="contentWrapper">
+            <div class="table-section" id="tableSection">
+                <div id="tableContainer" class="table-container">
+                    <div class="no-results">No results to display</div>
+                </div>
+            </div>
+            
+            <div id="resizeHandle" class="resize-handle" style="display: none;"></div>
+            
+            <div class="details-section" id="detailsSection" style="display: none;">
+                <div id="detailsPanel" class="details-panel">
+                    <div class="details-header">
+                        <div class="details-title">Row Details</div>
+                        <div class="details-navigation">
+                            <button id="detailsPrevBtn" class="nav-btn" onclick="navigateDetails(-1)" title="Previous row">
+                                <span>↑</span>
+                            </button>
+                            <button id="detailsNextBtn" class="nav-btn" onclick="navigateDetails(1)" title="Next row">
+                                <span>↓</span>
+                            </button>
+                            <button id="detailsCloseBtn" class="close-btn" onclick="closeDetails()" title="Close details">
+                                <span>×</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="detailsContent" class="details-content">
+                        <!-- Details content will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <div class="footer">
-        <div id="resultsInfo" class="results-info">No results yet. Run a query from a .kql file to see results here.</div>
+        <div id="resultsInfo" class="results-info">No results yet. Run a query to see results here.</div>
         <button id="exportBtn" class="export-btn" onclick="exportToCsv()" style="display: none;">Export CSV</button>
     </div>
 
@@ -516,6 +858,14 @@ export class BargePanel {
             
             let tableHtml = '<table class="results-table"><thead><tr>';
             
+            // Add details button column header
+            tableHtml += '<th class="detail-button-cell" style="width: 36px; cursor: default; text-align: center; padding: 0;" title="Row Details" draggable="false" ondragstart="return false;">' +
+                '<svg viewBox="0 0 16 16" style="width: 18px; height: 18px; fill: var(--vscode-descriptionForeground); opacity: 0.7; vertical-align: middle; margin: 0;">' +
+                '<circle cx="6.5" cy="6.5" r="4" fill="none" stroke="currentColor" stroke-width="1.5"/>' +
+                '<path d="m9.5 9.5 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
+                '</svg>' +
+                '</th>';
+            
             result.columns.forEach((col, index) => {
                 const sortClass = sortState.column === index ? 
                     (sortState.direction === 'asc' ? 'sorted-asc' : 'sorted-desc') : '';
@@ -538,6 +888,20 @@ export class BargePanel {
             
             result.data.forEach((row, rowIndex) => {
                 tableHtml += '<tr>';
+                
+                // Add details button cell  
+                const circleIcon = (currentDetailRowIndex === rowIndex) ? 
+                    '<circle cx="8" cy="8" r="5" fill="currentColor"/>' :
+                    '<circle cx="8" cy="8" r="5" fill="none" stroke="currentColor" stroke-width="2"/>';
+                
+                tableHtml += '<td class="detail-button-cell">' +
+                    '<button class="detail-button' + (currentDetailRowIndex === rowIndex ? ' active' : '') + '" onclick="showRowDetails(' + rowIndex + ')" title="View row details">' +
+                    '<svg viewBox="0 0 16 16">' +
+                    circleIcon +
+                    '</svg>' +
+                    '</button>' +
+                '</td>';
+                
                 row.forEach((cell, cellIndex) => {
                     const { displayValue, tooltipValue } = formatCellValue(cell);
                     // Store tooltip data as data attribute - tooltipValue is already safe
@@ -554,6 +918,11 @@ export class BargePanel {
             
             tableHtml += '</tbody></table>';
             tableContainer.innerHTML = tableHtml;
+            
+            // Update detail button states after table regeneration
+            setTimeout(() => {
+                updateDetailButtonStates();
+            }, 0);
             
             // Add context menu event listener to the table
             const table = tableContainer.querySelector('.results-table');
@@ -582,8 +951,8 @@ export class BargePanel {
         }
 
         function showLoadingIndicator() {
-            const tableContainer = document.getElementById('tableContainer');
-            if (!tableContainer) return;
+            const contentWrapper = document.getElementById('contentWrapper');
+            if (!contentWrapper) return;
             
             // Remove any existing loading overlay
             hideLoadingIndicator();
@@ -602,8 +971,8 @@ export class BargePanel {
                     '<div class="loading-message">' + randomMessage + '</div>' +
                 '</div>';
             
-            tableContainer.style.position = 'relative';
-            tableContainer.appendChild(loadingOverlay);
+            contentWrapper.style.position = 'relative';
+            contentWrapper.appendChild(loadingOverlay);
         }
 
         function hideLoadingIndicator() {
@@ -1505,6 +1874,9 @@ export class BargePanel {
             
             const sortedResult = { ...currentResults, data: sortedData };
             displayResults(sortedResult);
+            
+            // Update details panel if it's open
+            updateDetailsAfterSort();
         }
 
         function exportToCsv() {
@@ -1612,8 +1984,18 @@ export class BargePanel {
         // Add keyboard support for cell selection
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
-                clearSelection();
-                hideContextMenu(); // Also hide context menu on Escape
+                // Close details panel if open, otherwise clear selection
+                if (currentDetailRowIndex >= 0) {
+                    closeDetails();
+                } else {
+                    clearSelection();
+                    hideContextMenu(); // Also hide context menu on Escape
+                }
+            } else if (currentDetailRowIndex >= 0 && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
+                // Navigate details panel with arrow keys when it's open
+                event.preventDefault();
+                const direction = event.key === 'ArrowUp' ? -1 : 1;
+                navigateDetails(direction);
             } else if ((event.ctrlKey || event.metaKey) && event.key === 'a') {
                 // Ctrl/Cmd+A to select all cells
                 event.preventDefault();
@@ -1913,6 +2295,256 @@ export class BargePanel {
             exportBtn.style.display = 'none';
         }
 
+        // Details panel functionality
+        let currentDetailRowIndex = -1;
+        let currentDetailRowData = null;
+        
+        function updateDetailButtonStates() {
+            const buttons = document.querySelectorAll('.detail-button');
+            buttons.forEach((button, index) => {
+                const isActive = currentDetailRowIndex === index;
+                const svg = button.querySelector('svg');
+                if (svg) {
+                    const circle = svg.querySelector('circle');
+                    if (circle) {
+                        if (isActive) {
+                            circle.setAttribute('fill', 'currentColor');
+                            circle.removeAttribute('stroke');
+                            circle.removeAttribute('stroke-width');
+                            circle.setAttribute('r', '5');
+                            button.classList.add('active');
+                        } else {
+                            circle.setAttribute('fill', 'none');
+                            circle.setAttribute('stroke', 'currentColor');
+                            circle.setAttribute('stroke-width', '2');
+                            circle.setAttribute('r', '5');
+                            button.classList.remove('active');
+                        }
+                    }
+                }
+            });
+        }
+        
+        function selectEntireRow(rowIndex) {
+            if (!currentResults || !currentResults.columns || rowIndex < 0) {
+                return;
+            }
+            
+            clearSelection();
+            
+            // Select all cells in the row (excluding the details button column which is at index -1)
+            for (let colIndex = 0; colIndex < currentResults.columns.length; colIndex++) {
+                const cellElement = document.querySelector('td[data-row="' + rowIndex + '"][data-col="' + colIndex + '"]');
+                if (cellElement) {
+                    const cellKey = rowIndex + '-' + colIndex;
+                    selectedCells.add(cellKey);
+                    cellElement.classList.add('selected');
+                }
+            }
+        }
+        
+        function showRowDetails(rowIndex) {
+            if (!currentResults || !currentResults.data || rowIndex < 0 || rowIndex >= currentResults.data.length) {
+                return;
+            }
+            
+            currentDetailRowIndex = rowIndex;
+            currentDetailRowData = currentResults.data[rowIndex];
+            
+            // Update button states to show active state
+            updateDetailButtonStates();
+            
+            // Select the entire row when showing details
+            selectEntireRow(rowIndex);
+            
+            const contentWrapper = document.getElementById('contentWrapper');
+            const detailsSection = document.getElementById('detailsSection');
+            const tableSection = document.getElementById('tableSection');
+            const resizeHandle = document.getElementById('resizeHandle');
+            const detailsContent = document.getElementById('detailsContent');
+            const detailsTitle = document.querySelector('.details-title');
+            
+            // Detect and set layout
+            detectAndSetLayout();
+            
+            // Show the details section and resize handle
+            detailsSection.style.display = 'flex';
+            resizeHandle.style.display = 'block';
+            
+            // Set initial flex values for 2:1 ratio (table:details)
+            if (tableSection && detailsSection) {
+                tableSection.style.flex = '2 1 0';
+                detailsSection.style.flex = '1 1 0';
+            }
+            
+            // Set initial resize handle position
+            setTimeout(() => {
+                const resizeHandle = document.getElementById('resizeHandle');
+                if (resizeHandle) {
+                    if (currentLayout === 'horizontal') {
+                        resizeHandle.style.left = '66.666%';
+                        resizeHandle.style.top = '2.5%'; // Account for 95% height with 2.5% margin
+                    } else {
+                        resizeHandle.style.top = 'calc(66.666% - 3px)';
+                        resizeHandle.style.left = '2.5%'; // Account for 95% width with 2.5% margin
+                    }
+                }
+            }, 0);
+            
+            // Initialize resizing if not already done
+            initializeResizing();
+            
+            // Update title to show current row
+            const rowNumber = rowIndex + 1;
+            const totalRows = currentResults.data.length;
+            detailsTitle.textContent = 'Row ' + rowNumber + ' of ' + totalRows;
+            
+            // Update navigation buttons
+            updateDetailsNavigation();
+            
+            // Generate and display the row details
+            const rowData = generateRowObject(rowIndex);
+            const jsonHtml = formatAsJsonViewer(rowData);
+            detailsContent.innerHTML = jsonHtml;
+        }
+        
+        function closeDetails() {
+            const detailsSection = document.getElementById('detailsSection');
+            const resizeHandle = document.getElementById('resizeHandle');
+            const tableSection = document.getElementById('tableSection');
+            
+            detailsSection.style.display = 'none';
+            resizeHandle.style.display = 'none';
+            
+            // Reset flex values
+            if (tableSection) tableSection.style.flex = '';
+            if (detailsSection) detailsSection.style.flex = '';
+            
+            currentDetailRowIndex = -1;
+            currentDetailRowData = null;
+            
+            // Update button states to remove active state
+            updateDetailButtonStates();
+        }
+        
+        function updateDetailsAfterSort() {
+            // If details panel is open, find the new index of the tracked row data
+            if (currentDetailRowData && currentResults && currentResults.data) {
+                const newIndex = currentResults.data.findIndex(row => {
+                    // Compare objects by all their properties
+                    if (!row || typeof row !== 'object') return false;
+                    
+                    const keys1 = Object.keys(currentDetailRowData);
+                    const keys2 = Object.keys(row);
+                    
+                    if (keys1.length !== keys2.length) return false;
+                    
+                    return keys1.every(key => currentDetailRowData[key] === row[key]);
+                });
+                
+                if (newIndex !== -1) {
+                    currentDetailRowIndex = newIndex;
+                    
+                    // Update the details panel title
+                    const detailsTitle = document.querySelector('.details-title');
+                    if (detailsTitle) {
+                        const rowNumber = newIndex + 1;
+                        const totalRows = currentResults.data.length;
+                        detailsTitle.textContent = 'Row ' + rowNumber + ' of ' + totalRows;
+                    }
+                    
+                    // Update navigation buttons
+                    updateDetailsNavigation();
+                    
+                    // Select the row at its new position
+                    selectEntireRow(newIndex);
+                }
+            }
+        }
+        
+        function navigateDetails(direction) {
+            if (!currentResults || !currentResults.data) {
+                return;
+            }
+            
+            const newIndex = currentDetailRowIndex + direction;
+            
+            if (newIndex >= 0 && newIndex < currentResults.data.length) {
+                showRowDetails(newIndex);
+            }
+        }
+        
+        function updateDetailsNavigation() {
+            const prevBtn = document.getElementById('detailsPrevBtn');
+            const nextBtn = document.getElementById('detailsNextBtn');
+            
+            if (!currentResults || !currentResults.data) {
+                prevBtn.disabled = true;
+                nextBtn.disabled = true;
+                return;
+            }
+            
+            prevBtn.disabled = currentDetailRowIndex <= 0;
+            nextBtn.disabled = currentDetailRowIndex >= currentResults.data.length - 1;
+        }
+        
+        function generateRowObject(rowIndex) {
+            if (!currentResults || !currentResults.columns || !currentResults.data || 
+                rowIndex < 0 || rowIndex >= currentResults.data.length) {
+                return {};
+            }
+            
+            const row = currentResults.data[rowIndex];
+            const rowObject = {};
+            
+            currentResults.columns.forEach((column, colIndex) => {
+                if (colIndex < row.length) {
+                    rowObject[column.name] = row[colIndex];
+                }
+            });
+            
+            return rowObject;
+        }
+        
+        function formatAsJsonViewer(obj) {
+            if (!obj || typeof obj !== 'object') {
+                return '<div class="json-viewer">No data available</div>';
+            }
+            
+            let html = '<div class="json-viewer">';
+            
+            Object.keys(obj).forEach(key => {
+                const value = obj[key];
+                html += '<div class="json-property">';
+                html += '<div class="json-key">' + escapeHtml(key) + '</div>';
+                
+                if (value === null || value === undefined) {
+                    html += '<div class="json-value null">null</div>';
+                } else if (typeof value === 'string') {
+                    // Remove quotes for cleaner display, since we're in boxes now
+                    html += '<div class="json-value string">' + escapeHtml(value) + '</div>';
+                } else if (typeof value === 'number') {
+                    html += '<div class="json-value number">' + value + '</div>';
+                } else if (typeof value === 'boolean') {
+                    html += '<div class="json-value boolean">' + value + '</div>';
+                } else if (typeof value === 'object') {
+                    try {
+                        const jsonString = JSON.stringify(value, null, 2);
+                        html += '<pre class="json-value object">' + escapeHtml(jsonString) + '</pre>';
+                    } catch (error) {
+                        html += '<div class="json-value object">' + escapeHtml(String(value)) + '</div>';
+                    }
+                } else {
+                    html += '<div class="json-value">' + escapeHtml(String(value)) + '</div>';
+                }
+                
+                html += '</div>';
+            });
+            
+            html += '</div>';
+            return html;
+        }
+
         window.addEventListener('message', event => {
             const message = event.data;
             switch (message.type) {
@@ -1929,6 +2561,141 @@ export class BargePanel {
                     break;
             }
         });
+
+        // Layout and resizing functionality
+        let isResizingPanel = false;
+        let resizeInitialized = false;
+        let currentLayout = 'horizontal'; // 'horizontal' or 'vertical'
+
+        function detectAndSetLayout() {
+            const contentWrapper = document.getElementById('contentWrapper');
+            if (!contentWrapper) return;
+            
+            const rect = contentWrapper.getBoundingClientRect();
+            const aspectRatio = rect.width / rect.height;
+            
+            // Use horizontal layout if width is significantly larger than height
+            const newLayout = aspectRatio > 1.2 ? 'horizontal' : 'vertical';
+            
+            if (newLayout !== currentLayout) {
+                currentLayout = newLayout;
+                updateLayoutClasses();
+            }
+        }
+
+        function updateLayoutClasses() {
+            const contentWrapper = document.getElementById('contentWrapper');
+            const resizeHandle = document.getElementById('resizeHandle');
+            if (!contentWrapper || !resizeHandle) return;
+            
+            contentWrapper.classList.remove('layout-horizontal', 'layout-vertical');
+            contentWrapper.classList.add('layout-' + currentLayout);
+            
+            // Reset any custom flex values when switching layouts
+            const tableSection = document.getElementById('tableSection');
+            const detailsSection = document.getElementById('detailsSection');
+            if (tableSection) tableSection.style.flex = '2 1 0';
+            if (detailsSection) detailsSection.style.flex = '1 1 0';
+            
+            // Position resize handle at 2:1 ratio
+            if (currentLayout === 'horizontal') {
+                resizeHandle.style.left = '66.666%';
+                resizeHandle.style.top = '2.5%'; // Account for 95% height with 2.5% margin
+            } else {
+                resizeHandle.style.top = 'calc(66.666% - 3px)'; // Account for handle height
+                resizeHandle.style.left = '2.5%'; // Account for 95% width with 2.5% margin
+            }
+        }
+
+        function initializeResizing() {
+            if (resizeInitialized) return;
+            resizeInitialized = true;
+            
+            const resizeHandle = document.getElementById('resizeHandle');
+            if (!resizeHandle) return;
+
+            resizeHandle.addEventListener('mousedown', startResizing);
+            
+            // Add window resize listener for layout detection
+            window.addEventListener('resize', detectAndSetLayout);
+        }
+
+        function startResizing(event) {
+            event.preventDefault();
+            isResizingPanel = true;
+            
+            const resizeHandle = document.getElementById('resizeHandle');
+            if (resizeHandle) {
+                resizeHandle.classList.add('dragging');
+            }
+            
+            const cursor = currentLayout === 'horizontal' ? 'ew-resize' : 'ns-resize';
+            document.body.style.cursor = cursor;
+            document.body.style.userSelect = 'none';
+            
+            document.addEventListener('mousemove', handleResizing);
+            document.addEventListener('mouseup', stopResizing);
+        }
+
+        function handleResizing(event) {
+            if (!isResizingPanel) return;
+            
+            const contentWrapper = document.getElementById('contentWrapper');
+            const tableSection = document.getElementById('tableSection');
+            const detailsSection = document.getElementById('detailsSection');
+            const resizeHandle = document.getElementById('resizeHandle');
+            
+            if (!contentWrapper || !tableSection || !detailsSection || !resizeHandle) return;
+            
+            const wrapperRect = contentWrapper.getBoundingClientRect();
+            
+            if (currentLayout === 'horizontal') {
+                // Horizontal layout - vertical divider
+                const mouseX = event.clientX;
+                const relativeX = mouseX - wrapperRect.left;
+                const percentage = Math.max(20, Math.min(80, (relativeX / wrapperRect.width) * 100));
+                
+                const tablePercentage = percentage;
+                const detailsPercentage = 100 - percentage;
+                
+                tableSection.style.flex = tablePercentage + ' 1 0';
+                detailsSection.style.flex = detailsPercentage + ' 1 0';
+                
+                // Update resize handle position
+                resizeHandle.style.left = percentage + '%';
+                resizeHandle.style.top = '2.5%'; // Account for 95% height with 2.5% margin
+            } else {
+                // Vertical layout - horizontal divider
+                const mouseY = event.clientY;
+                const relativeY = mouseY - wrapperRect.top;
+                const percentage = Math.max(20, Math.min(80, (relativeY / wrapperRect.height) * 100));
+                
+                const tablePercentage = percentage;
+                const detailsPercentage = 100 - percentage;
+                
+                tableSection.style.flex = tablePercentage + ' 1 0';
+                detailsSection.style.flex = detailsPercentage + ' 1 0';
+                
+                // Update resize handle position
+                resizeHandle.style.top = 'calc(' + percentage + '% - 3px)'; // Account for handle height
+                resizeHandle.style.left = '2.5%'; // Account for 95% width with 2.5% margin
+            }
+        }
+
+        function stopResizing() {
+            isResizingPanel = false;
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+            
+            const resizeHandle = document.getElementById('resizeHandle');
+            if (resizeHandle) {
+                resizeHandle.classList.remove('dragging');
+            }
+            
+            document.removeEventListener('mousemove', handleResizing);
+            document.removeEventListener('mouseup', stopResizing);
+        }
+        
     </script>
 </body>
 </html>`;

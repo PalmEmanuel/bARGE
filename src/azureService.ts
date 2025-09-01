@@ -1,19 +1,17 @@
 import { DefaultAzureCredential, InteractiveBrowserCredential } from '@azure/identity';
-import { ResourceGraphClient } from '@azure/arm-resourcegraph';
 import { SubscriptionClient } from '@azure/arm-subscriptions';
 import * as vscode from 'vscode';
 import { AzureSubscription, QueryResult, ColumnDefinition, AuthScope } from './types';
 
 export class AzureService {
     private credential: DefaultAzureCredential | InteractiveBrowserCredential | null = null;
-    private resourceGraphClient: ResourceGraphClient | null = null;
     private subscriptionClient: SubscriptionClient | null = null;
     private currentScope: AuthScope = { type: 'tenant' }; // Default to tenant scope
 
     constructor() {}
 
     private validateAuthentication(): void {
-        if (!this.credential || !this.resourceGraphClient || !this.subscriptionClient) {
+        if (!this.credential || !this.subscriptionClient) {
             throw new Error('Not authenticated. Please authenticate first.');
         }
     }
@@ -25,7 +23,6 @@ export class AzureService {
             
             // Test the credential by trying to get subscriptions
             this.subscriptionClient = new SubscriptionClient(this.credential);
-            this.resourceGraphClient = new ResourceGraphClient(this.credential);
             
             // Test authentication by listing subscriptions
             await this.getSubscriptions();
@@ -42,7 +39,6 @@ export class AzureService {
                 });
                 
                 this.subscriptionClient = new SubscriptionClient(this.credential);
-                this.resourceGraphClient = new ResourceGraphClient(this.credential);
                 
                 // Test authentication
                 await this.getSubscriptions();
@@ -90,30 +86,15 @@ export class AzureService {
         const effectiveSubscriptions = this.currentScope.type === 'tenant' ? undefined : (subscriptionIds || this.currentScope.subscriptions);
 
         try {
-            // Try the REST API approach first to avoid AbortSignal issues
             const result = await this.runQueryViaRestApi(query, effectiveSubscriptions);
             const executionTime = Date.now() - startTime;
             return {
                 ...result,
                 executionTimeMs: executionTime
             };
-        } catch (restError) {
-            console.log('REST API failed, trying SDK approach:', restError);
-            
-            // Fallback to SDK approach
-            try {
-                const result = await this.runQueryViaSdk(query, effectiveSubscriptions);
-                const executionTime = Date.now() - startTime;
-                return {
-                    ...result,
-                    executionTimeMs: executionTime
-                };
-            } catch (sdkError) {
-                console.error('Both REST API and SDK failed');
-                console.error('REST Error:', restError);
-                console.error('SDK Error:', sdkError);
-                throw new Error(`Query execution failed. REST API: ${restError}. SDK: ${sdkError}`);
-            }
+        } catch (error) {
+            console.error('Query execution failed:', error);
+            throw new Error(`Query execution failed: ${error}`);
         }
     }
 
@@ -180,57 +161,6 @@ export class AzureService {
 
         // Extract row data
         const data: any[][] = tableData.rows || [];
-
-        return {
-            columns,
-            data,
-            totalRecords: data.length,
-            query,
-            timestamp: new Date().toISOString()
-        };
-    }
-
-    private async runQueryViaSdk(query: string, subscriptionIds?: string[]): Promise<QueryResult> {
-        console.log('Trying SDK approach...');
-        
-        // Use the simplest possible API call format
-        const queryRequest: any = {
-            query: query
-        };
-
-        // Only add subscriptions if we're in subscription scope
-        if (subscriptionIds && subscriptionIds.length > 0) {
-            queryRequest.subscriptions = subscriptionIds;
-        }
-
-        console.log('About to call resourceGraphClient.resources with:', queryRequest);
-
-        // Call the API without any additional options to avoid AbortSignal issues
-        const result = await this.resourceGraphClient!.resources(queryRequest);
-        
-        console.log('Raw result from Azure SDK:', result);
-        
-        // The response format should be: { data: { columns: [...], rows: [[...]] } }
-        let tableData;
-        if (result && result.data) {
-            tableData = result.data;
-        } else if (result && (result as any).columns && (result as any).rows) {
-            tableData = result;
-        } else {
-            console.error('Unexpected response format:', result);
-            throw new Error('Unexpected response format from Azure Resource Graph');
-        }
-
-        console.log('Processed table data:', tableData);
-        
-        // Extract column definitions
-        const columns: ColumnDefinition[] = (tableData as any).columns?.map((col: any) => ({
-            name: col.name,
-            type: col.type
-        })) || [];
-
-        // Extract row data
-        const data: any[][] = (tableData as any).rows || [];
 
         return {
             columns,
@@ -324,7 +254,6 @@ export class AzureService {
 
     isAuthenticated(): boolean {
         return this.credential !== null && 
-               this.resourceGraphClient !== null && 
                this.subscriptionClient !== null;
     }
 }
