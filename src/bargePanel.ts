@@ -1065,6 +1065,12 @@ export class BargePanel {
                 col: col
             };
             
+            // Simple selection logic: if we don't have multiple cells selected,
+            // make sure the right-clicked cell is selected before showing menu
+            if (selectedCells.size <= 1) {
+                selectCell(target, row, col); // target is the cellElement
+            }
+            
             // Hide tooltip when showing context menu
             hideCustomTooltip();
             
