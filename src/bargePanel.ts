@@ -1662,6 +1662,9 @@ export class BargePanel {
             
             const sortedResult = { ...currentResults, data: sortedData };
             displayResults(sortedResult);
+            
+            // Update details panel if it's open
+            updateDetailsAfterSort();
         }
 
         function exportToCsv() {
@@ -2082,6 +2085,7 @@ export class BargePanel {
 
         // Details panel functionality
         let currentDetailRowIndex = -1;
+        let currentDetailRowData = null;
         
         function selectEntireRow(rowIndex) {
             if (!currentResults || !currentResults.columns || rowIndex < 0) {
@@ -2107,6 +2111,7 @@ export class BargePanel {
             }
             
             currentDetailRowIndex = rowIndex;
+            currentDetailRowData = currentResults.data[rowIndex];
             
             // Select the entire row when showing details
             selectEntireRow(rowIndex);
@@ -2142,6 +2147,42 @@ export class BargePanel {
             tableContainer.classList.remove('with-details');
             
             currentDetailRowIndex = -1;
+            currentDetailRowData = null;
+        }
+        
+        function updateDetailsAfterSort() {
+            // If details panel is open, find the new index of the tracked row data
+            if (currentDetailRowData && currentResults && currentResults.data) {
+                const newIndex = currentResults.data.findIndex(row => {
+                    // Compare objects by all their properties
+                    if (!row || typeof row !== 'object') return false;
+                    
+                    const keys1 = Object.keys(currentDetailRowData);
+                    const keys2 = Object.keys(row);
+                    
+                    if (keys1.length !== keys2.length) return false;
+                    
+                    return keys1.every(key => currentDetailRowData[key] === row[key]);
+                });
+                
+                if (newIndex !== -1) {
+                    currentDetailRowIndex = newIndex;
+                    
+                    // Update the details panel title
+                    const detailsTitle = document.querySelector('.details-title');
+                    if (detailsTitle) {
+                        const rowNumber = newIndex + 1;
+                        const totalRows = currentResults.data.length;
+                        detailsTitle.textContent = 'Row ' + rowNumber + ' of ' + totalRows;
+                    }
+                    
+                    // Update navigation buttons
+                    updateDetailsNavigation();
+                    
+                    // Select the row at its new position
+                    selectEntireRow(newIndex);
+                }
+            }
         }
         
         function navigateDetails(direction) {
