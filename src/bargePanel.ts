@@ -352,6 +352,11 @@ export class BargePanel {
         .nav-btn:hover:not(:disabled), .close-btn:hover {
             background-color: var(--vscode-button-hoverBackground);
         }
+        .nav-btn:active:not(:disabled), .close-btn:active {  
+            background-color: var(--vscode-button-hoverBackground);  
+            transform: scale(0.95);  
+            transition: transform 0.1s ease;  
+        }
         .nav-btn:disabled {
             background-color: var(--vscode-button-secondaryBackground);
             color: var(--vscode-disabledForeground);
@@ -756,10 +761,14 @@ export class BargePanel {
                         <div class="details-title">Row Details</div>
                         <div class="details-navigation">
                             <button id="detailsPrevBtn" class="nav-btn" onclick="navigateDetails(-1)" title="Previous row">
-                                <span>↑</span>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="18,15 12,9 6,15"></polyline>
+                                </svg>
                             </button>
                             <button id="detailsNextBtn" class="nav-btn" onclick="navigateDetails(1)" title="Next row">
-                                <span>↓</span>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="6,9 12,15 18,9"></polyline>
+                                </svg>
                             </button>
                             <button id="detailsCloseBtn" class="close-btn" onclick="closeDetails()" title="Close details">
                                 <span>×</span>
@@ -840,6 +849,12 @@ export class BargePanel {
 
         function displayResults(result) {
             currentResults = result;
+            
+            // Close details pane when new query results are displayed
+            if (currentDetailRowIndex >= 0) {
+                closeDetails();
+            }
+            
             const tableContainer = document.getElementById('tableContainer');
             const resultsInfo = document.getElementById('resultsInfo');
             const exportBtn = document.getElementById('exportBtn');
@@ -2345,6 +2360,12 @@ export class BargePanel {
         
         function showRowDetails(rowIndex) {
             if (!currentResults || !currentResults.data || rowIndex < 0 || rowIndex >= currentResults.data.length) {
+                return;
+            }
+            
+            // If clicking on the already selected row, close the details pane
+            if (currentDetailRowIndex === rowIndex) {
+                closeDetails();
                 return;
             }
             
