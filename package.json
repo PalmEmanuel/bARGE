@@ -4,7 +4,15 @@
   "description": "bARGE is a boosted Azure Resource Graph Explorer for Visual Studio Code, with features for comparison and insights into KQL results.",
   "version": "0.0.8",
   "publisher": "PalmEmanuel",
-  "icon": "media/bARGE-small.png",
+  "icon": "media/readme/bARGE-small.png",
+  "files": [
+    "media/**/*",
+    "README.md"
+  ],
+  "galleryBanner": {
+    "color": "#008BD8",
+    "theme": "dark"
+  },
   "author": {
     "name": "Emanuel Palm",
     "url": "https://github.com/PalmEmanuel"
@@ -17,7 +25,7 @@
   "bugs": {
     "url": "https://github.com/PalmEmanuel/bARGE/issues"
   },
-  "homepage": "https://github.com/PalmEmanuel/bARGE#readme",
+  "homepage": "https://github.com/PalmEmanuel/bARGE",
   "keywords": [
     "azure",
     "resource graph",
@@ -58,7 +66,6 @@
         "category": "bARGE"
       }
     ],
-
     "menus": {
       "commandPalette": [
         {
