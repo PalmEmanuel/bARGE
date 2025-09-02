@@ -1,6 +1,6 @@
 # bARGE - boosted Azure Resource Graph Explorer
 
-![Visual Studio Marketplace Downloads](https://img.shields.io/visual-studio-marketplace/d/PalmEmanuel.barge-vscode)
+[![bARGE]][bARGEMarketplace] [![bARGEDownloads]][bARGEMarketplace]
 
 <img src="media/readme/bARGE.png" width="256">
 
@@ -152,3 +152,8 @@ If you encounter authentication problems:
 - [Azure Resource Graph Documentation](https://docs.microsoft.com/en-us/azure/governance/resource-graph/)
 - [KQL (Kusto Query Language) Reference](https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/)
 - [Azure Resource Graph Sample Queries](https://docs.microsoft.com/en-us/azure/governance/resource-graph/samples/starter)
+
+<!-- References -->
+[bARGEDownloads]: https://img.shields.io/visual-studio-marketplace/d/PalmEmanuel.barge-vscode?label=bARGE%20Downloads
+[bARGEMarketplace]: https://marketplace.visualstudio.com/items?itemName=PalmEmanuel.barge-vscode
+[bARGE]: https://img.shields.io/visual-studio-marketplace/d/PalmEmanuel.barge-vscode?label=bARGE
