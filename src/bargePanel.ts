@@ -352,15 +352,10 @@ export class BargePanel {
         .nav-btn:hover:not(:disabled), .close-btn:hover {
             background-color: var(--vscode-button-hoverBackground);
         }
-        .nav-btn:active:not(:disabled) {
-            background-color: var(--vscode-button-hoverBackground);
-            transform: scale(0.95);
-            transition: transform 0.1s ease;
-        }
-        .close-btn:active {
-            background-color: var(--vscode-button-hoverBackground);
-            transform: scale(0.95);
-            transition: transform 0.1s ease;
+        .nav-btn:active:not(:disabled), .close-btn:active {  
+            background-color: var(--vscode-button-hoverBackground);  
+            transform: scale(0.95);  
+            transition: transform 0.1s ease;  
         }
         .nav-btn:disabled {
             background-color: var(--vscode-button-secondaryBackground);
