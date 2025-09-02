@@ -370,6 +370,10 @@ export class BargePanel {
             word-wrap: break-word; /* Break long words */
             white-space: pre-wrap; /* Preserve formatting but allow wrapping */
         }
+        /* Reduce padding when showing comparison table */
+        .details-content.comparison-view {
+            padding: 8px;
+        }
         .detail-button {
             background: transparent;
             color: var(--vscode-descriptionForeground);
@@ -385,6 +389,8 @@ export class BargePanel {
             transition: all 0.2s ease;
             opacity: 0.6;
             margin: auto;
+            /* Prevent focus outline */
+            outline: none !important;
         }
         .detail-button:hover {
             color: var(--vscode-foreground);
@@ -394,6 +400,12 @@ export class BargePanel {
         .detail-button:active {
             background-color: var(--vscode-list-activeSelectionBackground);
             transform: scale(0.95);
+        }
+        .detail-button:focus,
+        .detail-button:focus-visible {
+            outline: none !important;
+            box-shadow: none !important;
+            background-color: transparent !important;
         }
         .detail-button.active {
             color: var(--vscode-focusBorder);
@@ -412,12 +424,44 @@ export class BargePanel {
             padding: 2px !important;
             vertical-align: middle;
             position: relative;
+            /* Prevent focus outline issues */
+            outline: none !important;
+        }
+        .detail-button-cell:focus,
+        .detail-button-cell:focus-visible {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        /* Override any table cell focus styles specifically for detail button cells */
+        .results-table .detail-button-cell:focus,
+        .results-table .detail-button-cell:focus-visible,
+        .results-table td.detail-button-cell:focus,
+        .results-table td.detail-button-cell:focus-visible {
+            outline: none !important;
+            box-shadow: none !important;
+            background-color: transparent !important;
         }
         th.detail-button-cell {
             cursor: default !important;
             user-select: none !important;
             position: relative !important;
             pointer-events: auto !important;
+        }
+        /* Make header magnifying glass clickable with hover feedback */
+        th.detail-button-cell.select-all-header {
+            cursor: pointer !important;
+            transition: all 0.2s ease;
+        }
+        th.detail-button-cell.select-all-header:hover {
+            background-color: var(--vscode-list-hoverBackground) !important;
+        }
+        th.detail-button-cell.select-all-header:hover svg {
+            opacity: 1 !important;
+            transform: scale(1.1);
+        }
+        th.detail-button-cell.select-all-header:active {
+            background-color: var(--vscode-list-activeSelectionBackground) !important;
+            transform: scale(0.95);
         }
         th.detail-button-cell::after {
             display: none !important;
@@ -438,6 +482,21 @@ export class BargePanel {
             overflow: hidden !important;
         }
         .detail-button-cell:hover {
+            background-color: transparent !important;
+        }
+        /* Additional comprehensive focus prevention for detail buttons */
+        .detail-button-cell *,
+        .detail-button-cell button,
+        .detail-button-cell svg {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        .detail-button-cell *:focus,
+        .detail-button-cell *:focus-visible,
+        .detail-button-cell button:focus,
+        .detail-button-cell button:focus-visible {
+            outline: none !important;
+            box-shadow: none !important;
             background-color: transparent !important;
         }
         .json-viewer {
@@ -502,6 +561,123 @@ export class BargePanel {
             border-left: 3px solid var(--vscode-widget-border);
             margin-top: 4px;
         }
+        
+        /* Comparison view styles */
+        .comparison-viewer {
+            font-family: var(--vscode-editor-font-family, 'Consolas', 'Monaco', monospace);
+            font-size: 0.9em;
+            line-height: 1.4;
+            color: var(--vscode-editor-foreground);
+            padding: 4px;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid var(--vscode-widget-border);
+        }
+        .comparison-table th,
+        .comparison-table td {
+            padding: 8px;
+            border: 1px solid var(--vscode-widget-border);
+            text-align: left;
+            vertical-align: top;
+        }
+        .comparison-table th {
+            background-color: var(--vscode-list-hoverBackground);
+            font-weight: 600;
+            position: relative;
+            /* Removed sticky positioning */
+        }
+        .comparison-table th:not(:last-child) {
+            border-right: 1px solid var(--vscode-widget-border);
+        }
+        .comparison-table th .column-resizer {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            cursor: col-resize;
+            background: transparent;
+            z-index: 1;
+        }
+        .comparison-table th .column-resizer:hover {
+            background-color: var(--vscode-focusBorder);
+        }
+        .property-name-header {
+            width: auto;
+            min-width: 160px; /* Increased from 120px to accommodate text + indicator */
+            max-width: none;
+        }
+        .row-header {
+            min-width: 150px;
+        }
+        .property-name-with-indicator {
+            font-weight: 500;
+            color: var(--vscode-symbolIcon-propertyForeground, #9cdcfe);
+            word-break: break-word;
+            position: relative;
+            /* Remove flex layout */
+            min-height: calc(100% - 16px);
+        }
+        .property-name-text {
+            /* Add right margin to make space for the indicator */
+            margin-right: 24px; /* Increased from 20px to give more space */
+        }
+        .match-indicator-inline {
+            /* Position the indicator to align with text baseline */
+            position: absolute;
+            top: 8px; /* Match the cell's top padding to align with text */
+            right: 4px; /* Small padding from the right edge */
+            display: inline-block;
+            line-height: 1; /* Ensure consistent height */
+        }
+        .property-value {
+            word-break: break-word;
+            max-width: 300px;
+        }
+        .null-value {
+            color: var(--vscode-symbolIcon-nullForeground, #808080);
+            font-style: italic;
+        }
+        .object-value {
+            background-color: var(--vscode-textCodeBlock-background);
+            padding: 4px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            margin: 0;
+            max-height: 200px;
+            overflow: auto;
+        }
+        .scalar-value {
+            color: var(--vscode-editor-foreground);
+        }
+        .property-row:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+        /* Property column styling to fix border issues */
+        .comparison-table .property-row td:first-child {
+            border-right: 2px solid var(--vscode-widget-border);
+            background-color: rgba(255, 255, 255, 0.02);
+            position: relative;
+            /* Different approach: force the cell to use table-cell display with proper height */
+            height: 100%;
+        }
+        .comparison-table .property-row td:first-child::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: inherit;
+            z-index: -1;
+        }
+        /* Ensure proper vertical alignment for property cells */
+        .comparison-table .property-row td {
+            vertical-align: top;
+        }
+        
         .footer {
             display: flex;
             justify-content: space-between;
@@ -586,6 +762,26 @@ export class BargePanel {
             cursor: pointer;
             user-select: none;
             position: relative;
+            /* Prevent focus outline issues */
+            outline: none !important;
+        }
+        .results-table td:focus,
+        .results-table td:focus-visible {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        /* Prevent selection highlighting on shift+click */
+        .results-table,
+        .results-table * {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        .results-table td::-moz-focus-inner,
+        .detail-button-cell::-moz-focus-inner {
+            border: 0;
+            outline: none;
         }
         .results-table td:hover {
             background-color: var(--vscode-list-hoverBackground);
@@ -851,7 +1047,7 @@ export class BargePanel {
             currentResults = result;
             
             // Close details pane when new query results are displayed
-            if (currentDetailRowIndex >= 0) {
+            if (selectedDetailRowIndices.length > 0) {
                 closeDetails();
             }
             
@@ -874,8 +1070,8 @@ export class BargePanel {
             let tableHtml = '<table class="results-table"><thead><tr>';
             
             // Add details button column header
-            tableHtml += '<th class="detail-button-cell" style="width: 36px; cursor: default; text-align: center; padding: 0;" title="Row Details" draggable="false" ondragstart="return false;">' +
-                '<svg viewBox="0 0 16 16" style="width: 18px; height: 18px; fill: var(--vscode-descriptionForeground); opacity: 0.7; vertical-align: middle; margin: 0;">' +
+            tableHtml += '<th class="detail-button-cell select-all-header" style="width: 36px; cursor: pointer; text-align: center; padding: 0;" title="Click to select/deselect all rows" draggable="false" ondragstart="return false;" onclick="toggleSelectAllRows()">' +
+                '<svg viewBox="0 0 16 16" style="width: 18px; height: 18px; fill: var(--vscode-descriptionForeground); opacity: 0.7; vertical-align: middle; margin: 0; transition: all 0.2s ease;">' +
                 '<circle cx="6.5" cy="6.5" r="4" fill="none" stroke="currentColor" stroke-width="1.5"/>' +
                 '<path d="m9.5 9.5 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
                 '</svg>' +
@@ -905,12 +1101,13 @@ export class BargePanel {
                 tableHtml += '<tr>';
                 
                 // Add details button cell  
-                const circleIcon = (currentDetailRowIndex === rowIndex) ? 
+                const isSelected = selectedDetailRowIndices.includes(rowIndex);
+                const circleIcon = isSelected ? 
                     '<circle cx="8" cy="8" r="5" fill="currentColor"/>' :
                     '<circle cx="8" cy="8" r="5" fill="none" stroke="currentColor" stroke-width="2"/>';
                 
                 tableHtml += '<td class="detail-button-cell">' +
-                    '<button class="detail-button' + (currentDetailRowIndex === rowIndex ? ' active' : '') + '" onclick="showRowDetails(' + rowIndex + ')" title="View row details">' +
+                    '<button class="detail-button' + (isSelected ? ' active' : '') + '" onclick="showRowDetails(' + rowIndex + ')" title="View row details">' +
                     '<svg viewBox="0 0 16 16">' +
                     circleIcon +
                     '</svg>' +
@@ -2000,14 +2197,14 @@ export class BargePanel {
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
                 // Close details panel if open, otherwise clear selection
-                if (currentDetailRowIndex >= 0) {
+                if (selectedDetailRowIndices.length > 0) {
                     closeDetails();
                 } else {
                     clearSelection();
                     hideContextMenu(); // Also hide context menu on Escape
                 }
-            } else if (currentDetailRowIndex >= 0 && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
-                // Navigate details panel with arrow keys when it's open
+            } else if (selectedDetailRowIndices.length === 1 && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
+                // Navigate details panel with arrow keys when exactly one row is selected
                 event.preventDefault();
                 const direction = event.key === 'ArrowUp' ? -1 : 1;
                 navigateDetails(direction);
@@ -2312,12 +2509,13 @@ export class BargePanel {
 
         // Details panel functionality
         let currentDetailRowIndex = -1;
+        let selectedDetailRowIndices = []; // Array to track multiple selected rows
         let currentDetailRowData = null;
         
         function updateDetailButtonStates() {
             const buttons = document.querySelectorAll('.detail-button');
             buttons.forEach((button, index) => {
-                const isActive = currentDetailRowIndex === index;
+                const isActive = selectedDetailRowIndices.includes(index);
                 const svg = button.querySelector('svg');
                 if (svg) {
                     const circle = svg.querySelector('circle');
@@ -2338,6 +2536,23 @@ export class BargePanel {
                     }
                 }
             });
+            
+            // Update magnifying glass header state
+            const headerMagnifyingGlass = document.querySelector('.select-all-header svg circle');
+            if (headerMagnifyingGlass) {
+                const isComparisonActive = selectedDetailRowIndices.length > 1;
+                if (isComparisonActive) {
+                    // Add blue fill while keeping the grey outline
+                    headerMagnifyingGlass.setAttribute('fill', 'var(--vscode-focusBorder)');
+                    headerMagnifyingGlass.setAttribute('stroke', 'currentColor');
+                    headerMagnifyingGlass.setAttribute('stroke-width', '1.5');
+                } else {
+                    // Reset to outline only
+                    headerMagnifyingGlass.setAttribute('fill', 'none');
+                    headerMagnifyingGlass.setAttribute('stroke', 'currentColor');
+                    headerMagnifyingGlass.setAttribute('stroke-width', '1.5');
+                }
+            }
         }
         
         function selectEntireRow(rowIndex) {
@@ -2345,7 +2560,7 @@ export class BargePanel {
                 return;
             }
             
-            clearSelection();
+            // Don't clear selection here anymore - it's handled by the caller
             
             // Select all cells in the row (excluding the details button column which is at index -1)
             for (let colIndex = 0; colIndex < currentResults.columns.length; colIndex++) {
@@ -2358,25 +2573,114 @@ export class BargePanel {
             }
         }
         
+        function toggleSelectAllRows() {
+            if (!currentResults || !currentResults.data) {
+                return;
+            }
+            
+            // Check if all rows are currently selected
+            const allSelected = currentResults.data.length > 0 && 
+                               selectedDetailRowIndices.length === currentResults.data.length &&
+                               selectedDetailRowIndices.every((index, i) => index === i);
+            
+            if (allSelected) {
+                // Deselect all rows and close details pane
+                selectedDetailRowIndices = [];
+                // Clear all cell selections
+                clearSelection();
+                updateDetailButtonStates();
+                closeDetails();
+            } else {
+                // Select all rows (or remaining rows)
+                selectedDetailRowIndices = [];
+                for (let i = 0; i < currentResults.data.length; i++) {
+                    selectedDetailRowIndices.push(i);
+                }
+                
+                // Update the detail buttons visual state
+                updateDetailButtonStates();
+                
+                // Select all cells in all selected rows (clear previous selection first)
+                clearSelection();
+                selectedDetailRowIndices.forEach(idx => selectEntireRow(idx));
+                
+                // Show comparison view for all rows
+                if (selectedDetailRowIndices.length > 1) {
+                    // Open details pane properly with correct sizing
+                    const detailsSection = document.getElementById('detailsSection');
+                    const resizeHandle = document.getElementById('resizeHandle');
+                    const tableSection = document.getElementById('tableSection');
+                    
+                    // Detect and set proper layout
+                    detectAndSetLayout();
+                    
+                    // Show the details section and resize handle
+                    if (detailsSection) detailsSection.style.display = 'flex';
+                    if (resizeHandle) resizeHandle.style.display = 'block';
+                    
+                    // Set initial flex values for 2:1 ratio (table:details)
+                    if (tableSection && detailsSection) {
+                        tableSection.style.flex = '2 1 0';
+                        detailsSection.style.flex = '1 1 0';
+                    }
+                    
+                    // Set initial resize handle position
+                    setTimeout(() => {
+                        const resizeHandle = document.getElementById('resizeHandle');
+                        if (resizeHandle) {
+                            if (currentLayout === 'horizontal') {
+                                resizeHandle.style.left = '66.666%';
+                                resizeHandle.style.top = '2.5%'; // Account for 95% height with 2.5% margin
+                            } else {
+                                resizeHandle.style.top = 'calc(66.666% - 3px)';
+                                resizeHandle.style.left = '2.5%'; // Account for 95% width with 2.5% margin
+                            }
+                            initializeResizing();
+                        }
+                    }, 0);
+                    
+                    const detailsContent = document.getElementById('detailsContent');
+                    if (detailsContent) {
+                        detailsContent.innerHTML = generateComparisonView(selectedDetailRowIndices);
+                        detailsContent.classList.add('comparison-view');
+                        initializeComparisonColumnResizing();
+                    }
+                } else if (selectedDetailRowIndices.length === 1) {
+                    // Show single row details
+                    showRowDetails(selectedDetailRowIndices[0]);
+                }
+            }
+        }
+        
         function showRowDetails(rowIndex) {
             if (!currentResults || !currentResults.data || rowIndex < 0 || rowIndex >= currentResults.data.length) {
                 return;
             }
             
-            // If clicking on the already selected row, close the details pane
-            if (currentDetailRowIndex === rowIndex) {
-                closeDetails();
-                return;
+            // Toggle selection for multiple row comparison
+            const existingIndex = selectedDetailRowIndices.indexOf(rowIndex);
+            if (existingIndex >= 0) {
+                // Remove from selection
+                selectedDetailRowIndices.splice(existingIndex, 1);
+                if (selectedDetailRowIndices.length === 0) {
+                    closeDetails();
+                    return;
+                }
+            } else {
+                // Add to selection
+                selectedDetailRowIndices.push(rowIndex);
             }
             
-            currentDetailRowIndex = rowIndex;
-            currentDetailRowData = currentResults.data[rowIndex];
+            // For backward compatibility, keep currentDetailRowIndex as the first selected
+            currentDetailRowIndex = selectedDetailRowIndices[0] || -1;
+            currentDetailRowData = selectedDetailRowIndices.length > 0 ? currentResults.data[selectedDetailRowIndices[0]] : null;
             
             // Update button states to show active state
             updateDetailButtonStates();
             
-            // Select the entire row when showing details
-            selectEntireRow(rowIndex);
+            // Select all selected rows (clear previous selection first)
+            clearSelection();
+            selectedDetailRowIndices.forEach(idx => selectEntireRow(idx));
             
             const contentWrapper = document.getElementById('contentWrapper');
             const detailsSection = document.getElementById('detailsSection');
@@ -2415,24 +2719,40 @@ export class BargePanel {
             // Initialize resizing if not already done
             initializeResizing();
             
-            // Update title to show current row
-            const rowNumber = rowIndex + 1;
-            const totalRows = currentResults.data.length;
-            detailsTitle.textContent = 'Row ' + rowNumber + ' of ' + totalRows;
+            // Update title to show selected rows
+            if (selectedDetailRowIndices.length === 1) {
+                const rowNumber = selectedDetailRowIndices[0] + 1;
+                const totalRows = currentResults.data.length;
+                detailsTitle.textContent = 'Row ' + rowNumber + ' of ' + totalRows;
+            } else {
+                detailsTitle.textContent = 'Comparing ' + selectedDetailRowIndices.length + ' rows';
+            }
             
             // Update navigation buttons
             updateDetailsNavigation();
             
-            // Generate and display the row details
-            const rowData = generateRowObject(rowIndex);
-            const jsonHtml = formatAsJsonViewer(rowData);
-            detailsContent.innerHTML = jsonHtml;
+            // Generate and display the comparison or single row details
+            if (selectedDetailRowIndices.length === 1) {
+                const rowData = generateRowObject(selectedDetailRowIndices[0]);
+                const jsonHtml = formatAsJsonViewer(rowData);
+                detailsContent.innerHTML = jsonHtml;
+                // Remove comparison view class for single row
+                detailsContent.classList.remove('comparison-view');
+            } else {
+                const comparisonHtml = generateComparisonView(selectedDetailRowIndices);
+                detailsContent.innerHTML = comparisonHtml;
+                // Add comparison view class for reduced padding
+                detailsContent.classList.add('comparison-view');
+                // Initialize column resizing for comparison table
+                initializeComparisonColumnResizing();
+            }
         }
         
         function closeDetails() {
             const detailsSection = document.getElementById('detailsSection');
             const resizeHandle = document.getElementById('resizeHandle');
             const tableSection = document.getElementById('tableSection');
+            const detailsContent = document.getElementById('detailsContent');
             
             detailsSection.style.display = 'none';
             resizeHandle.style.display = 'none';
@@ -2441,7 +2761,13 @@ export class BargePanel {
             if (tableSection) tableSection.style.flex = '';
             if (detailsSection) detailsSection.style.flex = '';
             
+            // Remove comparison view class
+            if (detailsContent) {
+                detailsContent.classList.remove('comparison-view');
+            }
+            
             currentDetailRowIndex = -1;
+            selectedDetailRowIndices = []; // Clear multiple selection
             currentDetailRowData = null;
             
             // Update button states to remove active state
@@ -2484,14 +2810,36 @@ export class BargePanel {
         }
         
         function navigateDetails(direction) {
-            if (!currentResults || !currentResults.data) {
-                return;
+            if (!currentResults || !currentResults.data || selectedDetailRowIndices.length !== 1) {
+                return; // Only allow navigation for single selection
             }
             
-            const newIndex = currentDetailRowIndex + direction;
+            const currentIndex = selectedDetailRowIndices[0];
+            const newIndex = currentIndex + direction;
             
             if (newIndex >= 0 && newIndex < currentResults.data.length) {
-                showRowDetails(newIndex);
+                // Update selection
+                selectedDetailRowIndices = [newIndex];
+                currentDetailRowIndex = newIndex;
+                currentDetailRowData = currentResults.data[newIndex];
+                
+                // Update UI without going through full showRowDetails
+                updateDetailButtonStates();
+                selectEntireRow(newIndex);
+                
+                // Update content
+                const detailsTitle = document.querySelector('.details-title');
+                const detailsContent = document.getElementById('detailsContent');
+                
+                const rowNumber = newIndex + 1;
+                const totalRows = currentResults.data.length;
+                detailsTitle.textContent = 'Row ' + rowNumber + ' of ' + totalRows;
+                
+                const rowData = generateRowObject(newIndex);
+                const jsonHtml = formatAsJsonViewer(rowData);
+                detailsContent.innerHTML = jsonHtml;
+                
+                updateDetailsNavigation();
             }
         }
         
@@ -2499,14 +2847,15 @@ export class BargePanel {
             const prevBtn = document.getElementById('detailsPrevBtn');
             const nextBtn = document.getElementById('detailsNextBtn');
             
-            if (!currentResults || !currentResults.data) {
+            if (!currentResults || !currentResults.data || selectedDetailRowIndices.length !== 1) {
                 prevBtn.disabled = true;
                 nextBtn.disabled = true;
                 return;
             }
             
-            prevBtn.disabled = currentDetailRowIndex <= 0;
-            nextBtn.disabled = currentDetailRowIndex >= currentResults.data.length - 1;
+            const currentIndex = selectedDetailRowIndices[0];
+            prevBtn.disabled = currentIndex <= 0;
+            nextBtn.disabled = currentIndex >= currentResults.data.length - 1;
         }
         
         function generateRowObject(rowIndex) {
@@ -2525,6 +2874,130 @@ export class BargePanel {
             });
             
             return rowObject;
+        }
+        
+        function generateComparisonView(rowIndices) {
+            if (!currentResults || !currentResults.data || rowIndices.length === 0) {
+                return '<div class="comparison-viewer">No data available</div>';
+            }
+            
+            // Get all unique property names across selected rows
+            const allProperties = new Set();
+            const rowObjects = rowIndices.map(idx => generateRowObject(idx));
+            
+            rowObjects.forEach(row => {
+                Object.keys(row).forEach(key => allProperties.add(key));
+            });
+            
+            let html = '<div class="comparison-viewer">';
+            html += '<table class="comparison-table">';
+            html += '<thead><tr>';
+            html += '<th class="property-name-header">Property<div class="column-resizer"></div></th>';
+            
+            // Add column headers for each selected row
+            rowIndices.forEach((rowIdx, colIdx) => {
+                const isLast = colIdx === rowIndices.length - 1;
+                html += '<th class="row-header">Row ' + (rowIdx + 1);
+                if (!isLast) {
+                    html += '<div class="column-resizer"></div>';
+                }
+                html += '</th>';
+            });
+            html += '</tr></thead><tbody>';
+            
+            // Create a row for each property
+            Array.from(allProperties).sort().forEach(property => {
+                html += '<tr class="property-row">';
+                
+                // Get values for this property across all selected rows
+                const values = rowObjects.map(row => row[property]);
+                const uniqueValues = [...new Set(values.map(v => JSON.stringify(v)))];
+                const allMatch = uniqueValues.length === 1;
+                
+                // Add property name with match indicator
+                const tooltipText = allMatch ? "Values match" : "Values differ";
+                html += '<td class="property-name-with-indicator" title="' + tooltipText + '">';
+                html += '<span class="property-name-text">' + escapeHtml(property) + '</span>';
+                html += '<span class="match-indicator-inline">';
+                if (allMatch) {
+                    html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">';
+                    html += '<polyline points="20,6 9,17 4,12"></polyline>';
+                    html += '</svg>';
+                } else {
+                    html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">';
+                    html += '<line x1="18" y1="6" x2="6" y2="18"></line>';
+                    html += '<line x1="6" y1="6" x2="18" y2="18"></line>';
+                    html += '</svg>';
+                }
+                html += '</span>';
+                html += '</td>';
+                
+                // Add value columns
+                values.forEach(value => {
+                    html += '<td class="property-value">';
+                    if (value === null || value === undefined) {
+                        html += '<span class="null-value">null</span>';
+                    } else if (typeof value === 'object') {
+                        html += '<pre class="object-value">' + escapeHtml(JSON.stringify(value, null, 2)) + '</pre>';
+                    } else {
+                        html += '<span class="scalar-value">' + escapeHtml(String(value)) + '</span>';
+                    }
+                    html += '</td>';
+                });
+                
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table></div>';
+            return html;
+        }
+        
+        function initializeComparisonColumnResizing() {
+            const table = document.querySelector('.comparison-table');
+            if (!table) return;
+            
+            const resizers = table.querySelectorAll('.column-resizer');
+            let isResizing = false;
+            let currentResizer = null;
+            let startX = 0;
+            let startWidth = 0;
+            
+            resizers.forEach(resizer => {
+                resizer.addEventListener('mousedown', (e) => {
+                    isResizing = true;
+                    currentResizer = resizer;
+                    startX = e.clientX;
+                    
+                    const th = resizer.parentElement;
+                    startWidth = th.offsetWidth;
+                    
+                    // Prevent text selection during resize
+                    e.preventDefault();
+                    document.body.style.userSelect = 'none';
+                    document.body.style.cursor = 'col-resize';
+                });
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (!isResizing || !currentResizer) return;
+                
+                const th = currentResizer.parentElement;
+                const diff = e.clientX - startX;
+                const newWidth = Math.max(50, startWidth + diff); // Minimum width of 50px
+                
+                th.style.width = newWidth + 'px';
+                th.style.minWidth = newWidth + 'px';
+                th.style.maxWidth = newWidth + 'px';
+            });
+            
+            document.addEventListener('mouseup', () => {
+                if (isResizing) {
+                    isResizing = false;
+                    currentResizer = null;
+                    document.body.style.userSelect = '';
+                    document.body.style.cursor = '';
+                }
+            });
         }
         
         function formatAsJsonViewer(obj) {
