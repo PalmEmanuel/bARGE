@@ -1759,6 +1759,7 @@ function toggleSelectAllRows() {
         // Clear all cell selections
         clearSelection();
         updateDetailButtonStates();
+        updateDetailsNavigation(); // Update arrow navigation buttons
         closeDetails();
     } else {
         // Select all rows (or remaining rows)
@@ -1769,6 +1770,7 @@ function toggleSelectAllRows() {
 
         // Update the detail buttons visual state
         updateDetailButtonStates();
+        updateDetailsNavigation(); // Update arrow navigation buttons
 
         // Select all cells in all selected rows (clear previous selection first)
         clearSelection();
@@ -1858,6 +1860,7 @@ function showRowDetails(rowIndex) {
 
     // Update button states to show active state
     updateDetailButtonStates();
+    updateDetailsNavigation(); // Update arrow navigation buttons
 
     // Select all selected rows (clear previous selection first)
     clearSelection();
@@ -1958,6 +1961,7 @@ function closeDetails() {
 
     // Update button states to remove active state
     updateDetailButtonStates();
+    updateDetailsNavigation(); // Update arrow navigation buttons
 }
 
 function updateDetailsAfterSort() {
