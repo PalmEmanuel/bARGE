@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>bARGE - boosted Azure Resource Graph Explorer</title>
+    <style>
+        body {
+            font-family: var(--vscode-font-family);
+            font-size: var(--vscode-font-size);
+            color: var(--vscode-foreground);
+            background-color: var(--vscode-editor-background);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Adaptive layout classes */
+        .content-wrapper.layout-horizontal {
+            flex-direction: row;
+        }
+
+        .content-wrapper.layout-vertical {
+            flex-direction: column;
+        }
+
+        /* Table section */
+        .table-section {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .table-container {
+            flex: 1;
+            overflow: auto;
+            margin: 15px;
+            border: 1px solid var(--vscode-widget-border);
+            border-radius: 4px;
+            min-height: 200px;
+        }
+
+        /* Details section */
+        .details-section {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .details-panel {
+            flex: 1;
+            background-color: var(--vscode-sideBar-background);
+            border: 1px solid var(--vscode-widget-border);
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            margin: 15px;
+        }
+
+        /* Horizontal layout (side-by-side) */
+        .content-wrapper.layout-horizontal .table-section {
+            flex: 2;
+            min-width: 300px;
+        }
+
+        .content-wrapper.layout-horizontal .table-container {
+            margin-right: 8px;
+        }
+
+        .content-wrapper.layout-horizontal .details-section {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .content-wrapper.layout-horizontal .details-panel {
+            margin-left: 8px;
+        }
+
+        /* Vertical layout (stacked) */
+        .content-wrapper.layout-vertical .table-section {
+            flex: 2;
+            min-height: 200px;
+        }
+
+        .content-wrapper.layout-vertical .table-container {
+            margin-bottom: 8px;
+        }
+
+        .content-wrapper.layout-vertical .details-section {
+            flex: 1;
+            min-height: 150px;
+        }
+
+        .content-wrapper.layout-vertical .details-panel {
+            margin-top: 8px;
+        }
+
+        /* Resize handle - positioned absolutely between sections */
+        #resizeHandle.resize-handle {
+            position: absolute;
+            background-color: var(--vscode-panel-border, var(--vscode-widget-border, #3c3c3c));
+            transition: background-color 0.2s ease, opacity 0.2s ease;
+            z-index: 100;
+            opacity: 0.8;
+            border-radius: 3px;
+        }
+
+        #resizeHandle.resize-handle:hover {
+            background-color: var(--vscode-focusBorder, #007ACC);
+            opacity: 1;
+        }
+
+        #resizeHandle.resize-handle:active {
+            background-color: var(--vscode-focusBorder, #007ACC);
+            opacity: 1;
+        }
+
+        #resizeHandle.resize-handle.dragging {
+            transition: none;
+            /* Remove all transitions while dragging */
+        }
+
+        /* Horizontal layout resize handle (vertical divider) */
+        .content-wrapper.layout-horizontal #resizeHandle.resize-handle {
+            width: 6px;
+            height: 95%;
+            top: 2.5%;
+            cursor: ew-resize;
+        }
+
+        /* Vertical layout resize handle (horizontal divider) */
+        .content-wrapper.layout-vertical #resizeHandle.resize-handle {
+            width: 95%;
+            height: 6px;
+            cursor: ns-resize;
+        }
+
+        .resize-handle:hover {
+            background-color: var(--vscode-focusBorder);
+        }
+
+        .details-panel.hidden {
+            transform: translateX(100%);
+        }
+
+        .main-content.vertical-layout .details-panel.hidden {
+            transform: translateY(100%);
+        }
+
+        .details-panel.hidden {
+            transform: translateX(100%);
+        }
+
+        .details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--vscode-widget-border);
+            background-color: var(--vscode-editor-widget-background);
+            flex-shrink: 0;
+        }
+
+        .details-title {
+            font-weight: 600;
+            font-size: 1.1em;
+            color: var(--vscode-foreground);
+        }
+
+        .details-navigation {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .nav-btn,
+        .close-btn {
+            background-color: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: background-color 0.2s ease;
+        }
+
+        .nav-btn:hover:not(:disabled),
+        .close-btn:hover {
+            background-color: var(--vscode-button-hoverBackground);
+        }
+
+        .nav-btn:active:not(:disabled),
+        .close-btn:active {
+            background-color: var(--vscode-button-hoverBackground);
+            transform: scale(0.95);
+            transition: transform 0.1s ease;
+        }
+
+        .nav-btn:disabled {
+            background-color: var(--vscode-button-secondaryBackground);
+            color: var(--vscode-disabledForeground);
+            cursor: not-allowed;
+        }
+
+        .details-content {
+            flex: 1;
+            overflow: auto;
+            padding: 16px;
+            min-width: 0;
+            /* Allow shrinking below content width */
+            word-wrap: break-word;
+            /* Break long words */
+            white-space: pre-wrap;
+            /* Preserve formatting but allow wrapping */
+        }
+
+        /* Reduce padding when showing comparison table */
+        .details-content.comparison-view {
+            padding: 8px;
+        }
+
+        .detail-button {
+            background: transparent;
+            color: var(--vscode-descriptionForeground);
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 3px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s ease;
+            opacity: 0.6;
+            margin: auto;
+            /* Prevent focus outline */
+            outline: none !important;
+        }
+
+        .detail-button:hover {
+            color: var(--vscode-foreground);
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .detail-button:active {
+            background-color: var(--vscode-list-activeSelectionBackground);
+            transform: scale(0.95);
+        }
+
+        .detail-button:focus,
+        .detail-button:focus-visible {
+            outline: none !important;
+            box-shadow: none !important;
+            background-color: transparent !important;
+        }
+
+        .detail-button.active {
+            color: var(--vscode-focusBorder);
+            opacity: 1;
+        }
+
+        .detail-button svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .detail-button-cell {
+            width: 36px !important;
+            min-width: 36px !important;
+            max-width: 36px !important;
+            text-align: center;
+            padding: 2px !important;
+            vertical-align: middle;
+            position: relative;
+            /* Prevent focus outline issues */
+            outline: none !important;
+        }
+
+        .detail-button-cell:focus,
+        .detail-button-cell:focus-visible {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Override any table cell focus styles specifically for detail button cells */
+        .results-table .detail-button-cell:focus,
+        .results-table .detail-button-cell:focus-visible,
+        .results-table td.detail-button-cell:focus,
+        .results-table td.detail-button-cell:focus-visible {
+            outline: none !important;
+            box-shadow: none !important;
+            background-color: transparent !important;
+        }
+
+        th.detail-button-cell {
+            cursor: default !important;
+            user-select: none !important;
+            position: relative !important;
+            pointer-events: auto !important;
+        }
+
+        /* Make header magnifying glass clickable with hover feedback */
+        th.detail-button-cell.select-all-header {
+            cursor: pointer !important;
+            transition: all 0.2s ease;
+        }
+
+        th.detail-button-cell.select-all-header:hover {
+            background-color: var(--vscode-list-hoverBackground) !important;
+        }
+
+        th.detail-button-cell.select-all-header:hover svg {
+            opacity: 1 !important;
+            transform: scale(1.1);
+        }
+
+        th.detail-button-cell.select-all-header:active {
+            background-color: var(--vscode-list-activeSelectionBackground) !important;
+            transform: scale(0.95);
+        }
+
+        th.detail-button-cell::after {
+            display: none !important;
+        }
+
+        th.detail-button-cell::before {
+            display: none !important;
+        }
+
+        th.detail-button-cell .resize-handle {
+            display: none !important;
+        }
+
+        th.detail-button-cell:hover::after {
+            display: none !important;
+        }
+
+        th.detail-button-cell * {
+            pointer-events: none !important;
+        }
+
+        th.detail-button-cell {
+            overflow: hidden !important;
+        }
+
+        .detail-button-cell:hover {
+            background-color: transparent !important;
+        }
+
+        /* Additional comprehensive focus prevention for detail buttons */
+        .detail-button-cell *,
+        .detail-button-cell button,
+        .detail-button-cell svg {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        .detail-button-cell *:focus,
+        .detail-button-cell *:focus-visible,
+        .detail-button-cell button:focus,
+        .detail-button-cell button:focus-visible {
+            outline: none !important;
+            box-shadow: none !important;
+            background-color: transparent !important;
+        }
+
+        .json-viewer {
+            font-family: var(--vscode-editor-font-family, 'Consolas', 'Monaco', monospace);
+            font-size: 0.9em;
+            line-height: 1.4;
+            color: var(--vscode-editor-foreground);
+            padding: 4px;
+        }
+
+        .json-property {
+            margin: 0;
+            padding: 8px 4px;
+            border-bottom: 1px solid var(--vscode-widget-border);
+            transition: background-color 0.2s ease;
+        }
+
+        .json-property:last-child {
+            border-bottom: none;
+        }
+
+        .json-property:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        .json-key {
+            color: var(--vscode-symbolIcon-propertyForeground, #9cdcfe);
+            font-weight: 600;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            display: block;
+            opacity: 0.8;
+        }
+
+        .json-value {
+            color: var(--vscode-editor-foreground);
+            font-size: 0.95em;
+            line-height: 1.3;
+            word-wrap: break-word;
+            display: block;
+        }
+
+        .json-value.string {
+            color: var(--vscode-symbolIcon-stringForeground, #ce9178);
+            font-style: normal;
+        }
+
+        .json-value.number {
+            color: var(--vscode-symbolIcon-numberForeground, #b5cea8);
+            font-weight: 500;
+        }
+
+        .json-value.boolean {
+            color: var(--vscode-symbolIcon-booleanForeground, #569cd6);
+            font-weight: 500;
+        }
+
+        .json-value.null {
+            color: var(--vscode-symbolIcon-nullForeground, #808080);
+            font-style: italic;
+        }
+
+        .json-value.object {
+            color: var(--vscode-editor-foreground);
+            background-color: var(--vscode-textCodeBlock-background);
+            padding: 8px;
+            border-radius: 4px;
+            font-family: var(--vscode-editor-font-family, 'Consolas', 'Monaco', monospace);
+            font-size: 0.85em;
+            border-left: 3px solid var(--vscode-widget-border);
+            margin-top: 4px;
+        }
+
+        /* Comparison view styles */
+        .comparison-viewer {
+            font-family: var(--vscode-editor-font-family, 'Consolas', 'Monaco', monospace);
+            font-size: 0.9em;
+            line-height: 1.4;
+            color: var(--vscode-editor-foreground);
+            padding: 4px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid var(--vscode-widget-border);
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 8px;
+            border: 1px solid var(--vscode-widget-border);
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .comparison-table th {
+            background-color: var(--vscode-list-hoverBackground);
+            font-weight: 600;
+            position: relative;
+            /* Removed sticky positioning */
+        }
+
+        .comparison-table th:not(:last-child) {
+            border-right: 1px solid var(--vscode-widget-border);
+        }
+
+        .comparison-table th .column-resizer {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            cursor: col-resize;
+            background: transparent;
+            z-index: 1;
+        }
+
+        .comparison-table th .column-resizer:hover {
+            background-color: var(--vscode-focusBorder);
+        }
+
+        .property-name-header {
+            width: auto;
+            min-width: 160px;
+            /* Increased from 120px to accommodate text + indicator */
+            max-width: none;
+        }
+
+        .row-header {
+            min-width: 150px;
+        }
+
+        .property-name-with-indicator {
+            font-weight: 500;
+            color: var(--vscode-symbolIcon-propertyForeground, #9cdcfe);
+            word-break: break-word;
+            position: relative;
+            /* Remove flex layout */
+            min-height: calc(100% - 16px);
+        }
+
+        .property-name-text {
+            /* Add right margin to make space for the indicator */
+            margin-right: 24px;
+            /* Increased from 20px to give more space */
+        }
+
+        .match-indicator-inline {
+            /* Position the indicator to align with text baseline */
+            position: absolute;
+            top: 8px;
+            /* Match the cell's top padding to align with text */
+            right: 4px;
+            /* Small padding from the right edge */
+            display: inline-block;
+            line-height: 1;
+            /* Ensure consistent height */
+        }
+
+        .property-value {
+            word-break: break-word;
+            max-width: 300px;
+        }
+
+        .null-value {
+            color: var(--vscode-symbolIcon-nullForeground, #808080);
+            font-style: italic;
+        }
+
+        .object-value {
+            background-color: var(--vscode-textCodeBlock-background);
+            padding: 4px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            margin: 0;
+            max-height: 200px;
+            overflow: auto;
+        }
+
+        .scalar-value {
+            color: var(--vscode-editor-foreground);
+        }
+
+        .property-row:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Property column styling to fix border issues */
+        .comparison-table .property-row td:first-child {
+            border-right: 2px solid var(--vscode-widget-border);
+            background-color: rgba(255, 255, 255, 0.02);
+            position: relative;
+            /* Different approach: force the cell to use table-cell display with proper height */
+            height: 100%;
+        }
+
+        .comparison-table .property-row td:first-child::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: inherit;
+            z-index: -1;
+        }
+
+        /* Ensure proper vertical alignment for property cells */
+        .comparison-table .property-row td {
+            vertical-align: top;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 15px;
+            border-top: 1px solid var(--vscode-widget-border);
+            background-color: var(--vscode-editor-background);
+            flex-shrink: 0;
+            min-height: 30px;
+        }
+
+        .results-info {
+            font-size: 0.9em;
+            color: var(--vscode-descriptionForeground);
+        }
+
+        .export-btn {
+            background-color: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .export-btn:hover {
+            background-color: var(--vscode-button-hoverBackground);
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+            table-layout: fixed;
+        }
+
+        .results-table th {
+            background-color: var(--vscode-sideBar-background, var(--vscode-editor-background));
+            border: 1px solid var(--vscode-widget-border);
+            padding: 8px;
+            text-align: left;
+            position: sticky;
+            top: -1px;
+            cursor: pointer;
+            user-select: none;
+            z-index: 10;
+            min-width: 60px;
+            resize: horizontal;
+            overflow: hidden;
+        }
+
+        .results-table th:hover {
+            background-color: var(--vscode-list-hoverBackground);
+        }
+
+        .results-table th.sorted-asc::after {
+            content: ' ↑';
+        }
+
+        .results-table th.sorted-desc::after {
+            content: ' ↓';
+        }
+
+        .results-table th.dragging {
+            opacity: 0.5;
+            background-color: var(--vscode-list-activeSelectionBackground);
+        }
+
+        .results-table th.drag-over {
+            border-left: 3px solid var(--vscode-focusBorder);
+        }
+
+        .resize-handle {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 5px;
+            height: 95%;
+            cursor: col-resize;
+            background: transparent;
+            z-index: 11;
+        }
+
+        .resize-handle:hover {
+            background-color: var(--vscode-focusBorder);
+        }
+
+        .results-table td {
+            border: 1px solid var(--vscode-widget-border);
+            padding: 6px 8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            /* Prevent focus outline issues */
+            outline: none !important;
+        }
+
+        .results-table td:focus,
+        .results-table td:focus-visible {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Prevent selection highlighting on shift+click */
+        .results-table,
+        .results-table * {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .results-table td::-moz-focus-inner,
+        .detail-button-cell::-moz-focus-inner {
+            border: 0;
+            outline: none;
+        }
+
+        .results-table td:hover {
+            background-color: var(--vscode-list-hoverBackground);
+        }
+
+        .results-table td.selected {
+            background-color: var(--vscode-list-activeSelectionBackground) !important;
+            color: var(--vscode-list-activeSelectionForeground);
+        }
+
+        .results-table td[title] {
+            /* Ensure tooltips are properly displayed */
+            white-space: nowrap;
+        }
+
+        /* JSON content styling */
+        .results-table td .json-content {
+            font-family: var(--vscode-editor-font-family, 'Consolas', 'Monaco', monospace);
+            color: var(--vscode-textPreformat-foreground);
+        }
+
+        /* Custom tooltip styling */
+        .custom-tooltip {
+            position: absolute;
+            background: var(--vscode-editorHoverWidget-background);
+            border: 1px solid var(--vscode-editorHoverWidget-border);
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 0.9em;
+            color: var(--vscode-editorHoverWidget-foreground);
+            z-index: 1000;
+            max-width: 400px;
+            max-height: 300px;
+            overflow: auto;
+            white-space: pre-wrap;
+            font-family: var(--vscode-editor-font-family, 'Consolas', 'Monaco', monospace);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.15s ease-in-out;
+        }
+
+        .custom-tooltip.interactive {
+            pointer-events: auto;
+            user-select: text;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+        }
+
+        .custom-tooltip.show {
+            opacity: 1;
+        }
+
+        .custom-tooltip.json {
+            font-family: var(--vscode-editor-font-family, 'Consolas', 'Monaco', monospace);
+        }
+
+        /* Custom context menu styling */
+        .custom-context-menu {
+            position: absolute;
+            background: var(--vscode-menu-background);
+            border: 1px solid var(--vscode-menu-border);
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 2000;
+            min-width: 160px;
+            padding: 4px 0;
+            font-size: 0.9em;
+        }
+
+        .context-menu-item {
+            padding: 8px 16px;
+            cursor: pointer;
+            color: var(--vscode-menu-foreground);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .context-menu-item:hover {
+            background: var(--vscode-menu-selectionBackground);
+            color: var(--vscode-menu-selectionForeground);
+        }
+
+        .context-menu-item.disabled {
+            color: var(--vscode-disabledForeground);
+            cursor: default;
+        }
+
+        .context-menu-item.disabled:hover {
+            background: transparent;
+            color: var(--vscode-disabledForeground);
+        }
+
+        /* Loading indicator styling */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(var(--vscode-editor-background-rgb, 30, 30, 30), 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            backdrop-filter: blur(2px);
+        }
+
+        .loading-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            color: var(--vscode-foreground);
+            font-size: 0.9em;
+            text-align: center;
+        }
+
+        .loading-animation {
+            width: 128px;
+            height: 128px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .loading-animation img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .loading-message {
+            font-weight: 500;
+            max-width: 200px;
+        }
+
+        .results-table tr:nth-child(even) {
+            background-color: var(--vscode-editor-widget-background);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: var(--vscode-descriptionForeground);
+            font-style: italic;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+        }
+
+        .error {
+            color: var(--vscode-errorForeground);
+            background-color: var(--vscode-inputValidation-errorBackground);
+            border: 1px solid var(--vscode-inputValidation-errorBorder);
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-content" id="mainContent">
+        <div class="content-wrapper" id="contentWrapper">
+            <div class="table-section" id="tableSection">
+                <div id="tableContainer" class="table-container">
+                    <div class="no-results">No results to display</div>
+                </div>
+            </div>
+
+            <div id="resizeHandle" class="resize-handle" style="display: none;"></div>
+
+            <div class="details-section" id="detailsSection" style="display: none;">
+                <div id="detailsPanel" class="details-panel">
+                    <div class="details-header">
+                        <div class="details-title">Row Details</div>
+                        <div class="details-navigation">
+                            <button id="detailsPrevBtn" class="nav-btn" onclick="navigateDetails(-1)"
+                                title="Previous row">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="18,15 12,9 6,15"></polyline>
+                                </svg>
+                            </button>
+                            <button id="detailsNextBtn" class="nav-btn" onclick="navigateDetails(1)" title="Next row">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="6,9 12,15 18,9"></polyline>
+                                </svg>
+                            </button>
+                            <button id="detailsCloseBtn" class="close-btn" onclick="closeDetails()"
+                                title="Close details">
+                                <span>×</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="detailsContent" class="details-content">
+                        <!-- Details content will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div id="resultsInfo" class="results-info">No results yet. Run a query to see results here.</div>
+        <button id="exportBtn" class="export-btn" onclick="exportToCsv()" style="display: none;">Export CSV</button>
+    </div>
+
+    <script nonce="{{NONCE}}">
+        // Set global configuration for the webview JavaScript
+        window.webviewConfig = {
+            loadingGifUri: '{{LOADING_GIF_URI}}'
+        };
+    </script>
+    <script nonce="{{NONCE}}" src="{{WEBVIEW_URI}}/webview.js"></script>
+</body>
+
+</html>
