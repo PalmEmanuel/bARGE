@@ -5,10 +5,6 @@
   "version": "0.0.9",
   "publisher": "PalmEmanuel",
   "icon": "media/readme/bARGE-small.png",
-  "files": [
-    "media/**/*",
-    "README.md"
-  ],
   "galleryBanner": {
     "color": "#008BD8",
     "theme": "dark"
