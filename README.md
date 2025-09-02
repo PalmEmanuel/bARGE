@@ -1,7 +1,6 @@
 # bARGE - boosted Azure Resource Graph Explorer
 
 [![bARGE]][bARGEMarketplace] [![bARGEDownloads]][bARGEMarketplace]
-[![bARGE]][bARGEMarketplace] [![bARGEDownloads]][bARGEMarketplace]
 
 <img src="media/readme/bARGE.png" width="256">
 
