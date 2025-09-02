@@ -1,6 +1,7 @@
 # bARGE - boosted Azure Resource Graph Explorer
 
 [![bARGE]][bARGEMarketplace] [![bARGEDownloads]][bARGEMarketplace]
+[![bARGE]][bARGEMarketplace] [![bARGEDownloads]][bARGEMarketplace]
 
 <img src="media/readme/bARGE.png" width="256">
 
@@ -156,4 +157,4 @@ If you encounter authentication problems:
 <!-- References -->
 [bARGEDownloads]: https://img.shields.io/visual-studio-marketplace/d/PalmEmanuel.barge-vscode?label=bARGE%20Downloads
 [bARGEMarketplace]: https://marketplace.visualstudio.com/items?itemName=PalmEmanuel.barge-vscode
-[bARGE]: https://img.shields.io/visual-studio-marketplace/d/PalmEmanuel.barge-vscode?label=bARGE
+[bARGE]: https://img.shields.io/visual-studio-marketplace/v/PalmEmanuel.barge-vscode?label=bARGE
