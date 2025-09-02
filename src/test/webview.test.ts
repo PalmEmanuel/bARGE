@@ -37,22 +37,62 @@ suite('Webview Logic Tests', () => {
 
 			let selectedDetailRowIndices: number[] = [];
 			
-			// Simulate clicking on multiple rows with Ctrl held (multi-select)
-			const firstClick = 0;
-			const secondClick = 2;
+			// Simulate clicking circle buttons for row selection (toggle behavior)
+			const firstClickRowIndex = 0;
+			const secondClickRowIndex = 2;
 			
-			// First click - select first row
-			selectedDetailRowIndices = [firstClick];
+			// First click on circle - toggle row 0 selection (add to selection)
+			const existingIndex1 = selectedDetailRowIndices.indexOf(firstClickRowIndex);
+			if (existingIndex1 >= 0) {
+				selectedDetailRowIndices.splice(existingIndex1, 1);
+			} else {
+				selectedDetailRowIndices.push(firstClickRowIndex);
+			}
 			
-			// Second click with Ctrl - add to selection
-			if (!selectedDetailRowIndices.includes(secondClick)) {
-				selectedDetailRowIndices.push(secondClick);
+			// Second click on circle - toggle row 2 selection (add to selection) 
+			const existingIndex2 = selectedDetailRowIndices.indexOf(secondClickRowIndex);
+			if (existingIndex2 >= 0) {
+				selectedDetailRowIndices.splice(existingIndex2, 1);
+			} else {
+				selectedDetailRowIndices.push(secondClickRowIndex);
 			}
 			
 			assert.strictEqual(selectedDetailRowIndices.length, 2, 'Should have two selected rows');
 			assert.ok(selectedDetailRowIndices.includes(0), 'Should include first row');
 			assert.ok(selectedDetailRowIndices.includes(2), 'Should include third row');
 			assert.ok(!selectedDetailRowIndices.includes(1), 'Should not include second row');
+		});
+
+		test('should handle circle click toggle behavior correctly', () => {
+			const mockData = [
+				['vm-1', 'Microsoft.Compute/virtualMachines', 'eastus'],
+				['vm-2', 'Microsoft.Compute/virtualMachines', 'westus']
+			];
+
+			let selectedDetailRowIndices: number[] = [];
+			
+			// Simulate clicking circle on row 0 - should add to selection
+			const clickRowIndex = 0;
+			let existingIndex = selectedDetailRowIndices.indexOf(clickRowIndex);
+			if (existingIndex >= 0) {
+				selectedDetailRowIndices.splice(existingIndex, 1);
+			} else {
+				selectedDetailRowIndices.push(clickRowIndex);
+			}
+			
+			assert.strictEqual(selectedDetailRowIndices.length, 1, 'Should have one selected row after first click');
+			assert.ok(selectedDetailRowIndices.includes(0), 'Should select row 0');
+			
+			// Click the same circle again - should remove from selection (toggle off)
+			existingIndex = selectedDetailRowIndices.indexOf(clickRowIndex);
+			if (existingIndex >= 0) {
+				selectedDetailRowIndices.splice(existingIndex, 1);
+			} else {
+				selectedDetailRowIndices.push(clickRowIndex);
+			}
+			
+			assert.strictEqual(selectedDetailRowIndices.length, 0, 'Should have no selected rows after second click');
+			assert.ok(!selectedDetailRowIndices.includes(0), 'Should deselect row 0');
 		});
 
 		test('should handle select all rows correctly', () => {
