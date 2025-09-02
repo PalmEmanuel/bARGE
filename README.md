@@ -1,13 +1,14 @@
-# bARGE - basic Azure Resource Graph Explorer
+# bARGE - boosted Azure Resource Graph Explorer
 
 <img src="./media/bARGE.png" width="256">
 
-bARGE is a VS Code extension that brings Azure Resource Graph querying capabilities directly into your development environment, similar to the Azure Portal's Resource Graph Explorer.
+bARGE is a VS Code extension that brings Azure Resource Graph querying capabilities directly into your development environment, similar to the Azure Portal's Resource Graph Explorer. It adds functionality such as comparison of results and improved data table handling.
 
 ## Features
 
 - **Flexible Data Grid**: Excel-like table with column resizing, reordering, and sticky headers
 - **Exploring Results**: Click, drag, and keyboard navigation with multi-cell selection support
+- **Comparison**: Select two or more rows for comparison to see differences in their properties
 - **Copying Options**: Right-click to copy cells, selections, or formatted JSON
 - **Querying**: Run queries directly from `.kql` files in your workspace, or from selected text
 - **Scope Management**: Query across your tenant or specific subscriptions
