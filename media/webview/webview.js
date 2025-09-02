@@ -1613,14 +1613,68 @@ function reorderColumn(fromIndex, toIndex) {
     displayResults(currentResults);
 }
 
-function displayError(error) {
+function displayError(error, errorDetails) {
     const tableContainer = document.getElementById('tableContainer');
     const resultsInfo = document.getElementById('resultsInfo');
     const exportBtn = document.getElementById('exportBtn');
 
-    tableContainer.innerHTML = '<div class="error">Error: ' + error + '</div>';
-    resultsInfo.textContent = 'Query failed';
-    exportBtn.style.display = 'none';
+    let errorHtml = '<div class="error">';
+    errorHtml += '<div class="error-title">Query Execution Failed</div>';
+
+    // Main error message (usually the support/correlation info)
+    if (error && error.trim()) {
+        errorHtml += '<div class="error-message">' + escapeHtml(error) + '</div>';
+    }
+    
+    // Details section - render each as separate compact boxes
+    if (errorDetails && errorDetails.trim()) {
+        const detailSections = errorDetails.split('\n---\n'); // Split by our separator
+        
+        if (detailSections.length > 0) {
+            errorHtml += '<div class="error-details-container">';
+            
+            detailSections.forEach((section, index) => {
+                if (section.trim()) {
+                    errorHtml += '<div class="error-detail-box">';
+                    
+                    // Split lines within each section and format them nicely
+                    const lines = section.trim().split('\n');
+                    lines.forEach((line, lineIndex) => {
+                        if (line.trim()) {
+                            const [key, ...valueParts] = line.split(': ');
+                            const value = valueParts.join(': ');
+                            
+                            if (value) {
+                                errorHtml += '<div class="error-detail-item">';
+                                errorHtml += '<span class="error-detail-key">' + escapeHtml(key) + ':</span> ';
+                                errorHtml += '<span class="error-detail-value">' + escapeHtml(value) + '</span>';
+                                errorHtml += '</div>';
+                            } else {
+                                // Handle lines that don't have the "key: value" format
+                                errorHtml += '<div class="error-detail-item">' + escapeHtml(line) + '</div>';
+                            }
+                        }
+                    });
+                    
+                    errorHtml += '</div>';
+                }
+            });
+            
+            errorHtml += '</div>';
+        }
+    }
+    
+    errorHtml += '</div>';
+    
+    if (tableContainer) {
+        tableContainer.innerHTML = errorHtml;
+    }
+    if (resultsInfo) {
+        resultsInfo.textContent = 'Query execution failed.';
+    }
+    if (exportBtn) {
+        exportBtn.style.display = 'none';
+    }
 }
 
 // Details panel functionality
@@ -2192,16 +2246,18 @@ function formatAsJsonViewer(obj) {
 
 window.addEventListener('message', event => {
     const message = event.data;
+    
     switch (message.type) {
         case 'queryStart':
             showLoadingIndicator();
             break;
         case 'queryResult':
             hideLoadingIndicator();
+            
             if (message.payload.success) {
                 displayResults(message.payload.data);
             } else {
-                displayError(message.payload.error);
+                displayError(message.payload.error, message.payload.errorDetails);
             }
             break;
     }

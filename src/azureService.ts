@@ -94,7 +94,15 @@ export class AzureService {
             };
         } catch (error) {
             console.error('Query execution failed:', error);
-            throw new Error(`Query execution failed: ${error}`);
+            
+            // Preserve details if they exist on the original error
+            if (error instanceof Error && (error as any).details) {
+                const newError = new Error(`Query execution failed: ${error.message}`);
+                (newError as any).details = (error as any).details;
+                throw newError;
+            } else {
+                throw new Error(`Query execution failed: ${error}`);
+            }
         }
     }
 
@@ -117,7 +125,7 @@ export class AzureService {
         console.log('Making REST API call with:', requestBody);
 
         const response = await fetch(
-            'https://management.azure.com/providers/Microsoft.ResourceGraph/resources?api-version=2021-03-01',
+            'https://management.azure.com/providers/Microsoft.ResourceGraph/resources?api-version=2024-04-01',
             {
                 method: 'POST',
                 headers: {
@@ -129,7 +137,78 @@ export class AzureService {
         );
 
         if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+            let errorDetails = '';
+            
+            try {
+                const errorBody = await response.json() as any;
+                
+                if (errorBody.error) {
+                    const error = errorBody.error;
+                    
+                    // Use correlation/support message as main error message if available
+                    if (error.message && (error.message.includes('correlationId') || error.message.includes('timestamp'))) {
+                        errorMessage = error.message;
+                    } else if (error.code && error.message) {
+                        errorMessage = `${error.code}: ${error.message}`;
+                    } else if (error.message) {
+                        errorMessage = error.message;
+                    } else if (error.code) {
+                        errorMessage = error.code;
+                    }
+                    
+                    // Parse all details into separate sections
+                    if (error.details && Array.isArray(error.details) && error.details.length > 0) {
+                        const detailSections: string[] = [];
+                        
+                        error.details.forEach((detail: any) => {
+                            const detailParts: string[] = [];
+                            
+                            // Add code if available
+                            if (detail.code) {
+                                detailParts.push(`Code: ${detail.code}`);
+                            }
+                            
+                            // Add message if available and different from code
+                            if (detail.message && detail.message !== detail.code) {
+                                detailParts.push(`Message: ${detail.message}`);
+                            }
+                            
+                            // Add location info for parser failures
+                            if (detail.line !== undefined) {
+                                detailParts.push(`Line: ${detail.line}`);
+                            }
+                            if (detail.characterPositionInLine !== undefined) {
+                                detailParts.push(`Position: ${detail.characterPositionInLine}`);
+                            }
+                            if (detail.token) {
+                                detailParts.push(`Token: "${detail.token}"`);
+                            }
+                            
+                            // Add any other properties we haven't handled
+                            Object.keys(detail).forEach(key => {
+                                if (!['code', 'message', 'line', 'characterPositionInLine', 'token'].includes(key)) {
+                                    detailParts.push(`${key}: ${detail[key]}`);
+                                }
+                            });
+                            
+                            if (detailParts.length > 0) {
+                                detailSections.push(detailParts.join('\n'));
+                            }
+                        });
+                        
+                        if (detailSections.length > 0) {
+                            errorDetails = detailSections.join('\n---\n'); // Use separator between sections
+                        }
+                    }
+                }
+            } catch (parseError) {
+                console.warn('Could not parse error response:', parseError);
+            }
+            
+            const error = new Error(errorMessage);
+            (error as any).details = errorDetails;
+            throw error;
         }
 
         const result = await response.json() as any;

@@ -96,9 +96,45 @@ export class BargePanel {
             });
 
         } catch (error) {
+            let errorMessage = 'Unknown error occurred';
+            let errorDetails = '';
+
+            if (error instanceof Error) {
+                errorMessage = error.message;
+                
+                // Extract details if available from our custom error parsing
+                if ((error as any).details) {
+                    errorDetails = (error as any).details;
+                } else {
+                    // Check for common Azure error patterns if no details were parsed
+                    if (error.message.includes('400')) {
+                        errorMessage = 'Bad Request - Invalid query syntax or parameters';
+                        errorDetails = error.message;
+                    } else if (error.message.includes('401')) {
+                        errorMessage = 'Unauthorized - Please check your Azure authentication';
+                        errorDetails = 'Try running "az login" or check your Azure credentials';
+                    } else if (error.message.includes('403')) {
+                        errorMessage = 'Forbidden - Insufficient permissions';
+                        errorDetails = 'You may not have permission to query the selected subscriptions or resources';
+                    } else if (error.message.includes('404')) {
+                        errorMessage = 'Not Found - Resource or subscription not found';
+                        errorDetails = error.message;
+                    } else if (error.message.includes('429')) {
+                        errorMessage = 'Rate Limited - Too many requests';
+                        errorDetails = 'Please wait a moment before running another query';
+                    } else if (error.message.includes('500')) {
+                        errorMessage = 'Server Error - Azure service error';
+                        errorDetails = error.message;
+                    }
+                }
+            } else {
+                errorMessage = String(error);
+            }
+
             const response: QueryResponse = {
                 success: false,
-                error: String(error)
+                error: errorMessage,
+                errorDetails: errorDetails
             };
 
             this._panel.webview.postMessage({

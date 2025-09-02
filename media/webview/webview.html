@@ -884,9 +884,106 @@
             color: var(--vscode-errorForeground);
             background-color: var(--vscode-inputValidation-errorBackground);
             border: 1px solid var(--vscode-inputValidation-errorBorder);
-            padding: 15px;
+            padding: 20px;
             border-radius: 4px;
-            margin: 15px;
+            margin: 0;
+            text-align: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 600px;
+            min-width: 300px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .error {
+            background-color: var(--vscode-inputValidation-errorBackground, #5a1d1d);
+            border: 1px solid var(--vscode-inputValidation-errorBorder, #be1100);
+            color: var(--vscode-inputValidation-errorForeground);
+            padding: 12px;
+            margin: 16px;
+            border-radius: 4px;
+        }
+
+        .error-title {
+            font-weight: bold;
+            font-size: 1.05em;
+            margin-bottom: 6px;
+        }
+
+        .error-message {
+            margin-bottom: 8px;
+            font-weight: 500;
+            line-height: 1.3;
+        }
+
+        .error-section-title {
+            font-weight: 600;
+            margin-top: 8px;
+            margin-bottom: 4px;
+            font-size: 0.95em;
+            opacity: 0.9;
+        }
+
+        .error-details {
+            font-family: var(--vscode-editor-font-family);
+            font-size: 0.9em;
+            margin-bottom: 6px;
+            white-space: pre-wrap;
+            word-break: break-word;
+            background: rgba(0, 0, 0, 0.1);
+            padding: 6px;
+            border-radius: 3px;
+        }
+
+        .error-details-container {
+            margin-top: 8px;
+        }
+
+        .error-detail-box {
+            background: rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            padding: 6px;
+            margin-bottom: 4px;
+            font-family: var(--vscode-editor-font-family);
+            font-size: 0.85em;
+        }
+
+        .error-detail-box:last-child {
+            margin-bottom: 0;
+        }
+
+        .error-detail-item {
+            margin-bottom: 1px;
+            line-height: 1.2;
+        }
+
+        .error-detail-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .error-detail-key {
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        .error-detail-value {
+            font-weight: 400;
+            word-break: break-word;
+        }
+
+        .error-correlation {
+            font-family: var(--vscode-editor-font-family);
+            font-size: 0.85em;
+            opacity: 0.7;
+            background: rgba(0, 0, 0, 0.15);
+            padding: 8px;
+            border-radius: 3px;
+            margin-top: 4px;
+            white-space: pre-wrap;
+            word-break: break-all;
         }
     </style>
 </head>

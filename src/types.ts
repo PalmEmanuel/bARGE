@@ -32,6 +32,7 @@ export interface QueryResponse {
     success: boolean;
     data?: QueryResult;
     error?: string;
+    errorDetails?: string;
 }
 
 export interface AuthScope {
