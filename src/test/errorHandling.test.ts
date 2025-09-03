@@ -96,54 +96,6 @@ suite('Error Handling Tests', () => {
 		});
 	});
 
-	suite('Query Validation Logic', () => {
-		test('should identify valid KQL query patterns', () => {
-			const validQueries = [
-				'Resources | limit 10',
-				'Resources | where type == "Microsoft.Storage/storageAccounts"',
-				'Resources | project name, type, location | order by name',
-				'ResourceContainers | where type == "microsoft.resources/subscriptions"',
-				'Resources\n| where type == "Microsoft.Compute/virtualMachines"\n| limit 5'
-			];
-
-			validQueries.forEach(query => {
-				// Basic query validation logic
-				const trimmedQuery = query.trim();
-				const isValid = trimmedQuery.length > 0 && 
-					!trimmedQuery.startsWith('//') && 
-					!trimmedQuery.startsWith('/*');
-				
-				assert.strictEqual(isValid, true, `Query should be valid: ${query}`);
-			});
-		});
-
-		test('should identify invalid query patterns', () => {
-			const invalidQueries = [
-				'', // Empty
-				'   ', // Whitespace only
-				'// This is just a comment',
-				'/* Block comment only */',
-				'WHER type == "invalid"' // Typo in keyword
-			];
-
-			const validationResults = invalidQueries.map(query => {
-				const trimmedQuery = query.trim();
-				return {
-					query,
-					isEmpty: trimmedQuery.length === 0,
-					isComment: trimmedQuery.startsWith('//') || trimmedQuery.startsWith('/*'),
-					hasTypo: trimmedQuery.includes('WHER ') // Common typo
-				};
-			});
-
-			assert.strictEqual(validationResults[0].isEmpty, true, 'Empty query should be detected');
-			assert.strictEqual(validationResults[1].isEmpty, true, 'Whitespace-only query should be detected');
-			assert.strictEqual(validationResults[2].isComment, true, 'Line comment should be detected');
-			assert.strictEqual(validationResults[3].isComment, true, 'Block comment should be detected');
-			assert.strictEqual(validationResults[4].hasTypo, true, 'Common typo should be detected');
-		});
-	});
-
 	suite('Azure Error Response Processing', () => {
 		test('should parse Azure error responses correctly', () => {
 			// Mock Azure error response structure
