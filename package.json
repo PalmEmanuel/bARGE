@@ -43,22 +43,27 @@
     "commands": [
       {
         "command": "barge.openResults",
-        "title": "bARGE: Open Results Panel",
+        "title": "Open Results Panel",
         "category": "bARGE"
       },
       {
         "command": "barge.runQueryFromFile",
-        "title": "bARGE: Run Query from Current File",
+        "title": "Run Query from Current File",
         "category": "bARGE"
       },
       {
         "command": "barge.runQueryFromSelection",
-        "title": "bARGE: Run Selected Query",
+        "title": "Run Selected Query",
         "category": "bARGE"
       },
       {
         "command": "barge.setScope",
-        "title": "bARGE: Set Query Scope",
+        "title": "Set Query Scope",
+        "category": "bARGE"
+      },
+      {
+        "command": "barge.authenticateWithVSCode",
+        "title": "Authenticate with VS Code",
         "category": "bARGE"
       }
     ],
@@ -66,21 +71,25 @@
       "commandPalette": [
         {
           "command": "barge.openResults",
-          "title": "bARGE: Open Results Panel"
+          "title": "Open Results Panel"
         },
         {
           "command": "barge.runQueryFromFile",
-          "title": "bARGE: Run Query from Current File",
+          "title": "Run Query from Current File",
           "when": "editorLangId == kql || resourceExtname == .kql"
         },
         {
           "command": "barge.runQueryFromSelection",
-          "title": "bARGE: Run Selected Query",
+          "title": "Run Selected Query",
           "when": "editorHasSelection && (editorLangId == kql || resourceExtname == .kql)"
         },
         {
           "command": "barge.setScope",
-          "title": "bARGE: Set Query Scope"
+          "title": "Set Query Scope"
+        },
+        {
+          "command": "barge.authenticateWithVSCode",
+          "title": "Authenticate with VS Code"
         }
       ],
       "editor/context": [

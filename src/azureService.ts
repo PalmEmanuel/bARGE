@@ -1,14 +1,82 @@
-import { DefaultAzureCredential, InteractiveBrowserCredential } from '@azure/identity';
+import { DefaultAzureCredential, TokenCredential } from '@azure/identity';
 import { SubscriptionClient } from '@azure/arm-subscriptions';
 import * as vscode from 'vscode';
 import { AzureSubscription, QueryResult, ColumnDefinition, AuthScope } from './types';
 
+// VS Code credential wrapper that uses built-in Microsoft authentication
+class VSCodeCredential implements TokenCredential {
+    private currentSession: vscode.AuthenticationSession | null = null;
+
+    async getToken(scopes?: string | string[], options?: any): Promise<{ token: string; expiresOnTimestamp: number } | null> {
+        try {
+            // Get current session or create new one silently
+            const session = await vscode.authentication.getSession(
+                'microsoft',
+                ['https://management.azure.com/.default'],
+                { createIfNone: false, silent: true }
+            );
+
+            if (!session) {
+                return null;
+            }
+
+            this.currentSession = session;
+
+            // Parse token expiration from JWT
+            let expiresOnTimestamp = Date.now() + (60 * 60 * 1000); // Default 1 hour
+            try {
+                const tokenParts = session.accessToken.split('.');
+                if (tokenParts.length === 3) {
+                    const payload = JSON.parse(atob(tokenParts[1]));
+                    if (payload.exp) {
+                        expiresOnTimestamp = payload.exp * 1000;
+                    }
+                }
+            } catch (error) {
+                console.warn('Could not parse token expiration:', error);
+            }
+
+            return {
+                token: session.accessToken,
+                expiresOnTimestamp
+            };
+        } catch (error) {
+            console.error('Failed to get token from VS Code authentication:', error);
+            return null;
+        }
+    }
+
+    async forceNewSession(account?: vscode.AuthenticationSessionAccountInformation): Promise<vscode.AuthenticationSession | null> {
+        try {
+            const session = await vscode.authentication.getSession(
+                'microsoft',
+                ['https://management.azure.com/.default'],
+                {
+                    forceNewSession: true,
+                    account: account
+                }
+            );
+            this.currentSession = session;
+            return session;
+        } catch (error) {
+            console.error('Failed to force new authentication session:', error);
+            return null;
+        }
+    }
+
+    getCurrentSession(): vscode.AuthenticationSession | null {
+        return this.currentSession;
+    }
+}
+
 export class AzureService {
-    private credential: DefaultAzureCredential | InteractiveBrowserCredential | null = null;
+    private credential: DefaultAzureCredential | VSCodeCredential | null = null;
     private subscriptionClient: SubscriptionClient | null = null;
     private currentScope: AuthScope = { type: 'tenant' }; // Default to tenant scope
+    private authenticated = false;
+    private currentAccount: string | null = null;
 
-    constructor() {}
+    constructor() { }
 
     private validateAuthentication(): void {
         if (!this.credential || !this.subscriptionClient) {
@@ -16,40 +84,165 @@ export class AzureService {
         }
     }
 
+    isAuthenticated(): boolean {
+        return this.authenticated;
+    }
+
+    getCurrentAccount(): string | null {
+        return this.currentAccount;
+    }
+
     async authenticate(): Promise<boolean> {
         try {
-            // Try DefaultAzureCredential first (works with Azure CLI, visual studio code etc.)
+            // First try VS Code's built-in Microsoft authentication
+            const vsCodeCredential = new VSCodeCredential();
+            const token = await vsCodeCredential.getToken(['https://management.azure.com/.default']);
+
+            if (token) {
+                this.credential = vsCodeCredential;
+                this.subscriptionClient = new SubscriptionClient(this.credential as TokenCredential);
+
+                // Test authentication by listing subscriptions
+                await this.getSubscriptions();
+
+                const session = vsCodeCredential.getCurrentSession();
+                this.authenticated = true;
+                this.currentAccount = session?.account.label || null;
+                vscode.window.showInformationMessage(`Authenticated to Azure as ${session?.account.label} through VS Code!`);
+                return true;
+            }
+
+        } catch (error) {
+            // Fall back to DefaultAzureCredential (Azure CLI, managed identity, etc.)
             this.credential = new DefaultAzureCredential();
-            
-            // Test the credential by trying to get subscriptions
             this.subscriptionClient = new SubscriptionClient(this.credential);
-            
+
             // Test authentication by listing subscriptions
             await this.getSubscriptions();
-            
-            vscode.window.showInformationMessage('Successfully authenticated with Azure');
+
+            this.authenticated = true;
+            vscode.window.showInformationMessage('Authenticated to Azure with existing credentials from Azure CLI, VS Code or environment variables!');
             return true;
-        } catch (error) {
-            console.log('DefaultAzureCredential failed, trying InteractiveBrowserCredential');
-            
-            try {
-                // Fallback to interactive browser authentication
-                this.credential = new InteractiveBrowserCredential({
-                    clientId: '04b07795-8ddb-461a-bbee-02f9e1bf7b46', // Azure CLI client ID
+        }
+
+        // If we reach here, authentication failed
+        vscode.window.showErrorMessage('Failed to authenticate to Azure! Try logging into Azure CLI, or to VS Code with a Microsoft account.');
+        return false;
+    }
+
+    async authenticateWithVSCode(): Promise<boolean> {
+        try {
+            // Get all available Microsoft accounts in VS Code
+            const accounts = await vscode.authentication.getAccounts('microsoft');
+
+            // Always build picker items starting with DefaultAzureCredential option
+            const items: vscode.QuickPickItem[] = [
+                {
+                    label: '$(azure) Use DefaultAzureCredential',
+                    description: 'Azure CLI, Environment vars, VS Code & more...',
+                    detail: 'Uses Azure CLI login, environment variables, or VS Code authentication automatically'
+                }
+            ];
+
+            // Add Microsoft accounts from VS Code if available
+            if (accounts.length > 0) {
+                items.push(
+                    ...accounts.map(account => ({
+                        label: `$(vscode) ${account.label}`,
+                        description: account.id,
+                        detail: 'Microsoft account signed into VS Code'
+                    }))
+                );
+            } else {
+                items.push({
+                    label: '$(info) No Microsoft accounts found in VS Code',
+                    description: 'Sign into VS Code with a Microsoft account to see more options',
+                    detail: 'Use the account icon in VS Code to add a Microsoft account'
                 });
-                
-                this.subscriptionClient = new SubscriptionClient(this.credential);
-                
-                // Test authentication
-                await this.getSubscriptions();
-                
-                vscode.window.showInformationMessage('Successfully authenticated with Azure via browser');
-                return true;
-            } catch (browserError) {
-                console.error('Authentication failed:', browserError);
-                vscode.window.showErrorMessage(`Azure authentication failed: ${browserError}`);
+            }
+
+            const selected = await vscode.window.showQuickPick(items, {
+                placeHolder: 'Select authentication method',
+                title: 'bARGE: Choose Azure Authentication'
+            });
+
+            if (!selected) {
                 return false;
             }
+
+            if (selected.label.startsWith('$(cloud)')) {
+                // User selected DefaultAzureCredential
+                return await this.authenticate();
+            }
+
+            if (selected.label.startsWith('$(info)')) {
+                // User clicked on the info item - try to trigger VS Code authentication
+                const vsCodeCredential = new VSCodeCredential();
+                const session = await vsCodeCredential.forceNewSession();
+
+                if (!session) {
+                    vscode.window.showErrorMessage('Please sign into VS Code with a Microsoft account and try again');
+                    return false;
+                }
+
+                return await this.completeAuthentication(vsCodeCredential, session);
+            }
+
+            if (selected.kind === vscode.QuickPickItemKind.Separator) {
+                return false; // Separator was selected somehow
+            }
+
+            // User selected a specific Microsoft account
+            const selectedAccount = accounts.find(account => account.label === selected.label);
+            if (!selectedAccount) {
+                vscode.window.showErrorMessage('Selected account not found');
+                return false;
+            }
+
+            // Get session for the selected account
+            const vsCodeCredential = new VSCodeCredential();
+            const session = await vscode.authentication.getSession(
+                'microsoft',
+                ['https://management.azure.com/.default'],
+                {
+                    createIfNone: false,
+                    silent: false,
+                    account: selectedAccount
+                }
+            );
+
+            if (!session) {
+                vscode.window.showErrorMessage(`Failed to authenticate with account: ${selectedAccount.label}`);
+                return false;
+            }
+
+            return await this.completeAuthentication(vsCodeCredential, session);
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            vscode.window.showErrorMessage(`Failed to authenticate: ${errorMessage}`);
+            console.error('VS Code authentication failed:', error);
+            return false;
+        }
+    }
+
+    private async completeAuthentication(credential: VSCodeCredential, session: vscode.AuthenticationSession): Promise<boolean> {
+        try {
+            // Set up our service clients with the VS Code credential
+            this.credential = credential;
+            this.subscriptionClient = new SubscriptionClient(this.credential as TokenCredential);
+
+            // Test authentication by getting subscriptions
+            await this.getSubscriptions();
+
+            this.authenticated = true;
+            this.currentAccount = session.account.label;
+
+            vscode.window.showInformationMessage(`Successfully authenticated as ${session.account.label}`);
+            return true;
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            vscode.window.showErrorMessage(`Authentication test failed: ${errorMessage}`);
+            return false;
         }
     }
 
@@ -58,7 +251,7 @@ export class AzureService {
 
         try {
             const subscriptions: AzureSubscription[] = [];
-            
+
             for await (const subscription of this.subscriptionClient!.subscriptions.list()) {
                 if (subscription.subscriptionId && subscription.displayName) {
                     subscriptions.push({
@@ -68,7 +261,7 @@ export class AzureService {
                     });
                 }
             }
-            
+
             return subscriptions;
         } catch (error) {
             console.error('Failed to get subscriptions:', error);
@@ -94,7 +287,7 @@ export class AzureService {
             };
         } catch (error) {
             console.error('Query execution failed:', error);
-            
+
             // Preserve details if they exist on the original error
             if (error instanceof Error && (error as any).details) {
                 const newError = new Error(`Query execution failed: ${error.message}`);
@@ -107,12 +300,13 @@ export class AzureService {
     }
 
     private async runQueryViaRestApi(query: string, subscriptionIds?: string[]): Promise<QueryResult> {
-        console.log('Trying REST API approach...');
-        
         // Get access token from credential
         const tokenResponse = await this.credential!.getToken('https://management.azure.com/.default');
+        if (!tokenResponse) {
+            throw new Error('Failed to get access token');
+        }
         const accessToken = tokenResponse.token;
-        
+
         const requestBody: any = {
             query: query
         };
@@ -139,13 +333,13 @@ export class AzureService {
         if (!response.ok) {
             let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
             let errorDetails = '';
-            
+
             try {
                 const errorBody = await response.json() as any;
-                
+
                 if (errorBody.error) {
                     const error = errorBody.error;
-                    
+
                     // Use correlation/support message as main error message if available
                     if (error.message && (error.message.includes('correlationId') || error.message.includes('timestamp'))) {
                         errorMessage = error.message;
@@ -156,24 +350,24 @@ export class AzureService {
                     } else if (error.code) {
                         errorMessage = error.code;
                     }
-                    
+
                     // Parse all details into separate sections
                     if (error.details && Array.isArray(error.details) && error.details.length > 0) {
                         const detailSections: string[] = [];
-                        
+
                         error.details.forEach((detail: any) => {
                             const detailParts: string[] = [];
-                            
+
                             // Add code if available
                             if (detail.code) {
                                 detailParts.push(`Code: ${detail.code}`);
                             }
-                            
+
                             // Add message if available and different from code
                             if (detail.message && detail.message !== detail.code) {
                                 detailParts.push(`Message: ${detail.message}`);
                             }
-                            
+
                             // Add location info for parser failures
                             if (detail.line !== undefined) {
                                 detailParts.push(`Line: ${detail.line}`);
@@ -184,19 +378,19 @@ export class AzureService {
                             if (detail.token) {
                                 detailParts.push(`Token: "${detail.token}"`);
                             }
-                            
+
                             // Add any other properties we haven't handled
                             Object.keys(detail).forEach(key => {
                                 if (!['code', 'message', 'line', 'characterPositionInLine', 'token'].includes(key)) {
                                     detailParts.push(`${key}: ${detail[key]}`);
                                 }
                             });
-                            
+
                             if (detailParts.length > 0) {
                                 detailSections.push(detailParts.join('\n'));
                             }
                         });
-                        
+
                         if (detailSections.length > 0) {
                             errorDetails = detailSections.join('\n---\n'); // Use separator between sections
                         }
@@ -205,7 +399,7 @@ export class AzureService {
             } catch (parseError) {
                 console.warn('Could not parse error response:', parseError);
             }
-            
+
             const error = new Error(errorMessage);
             (error as any).details = errorDetails;
             throw error;
@@ -215,7 +409,7 @@ export class AzureService {
         console.log('REST API response:', result);
 
         let tableData: any;
-        
+
         // Handle different response formats
         if (result && result.data && Array.isArray(result.data)) {
             // REST API returns objects in an array, need to convert to table format
@@ -262,7 +456,7 @@ export class AzureService {
         });
 
         const columnNames = Array.from(allKeys).sort();
-        
+
         // Create column definitions
         const columns = columnNames.map(name => ({
             name: name,
@@ -270,12 +464,12 @@ export class AzureService {
         }));
 
         // Create rows by extracting values in column order
-        const rows = objects.map(obj => 
+        const rows = objects.map(obj =>
             columnNames.map(colName => obj[colName] || null)
         );
 
-        console.log('Converted to table format:', { 
-            columnCount: columns.length, 
+        console.log('Converted to table format:', {
+            columnCount: columns.length,
             rowCount: rows.length,
             columns: columns.map(c => c.name)
         });
@@ -286,7 +480,7 @@ export class AzureService {
     public async setScope(): Promise<void> {
         try {
             const subscriptions = await this.getSubscriptions();
-            
+
             // Create quick pick items
             const items: vscode.QuickPickItem[] = [
                 {
@@ -313,7 +507,7 @@ export class AzureService {
                 } else {
                     const subscription = subscriptions.find(sub => sub.displayName === selected.label);
                     if (subscription) {
-                        this.currentScope = { 
+                        this.currentScope = {
                             type: 'subscription',
                             subscriptions: [subscription.subscriptionId]
                         };
@@ -329,10 +523,5 @@ export class AzureService {
 
     public getCurrentScope(): AuthScope {
         return this.currentScope;
-    }
-
-    isAuthenticated(): boolean {
-        return this.credential !== null && 
-               this.subscriptionClient !== null;
     }
 }

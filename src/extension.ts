@@ -65,6 +65,11 @@ export function activate(context: vscode.ExtensionContext) {
 		await azureService.setScope();
 	});
 
+	// Register VS Code authentication command
+	const authenticateWithVSCodeCommand = vscode.commands.registerCommand('barge.authenticateWithVSCode', async () => {
+		await azureService.authenticateWithVSCode();
+	});
+
 	// Helper function to run query in panel
 	async function runQueryInPanel(query: string, source: 'file' | 'selection', fileName?: string) {
 		try {
@@ -72,7 +77,6 @@ export function activate(context: vscode.ExtensionContext) {
 			if (!azureService.isAuthenticated()) {
 				const authResult = await azureService.authenticate();
 				if (!authResult) {
-					vscode.window.showErrorMessage('Authentication failed');
 					return;
 				}
 			}
@@ -95,7 +99,8 @@ export function activate(context: vscode.ExtensionContext) {
 		openResultsCommand,
 		runQueryFromFileCommand, 
 		runQueryFromSelectionCommand,
-		setScopeCommand
+		setScopeCommand,
+		authenticateWithVSCodeCommand
 	);
 
 	// Auto-authenticate if configured
