@@ -85,8 +85,8 @@ suite('Error Handling Tests', () => {
 			
 			let errorDisplay = {
 				hasTitle: true,
-				hasMessage: error && error.trim() !== '',
-				hasDetails: errorDetails && errorDetails.length > 0 && errorDetails.trim() !== '',
+				hasMessage: !!(error && error.trim() !== ''),
+				hasDetails: !!(errorDetails && errorDetails.length > 0 && errorDetails.trim() !== ''),
 				messageContent: error
 			};
 			
