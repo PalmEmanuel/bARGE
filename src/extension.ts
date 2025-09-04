@@ -4,7 +4,6 @@ import * as vscode from 'vscode';
 import { AzureService } from './azure/azureService';
 import { BargePanel } from './bargePanel';
 import { StatusBarManager } from './statusBar';
-import { error } from 'console';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed

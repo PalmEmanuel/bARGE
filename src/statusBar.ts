@@ -4,7 +4,7 @@ export class StatusBarManager {
     private statusBarItem: vscode.StatusBarItem;
     private sessionChangeListener: vscode.Disposable;
 
-    constructor(onAuthSessionChange?: () => void) {
+    constructor(onAuthSessionChange?: () => Promise<void>) {
         // Create status bar item with compass icon on the right side
         this.statusBarItem = vscode.window.createStatusBarItem(
             vscode.StatusBarAlignment.Right,
@@ -20,9 +20,13 @@ export class StatusBarManager {
         this.statusBarItem.show();
 
         // Listen for Microsoft authentication session changes
-        this.sessionChangeListener = vscode.authentication.onDidChangeSessions((e: vscode.AuthenticationSessionsChangeEvent) => {
+        this.sessionChangeListener = vscode.authentication.onDidChangeSessions(async (e: vscode.AuthenticationSessionsChangeEvent) => {
             if (e.provider.id === 'microsoft' && onAuthSessionChange) {
-                onAuthSessionChange();
+                try {
+                    await onAuthSessionChange();
+                } catch (error) {
+                    console.error('bARGE: Error handling authentication session change:', error);
+                }
             }
         });
     }
