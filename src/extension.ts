@@ -3,13 +3,23 @@
 import * as vscode from 'vscode';
 import { AzureService } from './azure/azureService';
 import { BargePanel } from './bargePanel';
+import { StatusBarManager } from './statusBar';
 import { error } from 'console';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-	// Initialize Azure service
-	const azureService = new AzureService();
+	// Initialize status bar
+	const statusBar = new StatusBarManager();
+	
+	// Initialize Azure service with status bar callback
+	const azureService = new AzureService((authenticated: boolean, accountName: string | null) => {
+		if (authenticated && accountName) {
+			statusBar.updateStatusAuthenticated(accountName);
+		} else {
+			statusBar.updateStatusNotAuthenticated();
+		}
+	});
 
 	// Register command to open results panel
 	const openResultsCommand = vscode.commands.registerCommand('barge.openResults', () => {
@@ -101,7 +111,8 @@ export function activate(context: vscode.ExtensionContext) {
 		runQueryFromFileCommand, 
 		runQueryFromSelectionCommand,
 		setScopeCommand,
-		authenticateCommand
+		authenticateCommand,
+		statusBar // Add status bar for proper cleanup
 	);
 
 	// Auto-authenticate if configured

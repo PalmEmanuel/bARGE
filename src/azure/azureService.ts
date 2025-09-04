@@ -11,8 +11,11 @@ export class AzureService {
     private authenticated = false;
     private currentAccount: string | null = null;
     private static readonly ARM_RESOURCE_DEFAULT_SCOPE = 'https://management.azure.com/.default';
+    private onAuthStatusChanged?: (authenticated: boolean, accountName: string | null) => void;
 
-    constructor() { }
+    constructor(onAuthStatusChanged?: (authenticated: boolean, accountName: string | null) => void) {
+        this.onAuthStatusChanged = onAuthStatusChanged;
+    }
 
     private validateAuthentication(): void {
         if (!this.credential || !this.subscriptionClient) {
@@ -28,8 +31,15 @@ export class AzureService {
         return this.currentAccount;
     }
 
+    private notifyAuthStatusChanged(): void {
+        if (this.onAuthStatusChanged) {
+            this.onAuthStatusChanged(this.authenticated, this.currentAccount);
+        }
+    }
+
     async authenticate(): Promise<boolean> {
         try {
+            // Messages here use codicons - https://microsoft.github.io/vscode-codicons/dist/codicon.html
             // Always build picker items starting with DefaultAzureCredential option
             const defaultCredentialOption = '$(azure) Use DefaultAzureCredential';
             const vsCodeOption = '$(vscode) Use VS Code Accounts';
@@ -41,8 +51,8 @@ export class AzureService {
             const items: vscode.QuickPickItem[] = [
                 {
                     label: defaultCredentialOption,
-                    description: 'Azure CLI, Environment vars, VS Code & more...',
-                    detail: 'Uses Azure CLI login, environment variables, VS Code, managed identity and more...'
+                    description: 'Use existing credentials',
+                    detail: 'Azure CLI and PowerShell, environment vars, VS Code, and more...'
                 }
             ];
 
@@ -67,7 +77,7 @@ export class AzureService {
                     }
                     items.push({
                         label: `$(vscode) ${account.label}`,
-                        description: signedIn ? 'Signed in' : 'Requires Consent',
+                        description: signedIn ? 'Signed in' : 'Requires consent',
                         detail: 'Microsoft account in VS Code'
                     });
                 }
@@ -85,7 +95,7 @@ export class AzureService {
 
             const selected = await vscode.window.showQuickPick(items, {
                 placeHolder: 'Select authentication method',
-                title: 'Choose Azure Authentication method'
+                title: 'bARGE: Select authentication method'
             });
 
             if (!selected) {
@@ -143,6 +153,7 @@ export class AzureService {
                     console.warn('Could not parse identity from JWT:', jwtError);
                     this.currentAccount = 'Unknown User';
                 }
+                this.notifyAuthStatusChanged();
                 vscode.window.showInformationMessage(`Signed in as ${this.currentAccount} from [existing login](https://learn.microsoft.com/en-us/javascript/api/@azure/identity/defaultazurecredential?view=azure-node-latest)!`);
                 return true;
             }
@@ -184,6 +195,7 @@ export class AzureService {
 
             this.authenticated = true;
             this.currentAccount = session.account.label;
+            this.notifyAuthStatusChanged();
 
             vscode.window.showInformationMessage(`Signed in as ${session.account.label} from VS Code!`);
             return true;
