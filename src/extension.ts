@@ -1,8 +1,9 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { AzureService } from './azureService';
+import { AzureService } from './azure/azureService';
 import { BargePanel } from './bargePanel';
+import { error } from 'console';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -56,13 +57,18 @@ export function activate(context: vscode.ExtensionContext) {
 	// Register scope setting command
 	const setScopeCommand = vscode.commands.registerCommand('barge.setScope', async () => {
 		if (!azureService.isAuthenticated()) {
-			const authResult = await azureService.authenticate();
+			const authResult = await azureService.authenticateWithDefaultCredential();
 			if (!authResult) {
-				vscode.window.showErrorMessage('Authentication failed. Cannot set scope.');
+				vscode.window.showErrorMessage('Authentication failed, cannot set scope!');
 				return;
 			}
 		}
 		await azureService.setScope();
+	});
+
+	// Register VS Code authentication command
+	const authenticateCommand = vscode.commands.registerCommand('barge.authenticate', async () => {
+		await azureService.authenticate();
 	});
 
 	// Helper function to run query in panel
@@ -72,7 +78,6 @@ export function activate(context: vscode.ExtensionContext) {
 			if (!azureService.isAuthenticated()) {
 				const authResult = await azureService.authenticate();
 				if (!authResult) {
-					vscode.window.showErrorMessage('Authentication failed');
 					return;
 				}
 			}
@@ -95,16 +100,16 @@ export function activate(context: vscode.ExtensionContext) {
 		openResultsCommand,
 		runQueryFromFileCommand, 
 		runQueryFromSelectionCommand,
-		setScopeCommand
+		setScopeCommand,
+		authenticateCommand
 	);
 
 	// Auto-authenticate if configured
 	const config = vscode.workspace.getConfiguration('barge');
 	if (config.get('autoAuthenticate', true)) {
 		// Try to authenticate silently on activation
-		azureService.authenticate().catch(error => {
-			console.log('Auto-authentication failed:', error);
-			// Don't show error to user for silent auth failure
+		azureService.authenticateWithDefaultCredential().catch(error => {
+			console.log('Authentication with DefaultAzureCredential failed:', error);
 		});
 	}
 }

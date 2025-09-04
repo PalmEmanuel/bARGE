@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
-import { AzureService } from './azureService';
+import { AzureService } from './azure/azureService';
 import { WebviewMessage, QueryResponse } from './types';
 
 export class BargePanel {
