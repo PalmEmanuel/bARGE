@@ -62,8 +62,8 @@
         "category": "bARGE"
       },
       {
-        "command": "barge.authenticateWithVSCode",
-        "title": "Authenticate with VS Code",
+        "command": "barge.authenticate",
+        "title": "Sign In",
         "category": "bARGE"
       }
     ],
@@ -81,15 +81,15 @@
         {
           "command": "barge.runQueryFromSelection",
           "title": "Run Selected Query",
-          "when": "editorHasSelection && (editorLangId == kql || resourceExtname == .kql)"
+          "when": "editorHasSelection && (editorLangId == kql || resourceExtname == .kql || editorLangId == powershell || resourceExtname == .ps1 || editorLangId == plaintext)"
         },
         {
           "command": "barge.setScope",
           "title": "Set Query Scope"
         },
         {
-          "command": "barge.authenticateWithVSCode",
-          "title": "Authenticate with VS Code"
+          "command": "barge.authenticate",
+          "title": "Sign In"
         }
       ],
       "editor/context": [
@@ -102,7 +102,7 @@
         {
           "command": "barge.runQueryFromSelection",
           "title": "bARGE: Run Selected Query",
-          "when": "editorHasSelection && resourceExtname == .kql",
+          "when": "editorHasSelection && (editorLangId == kql || resourceExtname == .kql || editorLangId == powershell || resourceExtname == .ps1 || editorLangId == plaintext)",
           "group": "barge@2"
         }
       ]
@@ -111,6 +111,11 @@
       {
         "command": "barge.runQueryFromSelection",
         "key": "f8",
+        "when": "editorTextFocus && editorHasSelection && (editorLangId == kql || resourceExtname == .kql)"
+      },
+      {
+        "command": "barge.runQueryFromFile",
+        "key": "f5",
         "when": "editorTextFocus && (editorLangId == kql || resourceExtname == .kql)"
       }
     ],
@@ -130,20 +135,10 @@
     "configuration": {
       "title": "bARGE",
       "properties": {
-        "barge.defaultSubscription": {
-          "type": "string",
-          "default": "",
-          "description": "Default Azure subscription ID to use for queries"
-        },
         "barge.autoAuthenticate": {
           "type": "boolean",
           "default": true,
-          "description": "Automatically authenticate with Azure on extension activation"
-        },
-        "barge.runQueryKeybinding": {
-          "type": "string",
-          "default": "f8",
-          "description": "Default keybinding for running selected query text is F8. To customize keybindings, go to File > Preferences > Keyboard Shortcuts and search for 'barge' commands."
+          "description": "Automatically authenticate to Azure using DefaultAzureCredential on extension activation"
         }
       }
     }

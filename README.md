@@ -95,7 +95,6 @@ Resources
 
 The extension supports the following configuration options in VS Code settings:
 
-- `barge.defaultSubscription`: Default Azure subscription ID to use for queries
 - `barge.autoAuthenticate`: Automatically authenticate with Azure on extension activation (default: true)
 
 ## Commands

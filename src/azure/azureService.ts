@@ -1,73 +1,8 @@
 import { DefaultAzureCredential, TokenCredential } from '@azure/identity';
 import { SubscriptionClient } from '@azure/arm-subscriptions';
 import * as vscode from 'vscode';
-import { AzureSubscription, QueryResult, ColumnDefinition, AuthScope } from './types';
-
-// VS Code credential wrapper that uses built-in Microsoft authentication
-class VSCodeCredential implements TokenCredential {
-    private currentSession: vscode.AuthenticationSession | null = null;
-
-    async getToken(scopes?: string | string[], options?: any): Promise<{ token: string; expiresOnTimestamp: number } | null> {
-        try {
-            // Get current session or create new one silently
-            const session = await vscode.authentication.getSession(
-                'microsoft',
-                ['https://management.azure.com/.default'],
-                { createIfNone: false, silent: true }
-            );
-
-            if (!session) {
-                return null;
-            }
-
-            this.currentSession = session;
-
-            // Parse token expiration from JWT
-            let expiresOnTimestamp = Date.now() + (60 * 60 * 1000); // Default 1 hour
-            try {
-                const tokenParts = session.accessToken.split('.');
-                if (tokenParts.length === 3) {
-                    const payload = JSON.parse(atob(tokenParts[1]));
-                    if (payload.exp) {
-                        expiresOnTimestamp = payload.exp * 1000;
-                    }
-                }
-            } catch (error) {
-                console.warn('Could not parse token expiration:', error);
-            }
-
-            return {
-                token: session.accessToken,
-                expiresOnTimestamp
-            };
-        } catch (error) {
-            console.error('Failed to get token from VS Code authentication:', error);
-            return null;
-        }
-    }
-
-    async forceNewSession(account?: vscode.AuthenticationSessionAccountInformation): Promise<vscode.AuthenticationSession | null> {
-        try {
-            const session = await vscode.authentication.getSession(
-                'microsoft',
-                ['https://management.azure.com/.default'],
-                {
-                    forceNewSession: true,
-                    account: account
-                }
-            );
-            this.currentSession = session;
-            return session;
-        } catch (error) {
-            console.error('Failed to force new authentication session:', error);
-            return null;
-        }
-    }
-
-    getCurrentSession(): vscode.AuthenticationSession | null {
-        return this.currentSession;
-    }
-}
+import { AzureSubscription, QueryResult, ColumnDefinition, AuthScope } from '../types';
+import { VSCodeCredential } from './vsCodeCredential';
 
 export class AzureService {
     private credential: DefaultAzureCredential | VSCodeCredential | null = null;
@@ -75,12 +10,13 @@ export class AzureService {
     private currentScope: AuthScope = { type: 'tenant' }; // Default to tenant scope
     private authenticated = false;
     private currentAccount: string | null = null;
+    private static readonly ARM_RESOURCE_DEFAULT_SCOPE = 'https://management.azure.com/.default';
 
     constructor() { }
 
     private validateAuthentication(): void {
         if (!this.credential || !this.subscriptionClient) {
-            throw new Error('Not authenticated. Please authenticate first.');
+            throw new Error('Not authenticated, please sign in first!');
         }
     }
 
@@ -94,141 +30,143 @@ export class AzureService {
 
     async authenticate(): Promise<boolean> {
         try {
-            // First try VS Code's built-in Microsoft authentication
-            const vsCodeCredential = new VSCodeCredential();
-            const token = await vsCodeCredential.getToken(['https://management.azure.com/.default']);
+            // Always build picker items starting with DefaultAzureCredential option
+            const defaultCredentialOption = '$(azure) Use DefaultAzureCredential';
+            const vsCodeOption = '$(vscode) Use VS Code Accounts';
 
-            if (token) {
-                this.credential = vsCodeCredential;
-                this.subscriptionClient = new SubscriptionClient(this.credential as TokenCredential);
-
-                // Test authentication by listing subscriptions
-                await this.getSubscriptions();
-
-                const session = vsCodeCredential.getCurrentSession();
-                this.authenticated = true;
-                this.currentAccount = session?.account.label || null;
-                vscode.window.showInformationMessage(`Authenticated to Azure as ${session?.account.label} through VS Code!`);
-                return true;
-            }
-
-        } catch (error) {
-            // Fall back to DefaultAzureCredential (Azure CLI, managed identity, etc.)
-            this.credential = new DefaultAzureCredential();
-            this.subscriptionClient = new SubscriptionClient(this.credential);
-
-            // Test authentication by listing subscriptions
-            await this.getSubscriptions();
-
-            this.authenticated = true;
-            vscode.window.showInformationMessage('Authenticated to Azure with existing credentials from Azure CLI, VS Code or environment variables!');
-            return true;
-        }
-
-        // If we reach here, authentication failed
-        vscode.window.showErrorMessage('Failed to authenticate to Azure! Try logging into Azure CLI, or to VS Code with a Microsoft account.');
-        return false;
-    }
-
-    async authenticateWithVSCode(): Promise<boolean> {
-        try {
-            // Get all available Microsoft accounts in VS Code
             const accounts = await vscode.authentication.getAccounts('microsoft');
 
-            // Always build picker items starting with DefaultAzureCredential option
+            // Create quick pick items
             const items: vscode.QuickPickItem[] = [
                 {
-                    label: '$(azure) Use DefaultAzureCredential',
+                    label: defaultCredentialOption,
                     description: 'Azure CLI, Environment vars, VS Code & more...',
-                    detail: 'Uses Azure CLI login, environment variables, or VS Code authentication automatically'
+                    detail: 'Uses Azure CLI login, environment variables, VS Code, managed identity and more...'
                 }
             ];
 
-            // Add Microsoft accounts from VS Code if available
             if (accounts.length > 0) {
-                items.push(
-                    ...accounts.map(account => ({
+                for (const account of accounts) {
+                    let signedIn = false;
+                    try {
+                        const session = await vscode.authentication.getSession(
+                            'microsoft',
+                            [AzureService.ARM_RESOURCE_DEFAULT_SCOPE],
+                            {
+                                account: account,
+                                silent: true
+                            }
+                        );
+
+                        if (session) {
+                            signedIn = true;
+                        }
+                    } catch (error) {
+                        // Ignore errors here, we'll just show as not signed in
+                    }
+                    items.push({
                         label: `$(vscode) ${account.label}`,
-                        description: account.id,
-                        detail: 'Microsoft account signed into VS Code'
-                    }))
-                );
-            } else {
+                        description: signedIn ? 'Signed in' : 'May require re-authentication',
+                        detail: 'Microsoft account in VS Code'
+                    });
+                }
+            }
+            else {
                 items.push({
-                    label: '$(info) No Microsoft accounts found in VS Code',
-                    description: 'Sign into VS Code with a Microsoft account to see more options',
-                    detail: 'Use the account icon in VS Code to add a Microsoft account'
+                    label: vsCodeOption,
+                    detail: 'Sign into Microsoft accounts in VS Code'
                 });
             }
 
             const selected = await vscode.window.showQuickPick(items, {
                 placeHolder: 'Select authentication method',
-                title: 'bARGE: Choose Azure Authentication'
+                title: 'Choose Azure Authentication method'
             });
 
             if (!selected) {
                 return false;
             }
 
-            if (selected.label.startsWith('$(cloud)')) {
+            if (selected.label === defaultCredentialOption) {
                 // User selected DefaultAzureCredential
-                return await this.authenticate();
-            }
-
-            if (selected.label.startsWith('$(info)')) {
-                // User clicked on the info item - try to trigger VS Code authentication
-                const vsCodeCredential = new VSCodeCredential();
-                const session = await vsCodeCredential.forceNewSession();
-
-                if (!session) {
-                    vscode.window.showErrorMessage('Please sign into VS Code with a Microsoft account and try again');
-                    return false;
-                }
-
-                return await this.completeAuthentication(vsCodeCredential, session);
-            }
-
-            if (selected.kind === vscode.QuickPickItemKind.Separator) {
-                return false; // Separator was selected somehow
-            }
-
-            // User selected a specific Microsoft account
-            const selectedAccount = accounts.find(account => account.label === selected.label);
-            if (!selectedAccount) {
-                vscode.window.showErrorMessage('Selected account not found');
+                console.log('Authentication method selected: DefaultAzureCredential');
+                return await this.authenticateWithDefaultCredential();
+            } else if (selected.label.startsWith('$(vscode)')) {
+                // User selected VS Code authentication
+                const trimmedLabel = selected?.label.replace('$(vscode) ', '');
+                console.log('Authentication method selected:', trimmedLabel);
+                const selectedAccount = accounts.find(acc => trimmedLabel === acc.label);
+                return await this.authenticateWithVSCode(selectedAccount);
+            } else {
                 return false;
             }
 
-            // Get session for the selected account
-            const vsCodeCredential = new VSCodeCredential();
-            const session = await vscode.authentication.getSession(
-                'microsoft',
-                ['https://management.azure.com/.default'],
-                {
-                    createIfNone: false,
-                    silent: false,
-                    account: selectedAccount
-                }
-            );
-
-            if (!session) {
-                vscode.window.showErrorMessage(`Failed to authenticate with account: ${selectedAccount.label}`);
-                return false;
-            }
-
-            return await this.completeAuthentication(vsCodeCredential, session);
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error);
             vscode.window.showErrorMessage(`Failed to authenticate: ${errorMessage}`);
-            console.error('VS Code authentication failed:', error);
+            console.error('Authentication failed:', error);
             return false;
         }
     }
 
-    private async completeAuthentication(credential: VSCodeCredential, session: vscode.AuthenticationSession): Promise<boolean> {
+    async authenticateWithDefaultCredential(): Promise<boolean> {
+        try {
+            // Fall back to DefaultAzureCredential (Azure CLI, managed identity, etc.)
+            this.credential = new DefaultAzureCredential();
+            this.subscriptionClient = new SubscriptionClient(this.credential);
+            // Get token to verify authentication and get identity
+            const token = await this.credential.getToken([AzureService.ARM_RESOURCE_DEFAULT_SCOPE]);
+
+            if (token) {
+                this.subscriptionClient = new SubscriptionClient(this.credential as TokenCredential);
+
+                // Test authentication by listing subscriptions
+                await this.getSubscriptions();
+
+                this.authenticated = true;
+                // Parse JWT to get identity claim
+                try {
+                    const jwt = token.token.split('.')[1];
+                    const payload = JSON.parse(atob(jwt));
+                    // Try different identity claims in order of preference
+                    this.currentAccount = payload.upn || payload.unique_name || payload.email || payload.name || payload.oid || 'Unknown User';
+                } catch (jwtError) {
+                    console.warn('Could not parse identity from JWT:', jwtError);
+                    this.currentAccount = 'Unknown User';
+                }
+                vscode.window.showInformationMessage(`Signed in as ${this.currentAccount} from [existing login](https://learn.microsoft.com/en-us/javascript/api/@azure/identity/defaultazurecredential?view=azure-node-latest)!`);
+                return true;
+            }
+
+        } catch (error) {
+            vscode.window.showInformationMessage('Authenticated with existing credentials from Azure CLI, VS Code or environment variables!');
+            return true;
+        }
+
+        // If we reach here, authentication failed
+        vscode.window.showErrorMessage('Failed to authenticate! Try logging into Azure CLI, or to VS Code with a Microsoft account.');
+        return false;
+    }
+
+    private async authenticateWithVSCode(account: vscode.AuthenticationSessionAccountInformation | undefined): Promise<boolean> {
         try {
             // Set up our service clients with the VS Code credential
-            this.credential = credential;
+            this.credential = new VSCodeCredential();
+
+            const session = await vscode.authentication.getSession(
+                'microsoft',
+                [AzureService.ARM_RESOURCE_DEFAULT_SCOPE],
+                {
+                    account: account,
+                    createIfNone: true
+                }
+            );
+
+            if (!session) {
+                vscode.window.showErrorMessage(`Failed to authenticate with VS Code!`);
+                return false;
+            }
+
             this.subscriptionClient = new SubscriptionClient(this.credential as TokenCredential);
 
             // Test authentication by getting subscriptions
@@ -237,11 +175,10 @@ export class AzureService {
             this.authenticated = true;
             this.currentAccount = session.account.label;
 
-            vscode.window.showInformationMessage(`Successfully authenticated as ${session.account.label}`);
+            vscode.window.showInformationMessage(`Signed in as ${session.account.label} from VS Code!`);
             return true;
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : String(error);
-            vscode.window.showErrorMessage(`Authentication test failed: ${errorMessage}`);
+            vscode.window.showErrorMessage(`Failed to authenticate with VS Code: ${error}`);
             return false;
         }
     }
@@ -301,7 +238,7 @@ export class AzureService {
 
     private async runQueryViaRestApi(query: string, subscriptionIds?: string[]): Promise<QueryResult> {
         // Get access token from credential
-        const tokenResponse = await this.credential!.getToken('https://management.azure.com/.default');
+        const tokenResponse = await this.credential!.getToken(AzureService.ARM_RESOURCE_DEFAULT_SCOPE);
         if (!tokenResponse) {
             throw new Error('Failed to get access token');
         }
