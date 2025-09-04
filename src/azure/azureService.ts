@@ -98,7 +98,7 @@ export class AzureService {
                 return await this.authenticateWithDefaultCredential();
             } else if (selected.label.startsWith('$(vscode)')) {
                 // User selected VS Code authentication
-                const trimmedLabel = selected?.label.replace('$(vscode) ', '');
+                const trimmedLabel = selected.label.replace('$(vscode) ', '');
                 console.log('Authentication method selected:', trimmedLabel);
                 const selectedAccount = accounts.find(acc => trimmedLabel === acc.label);
                 return await this.authenticateWithVSCode(selectedAccount);
@@ -148,8 +148,8 @@ export class AzureService {
             }
 
         } catch (error) {
-            vscode.window.showInformationMessage('Authenticated with existing credentials from Azure CLI, VS Code or environment variables!');
-            return true;
+            vscode.window.showErrorMessage('Failed to authenticate! Try logging into Azure CLI, or to VS Code with a Microsoft account.');
+            return false;
         }
 
         // If we reach here, authentication failed
