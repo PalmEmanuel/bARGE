@@ -2,8 +2,9 @@ import * as vscode from 'vscode';
 
 export class StatusBarManager {
     private statusBarItem: vscode.StatusBarItem;
+    private sessionChangeListener: vscode.Disposable;
 
-    constructor() {
+    constructor(onAuthSessionChange?: () => void) {
         // Create status bar item with compass icon on the right side
         this.statusBarItem = vscode.window.createStatusBarItem(
             vscode.StatusBarAlignment.Right,
@@ -17,6 +18,21 @@ export class StatusBarManager {
         // Show as not authenticated initially
         this.updateStatusNotAuthenticated();
         this.statusBarItem.show();
+
+        // Listen for Microsoft authentication session changes
+        this.sessionChangeListener = vscode.authentication.onDidChangeSessions((e: vscode.AuthenticationSessionsChangeEvent) => {
+            if (e.provider.id === 'microsoft') {
+                console.log('🔄 Authentication sessions changed for Microsoft provider');
+                console.log('  Provider ID:', e.provider.id);
+                console.log('  Provider label:', e.provider.label);
+                console.log('  Full event details:', JSON.stringify(e, null, 2));
+                
+                if (onAuthSessionChange) {
+                    console.log('🔄 Calling session change callback...');
+                    onAuthSessionChange();
+                }
+            }
+        });
     }
 
     public updateStatusAuthenticated(accountName: string): void {
@@ -39,5 +55,6 @@ export class StatusBarManager {
 
     public dispose(): void {
         this.statusBarItem.dispose();
+        this.sessionChangeListener.dispose();
     }
 }

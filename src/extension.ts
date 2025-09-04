@@ -9,14 +9,30 @@ import { error } from 'console';
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-	// Initialize status bar
-	const statusBar = new StatusBarManager();
-	
-	// Initialize Azure service with status bar callback
+	// Initialize Azure service first
 	const azureService = new AzureService((authenticated: boolean, accountName: string | null) => {
 		if (authenticated && accountName) {
 			statusBar.updateStatusAuthenticated(accountName);
 		} else {
+			statusBar.updateStatusNotAuthenticated();
+		}
+	});
+
+	// Initialize status bar with session change callback
+	const statusBar = new StatusBarManager(async () => {
+		// When VS Code authentication sessions change, verify if our session is still valid
+		try {
+			console.log('🔍 [bARGE] Authentication sessions changed, verifying current session...');
+			const isStillValid = await azureService.verifyAuthentication();
+			
+			if (!isStillValid) {
+				console.log('❌ [bARGE] Current authentication is no longer valid after session change');
+				statusBar.updateStatusNotAuthenticated();
+			} else {
+				console.log('✅ [bARGE] Current authentication is still valid after session change');
+			}
+		} catch (error) {
+			console.log('💥 [bARGE] Session verification failed after auth change:', error);
 			statusBar.updateStatusNotAuthenticated();
 		}
 	});

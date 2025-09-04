@@ -18,7 +18,7 @@ export class AzureService {
     }
 
     private validateAuthentication(): void {
-        if (!this.credential || !this.subscriptionClient) {
+        if (!this.credential || !this.subscriptionClient || !this.authenticated) {
             throw new Error('Not authenticated, please sign in first!');
         }
     }
@@ -31,9 +31,115 @@ export class AzureService {
         return this.currentAccount;
     }
 
+    /**
+     * Completely clears authentication state and logs out
+     */
+    private clearAuthentication(): void {
+        this.authenticated = false;
+        this.currentAccount = null;
+        this.credential = null;
+        this.subscriptionClient = null;
+        this.notifyAuthStatusChanged();
+    }
+
+    /**
+     * Verifies if the current authentication is still valid by attempting to get a fresh token
+     * and checking if it's for the expected account
+     */
+    async verifyAuthentication(): Promise<boolean> {
+        if (!this.credential) {
+            this.clearAuthentication();
+            return false;
+        }
+
+        try {
+            // For VS Code credentials, check if the session is still available
+            if (this.credential instanceof VSCodeCredential) {
+                const session = this.credential.getCurrentSession();
+                if (!session) {
+                    console.log('VS Code session is no longer available - logging out');
+                    this.clearAuthentication();
+                    return false;
+                }
+                
+                // Also verify we can still get accounts from VS Code
+                const accounts = await vscode.authentication.getAccounts('microsoft');
+                const sessionStillExists = accounts.some(account => account.id === session.account.id);
+                if (!sessionStillExists) {
+                    console.log('VS Code account was removed from available accounts - logging out');
+                    this.clearAuthentication();
+                    return false;
+                }
+            }
+
+            const tokenResponse = await this.credential.getToken(AzureService.ARM_RESOURCE_DEFAULT_SCOPE);
+            if (!tokenResponse) {
+                this.clearAuthentication();
+                return false;
+            }
+            
+            // Verify that the token is for the expected account
+            const currentTokenAccount = await this.extractAccountFromToken(tokenResponse.token);
+            
+            // If we have a current account stored, check if it matches the token
+            if (this.currentAccount && currentTokenAccount && this.currentAccount !== currentTokenAccount) {
+                console.log(`Account change detected. Previous: ${this.currentAccount}, Current: ${currentTokenAccount}`);
+                // This could be a legitimate account switch or an unexpected change
+                // For VS Code credentials, we should trust the new account since user explicitly chose it
+                if (this.credential instanceof VSCodeCredential) {
+                    console.log('VS Code account change - updating to new account');
+                    this.currentAccount = currentTokenAccount;
+                } else {
+                    // For DefaultAzureCredential, account changes could indicate a security issue
+                    console.log('DefaultAzureCredential account mismatch - logging out for security');
+                    this.clearAuthentication();
+                    return false;
+                }
+            }
+            
+            // Token is valid, ensure our state reflects this
+            if (!this.authenticated) {
+                this.authenticated = true;
+                // Update account name from token or VS Code session
+                if (!this.currentAccount) {
+                    if (currentTokenAccount) {
+                        this.currentAccount = currentTokenAccount;
+                    } else if (this.credential instanceof VSCodeCredential) {
+                        const session = this.credential.getCurrentSession();
+                        this.currentAccount = session?.account.label || 'VS Code User';
+                    }
+                }
+                this.notifyAuthStatusChanged();
+            }
+
+            return true;
+        } catch (error) {
+            console.log('Authentication verification failed:', error);
+            this.clearAuthentication();
+            return false;
+        }
+    }
+
     private notifyAuthStatusChanged(): void {
         if (this.onAuthStatusChanged) {
             this.onAuthStatusChanged(this.authenticated, this.currentAccount);
+        }
+    }
+
+    /**
+     * Extracts the account identifier from a JWT token
+     */
+    private async extractAccountFromToken(token: string): Promise<string | null> {
+        try {
+            const jwt = token.split('.')[1];
+            const payload = JSON.parse(atob(jwt));
+            
+            // Try different identity claims in order of preference
+            // These are the same claims used in authenticateWithDefaultCredential
+            return payload.upn || payload.unique_name || payload.email || payload.name || payload.oid || null;
+        } catch (error) {
+            console.warn('Could not parse account from JWT token:', error);
+            return null;
         }
     }
 
@@ -139,31 +245,27 @@ export class AzureService {
             if (token) {
                 this.subscriptionClient = new SubscriptionClient(this.credential as TokenCredential);
 
+                // Set authenticated state before testing with getSubscriptions
+                this.authenticated = true;
+                this.currentAccount = await this.extractAccountFromToken(token.token);
+
                 // Test authentication by listing subscriptions
                 await this.getSubscriptions();
 
-                this.authenticated = true;
-                // Parse JWT to get identity claim
-                try {
-                    const jwt = token.token.split('.')[1];
-                    const payload = JSON.parse(atob(jwt));
-                    // Try different identity claims in order of preference
-                    this.currentAccount = payload.upn || payload.unique_name || payload.email || payload.name || payload.oid || 'Unknown User';
-                } catch (jwtError) {
-                    console.warn('Could not parse identity from JWT:', jwtError);
-                    this.currentAccount = 'Unknown User';
-                }
                 this.notifyAuthStatusChanged();
                 vscode.window.showInformationMessage(`Signed in as ${this.currentAccount} from [existing login](https://learn.microsoft.com/en-us/javascript/api/@azure/identity/defaultazurecredential?view=azure-node-latest)!`);
                 return true;
             }
 
         } catch (error) {
+            console.error('DefaultAzureCredential authentication error:', error);
+            this.clearAuthentication();
             vscode.window.showErrorMessage('Failed to authenticate! Try logging into Azure CLI, or to VS Code with a Microsoft account.');
             return false;
         }
 
         // If we reach here, authentication failed
+        this.clearAuthentication();
         vscode.window.showErrorMessage('Failed to authenticate! Try logging into Azure CLI, or to VS Code with a Microsoft account.');
         return false;
     }
@@ -190,16 +292,20 @@ export class AzureService {
 
             this.subscriptionClient = new SubscriptionClient(this.credential as TokenCredential);
 
+            // Set authenticated state before testing with getSubscriptions
+            this.authenticated = true;
+            this.currentAccount = session.account.label;
+
             // Test authentication by getting subscriptions
             await this.getSubscriptions();
 
-            this.authenticated = true;
-            this.currentAccount = session.account.label;
             this.notifyAuthStatusChanged();
 
             vscode.window.showInformationMessage(`Signed in as ${session.account.label} from VS Code!`);
             return true;
         } catch (error) {
+            console.error('VS Code authentication error:', error);
+            this.clearAuthentication();
             vscode.window.showErrorMessage(`Failed to authenticate with VS Code: ${error}`);
             return false;
         }
