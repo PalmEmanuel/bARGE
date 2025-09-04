@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as vscode from 'vscode';
-import { AzureService } from '../azureService';
+import { AzureService } from '../azure/azureService';
 import { BargePanel } from '../bargePanel';
 import { QueryResponse, QueryResult } from '../types';
 
