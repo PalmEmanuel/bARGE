@@ -3,13 +3,55 @@
 import * as vscode from 'vscode';
 import { AzureService } from './azure/azureService';
 import { BargePanel } from './bargePanel';
-import { error } from 'console';
+import { StatusBarManager } from './statusBar';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-	// Initialize Azure service
-	const azureService = new AzureService();
+	// Initialize status bar first
+	const statusBar = new StatusBarManager(async () => {
+		// When VS Code authentication sessions change, verify if our session is still valid
+		try {
+			const isStillValid = await azureService.verifyAuthentication();
+			
+			if (!isStillValid) {
+				statusBar.updateStatusNotAuthenticated();
+			}
+		} catch (error) {
+			console.error('bARGE: Session verification failed:', error);
+			statusBar.updateStatusNotAuthenticated();
+		}
+	});
+
+	// Initialize Azure service with auth and loading callbacks
+	const azureService = new AzureService(
+		// Auth status callback
+		(authenticated: boolean, accountName: string | null) => {
+			if (authenticated && accountName) {
+				statusBar.updateStatusAuthenticated(accountName);
+			} else {
+				statusBar.updateStatusNotAuthenticated();
+			}
+		},
+		// Loading status callback
+		(isLoading: boolean, message?: string) => {
+			if (isLoading && message) {
+				statusBar.updateStatusLoading(message);
+			} else {
+				// When loading stops, restore the appropriate auth status
+				if (azureService.isAuthenticated()) {
+					const accountName = azureService.getCurrentAccount();
+					if (accountName) {
+						statusBar.updateStatusAuthenticated(accountName);
+					} else {
+						statusBar.updateStatusNotAuthenticated();
+					}
+				} else {
+					statusBar.updateStatusNotAuthenticated();
+				}
+			}
+		}
+	);
 
 	// Register command to open results panel
 	const openResultsCommand = vscode.commands.registerCommand('barge.openResults', () => {
@@ -101,15 +143,16 @@ export function activate(context: vscode.ExtensionContext) {
 		runQueryFromFileCommand, 
 		runQueryFromSelectionCommand,
 		setScopeCommand,
-		authenticateCommand
+		authenticateCommand,
+		statusBar // Add status bar for proper cleanup
 	);
 
 	// Auto-authenticate if configured
 	const config = vscode.workspace.getConfiguration('barge');
 	if (config.get('autoAuthenticate', true)) {
 		// Try to authenticate silently on activation
-		azureService.authenticateWithDefaultCredential().catch(error => {
-			console.log('Authentication with DefaultAzureCredential failed:', error);
+		azureService.authenticateWithDefaultCredential().catch(() => {
+			// Silent failure - user can manually authenticate if needed
 		});
 	}
 }

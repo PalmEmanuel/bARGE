@@ -4,38 +4,43 @@
 
 <img src="media/readme/bARGE.png" width="256">
 
-bARGE is a VS Code extension that brings Azure Resource Graph querying capabilities directly into your development environment, similar to the Azure Portal's Resource Graph Explorer. It adds functionality such as comparison of results and improved data table handling.
+bARGE is a Visual Studio Code extension that brings Azure Resource Graph querying capabilities directly into your development environment, similar to the Azure Portal's Resource Graph Explorer. It adds functionality such as comparison of results and improved data table handling.
 
 ## Features
 
-- **Flexible Data Grid**: Excel-like table with column resizing, reordering, and sticky headers
-- **Exploring Results**: Click, drag, and keyboard navigation with multi-cell selection support
-- **Comparison**: Select two or more rows for comparison to see differences in their properties
-- **Copying Options**: Right-click to copy cells, selections, or formatted JSON
-- **Querying**: Run queries directly from `.kql` files in your workspace, or from selected text
-- **Scope Management**: Query across your tenant or specific subscriptions
-- **Authentication**: Seamless integration with VS Code's Azure authentication
+- **Run KQL Queries**: Execute Kusto Query Language (KQL) queries against Azure Resource Graph directly from VS Code.
+- **Results Panel**: View query results in a dedicated panel with sortable and resizable columns.
+- **Comparison**: Select two or more rows for comparison to see differences in their properties.
+- **Copy & Export**: Easily copy selected cells as formatted text or for Excel, or export entire results to CSV for further analysis.
+- **Scope Selection**: Choose the subscription or tenant scope for your queries.
+- **Authentication Options**: Authenticate using [DefaultAzureCredential](https://learn.microsoft.com/en-us/javascript/api/@azure/identity/defaultazurecredential?view=azure-node-latest) or VS Code's built-in Microsoft account provider.
 
-## Getting Started
+## Installation
 
-### Prerequisites
-
-- VS Code 1.103.0 or higher
-- Access to Azure subscriptions
-- One of the following for authentication:
-  - Azure CLI installed and logged in (`az login`)
-  - Or browser-based authentication (fallback)
-
-### Installation
-
-1. Install the extension from the VS Code marketplace
-2. Or [build from source](#building-from-source) for development
+1. [Install the extension](https://marketplace.visualstudio.com/items?itemName=PalmEmanuel.barge-vscode) from the VS Code marketplace
+2. Run the following command in VS Code's Quick Open panel (CTRL / CMD + P):
+```
+ext install PalmEmanuel.barge-vscode
+```
+3. Or [build from source](#building-from-source) for development
 
 ### Usage
 
-1. **Authenticate with Azure**
-   - Run `az login` in your terminal, or
-   - Use VS Code's built-in Azure authentication
+1. **Sign In**
+
+There are multiple options for sign-in, either via the Azure CLI or via VS Code's logged in Microsoft accounts. The easiest way is to use the Sign In command.
+
+![Sign In](media/readme/gifs/sign-in.gif)
+
+By default, the extension will attempt to use the available tokens from the DefaultAzureCredential chain, which in order includes:
+
+- Environment Variables
+- Workload Identity
+- Managed Identity
+- Visual Studio Code
+- Azure CLI
+- Azure PowerShell
+- Azure Developer CLI
 
 2. **Run queries:**
    - **From a .kql file**: Open the file and right click to run `bARGE: Run Query from Current File`
@@ -50,46 +55,6 @@ bARGE is a VS Code extension that brings Azure Resource Graph querying capabilit
    - Select cells and copy data to Excel or other tools
    - Click JSON objects to view formatted content
    - Export results to CSV using the export button in the results panel
-
-## Example Queries
-
-Here are some useful queries to get you started:
-
-### List all Virtual Machines
-
-```kql
-Resources
-| where type == 'microsoft.compute/virtualmachines'
-| project name, location, resourceGroup, properties.hardwareProfile.vmSize
-| limit 100
-```
-
-### Find resources by tag
-
-```kql
-Resources
-| where tags.Environment == 'Production'
-| project name, type, location, resourceGroup
-| limit 50
-```
-
-### Storage accounts by region
-
-```kql
-Resources
-| where type == 'microsoft.storage/storageaccounts'
-| summarize count() by location
-| order by count_ desc
-```
-
-### Resources created in the last 30 days
-
-```kql
-Resources
-| where todatetime(properties.timeCreated) > ago(30d)
-| project name, type, resourceGroup, properties.timeCreated
-| order by todatetime(properties.timeCreated) desc
-```
 
 ## Configuration
 
@@ -112,10 +77,9 @@ The extension supports the following configuration options in VS Code settings:
 git clone https://github.com/PalmEmanuel/bARGE.git
 cd bARGE
 npm install
-npm run watch
 ```
 
-Then press `F5` in VS Code to launch the Extension Development Host.
+Press `F5` in VS Code to launch the Extension Development Host.
 
 ## Contributing
 
