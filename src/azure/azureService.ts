@@ -57,7 +57,6 @@ export class AzureService {
             if (this.credential instanceof VSCodeCredential) {
                 const session = this.credential.getCurrentSession();
                 if (!session) {
-                    console.log('VS Code session is no longer available - logging out');
                     this.clearAuthentication();
                     return false;
                 }
@@ -66,7 +65,6 @@ export class AzureService {
                 const accounts = await vscode.authentication.getAccounts('microsoft');
                 const sessionStillExists = accounts.some(account => account.id === session.account.id);
                 if (!sessionStillExists) {
-                    console.log('VS Code account was removed from available accounts - logging out');
                     this.clearAuthentication();
                     return false;
                 }
@@ -83,15 +81,13 @@ export class AzureService {
             
             // If we have a current account stored, check if it matches the token
             if (this.currentAccount && currentTokenAccount && this.currentAccount !== currentTokenAccount) {
-                console.log(`Account change detected. Previous: ${this.currentAccount}, Current: ${currentTokenAccount}`);
                 // This could be a legitimate account switch or an unexpected change
                 // For VS Code credentials, we should trust the new account since user explicitly chose it
                 if (this.credential instanceof VSCodeCredential) {
-                    console.log('VS Code account change - updating to new account');
                     this.currentAccount = currentTokenAccount;
                 } else {
                     // For DefaultAzureCredential, account changes could indicate a security issue
-                    console.log('DefaultAzureCredential account mismatch - logging out for security');
+                    console.warn('bARGE: Unexpected account change in DefaultAzureCredential - logging out for security');
                     this.clearAuthentication();
                     return false;
                 }
@@ -114,7 +110,7 @@ export class AzureService {
 
             return true;
         } catch (error) {
-            console.log('Authentication verification failed:', error);
+            console.error('bARGE: Authentication verification failed:', error);
             this.clearAuthentication();
             return false;
         }
@@ -210,17 +206,14 @@ export class AzureService {
 
             if (selected.label === defaultCredentialOption) {
                 // User selected DefaultAzureCredential
-                console.log('Authentication method selected: DefaultAzureCredential');
                 return await this.authenticateWithDefaultCredential();
             } else if (selected.label.startsWith('$(vscode)')) {
                 // User selected VS Code authentication
                 const trimmedLabel = selected.label.replace('$(vscode) ', '');
-                console.log('Authentication method selected:', trimmedLabel);
                 const selectedAccount = accounts.find(acc => trimmedLabel === acc.label);
                 return await this.authenticateWithVSCode(selectedAccount);
             } else if (selected.label === vsCodeOtherOption) {
                 // User selected VS Code authentication without an account
-                console.log('Authentication method selected: VS Code Accounts (no specific account)');
                 return await this.authenticateWithVSCode(undefined);
             } else {
                 return false;
@@ -335,7 +328,7 @@ export class AzureService {
     }
 
     async runQuery(query: string, subscriptionIds?: string[]): Promise<QueryResult> {
-        console.log('runQuery called with:', { query, subscriptionIds, currentScope: this.currentScope });
+        console.log('bARGE: runQuery called with:', { query, subscriptionIds, currentScope: this.currentScope });
         this.validateAuthentication();
 
         const startTime = Date.now();
@@ -380,8 +373,6 @@ export class AzureService {
         if (subscriptionIds && subscriptionIds.length > 0) {
             requestBody.subscriptions = subscriptionIds;
         }
-
-        console.log('Making REST API call with:', requestBody);
 
         const response = await fetch(
             'https://management.azure.com/providers/Microsoft.ResourceGraph/resources?api-version=2024-04-01',
@@ -471,14 +462,13 @@ export class AzureService {
         }
 
         const result = await response.json() as any;
-        console.log('REST API response:', result);
+        console.log('bARGE: REST API response:', result);
 
         let tableData: any;
 
         // Handle different response formats
         if (result && result.data && Array.isArray(result.data)) {
             // REST API returns objects in an array, need to convert to table format
-            console.log('Converting object array to table format');
             tableData = this.convertObjectArrayToTable(result.data);
         } else if (result && result.data && result.data.columns && result.data.rows) {
             // Already in table format
@@ -533,12 +523,6 @@ export class AzureService {
             columnNames.map(colName => obj[colName] || null)
         );
 
-        console.log('Converted to table format:', {
-            columnCount: columns.length,
-            rowCount: rows.length,
-            columns: columns.map(c => c.name)
-        });
-
         return { columns, rows };
     }
 
@@ -579,7 +563,6 @@ export class AzureService {
                         vscode.window.showInformationMessage(`Scope set to: ${selected.label}`);
                     }
                 }
-                console.log('Scope changed to:', this.currentScope);
             }
         } catch (error) {
             vscode.window.showErrorMessage(`Failed to set scope: ${error}`);

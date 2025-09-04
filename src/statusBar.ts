@@ -21,16 +21,8 @@ export class StatusBarManager {
 
         // Listen for Microsoft authentication session changes
         this.sessionChangeListener = vscode.authentication.onDidChangeSessions((e: vscode.AuthenticationSessionsChangeEvent) => {
-            if (e.provider.id === 'microsoft') {
-                console.log('🔄 Authentication sessions changed for Microsoft provider');
-                console.log('  Provider ID:', e.provider.id);
-                console.log('  Provider label:', e.provider.label);
-                console.log('  Full event details:', JSON.stringify(e, null, 2));
-                
-                if (onAuthSessionChange) {
-                    console.log('🔄 Calling session change callback...');
-                    onAuthSessionChange();
-                }
+            if (e.provider.id === 'microsoft' && onAuthSessionChange) {
+                onAuthSessionChange();
             }
         });
     }

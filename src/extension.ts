@@ -22,17 +22,13 @@ export function activate(context: vscode.ExtensionContext) {
 	const statusBar = new StatusBarManager(async () => {
 		// When VS Code authentication sessions change, verify if our session is still valid
 		try {
-			console.log('🔍 [bARGE] Authentication sessions changed, verifying current session...');
 			const isStillValid = await azureService.verifyAuthentication();
 			
 			if (!isStillValid) {
-				console.log('❌ [bARGE] Current authentication is no longer valid after session change');
 				statusBar.updateStatusNotAuthenticated();
-			} else {
-				console.log('✅ [bARGE] Current authentication is still valid after session change');
 			}
 		} catch (error) {
-			console.log('💥 [bARGE] Session verification failed after auth change:', error);
+			console.error('bARGE: Session verification failed:', error);
 			statusBar.updateStatusNotAuthenticated();
 		}
 	});
