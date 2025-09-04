@@ -4,56 +4,24 @@ import { TokenCredential } from '@azure/identity';
 
 // VS Code credential wrapper that uses built-in Microsoft authentication
 export class VSCodeCredential implements TokenCredential {
-    private currentSession: vscode.AuthenticationSession | null = null;
+    private currentSession: vscode.AuthenticationSession;
 
-    async forceNewSession(account?: vscode.AuthenticationSessionAccountInformation): Promise<vscode.AuthenticationSession | null> {
-        try {
-            const session = await vscode.authentication.getSession(
-                'microsoft',
-                ['https://management.azure.com/.default'],
-                {
-                    forceNewSession: true,
-                    account: account
-                }
-            );
-            this.currentSession = session;
-            return session;
-        } catch (error) {
-            console.error('Failed to force new authentication session:', error);
-            return null;
-        }
+    constructor(session: vscode.AuthenticationSession) {
+        this.currentSession = session;
     }
 
-    getCurrentSession(): vscode.AuthenticationSession | null {
+    getCurrentSession(): vscode.AuthenticationSession {
         return this.currentSession;
     }
 
     async getToken(scopes?: string | string[], options?: any): Promise<{ token: string; expiresOnTimestamp: number } | null> {
         try {
-            // Ensure we have a valid scopes array, default to Azure management scope
-            const scopesArray = Array.isArray(scopes) 
-                ? scopes 
-                : scopes 
-                    ? [scopes] 
-                    : ['https://management.azure.com/.default'];
-
-            // Get current session or create new one silently
-            const session = await vscode.authentication.getSession(
-                'microsoft',
-                scopesArray,
-                { createIfNone: true }
-            );
-
-            if (!session) {
-                return null;
-            }
-
-            this.currentSession = session;
+            const token = this.currentSession.accessToken;
 
             // Parse token expiration from JWT
             let expiresOnTimestamp = Date.now() + (60 * 60 * 1000); // Default 1 hour
             try {
-                const tokenParts = session.accessToken.split('.');
+                const tokenParts = token.split('.');
                 if (tokenParts.length === 3) {
                     const payload = JSON.parse(atob(tokenParts[1]));
                     if (payload.exp) {
@@ -65,7 +33,7 @@ export class VSCodeCredential implements TokenCredential {
             }
 
             return {
-                token: session.accessToken,
+                token: token,
                 expiresOnTimestamp
             };
         } catch (error) {

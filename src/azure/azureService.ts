@@ -33,6 +33,7 @@ export class AzureService {
             // Always build picker items starting with DefaultAzureCredential option
             const defaultCredentialOption = '$(azure) Use DefaultAzureCredential';
             const vsCodeOption = '$(vscode) Use VS Code Accounts';
+            const vsCodeOtherOption = '$(vscode) Use Other VS Code Account';
 
             const accounts = await vscode.authentication.getAccounts('microsoft');
 
@@ -66,17 +67,21 @@ export class AzureService {
                     }
                     items.push({
                         label: `$(vscode) ${account.label}`,
-                        description: signedIn ? 'Signed in' : 'May require re-authentication',
+                        description: signedIn ? 'Signed in' : 'Requires Consent',
                         detail: 'Microsoft account in VS Code'
                     });
                 }
             }
-            else {
-                items.push({
-                    label: vsCodeOption,
-                    detail: 'Sign into Microsoft accounts in VS Code'
-                });
-            }
+
+
+            items.push({
+                label: '',
+                kind: vscode.QuickPickItemKind.Separator
+            });
+            items.push({
+                label: accounts.length > 0 ? vsCodeOtherOption : vsCodeOption,
+                detail: 'Sign into Microsoft accounts in VS Code'
+            });
 
             const selected = await vscode.window.showQuickPick(items, {
                 placeHolder: 'Select authentication method',
@@ -97,6 +102,10 @@ export class AzureService {
                 console.log('Authentication method selected:', trimmedLabel);
                 const selectedAccount = accounts.find(acc => trimmedLabel === acc.label);
                 return await this.authenticateWithVSCode(selectedAccount);
+            } else if (selected.label === vsCodeOtherOption) {
+                // User selected VS Code authentication without an account
+                console.log('Authentication method selected: VS Code Accounts (no specific account)');
+                return await this.authenticateWithVSCode(undefined);
             } else {
                 return false;
             }
@@ -150,15 +159,13 @@ export class AzureService {
 
     private async authenticateWithVSCode(account: vscode.AuthenticationSessionAccountInformation | undefined): Promise<boolean> {
         try {
-            // Set up our service clients with the VS Code credential
-            this.credential = new VSCodeCredential();
-
             const session = await vscode.authentication.getSession(
                 'microsoft',
                 [AzureService.ARM_RESOURCE_DEFAULT_SCOPE],
                 {
-                    account: account,
-                    createIfNone: true
+                    account: account ? account : undefined,
+                    createIfNone: true,
+                    clearSessionPreference: account ? false : true
                 }
             );
 
@@ -166,6 +173,9 @@ export class AzureService {
                 vscode.window.showErrorMessage(`Failed to authenticate with VS Code!`);
                 return false;
             }
+
+            // Set up our service clients with the VS Code credential
+            this.credential = new VSCodeCredential(session);
 
             this.subscriptionClient = new SubscriptionClient(this.credential as TokenCredential);
 
