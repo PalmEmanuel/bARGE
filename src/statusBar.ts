@@ -39,6 +39,12 @@ export class StatusBarManager {
         this.statusBarItem.backgroundColor = undefined; // Clear any error background
     }
 
+    public updateStatusLoading(message: string): void {
+        this.statusBarItem.text = `$(loading~spin) ${message}`;
+        this.statusBarItem.tooltip = `bARGE: ${message}`;
+        this.statusBarItem.backgroundColor = undefined; // Clear any error background
+    }
+
     public updateStatusError(message: string): void {
         this.statusBarItem.text = `$(compass-dot) Authentication Error`;
         this.statusBarItem.tooltip = `bARGE: ${message}. Click to retry`;

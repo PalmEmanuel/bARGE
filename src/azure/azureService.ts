@@ -11,10 +11,18 @@ export class AzureService {
     private authenticated = false;
     private currentAccount: string | null = null;
     private static readonly ARM_RESOURCE_DEFAULT_SCOPE = 'https://management.azure.com/.default';
-    private onAuthStatusChanged?: (authenticated: boolean, accountName: string | null) => void;
 
-    constructor(onAuthStatusChanged?: (authenticated: boolean, accountName: string | null) => void) {
+    private static readonly SIGNING_IN_MESSAGE = 'Signing in...';
+
+    private onAuthStatusChanged?: (authenticated: boolean, accountName: string | null) => void;
+    private onLoadingStatusChanged?: (isLoading: boolean, message?: string) => void;
+
+    constructor(
+        onAuthStatusChanged?: (authenticated: boolean, accountName: string | null) => void,
+        onLoadingStatusChanged?: (isLoading: boolean, message?: string) => void
+    ) {
         this.onAuthStatusChanged = onAuthStatusChanged;
+        this.onLoadingStatusChanged = onLoadingStatusChanged;
     }
 
     private validateAuthentication(): void {
@@ -122,6 +130,12 @@ export class AzureService {
         }
     }
 
+    private notifyLoadingStatusChanged(isLoading: boolean, message?: string): void {
+        if (this.onLoadingStatusChanged) {
+            this.onLoadingStatusChanged(isLoading, message);
+        }
+    }
+
     /**
      * Extracts the account identifier from a JWT token
      */
@@ -140,6 +154,8 @@ export class AzureService {
     }
 
     async authenticate(): Promise<boolean> {
+        this.notifyLoadingStatusChanged(true, AzureService.SIGNING_IN_MESSAGE);
+        
         try {
             // Messages here use codicons - https://microsoft.github.io/vscode-codicons/dist/codicon.html
             // Always build picker items starting with DefaultAzureCredential option
@@ -185,7 +201,6 @@ export class AzureService {
                 }
             }
 
-
             items.push({
                 label: '',
                 kind: vscode.QuickPickItemKind.Separator
@@ -201,6 +216,7 @@ export class AzureService {
             });
 
             if (!selected) {
+                this.notifyLoadingStatusChanged(false);
                 return false;
             }
 
@@ -216,6 +232,7 @@ export class AzureService {
                 // User selected VS Code authentication without an account
                 return await this.authenticateWithVSCode(undefined);
             } else {
+                this.notifyLoadingStatusChanged(false);
                 return false;
             }
 
@@ -223,11 +240,14 @@ export class AzureService {
             const errorMessage = error instanceof Error ? error.message : String(error);
             vscode.window.showErrorMessage(`Failed to authenticate: ${errorMessage}`);
             console.error('Authentication failed:', error);
+            this.notifyLoadingStatusChanged(false);
             return false;
         }
     }
 
     async authenticateWithDefaultCredential(): Promise<boolean> {
+        this.notifyLoadingStatusChanged(true, AzureService.SIGNING_IN_MESSAGE);
+
         try {
             // Fall back to DefaultAzureCredential (Azure CLI, managed identity, etc.)
             this.credential = new DefaultAzureCredential();
@@ -245,25 +265,29 @@ export class AzureService {
                 // Test authentication by listing subscriptions
                 await this.getSubscriptions();
 
+                this.notifyLoadingStatusChanged(false);
                 this.notifyAuthStatusChanged();
                 vscode.window.showInformationMessage(`Signed in as ${this.currentAccount} from [existing login](https://learn.microsoft.com/en-us/javascript/api/@azure/identity/defaultazurecredential?view=azure-node-latest)!`);
                 return true;
             }
-
         } catch (error) {
             console.error('DefaultAzureCredential authentication error:', error);
             this.clearAuthentication();
+            this.notifyLoadingStatusChanged(false);
             vscode.window.showErrorMessage('Failed to authenticate! Try logging into Azure CLI, or to VS Code with a Microsoft account.');
             return false;
         }
 
         // If we reach here, authentication failed
         this.clearAuthentication();
+        this.notifyLoadingStatusChanged(false);
         vscode.window.showErrorMessage('Failed to authenticate! Try logging into Azure CLI, or to VS Code with a Microsoft account.');
         return false;
     }
 
     private async authenticateWithVSCode(account: vscode.AuthenticationSessionAccountInformation | undefined): Promise<boolean> {
+        this.notifyLoadingStatusChanged(true, AzureService.SIGNING_IN_MESSAGE);
+
         try {
             const session = await vscode.authentication.getSession(
                 'microsoft',
@@ -277,6 +301,7 @@ export class AzureService {
 
             if (!session) {
                 vscode.window.showErrorMessage(`Failed to authenticate with VS Code!`);
+                this.notifyLoadingStatusChanged(false);
                 return false;
             }
 
@@ -292,6 +317,7 @@ export class AzureService {
             // Test authentication by getting subscriptions
             await this.getSubscriptions();
 
+            this.notifyLoadingStatusChanged(false);
             this.notifyAuthStatusChanged();
 
             vscode.window.showInformationMessage(`Signed in as ${session.account.label} from VS Code!`);
@@ -299,6 +325,7 @@ export class AzureService {
         } catch (error) {
             console.error('VS Code authentication error:', error);
             this.clearAuthentication();
+            this.notifyLoadingStatusChanged(false);
             vscode.window.showErrorMessage(`Failed to authenticate with VS Code: ${error}`);
             return false;
         }
@@ -330,6 +357,7 @@ export class AzureService {
     async runQuery(query: string, subscriptionIds?: string[]): Promise<QueryResult> {
         console.log('bARGE: runQuery called with:', { query, subscriptionIds, currentScope: this.currentScope });
         this.validateAuthentication();
+        this.notifyLoadingStatusChanged(true, 'Running query...');
 
         const startTime = Date.now();
 
@@ -339,12 +367,14 @@ export class AzureService {
         try {
             const result = await this.runQueryViaRestApi(query, effectiveSubscriptions);
             const executionTime = Date.now() - startTime;
+            this.notifyLoadingStatusChanged(false);
             return {
                 ...result,
                 executionTimeMs: executionTime
             };
         } catch (error) {
             console.error('Query execution failed:', error);
+            this.notifyLoadingStatusChanged(false);
 
             // Preserve details if they exist on the original error
             if (error instanceof Error && (error as any).details) {
