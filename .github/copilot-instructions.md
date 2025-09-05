@@ -125,7 +125,9 @@ vsce package --no-yarn
 ### Commit Message Format
 bARGE follows the [Conventional Commits specification v1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) for consistent commit messages and automated changelog generation.
 
-All commits are validated towards the configuration in `commitlint.config.js` using `@commitlint/config-conventional` and must have subject with sentence case.
+All commits are validated towards the configuration in `commitlint.config.js` using `@commitlint/config-conventional`.
+
+All commits **MUST** have a subject in normal sentence case (capitalized first letter).
 
 #### Basic Structure
 ```
@@ -149,7 +151,7 @@ All commits are validated towards the configuration in `commitlint.config.js` us
 - **build**: Build system changes (esbuild, npm scripts, etc.)
 
 #### Breaking Changes
-- Add `!` after type/scope for breaking changes: `feat!: redesign authentication API`
+- Add `!` after type/scope for breaking changes: `feat!: Redesign authentication API`
 - Include `BREAKING CHANGE:` in footer with description
 - Triggers major version bump in semantic versioning
 
@@ -201,15 +203,16 @@ Common scopes for bARGE:
 
 ### Best Practices
 1. **Keep commits atomic**: One logical change per commit
-2. **Write clear descriptions**: Describe what and why, not how
-3. **Use present tense**: "Add feature" not "Added feature"
-4. **Reference issues**: Include "Closes #123" or "Fixes #456"
-5. **Limit subject line**: 50 characters or less for subject
-6. **Include breaking changes**: Always document breaking changes in footer
-7. **Consistent scoping**: Use established scopes for better organization
+2. **Sentence casing**: Capitalize the first letter of the subject
+3. **Write clear descriptions**: Describe what and why, not how
+4. **Use present tense**: "Add feature" not "Added feature"
+5. **Reference issues**: Include "Closes #123" or "Fixes #456"
+6. **Limit subject line**: 50 characters or less for subject
+7. **Include breaking changes**: Always document breaking changes in footer
+8. **Consistent scoping**: Use established scopes for better organization
 
 ### Automated Validation
-- **Commitlint**: Automatically validates commit messages using `@commitlint/config-conventional`
+- **Commitlint**: Automatically validates commit messages using `@commitlint/config-conventional` with specific config found in `commitlint.config.js`
 - **Git Hooks**: Husky prevents commits that don't follow conventional format
 - **CI Validation**: Use `npm run commit-lint-ci` to validate PR commits
 - **Manual Check**: Use `npm run commit-lint` to validate recent commits
