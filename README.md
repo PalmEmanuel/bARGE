@@ -48,8 +48,8 @@ Running the Sign In command, through the command palette or through the bARGE st
 
 ### Run KQL Queries
 
-   - **From a .kql file**: Open the file and right click to run `bARGE: Run Query from Current File`
-   - **From selected text**: Select KQL text and right click to run `bARGE: Run Selected Query text`  
+   - **From a .kql file**: Open the file and right click to run `bARGE: Run Query from Current File` or press `F5`
+   - **From selected text**: Select KQL text and right click to run `bARGE: Run Selected Query text` or press `F8`  
    - **Open the panel**: Run `bARGE: Open bARGE Results Panel` to view previous results
 
 3. **Set your scope** (optional):
@@ -73,6 +73,12 @@ The extension supports the following configuration options in VS Code settings:
 - `barge.runQueryFromFile`: Run Query from Current File (works with .kql files)
 - `barge.runQueryFromSelection`: Run Selected Query text
 - `barge.setScope`: Set Query Scope (subscription, management group, or tenant)
+- `barge.authenticate`: Sign In to Azure
+
+## Keybindings
+
+- `F5`: Run Query from Current File (when editing .kql files)
+- `F8`: Run Selected Query (when text is selected in .kql files)
 
 ## Development
 
