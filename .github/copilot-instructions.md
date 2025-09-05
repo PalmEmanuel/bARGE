@@ -125,7 +125,7 @@ vsce package --no-yarn
 ### Commit Message Format
 bARGE follows the [Conventional Commits specification v1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) for consistent commit messages and automated changelog generation.
 
-All commits are validated towards the configuration in `commitlint.config.js` using `@commitlint/config-conventional`
+All commits are validated towards the configuration in `commitlint.config.js` using `@commitlint/config-conventional` and must have subject with sentence case.
 
 #### Basic Structure
 ```
@@ -155,7 +155,7 @@ All commits are validated towards the configuration in `commitlint.config.js` us
 
 #### Examples
 ```
-feat(auth): add Azure account picker with tenant switching
+feat(auth): Add Azure account picker with tenant switching
 
 Implements comprehensive account selection dialog with:
 - Real-time tenant and subscription listing
@@ -164,21 +164,21 @@ Implements comprehensive account selection dialog with:
 
 Closes #45
 
-fix(results): resolve panel not updating after query execution
+fix(results): Resolve panel not updating after query execution
 
 The results panel was not refreshing when running queries from
 files due to incorrect event listener registration.
 
-refactor(types): simplify QueryScope interface
+refactor(types): Simplify QueryScope interface
 
 BREAKING CHANGE: QueryScope.subscriptions is now required array
 instead of optional parameter
 
-docs: add conventional commits guidelines to development workflow
+docs: Add conventional commits guidelines to development workflow
 
-chore(deps): update @azure/identity to v4.0.1
+chore(deps): Update @azure/identity to v4.0.1
 
-test(auth): add unit tests for account selection scenarios
+test(auth): Add unit tests for account selection scenarios
 ```
 
 #### Scope Guidelines

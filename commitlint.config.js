@@ -25,9 +25,6 @@ module.exports = {
     ]],
     'scope-empty': [1, 'never'], // Warn if scope is missing (but allow it)
     'subject-case': [2, 'always', 'sentence-case'],
-    'subject-max-length': [2, 'always', 50],
-    'subject-min-length': [2, 'always', 10],
-    'body-max-line-length': [2, 'always', 72],
-    'footer-max-line-length': [2, 'always', 72]
+    'subject-min-length': [2, 'always', 10]
   }
 };
