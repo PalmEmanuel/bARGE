@@ -28,7 +28,9 @@ ext install PalmEmanuel.barge-vscode
 
 ### Sign In
 
-There are multiple options for sign-in, either via the Azure CLI or via VS Code's logged in Microsoft accounts. The easiest way is to use the Sign In command.
+There are multiple options for sign-in, either via the Azure CLI or via VS Code's logged in Microsoft accounts. The easiest way is to use the `Sign In` command.
+
+The status bar at the bottom of VS Code shows the account currently logged into bARGE, and allows easy switching between accounts.
 
 ![Sign In](media/readme/gifs/sign-in.gif)
 
@@ -44,22 +46,27 @@ By default, the extension will attempt to use the available tokens from the [Def
 
 It's possible to turn off the automatic sign-in through the configuration settings for bARGE.
 
-Running the Sign In command, through the command palette or through the bARGE status bar account selector, allows selecting either the DefaultAzureCredential described above, or any of the signed-in Microsoft accounts in VS Code.
+Running the `Sign In` command, either through the command palette or through the bARGE status bar account selector, allows selecting either the DefaultAzureCredential described above, or any of the signed-in Microsoft accounts in VS Code.
 
-### Run KQL Queries
+### Running KQL Queries
 
-   - **From a .kql file**: Open the file and right click to run `bARGE: Run Query from Current File`
-   - **From selected text**: Select KQL text and right click to run `bARGE: Run Selected Query text`  
-   - **Open the panel**: Run `bARGE: Open bARGE Results Panel` to view previous results
+There are two main ways to execute KQL queries against Azure Resource Graph using bARGE:
 
-3. **Set your scope** (optional):
-   - Run `bARGE: Set Query Scope` to choose subscription or tenant querying scope
+   - **From a .kql file**: Open the file and right click to run `bARGE: Run Query from Current File` or click `F5`
+   - **From selected text**: Select KQL text and right click to run `bARGE: Run Selected Query text` or click `F8`
 
-4. **Interact with results:**
-   - Resize and reorder columns by dragging
-   - Select cells and copy data to Excel or other tools
-   - Click JSON objects to view formatted content
-   - Export results to CSV using the export button in the results panel
+Both commands are also possible to execute from the command palette.
+
+### Interacting with Results
+
+bARGE supports functionality expected from modern tables and Azure Resource Graph Explorer in the Azure Portal:
+
+- Resize and reorder columns by dragging headers
+- Select cells and copy data to Excel or other tools, with or without headers
+- Hover or right click JSON values in results, such as `properties`, to view or copy formatted content
+- Export results to CSV using the export button in the results panel
+- Select a row in the results table for details
+- Select multiple rows in the results table for comparison and quick overview of matching or differing properties
 
 ## Configuration
 
@@ -67,12 +74,7 @@ The extension supports the following configuration options in VS Code settings:
 
 - `barge.autoAuthenticate`: Automatically authenticate with Azure on extension activation (default: true)
 
-## Commands
-
-- `barge.openResults`: Open bARGE Results Panel
-- `barge.runQueryFromFile`: Run Query from Current File (works with .kql files)
-- `barge.runQueryFromSelection`: Run Selected Query text
-- `barge.setScope`: Set Query Scope (subscription, management group, or tenant)
+The default keybindings for executing queries are also possible to change.
 
 ## Development
 
@@ -84,36 +86,19 @@ cd bARGE
 npm install
 ```
 
-Press `F5` in VS Code to launch the Extension Development Host.
+Press `F5` in VS Code to launch the Extension Development Host and debug the extension.
 
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## License
-
-This project is licensed under the MIT License.
+If you have a feature request, create an Issue!
 
 ## Troubleshooting
 
-### Authentication Issues
+If you encounter issues with using the extension, verify that your account has access, that you're logged in to the correct account (as indicated in the status bar in the bottom of VS Code), and that your query is correct.
 
-If you encounter authentication problems:
-
-1. Make sure you're logged into Azure CLI: `az login`
-2. Verify you have access to the subscription you're trying to query
-3. Try refreshing your browser authentication
-
-### Query Errors
-
-- Ensure your KQL syntax is correct
-- Verify you have permissions to query the resources
-- Check that the subscription is selected
-
-### Performance
-
-- Use `limit` clauses for large result sets
-- Consider filtering early in your queries to improve performance
+If the problem persists, please create an Issue and try to describe the unexpected behavior and a way to reproduce it.
 
 ## Resources
 
