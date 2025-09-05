@@ -4,7 +4,7 @@
 
 <img src="media/readme/bARGE.png" width="256">
 
-bARGE is a Visual Studio Code extension that brings Azure Resource Graph querying capabilities directly into your development environment, similar to the Azure Portal's Resource Graph Explorer. It adds functionality such as comparison of results and improved data table handling.
+bARGE is a Visual Studio Code extension that brings Azure Resource Graph querying capabilities with KQL directly to your development environment, similar to the Azure Portal's Resource Graph Explorer. It boosts the functionality with features such as comparison of results, improved data table handling, easy sign-in and switching of accounts.
 
 ## Features
 
@@ -24,15 +24,15 @@ ext install PalmEmanuel.barge-vscode
 ```
 3. Or [build from source](#building-from-source) for development
 
-### Usage
+## Using bARGE
 
-1. **Sign In**
+### Sign In
 
 There are multiple options for sign-in, either via the Azure CLI or via VS Code's logged in Microsoft accounts. The easiest way is to use the Sign In command.
 
 ![Sign In](media/readme/gifs/sign-in.gif)
 
-By default, the extension will attempt to use the available tokens from the DefaultAzureCredential chain, which in order includes:
+By default, the extension will attempt to use the available tokens from the [DefaultAzureCredential](https://learn.microsoft.com/en-us/javascript/api/@azure/identity/defaultazurecredential?view=azure-node-latest) chain, which in order includes:
 
 - Environment Variables
 - Workload Identity
@@ -42,7 +42,12 @@ By default, the extension will attempt to use the available tokens from the Defa
 - Azure PowerShell
 - Azure Developer CLI
 
-2. **Run queries:**
+It's possible to turn off the automatic sign-in through the configuration settings for bARGE.
+
+Running the Sign In command, through the command palette or through the bARGE status bar account selector, allows selecting either the DefaultAzureCredential described above, or any of the signed-in Microsoft accounts in VS Code.
+
+### Run KQL Queries
+
    - **From a .kql file**: Open the file and right click to run `bARGE: Run Query from Current File`
    - **From selected text**: Select KQL text and right click to run `bARGE: Run Selected Query text`  
    - **Open the panel**: Run `bARGE: Open bARGE Results Panel` to view previous results
