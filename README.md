@@ -4,7 +4,7 @@
 
 <img src="media/readme/bARGE.png" width="256">
 
-bARGE is a Visual Studio Code extension that brings Azure Resource Graph querying capabilities with KQL directly to your development environment, similar to the Azure Portal's Resource Graph Explorer. It boosts the functionality with features such as comparison of results, improved data table handling, easy sign-in and switching of accounts.
+bARGE is a Visual Studio Code extension that brings Azure Resource Graph querying capabilities with KQL directly to your development environment, similar to the Azure Portal's Resource Graph Explorer. It boosts the functionality with features for better insight such as comparison of results, improved data table handling, easy sign-in and switching of accounts.
 
 ## Features
 
