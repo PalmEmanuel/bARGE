@@ -125,6 +125,8 @@ vsce package --no-yarn
 ### Commit Message Format
 bARGE follows the [Conventional Commits specification v1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) for consistent commit messages and automated changelog generation.
 
+All commits are validated towards the configuration in `commitlint.config.js` using `@commitlint/config-conventional`
+
 #### Basic Structure
 ```
 <type>[optional scope]: <description>
@@ -206,14 +208,23 @@ Common scopes for bARGE:
 6. **Include breaking changes**: Always document breaking changes in footer
 7. **Consistent scoping**: Use established scopes for better organization
 
+### Automated Validation
+- **Commitlint**: Automatically validates commit messages using `@commitlint/config-conventional`
+- **Git Hooks**: Husky prevents commits that don't follow conventional format
+- **CI Validation**: Use `npm run commit-lint-ci` to validate PR commits
+- **Manual Check**: Use `npm run commit-lint` to validate recent commits
+
 ### Development Workflow Integration
 ```bash
 # Before committing changes
 npm run lint && npm run check-types
 
-# Commit with conventional format for an example status bar feature implementation
+# Commit with conventional format (automatically validated by commitlint)
 git add .
 git commit -m "feat(auth): implement status bar authentication indicator"
+
+# Validate recent commits manually (optional)
+npm run commit-lint
 
 # Package and test
 npm run package

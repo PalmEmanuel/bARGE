@@ -155,9 +155,14 @@
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "commit-lint": "commitlint --from=HEAD~1 --to=HEAD --verbose",
+    "commit-lint-ci": "commitlint --from=origin/main --to=HEAD --verbose",
+    "prepare": "husky"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
     "@types/mocha": "^10.0.10",
     "@types/node": "24.x",
     "@types/uuid": "^10.0.0",
@@ -168,6 +173,7 @@
     "@vscode/test-electron": "^2.5.2",
     "esbuild": "^0.25.8",
     "eslint": "^9.32.0",
+    "husky": "^9.1.7",
     "npm-run-all": "^4.1.5",
     "typescript": "^5.9.2",
     "uuid": "^11.1.0"
