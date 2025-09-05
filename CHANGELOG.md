@@ -6,7 +6,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+### Changed
 
+- Updated minimum VS Code version requirement for extension to `1.101.0`
 
 ## v0.0.11
 
