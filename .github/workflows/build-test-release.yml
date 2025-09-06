@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     tags:
-      - v[0-9]+.[0-9]+.[0-9]+
+      - v[0-9]+.[0-9]+.[0-9]+-?*
   pull_request:
     branches: [main]
 
@@ -54,7 +54,7 @@ jobs:
         run: npm install -g @vscode/vsce
 
       - name: Package VSIX
-        run: vsce package --no-yarn --out ${{ steps.package-info.outputs.vsix-name }}
+        run: vsce package --out ${{ steps.package-info.outputs.vsix-name }} ${{ github.ref_name }} --no-git-tag-version
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -156,7 +156,8 @@ jobs:
         shell: pwsh
         run: |
           # The --azure-authentication option relies on DefaultAzureCredential (and we're logged into Azure CLI using OIDC)
-          if ("${{ github.ref_name }}" -match '-') {
+          # vsce publish without --no-update-package-json allows us to update the version in package.json and PR it later
+          if ("${{ github.ref_name }}" -match '-preview') {
             vsce publish --packagePath ${{ needs.build.outputs.vsix-name }} --azure-authentication --no-git-tag-version ${{ github.ref_name }} --pre-release
           } else {
             vsce publish --packagePath ${{ needs.build.outputs.vsix-name }} --azure-authentication --no-git-tag-version ${{ github.ref_name }}
@@ -166,11 +167,11 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: ${{ needs.build.outputs.vsix-name }}
-          generate_release_notes: true
+          body: ${{ steps.changelog.outputs.changes }}
           draft: false
-          prerelease: ${{ contains(github.ref_name, '-') }}
+          prerelease: ${{ contains(github.ref_name, '-preview') }}
 
-      - name: Create Pull Request
+      - name: Create Pull Request for CHANGELOG and package.json
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ github.token }}
