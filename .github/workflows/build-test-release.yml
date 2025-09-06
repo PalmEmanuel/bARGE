@@ -1,0 +1,180 @@
+name: Build, Test, and Release (if tag)
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - v[0-9]+.[0-9]+.[0-9]+
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  build:
+    name: Build Extension
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.package-info.outputs.version }}
+      vsix-name: ${{ steps.package-info.outputs.vsix-name }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type checking
+        run: npm run check-types
+
+      - name: Lint code
+        run: npm run lint
+
+      - name: Build extension
+        run: npm run package
+
+      - name: Get package info
+        id: package-info
+        shell: pwsh
+        run: |
+          $VERSION = node -p "require('./package.json').version"
+          $VSIX_NAME = "barge-vscode-$VERSION.vsix"
+          "version=$VERSION" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "vsix-name=$VSIX_NAME" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Install VSCE
+        run: npm install -g @vscode/vsce
+
+      - name: Package VSIX
+        run: vsce package --no-yarn --out ${{ steps.package-info.outputs.vsix-name }}
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vsix-package
+          path: ${{ steps.package-info.outputs.vsix-name }}
+
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-build
+          path: dist/
+          retention-days: 7
+
+  test:
+    name: Test Extension
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-build
+          path: dist/
+
+      - name: Compile tests
+        run: npm run compile-tests
+
+      - name: Run tests
+        run: npm test
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: |
+            out/
+            .vscode-test/
+          retention-days: 7
+
+  release:
+    name: Release to Marketplace
+    runs-on: ubuntu-latest
+    needs: [build, test]
+    if: startsWith(github.ref_name, 'v')
+    permissions:
+      id-token: write # For OIDC to Azure for publishing to Marketplace
+      contents: write # For creating GitHub Release of new version
+      pull-requests: write # For pushing CHANGELOG update back to main
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Download VSIX artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vsix-package
+
+      - name: Install VSCE
+        run: npm install -g @vscode/vsce
+
+      - name: Azure Login (Workload Identity Federation)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+
+      - name: Update CHANGELOG
+        id: changelog
+        uses: requarks/changelog-action@v1
+        with:
+          token: ${{ github.token }}
+          tag: ${{ github.ref_name }}
+          reverseOrder: true
+
+      - name: Publish to VS Code Marketplace
+        shell: pwsh
+        run: |
+          # The --azure-authentication option relies on DefaultAzureCredential (and we're logged into Azure CLI using OIDC)
+          if ("${{ github.ref_name }}" -match '-') {
+            vsce publish --packagePath ${{ needs.build.outputs.vsix-name }} --azure-authentication --no-git-tag-version ${{ github.ref_name }} --pre-release
+          } else {
+            vsce publish --packagePath ${{ needs.build.outputs.vsix-name }} --azure-authentication --no-git-tag-version ${{ github.ref_name }}
+          }
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ needs.build.outputs.vsix-name }}
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-') }}
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ github.token }}
+          commit-message: "docs: Update CHANGELOG for ${{ github.ref_name }}"
+          title: Update CHANGELOG for ${{ github.ref_name }}
+          body: Automatic update of CHANGELOG for release ${{ github.ref_name }}.
+          labels: documentation
