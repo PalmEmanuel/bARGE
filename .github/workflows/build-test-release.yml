@@ -64,7 +64,7 @@ jobs:
         run: |
           $Version = '${{ steps.package-info.outputs.version }}'
           $VsixName = '${{ steps.package-info.outputs.vsix-name }}'
-          if ($Version -eq '${{ github.ref_name }}') {
+          if ($Version -eq '${{ github.ref_name }}' -and '${{ github.ref_type }}' -eq 'tag') {
             # If tag version is same as package.json version, don't pass version because it will try and fail to update package.json
             # This happens if we've already updated package.json on main and are now creating a tag/release
             vsce package --out $VsixName --no-git-tag-version
