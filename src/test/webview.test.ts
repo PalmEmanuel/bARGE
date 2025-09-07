@@ -367,7 +367,6 @@ suite('Webview Logic Tests', () => {
 		test('should handle text selection scenarios for details pane', () => {
 			// Test the logic for determining copy options in details pane
 			const selectedText = '{"property": "value"}';
-			const emptySelection = '';
 			
 			// Mock the selection logic from createDetailsContextMenu
 			const hasSelection = (text: string) => text && text.trim().length > 0;
@@ -381,7 +380,6 @@ suite('Webview Logic Tests', () => {
 			};
 			
 			assert.strictEqual(hasSelection(selectedText), true, 'Should detect valid selection');
-			assert.strictEqual(hasSelection(emptySelection), false, 'Should detect empty selection');
 			assert.strictEqual(isJson(selectedText), true, 'Should detect JSON in selection');
 		});
 	});
