@@ -54,7 +54,7 @@ jobs:
         run: npm install -g @vscode/vsce
 
       - name: Package VSIX
-        run: vsce package --out ${{ steps.package-info.outputs.vsix-name }} ${{ github.ref_name }} --no-git-tag-version
+        run: vsce package --out ${{ steps.package-info.outputs.vsix-name }} ${{ steps.package-info.outputs.version }} --no-git-tag-version
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4

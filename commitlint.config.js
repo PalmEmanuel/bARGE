@@ -24,7 +24,7 @@ module.exports = {
       'test',     // Testing infrastructure
       'release',  // Release process
     ]],
-    'scope-empty': [1, 'never'], // Warn if scope is missing (but allow it)
+    // 'scope-empty': [1, 'never'], // Warn if scope is missing (but allow it)
     'subject-case': [2, 'always', 'sentence-case'],
     'subject-min-length': [2, 'always', 10]
   }
