@@ -132,13 +132,25 @@ jobs:
       - name: Publish to VS Code Marketplace
         shell: pwsh
         run: |
-          # The --azure-credential option relies on DefaultAzureCredential (and we're logged into Azure CLI using OIDC)
-          # vsce publish without --no-update-package-json allows us to update the version in package.json and PR it later
+          $Parameters = @(
+            # The --azure-credential option relies on DefaultAzureCredential (and we're logged into Azure CLI using OIDC)
+            --azure-credential
+            --no-git-tag-version
+          )
           if ("${{ github.ref_name }}" -match '-preview') {
-            vsce publish --azure-credential --no-git-tag-version ${{ github.ref_name }} --pre-release
-          } else {
-            vsce publish --azure-credential --no-git-tag-version ${{ github.ref_name }}
+            $Parameters += '--pre-release'
           }
+          
+          # Get version and compare to tag
+          # We cannot give vsce the version of tag if it's already in package.json as it will error
+          $Version = node -p "require('./package.json').version"
+          $TagVersion = '${{ github.ref_name }}' -replace '^v', ''
+          if ($TagVersion -ne $Version) {
+            $Parameters += $TagVersion
+          }
+          
+          # vsce publish without --no-update-package-json allows us to update the version in package.json and PR it in later step
+          vsce publish @Parameters
 
       - name: Get built VSIX filename
         id: vsix-file
