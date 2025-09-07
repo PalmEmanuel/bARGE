@@ -48,7 +48,7 @@
       },
       {
         "command": "barge.runQueryFromFile",
-        "title": "Run Query from Current File",
+        "title": "Run Query from File",
         "category": "bARGE"
       },
       {
@@ -75,7 +75,7 @@
         },
         {
           "command": "barge.runQueryFromFile",
-          "title": "Run Query from Current File",
+          "title": "Run Query from File",
           "when": "editorLangId == kql || resourceExtname == .kql"
         },
         {
