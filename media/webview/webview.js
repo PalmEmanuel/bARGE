@@ -706,6 +706,39 @@ function handleContextMenuKeydown(event) {
     }
 }
 
+// Context menu handler for details pane
+function handleDetailsContextMenu(event) {
+    event.preventDefault();
+
+    // Hide tooltip and its context menu when showing details context menu
+    hideCustomTooltip();
+    hideTooltipContextMenu();
+
+    // Hide any existing context menu
+    if (customContextMenu) {
+        document.body.removeChild(customContextMenu);
+        customContextMenu = null;
+    }
+
+    // Reset right-clicked cell since we're in details pane context
+    rightClickedCell = null;
+
+    // Create context menu for details pane
+    const contextMenu = createDetailsContextMenu();
+
+    // Position and show context menu
+    positionContextMenu(event, contextMenu);
+
+    // Set flag that context menu is visible
+    contextMenuVisible = true;
+
+    // Add click outside listener to close menu
+    setTimeout(() => {
+        document.addEventListener('click', hideContextMenu, { once: true });
+        document.addEventListener('keydown', handleContextMenuKeydown, { once: true });
+    }, 0);
+}
+
 function createContextMenu() {
     if (customContextMenu) {
         document.body.removeChild(customContextMenu);
@@ -833,6 +866,105 @@ function createContextMenu() {
 
     document.body.appendChild(customContextMenu);
     return customContextMenu;
+}
+
+function createDetailsContextMenu() {
+    if (customContextMenu) {
+        document.body.removeChild(customContextMenu);
+    }
+
+    customContextMenu = document.createElement('div');
+    customContextMenu.className = 'custom-context-menu';
+
+    // Prevent clicks on the menu itself from closing it
+    customContextMenu.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+
+    // Check if there's text selected in the details pane
+    const selection = window.getSelection();
+    const hasSelection = selection && selection.toString().trim().length > 0;
+    const selectedText = hasSelection ? selection.toString() : '';
+
+    // Copy option (copy selected text or indicate no selection)
+    const copyItem = document.createElement('div');
+    copyItem.className = 'context-menu-item ' + (hasSelection ? '' : 'disabled');
+    copyItem.innerHTML = '<span>Copy</span>';
+    copyItem.addEventListener('click', () => {
+        if (hasSelection) {
+            copyDetailsSelection(selectedText);
+            hideContextMenu();
+        }
+    });
+
+    // Copy formatted option (if selected text appears to be JSON)
+    let copyFormattedItem = null;
+    if (hasSelection && isJsonString(selectedText)) {
+        copyFormattedItem = document.createElement('div');
+        copyFormattedItem.className = 'context-menu-item';
+        copyFormattedItem.innerHTML = '<span>Copy Formatted</span>';
+        copyFormattedItem.addEventListener('click', () => {
+            copyDetailsSelectionFormatted(selectedText);
+            hideContextMenu();
+        });
+    }
+
+    // Add menu items
+    customContextMenu.appendChild(copyItem);
+    if (copyFormattedItem) {
+        customContextMenu.appendChild(copyFormattedItem);
+    }
+
+    document.body.appendChild(customContextMenu);
+    return customContextMenu;
+}
+
+// Helper function to detect if a string is JSON
+function isJsonString(str) {
+    try {
+        const parsed = JSON.parse(str);
+        return (typeof parsed === 'object' && parsed !== null);
+    } catch (e) {
+        return false;
+    }
+}
+
+// Copy selected text from details pane
+function copyDetailsSelection(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        showCopyFeedback();
+    }).catch(err => {
+        console.error('Failed to copy to clipboard:', err);
+        fallbackCopyTextToClipboard(text);
+    });
+}
+
+// Copy selected text from details pane with JSON formatting
+function copyDetailsSelectionFormatted(text) {
+    try {
+        const parsed = JSON.parse(text);
+        const formatted = JSON.stringify(parsed, null, 2);
+        navigator.clipboard.writeText(formatted).then(() => {
+            showCopyFeedback('formatted');
+        }).catch(err => {
+            console.error('Failed to copy to clipboard:', err);
+            fallbackCopyTextToClipboard(formatted);
+        });
+    } catch (e) {
+        // Fallback to regular copy if JSON parsing fails
+        copyDetailsSelection(text);
+    }
+}
+
+// Initialize context menu for details content
+function initializeDetailsContextMenu() {
+    const detailsContent = document.getElementById('detailsContent');
+    if (detailsContent) {
+        // Remove any existing listener to avoid duplicates
+        detailsContent.removeEventListener('contextmenu', handleDetailsContextMenu);
+        // Add the context menu handler
+        detailsContent.addEventListener('contextmenu', handleDetailsContextMenu);
+    }
 }
 
 function positionContextMenu(event, menu) {
@@ -1821,6 +1953,8 @@ function toggleSelectAllRows() {
                 detailsContent.innerHTML = generateComparisonView(selectedDetailRowIndices);
                 detailsContent.classList.add('comparison-view');
                 initializeComparisonColumnResizing();
+                // Initialize custom context menu for details content
+                initializeDetailsContextMenu();
             }
 
             // Update the details panel title
@@ -1927,6 +2061,8 @@ function showRowDetails(rowIndex) {
         detailsContent.innerHTML = jsonHtml;
         // Remove comparison view class for single row
         detailsContent.classList.remove('comparison-view');
+        // Initialize custom context menu for details content
+        initializeDetailsContextMenu();
     } else {
         const comparisonHtml = generateComparisonView(selectedDetailRowIndices);
         detailsContent.innerHTML = comparisonHtml;
@@ -1934,6 +2070,8 @@ function showRowDetails(rowIndex) {
         detailsContent.classList.add('comparison-view');
         // Initialize column resizing for comparison table
         initializeComparisonColumnResizing();
+        // Initialize custom context menu for details content
+        initializeDetailsContextMenu();
     }
 }
 
@@ -1993,6 +2131,8 @@ function updateDetailsAfterSort() {
                 const jsonHtml = formatAsJsonViewer(rowData);
                 detailsContent.innerHTML = jsonHtml;
                 detailsContent.classList.remove('comparison-view');
+                // Initialize custom context menu for details content
+                initializeDetailsContextMenu();
             }
         } else if (selectedDetailRowIndices.length > 1) {
             // Multiple rows - show comparison
@@ -2007,6 +2147,8 @@ function updateDetailsAfterSort() {
                 detailsContent.innerHTML = comparisonHtml;
                 detailsContent.classList.add('comparison-view');
                 initializeComparisonColumnResizing();
+                // Initialize custom context menu for details content
+                initializeDetailsContextMenu();
             }
         }
 
@@ -2047,6 +2189,8 @@ function navigateDetails(direction) {
         const rowData = generateRowObject(newIndex);
         const jsonHtml = formatAsJsonViewer(rowData);
         detailsContent.innerHTML = jsonHtml;
+        // Initialize custom context menu for details content
+        initializeDetailsContextMenu();
 
         updateDetailsNavigation();
     }
