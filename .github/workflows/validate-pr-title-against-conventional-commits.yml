@@ -9,6 +9,7 @@ on:
 
 jobs:
   validate-pr-title:
+    name: Validate PR Title for Conventional Commits Format
     runs-on: ubuntu-latest
     permissions:
       pull-requests: read

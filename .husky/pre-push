@@ -1,2 +1,35 @@
-# Validate all commits being pushed
-npx commitlint --from=origin/main --to=HEAD --verbose
+#!/bin/sh
+
+# Validate commits being pushed, excluding bot commits
+echo "Validating commits from origin/main to HEAD..."
+
+# Get all commit hashes in the range
+commit_hashes=$(git log --format="%H" origin/main..HEAD)
+total_commits=0
+skipped_commits=0
+validated_commits=0
+
+for commit_hash in $commit_hashes; do
+  # Get the author for this commit
+  author=$(git log --format="%an" -n 1 "$commit_hash")
+  total_commits=$((total_commits + 1))
+  
+  # Skip validation for bot commits
+  case "$author" in
+    "dependabot[bot]"|"github-actions[bot]"|"copilot-swe-agent[bot]"|"GitHub Copilot"|"Copilot")
+      echo "⏭️  Skipping commitlint for bot commit by $author: $(git log --format='%s' -n 1 "$commit_hash")"
+      skipped_commits=$((skipped_commits + 1))
+      ;;
+    *)
+      echo "✅ Validating commit by $author: $(git log --format='%s' -n 1 "$commit_hash")"
+      # Validate this specific commit using commitlint with the commit hash
+      if ! npx commitlint --from="$commit_hash~1" --to="$commit_hash"; then
+        echo "❌ Commit validation failed for: $commit_hash"
+        exit 1
+      fi
+      validated_commits=$((validated_commits + 1))
+      ;;
+  esac
+done
+
+echo "🎉 Validation complete! Total: $total_commits commits, Validated: $validated_commits, Skipped: $skipped_commits bot commits."

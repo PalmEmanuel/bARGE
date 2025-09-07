@@ -125,9 +125,9 @@ vsce package --no-yarn
 ### Commit Message Format
 bARGE follows the [Conventional Commits specification v1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) for consistent commit messages and automated changelog generation.
 
-All commits are validated towards the configuration in `commitlint.config.js` using `@commitlint/config-conventional`.
+All commits and pull request titles are validated towards the configuration in `commitlint.config.js` using `@commitlint/config-conventional`.
 
-All commits **MUST** have a subject in normal sentence case (capitalized first letter).
+All commits and pull request titles **MUST** have a subject in normal sentence case (capitalized first letter).
 
 #### Basic Structure
 ```
@@ -153,7 +153,6 @@ All commits **MUST** have a subject in normal sentence case (capitalized first l
 #### Breaking Changes
 - Add `!` after type/scope for breaking changes: `feat!: Redesign authentication API`
 - Include `BREAKING CHANGE:` in footer with description
-- Triggers major version bump in semantic versioning
 
 #### Examples
 ```
