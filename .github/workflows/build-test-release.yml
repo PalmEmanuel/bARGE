@@ -156,6 +156,7 @@ jobs:
           token: ${{ github.token }}
           tag: ${{ github.ref_name }}
           reverseOrder: true
+          excludeScopes: dev, release
 
       - name: Publish to VS Code Marketplace
         shell: pwsh
