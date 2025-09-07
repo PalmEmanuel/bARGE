@@ -47,7 +47,7 @@ jobs:
         run: |
           if ('${{ github.ref_type }}' -eq 'tag') {
             # If this is a tag push, use the tag name as the version
-            $VERSION = ${{ github.ref_name }}
+            $VERSION = '${{ github.ref_name }}'
           } else {
             # Otherwise, use the version from package.json
             $VERSION = node -p "require('./package.json').version"
