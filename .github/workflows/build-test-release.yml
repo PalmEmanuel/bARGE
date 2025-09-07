@@ -64,13 +64,13 @@ jobs:
         run: |
           $Version = '${{ steps.package-info.outputs.version }}'
           $VsixName = '${{ steps.package-info.outputs.vsix-name }}'
-          if ($Version -eq '${{ github.ref_name }}' -and '${{ github.ref_type }}' -eq 'tag') {
-            # If tag version is same as package.json version, don't pass version because it will try and fail to update package.json
-            # This happens if we've already updated package.json on main and are now creating a tag/release
-            vsce package --out $VsixName --no-git-tag-version
+          # If we've triggered on a tag and the version hasn't already been updated in package.json, pass the version to vsce
+          # This will make vsce update package.json version to match the tag
+          if ($Version -ne '${{ github.ref_name }}' -and '${{ github.ref_type }}' -eq 'tag') {
+            vsce package --out $VsixName $Version --no-git-tag-version
           }
           else {
-            vsce package --out $VsixName $Version --no-git-tag-version
+            vsce package --out $VsixName --no-git-tag-version
           }
 
       - name: Upload build artifact
