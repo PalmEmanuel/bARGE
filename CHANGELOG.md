@@ -4,6 +4,15 @@ All notable changes to the bARGE Visual Studio Code extension will be documented
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [v0.0.13] - 2025-09-07
+
+### New Features
+[48da006](https://github.com/PalmEmanuel/bARGE/commit/48da0066d11149487d26ea11b3a698ba5992e500) - Right click menu in details pane now has Copy option for properties, and Copy Compressed for JSON (PR [#50](https://github.com/PalmEmanuel/bARGE/pull/50) by [@Copilot](https://github.com/apps/copilot-swe-agent))
+- *addresses issue [#49](https://github.com/PalmEmanuel/bARGE/issues/49) opened by [@PalmEmanuel](https://github.com/PalmEmanuel)*
+
+### Bug Fixes
+[339e4e5](https://github.com/PalmEmanuel/bARGE/commit/339e4e54f1f705419cc4382324095631b624e534) - Clarify changelog for Marketplace, improve version update process (PR [#58](https://github.com/PalmEmanuel/bARGE/pull/58) by [@PalmEmanuel](https://github.com/PalmEmanuel))
+
 ## [v0.0.12] - 2025-09-07
 
 ### BREAKING CHANGES
