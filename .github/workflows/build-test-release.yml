@@ -15,9 +15,6 @@ jobs:
   build:
     name: Build Extension
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.package-info.outputs.version }}
-      vsix-name: ${{ steps.package-info.outputs.vsix-name }}
     
     steps:
       - name: Checkout code
@@ -39,45 +36,7 @@ jobs:
         run: npm run lint
 
       - name: Build extension
-        run: npm run package
-
-      - name: Get package info
-        id: package-info
-        shell: pwsh
-        run: |
-          # Otherwise, use the version from package.json
-          $Version = node -p "require('./package.json').version"
-          $Version = "v$Version"
-          if ('${{ github.ref_type }}' -eq 'tag') {
-            # If this is a tag push, use the tag name as the version
-            $Version = '${{ github.ref_name }}'
-          }
-          $VsixName = "barge-vscode-$Version.vsix"
-          "version=$Version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-          "vsix-name=$VsixName" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-
-      - name: Install VSCE
-        run: npm install -g @vscode/vsce
-
-      - name: Package VSIX
-        shell: pwsh
-        run: |
-          $Version = '${{ steps.package-info.outputs.version }}'
-          $VsixName = '${{ steps.package-info.outputs.vsix-name }}'
-          # If we've triggered on a tag and the version hasn't already been updated in package.json, pass the version to vsce
-          # This will make vsce update package.json version to match the tag
-          if ($Version -ne '${{ github.ref_name }}' -and '${{ github.ref_type }}' -eq 'tag') {
-            vsce package --out $VsixName $Version --no-git-tag-version
-          }
-          else {
-            vsce package --out $VsixName --no-git-tag-version
-          }
-
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: vsix-package
-          path: ${{ steps.package-info.outputs.vsix-name }}
+        run: npm run compile
 
       - name: Upload dist artifact
         uses: actions/upload-artifact@v4
@@ -128,7 +87,7 @@ jobs:
   release:
     name: Release to Marketplace
     runs-on: ubuntu-latest
-    needs: [build, test]
+    needs: [test]
     if: startsWith(github.ref_name, 'v')
     permissions:
       id-token: write # For OIDC to Azure for publishing to Marketplace
@@ -138,6 +97,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v5
@@ -145,10 +106,8 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: Download VSIX artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: vsix-package
+      - name: Install dependencies
+        run: npm ci
 
       - name: Install VSCE
         run: npm install -g @vscode/vsce
@@ -159,6 +118,23 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           allow-no-subscriptions: true
+
+      - name: Set git user
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Update package.json version
+        shell: pwsh
+        run: |
+          # Extract version from git tag (remove 'v' prefix if present)
+          $tag = "${{ github.ref_name }}"
+          $version = $tag -replace '^v', ''
+          
+          # Update package.json with the tag version
+          npm version $version --no-git-tag-version
+          
+          Write-Host "Updated package.json to version: $version"
 
       - name: Update CHANGELOG
         id: changelog
@@ -181,10 +157,18 @@ jobs:
             vsce publish --azure-credential --no-git-tag-version ${{ github.ref_name }}
           }
 
+      - name: Get built VSIX filename
+        id: vsix-file
+        shell: pwsh
+        run: |
+          $vsixFile = Get-ChildItem -Path . -Filter "*.vsix" | Select-Object -First 1
+          echo "filename=$($vsixFile.Name)" >> $env:GITHUB_OUTPUT
+          Write-Host "Found VSIX file: $($vsixFile.Name)"
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ needs.build.outputs.vsix-name }}
+          files: ${{ steps.vsix-file.outputs.filename }}
           body: ${{ steps.changelog.outputs.changes }}
           draft: false
           prerelease: ${{ contains(github.ref_name, '-preview') }}
