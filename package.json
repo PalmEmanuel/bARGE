@@ -96,7 +96,7 @@
         {
           "command": "barge.runQueryFromFile",
           "title": "bARGE: Run Query from File",
-          "when": "resourceExtname == .kql",
+          "when": "editorLangId == kql || resourceExtname == .kql",
           "group": "barge@1"
         },
         {
