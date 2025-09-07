@@ -105,6 +105,14 @@
           "when": "editorHasSelection && (editorLangId == kql || resourceExtname == .kql || editorLangId == powershell || resourceExtname == .ps1 || editorLangId == plaintext)",
           "group": "barge@2"
         }
+      ],
+      "explorer/context": [
+        {
+          "command": "barge.runQueryFromFile",
+          "title": "bARGE: Run Query from File",
+          "when": "resourceExtname == .kql",
+          "group": "barge@1"
+        }
       ]
     },
     "keybindings": [

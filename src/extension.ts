@@ -59,14 +59,30 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	// Register command to run query from current file
-	const runQueryFromFileCommand = vscode.commands.registerCommand('barge.runQueryFromFile', async () => {
-		const activeEditor = vscode.window.activeTextEditor;
-		if (!activeEditor) {
-			vscode.window.showErrorMessage('No active file found');
-			return;
+	const runQueryFromFileCommand = vscode.commands.registerCommand('barge.runQueryFromFile', async (uri?: vscode.Uri) => {
+		let document: vscode.TextDocument;
+		let fileName: string;
+
+		if (uri) {
+			// Called from explorer context - uri is provided
+			try {
+				document = await vscode.workspace.openTextDocument(uri);
+				fileName = uri.fsPath;
+			} catch (error) {
+				vscode.window.showErrorMessage(`Failed to open file: ${error}`);
+				return;
+			}
+		} else {
+			// Called from editor context - use active editor
+			const activeEditor = vscode.window.activeTextEditor;
+			if (!activeEditor) {
+				vscode.window.showErrorMessage('No active file found');
+				return;
+			}
+			document = activeEditor.document;
+			fileName = document.fileName;
 		}
 
-		const document = activeEditor.document;
 		const query = document.getText().trim();
 		
 		if (!query) {
@@ -74,7 +90,7 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 
-		await runQueryInPanel(query, 'file', document.fileName);
+		await runQueryInPanel(query, 'file', fileName);
 	});
 
 	// Register command to run query from selection
