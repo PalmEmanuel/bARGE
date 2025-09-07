@@ -128,6 +128,7 @@ jobs:
           reverseOrder: true
           excludeTypes: docs, style, refactor, test, ci, dev
           excludeScopes: dev, test, release
+          useGitmojis: false
 
       - name: Publish to VS Code Marketplace
         shell: pwsh
@@ -167,16 +168,15 @@ jobs:
           body: ${{ steps.changelog.outputs.changes }}
           draft: false
           prerelease: ${{ contains(github.ref_name, '-preview') }}
+          generate_release_notes: false
 
-      - name: Create Pull Request for CHANGELOG and package.json
+      - name: Create Pull Request for Updated Release Files
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ github.token }}
           commit-message: |
             chore(release): Release ${{ github.ref_name }}
-
-            - Update CHANGELOG for ${{ github.ref_name }}
-            - Bump package.json version to ${{ github.ref_name }}
-          title: Update CHANGELOG and Version for ${{ github.ref_name }}
-          body: Automatic update of CHANGELOG and package.json for release ${{ github.ref_name }}.
+          title: Update files for ${{ github.ref_name }}
+          body: Automatic update of files for release ${{ github.ref_name }}.
           labels: release
+          base: main
