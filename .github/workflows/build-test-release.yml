@@ -45,22 +45,33 @@ jobs:
         id: package-info
         shell: pwsh
         run: |
+          # Otherwise, use the version from package.json
+          $Version = node -p "require('./package.json').version"
+          $Version = "v$Version"
           if ('${{ github.ref_type }}' -eq 'tag') {
             # If this is a tag push, use the tag name as the version
-            $VERSION = '${{ github.ref_name }}'
-          } else {
-            # Otherwise, use the version from package.json
-            $VERSION = node -p "require('./package.json').version"
+            $Version = '${{ github.ref_name }}'
           }
-          $VSIX_NAME = "barge-vscode-$VERSION.vsix"
-          "version=$VERSION" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-          "vsix-name=$VSIX_NAME" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          $VsixName = "barge-vscode-$Version.vsix"
+          "version=$Version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "vsix-name=$VsixName" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
       - name: Install VSCE
         run: npm install -g @vscode/vsce
 
       - name: Package VSIX
-        run: vsce package --out ${{ steps.package-info.outputs.vsix-name }} ${{ steps.package-info.outputs.version }} --no-git-tag-version
+        shell: pwsh
+        run: |
+          $Version = '${{ steps.package-info.outputs.version }}'
+          $VsixName = '${{ steps.package-info.outputs.vsix-name }}'
+          # If we've triggered on a tag and the version hasn't already been updated in package.json, pass the version to vsce
+          # This will make vsce update package.json version to match the tag
+          if ($Version -ne '${{ github.ref_name }}' -and '${{ github.ref_type }}' -eq 'tag') {
+            vsce package --out $VsixName $Version --no-git-tag-version
+          }
+          else {
+            vsce package --out $VsixName --no-git-tag-version
+          }
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
