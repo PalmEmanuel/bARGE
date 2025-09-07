@@ -119,23 +119,6 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           allow-no-subscriptions: true
 
-      - name: Set git user
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Update package.json version
-        shell: pwsh
-        run: |
-          # Extract version from git tag (remove 'v' prefix if present)
-          $tag = "${{ github.ref_name }}"
-          $version = $tag -replace '^v', ''
-          
-          # Update package.json with the tag version
-          npm version $version --no-git-tag-version
-          
-          Write-Host "Updated package.json to version: $version"
-
       - name: Update CHANGELOG
         id: changelog
         uses: requarks/changelog-action@v1
