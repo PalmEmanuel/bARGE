@@ -723,8 +723,20 @@ function handleDetailsContextMenu(event) {
     // Reset right-clicked cell since we're in details pane context
     rightClickedCell = null;
 
-    // Create context menu for details pane
-    const contextMenu = createDetailsContextMenu();
+    // Check if we're right-clicking on a property box or selected text
+    const clickedElement = event.target;
+    const propertyElement = clickedElement.closest('.json-property');
+    const selection = window.getSelection();
+    const hasTextSelection = selection && selection.toString().trim().length > 0;
+
+    let contextMenu;
+    if (propertyElement && !hasTextSelection) {
+        // Right-clicked on a property box without text selection
+        contextMenu = createPropertyContextMenu(propertyElement);
+    } else {
+        // Right-clicked on selected text or general area
+        contextMenu = createDetailsContextMenu();
+    }
 
     // Position and show context menu
     positionContextMenu(event, contextMenu);
@@ -897,22 +909,82 @@ function createDetailsContextMenu() {
         }
     });
 
-    // Copy formatted option (if selected text appears to be JSON)
-    let copyFormattedItem = null;
+    // Copy compressed option (if selected text appears to be JSON)
+    let copyCompressedItem = null;
     if (hasSelection && isJsonString(selectedText)) {
-        copyFormattedItem = document.createElement('div');
-        copyFormattedItem.className = 'context-menu-item';
-        copyFormattedItem.innerHTML = '<span>Copy Formatted</span>';
-        copyFormattedItem.addEventListener('click', () => {
-            copyDetailsSelectionFormatted(selectedText);
+        copyCompressedItem = document.createElement('div');
+        copyCompressedItem.className = 'context-menu-item';
+        copyCompressedItem.innerHTML = '<span>Copy Compressed</span>';
+        copyCompressedItem.addEventListener('click', () => {
+            copyDetailsSelectionCompressed(selectedText);
             hideContextMenu();
         });
     }
 
     // Add menu items
     customContextMenu.appendChild(copyItem);
-    if (copyFormattedItem) {
-        customContextMenu.appendChild(copyFormattedItem);
+    if (copyCompressedItem) {
+        customContextMenu.appendChild(copyCompressedItem);
+    }
+
+    document.body.appendChild(customContextMenu);
+    return customContextMenu;
+}
+
+// Create context menu for right-clicking on a property box
+function createPropertyContextMenu(propertyElement) {
+    if (customContextMenu) {
+        document.body.removeChild(customContextMenu);
+    }
+
+    customContextMenu = document.createElement('div');
+    customContextMenu.className = 'custom-context-menu';
+
+    // Prevent clicks on the menu itself from closing it
+    customContextMenu.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+
+    // Extract the property value from the clicked element
+    const valueElement = propertyElement.querySelector('.json-value');
+    let propertyValue = '';
+    
+    if (valueElement) {
+        // Handle different types of value elements
+        if (valueElement.tagName === 'PRE') {
+            // For object values that are in <pre> tags
+            propertyValue = valueElement.textContent || valueElement.innerText;
+        } else {
+            // For string, number, boolean, null values
+            propertyValue = valueElement.textContent || valueElement.innerText;
+        }
+    }
+
+    // Copy option for property value
+    const copyItem = document.createElement('div');
+    copyItem.className = 'context-menu-item';
+    copyItem.innerHTML = '<span>Copy</span>';
+    copyItem.addEventListener('click', () => {
+        copyDetailsSelection(propertyValue);
+        hideContextMenu();
+    });
+
+    // Copy compressed option (if property value is JSON)
+    let copyCompressedItem = null;
+    if (propertyValue && isJsonString(propertyValue)) {
+        copyCompressedItem = document.createElement('div');
+        copyCompressedItem.className = 'context-menu-item';
+        copyCompressedItem.innerHTML = '<span>Copy Compressed</span>';
+        copyCompressedItem.addEventListener('click', () => {
+            copyDetailsSelectionCompressed(propertyValue);
+            hideContextMenu();
+        });
+    }
+
+    // Add menu items
+    customContextMenu.appendChild(copyItem);
+    if (copyCompressedItem) {
+        customContextMenu.appendChild(copyCompressedItem);
     }
 
     document.body.appendChild(customContextMenu);
@@ -939,16 +1011,16 @@ function copyDetailsSelection(text) {
     });
 }
 
-// Copy selected text from details pane with JSON formatting
-function copyDetailsSelectionFormatted(text) {
+// Copy selected text from details pane with JSON compression (single line)
+function copyDetailsSelectionCompressed(text) {
     try {
         const parsed = JSON.parse(text);
-        const formatted = JSON.stringify(parsed, null, 2);
-        navigator.clipboard.writeText(formatted).then(() => {
-            showCopyFeedback('formatted');
+        const compressed = JSON.stringify(parsed);
+        navigator.clipboard.writeText(compressed).then(() => {
+            showCopyFeedback('compressed');
         }).catch(err => {
             console.error('Failed to copy to clipboard:', err);
-            fallbackCopyTextToClipboard(formatted);
+            fallbackCopyTextToClipboard(compressed);
         });
     } catch (e) {
         // Fallback to regular copy if JSON parsing fails
