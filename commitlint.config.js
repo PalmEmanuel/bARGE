@@ -11,7 +11,7 @@ module.exports = {
             'chore',    // Maintenance tasks, build changes, dependency updates
             'perf',     // Performance improvements
             'ci',       // CI/CD pipeline changes
-            'build',    // Build system changes (esbuild, npm scripts, etc.)
+            'dev',    // Build system changes (esbuild, npm scripts, etc.)
             'revert'    // Revert changes
         ]],
         'scope-enum': [2, 'always', [
@@ -20,7 +20,7 @@ module.exports = {
             'panel',    // Webview panels and UI components
             'query',    // KQL file handling and query execution
             'config',   // Configuration and settings
-            'build',    // Build system and bundling
+            'dev',    // Build system and bundling
             'test',     // Testing infrastructure
             'release',  // Release process
         ]],
