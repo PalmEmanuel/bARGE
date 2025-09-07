@@ -22,6 +22,7 @@ module.exports = {
       'config',   // Configuration and settings
       'build',    // Build system and bundling
       'test',     // Testing infrastructure
+      'release',  // Release process
     ]],
     'scope-empty': [1, 'never'], // Warn if scope is missing (but allow it)
     'subject-case': [2, 'always', 'sentence-case'],

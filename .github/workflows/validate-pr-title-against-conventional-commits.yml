@@ -38,6 +38,7 @@ jobs:
             config
             build
             test
+            release
           requireScope: false
           subjectPattern: ^[A-Z].{9,}$
           subjectPatternError: |

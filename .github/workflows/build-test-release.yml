@@ -99,16 +99,6 @@ jobs:
       - name: Run tests
         run: npm test
 
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results
-          path: |
-            out/
-            .vscode-test/
-          retention-days: 7
-
   release:
     name: Release to Marketplace
     runs-on: ubuntu-latest
@@ -175,7 +165,11 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ github.token }}
-          commit-message: "docs: Update CHANGELOG for ${{ github.ref_name }}"
-          title: Update CHANGELOG for ${{ github.ref_name }}
-          body: Automatic update of CHANGELOG for release ${{ github.ref_name }}.
-          labels: documentation
+          commit-message: |
+            chore(release): Release ${{ github.ref_name }}
+
+            - Update CHANGELOG for ${{ github.ref_name }}
+            - Bump package.json version to ${{ github.ref_name }}
+          title: Update CHANGELOG and Version for ${{ github.ref_name }}
+          body: Automatic update of CHANGELOG and package.json for release ${{ github.ref_name }}.
+          labels: release
