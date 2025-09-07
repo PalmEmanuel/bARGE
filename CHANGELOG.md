@@ -4,19 +4,29 @@ All notable changes to the bARGE Visual Studio Code extension will be documented
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
+## [v0.0.12] - 2025-09-07
 
-### Changed
+### BREAKING CHANGES
 
-- Updated minimum VS Code version requirement for extension to `1.101.0`
+- due to [`573c40d`](https://github.com/PalmEmanuel/bARGE/commit/573c40dd2395c26e5ee28180bdcf2a943ae02892) - Adds build/test/release pipeline, Conventional Commits for CHANGELOG automation, v0.0.12, sets minimum supported VS Code version to 1.101.0 *(PR [#45](https://github.com/PalmEmanuel/bARGE/pull/45) by [@PalmEmanuel](https://github.com/PalmEmanuel))*:
 
-## v0.0.11
+  Minimum supported VS Code version increased to 1.101.0
+
+### New Features
+
+- [`69fb290`](https://github.com/PalmEmanuel/bARGE/commit/69fb290933ed51d86542d00fbba4eef90f791170) - Add support for right-clicking KQL files in VS Code Explorer to run query *(PR [#47](https://github.com/PalmEmanuel/bARGE/pull/47) by [@Copilot](https://github.com/apps/copilot-swe-agent))*
+  - *addresses issue [#46](https://github.com/PalmEmanuel/bARGE/issues/46) opened by [@PalmEmanuel](https://github.com/PalmEmanuel)*
+- [`573c40d`](https://github.com/PalmEmanuel/bARGE/commit/573c40dd2395c26e5ee28180bdcf2a943ae02892) - Adds build/test/release pipeline, Conventional Commits for CHANGELOG automation, v0.0.12, sets minimum supported VS Code version to 1.101.0 *(PR [#45](https://github.com/PalmEmanuel/bARGE/pull/45) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
+  - *addresses issue [#39](https://github.com/PalmEmanuel/bARGE/issues/39) opened by [@PalmEmanuel](https://github.com/PalmEmanuel)*
+  - *addresses issue [#40](https://github.com/PalmEmanuel/bARGE/issues/40) opened by [@PalmEmanuel](https://github.com/PalmEmanuel)*
+
+## [v0.0.11] - 2025-09-04
 
 ### Added
 
 - Added status bar indicator at the bottom of editor to show currently signed-in account and extension job status like running queries [#34](https://github.com/PalmEmanuel/bARGE/pull/34)
 
-## v0.0.10
+## [v0.0.10] - 2025-09-04
 
 ### Added
 
@@ -36,20 +46,20 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - Removes unused configuration options that may be partly re-implemented in better form later [#31](https://github.com/PalmEmanuel/bARGE/pull/31)
 
-## v0.0.9
+## [v0.0.9] - 2025-09-02
 
 ### Changed
 
 - Improved error handling, selection logic and details pane navigation [#20](https://github.com/PalmEmanuel/bARGE/pull/20)
 - Updated API version used for querying Azure Resource Graph [#20](https://github.com/PalmEmanuel/bARGE/pull/20)
 
-## v0.0.8
+## [v0.0.8] - 2025-09-02
 
 ### Changed
 
 - Changed name of bARGE extension from `basic Azure Resource Graph Explorer` to `boosted Azure Resource Graph Explorer` [#18](https://github.com/PalmEmanuel/bARGE/pull/18)
 
-## v0.0.7
+## [v0.0.7] - 2025-09-02
 
 ### Added
 
@@ -60,7 +70,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Improved styling, navigation and selection in table and details pane [#16](https://github.com/PalmEmanuel/bARGE/pull/16) [#17](https://github.com/PalmEmanuel/bARGE/pull/17)
 - Upgraded dependency package versions [#12](https://github.com/PalmEmanuel/bARGE/pull/12)
 
-## v0.0.6
+## [v0.0.6] - 2025-09-01
 
 ### Added
 
@@ -70,25 +80,25 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - Removed Azure Resource Graph package dependency to instead use REST API [#10](https://github.com/PalmEmanuel/bARGE/pull/10)
 
-## v0.0.5
+## [v0.0.5] - 2025-09-01
 
 ### Changed
 
 - Reduced VS Code version requirements of extension for compatibility [#5](https://github.com/PalmEmanuel/bARGE/pull/5)
 
-## v0.0.4
+## [v0.0.4] - 2025-09-01
 
 ### Changed
 
 - Improved selection logic and right click menu behavior [#3](https://github.com/PalmEmanuel/bARGE/pull/3)
 
-## v0.0.3
+## [v0.0.3] - 2025-08-31
 
 ### Changed
 
 - Improved resolution of logo image [#1](https://github.com/PalmEmanuel/bARGE/pull/1)
 
-## v0.0.2
+## [v0.0.2] - 2025-08-31
 
 ### Added
 
@@ -98,6 +108,6 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - Adjusted background of logo image.
 
-## v0.0.1
+## [v0.0.1] - 2025-08-30
 
 Initial release of bARGE, supporting basic functionality for logging in using [DefaultAzureCredential](https://learn.microsoft.com/en-us/javascript/api/@azure/identity/defaultazurecredential?view=azure-node-latest), running queries and displaying results in a table.

@@ -15,9 +15,6 @@ jobs:
   build:
     name: Build Extension
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.package-info.outputs.version }}
-      vsix-name: ${{ steps.package-info.outputs.vsix-name }}
     
     steps:
       - name: Checkout code
@@ -39,34 +36,7 @@ jobs:
         run: npm run lint
 
       - name: Build extension
-        run: npm run package
-
-      - name: Get package info
-        id: package-info
-        shell: pwsh
-        run: |
-          if ('${{ github.ref_type }}' -eq 'tag') {
-            # If this is a tag push, use the tag name as the version
-            $VERSION = '${{ github.ref_name }}'
-          } else {
-            # Otherwise, use the version from package.json
-            $VERSION = node -p "require('./package.json').version"
-          }
-          $VSIX_NAME = "barge-vscode-$VERSION.vsix"
-          "version=$VERSION" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-          "vsix-name=$VSIX_NAME" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-
-      - name: Install VSCE
-        run: npm install -g @vscode/vsce
-
-      - name: Package VSIX
-        run: vsce package --out ${{ steps.package-info.outputs.vsix-name }} ${{ steps.package-info.outputs.version }} --no-git-tag-version
-
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: vsix-package
-          path: ${{ steps.package-info.outputs.vsix-name }}
+        run: npm run compile
 
       - name: Upload dist artifact
         uses: actions/upload-artifact@v4
@@ -117,7 +87,7 @@ jobs:
   release:
     name: Release to Marketplace
     runs-on: ubuntu-latest
-    needs: [build, test]
+    needs: [test]
     if: startsWith(github.ref_name, 'v')
     permissions:
       id-token: write # For OIDC to Azure for publishing to Marketplace
@@ -127,6 +97,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v5
@@ -134,10 +106,8 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: Download VSIX artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: vsix-package
+      - name: Install dependencies
+        run: npm ci
 
       - name: Install VSCE
         run: npm install -g @vscode/vsce
@@ -158,35 +128,55 @@ jobs:
           reverseOrder: true
           excludeTypes: docs, style, refactor, test, ci, dev
           excludeScopes: dev, test, release
+          useGitmojis: false
 
       - name: Publish to VS Code Marketplace
         shell: pwsh
         run: |
-          # The --azure-authentication option relies on DefaultAzureCredential (and we're logged into Azure CLI using OIDC)
-          # vsce publish without --no-update-package-json allows us to update the version in package.json and PR it later
+          $Parameters = @(
+            # The --azure-credential option relies on DefaultAzureCredential (and we're logged into Azure CLI using OIDC)
+            '--azure-credential'
+            '--no-git-tag-version'
+          )
           if ("${{ github.ref_name }}" -match '-preview') {
-            vsce publish --packagePath ${{ needs.build.outputs.vsix-name }} --azure-authentication --no-git-tag-version ${{ github.ref_name }} --pre-release
-          } else {
-            vsce publish --packagePath ${{ needs.build.outputs.vsix-name }} --azure-authentication --no-git-tag-version ${{ github.ref_name }}
+            $Parameters += '--pre-release'
           }
+          
+          # Get version and compare to tag
+          # We cannot give vsce the version of tag if it's already in package.json as it will error
+          $Version = node -p "require('./package.json').version"
+          $TagVersion = '${{ github.ref_name }}' -replace '^v', ''
+          if ($TagVersion -ne $Version) {
+            $Parameters += $TagVersion
+          }
+          
+          # vsce publish without --no-update-package-json allows us to update the version in package.json and PR it in later step
+          vsce publish @Parameters
+
+      - name: Get built VSIX filename
+        id: vsix-file
+        shell: pwsh
+        run: |
+          $vsixFile = Get-ChildItem -Path . -Filter "*.vsix" | Select-Object -First 1
+          echo "filename=$($vsixFile.Name)" >> $env:GITHUB_OUTPUT
+          Write-Host "Found VSIX file: $($vsixFile.Name)"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ needs.build.outputs.vsix-name }}
+          files: ${{ steps.vsix-file.outputs.filename }}
           body: ${{ steps.changelog.outputs.changes }}
           draft: false
           prerelease: ${{ contains(github.ref_name, '-preview') }}
+          generate_release_notes: false
 
-      - name: Create Pull Request for CHANGELOG and package.json
+      - name: Create Pull Request for Updated Release Files
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ github.token }}
           commit-message: |
             chore(release): Release ${{ github.ref_name }}
-
-            - Update CHANGELOG for ${{ github.ref_name }}
-            - Bump package.json version to ${{ github.ref_name }}
-          title: Update CHANGELOG and Version for ${{ github.ref_name }}
-          body: Automatic update of CHANGELOG and package.json for release ${{ github.ref_name }}.
+          title: Update files for ${{ github.ref_name }}
+          body: Automatic update of files for release ${{ github.ref_name }}.
           labels: release
+          base: main
