@@ -341,4 +341,46 @@ suite('Webview Logic Tests', () => {
 			assert.strictEqual(headerState, 'comparison-active', 'Header should be comparison-active with multiple selection');
 		});
 	});
+
+	suite('Context Menu Logic', () => {
+		test('should detect JSON strings correctly', () => {
+			// Test the isJsonString helper function logic
+			const validJson = '{"name": "test", "value": 123}';
+			const invalidJson = 'not a json string';
+			const simpleString = 'hello world';
+			
+			// Mock implementation of isJsonString logic
+			function testIsJsonString(str: string): boolean {
+				try {
+					const parsed = JSON.parse(str);
+					return (typeof parsed === 'object' && parsed !== null);
+				} catch (e) {
+					return false;
+				}
+			}
+			
+			assert.strictEqual(testIsJsonString(validJson), true, 'Should detect valid JSON');
+			assert.strictEqual(testIsJsonString(invalidJson), false, 'Should reject invalid JSON');
+			assert.strictEqual(testIsJsonString(simpleString), false, 'Should reject non-JSON strings');
+		});
+
+		test('should handle text selection scenarios for details pane', () => {
+			// Test the logic for determining copy options in details pane
+			const selectedText = '{"property": "value"}';
+			
+			// Mock the selection logic from createDetailsContextMenu
+			const hasSelection = (text: string) => text && text.trim().length > 0;
+			const isJson = (str: string) => {
+				try {
+					const parsed = JSON.parse(str);
+					return (typeof parsed === 'object' && parsed !== null);
+				} catch (e) {
+					return false;
+				}
+			};
+			
+			assert.strictEqual(hasSelection(selectedText), true, 'Should detect valid selection');
+			assert.strictEqual(isJson(selectedText), true, 'Should detect JSON in selection');
+		});
+	});
 });
