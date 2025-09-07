@@ -134,8 +134,8 @@ jobs:
         run: |
           $Parameters = @(
             # The --azure-credential option relies on DefaultAzureCredential (and we're logged into Azure CLI using OIDC)
-            --azure-credential
-            --no-git-tag-version
+            '--azure-credential'
+            '--no-git-tag-version'
           )
           if ("${{ github.ref_name }}" -match '-preview') {
             $Parameters += '--pre-release'
