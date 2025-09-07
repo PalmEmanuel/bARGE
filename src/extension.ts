@@ -69,7 +69,8 @@ export function activate(context: vscode.ExtensionContext) {
 				document = await vscode.workspace.openTextDocument(uri);
 				fileName = uri.fsPath;
 			} catch (error) {
-				vscode.window.showErrorMessage(`Failed to open file: ${error}`);
+				const errorMsg = (error && typeof error === 'object' && 'message' in error) ? (error as Error).message : '';
+				vscode.window.showErrorMessage(`Failed to open file. Please check the file path and permissions.${errorMsg ? ' Error: ' + errorMsg : ''}`);
 				return;
 			}
 		} else {
