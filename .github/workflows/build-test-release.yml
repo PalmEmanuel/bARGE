@@ -129,6 +129,7 @@ jobs:
           excludeTypes: docs, style, refactor, test, ci, dev
           excludeScopes: dev, test, release
           useGitmojis: false
+          includeRefIssues: false
 
       - name: Publish to VS Code Marketplace
         shell: pwsh
