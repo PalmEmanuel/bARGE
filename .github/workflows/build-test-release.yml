@@ -97,7 +97,16 @@ jobs:
         run: npm run compile-tests
 
       - name: Run tests
-        run: npm test
+        run: |
+          # Install and start virtual display for headless testing
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+          xvfb-run -a npm test
+        env:
+          # Disable VS Code telemetry during tests
+          VSCODE_DISABLE_CRASH_REPORTER: true
+          # Suppress punycode deprecation warnings from dependencies
+          NODE_NO_WARNINGS: 1
 
   release:
     name: Release to Marketplace

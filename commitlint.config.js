@@ -2,8 +2,8 @@ module.exports = {
   extends: ['@commitlint/config-conventional'],
   rules: {
     'type-enum': [2, 'always', [
-      'feat',     // New feature for the user (triggers minor version bump)
-      'fix',      // Bug fix for the user (triggers patch version bump)
+      'feat',     // New feature for the user
+      'fix',      // Bug fix for the user
       'docs',     // Documentation changes only
       'style',    // Code style changes (formatting, semicolons, etc.) - no code logic changes
       'refactor', // Code changes that neither fix bugs nor add features
