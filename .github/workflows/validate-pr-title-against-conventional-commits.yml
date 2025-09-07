@@ -1,0 +1,47 @@
+name: Validate PR Title for Conventional Commits Format
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - edited
+      - reopened
+
+jobs:
+  validate-pr-title:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    steps:
+      - name: Validate PR title follows conventional commits
+        uses: amannn/action-semantic-pull-request@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            test
+            chore
+            perf
+            ci
+            build
+            revert
+          scopes: |
+            auth
+            results
+            panel
+            query
+            config
+            build
+            test
+            release
+          requireScope: false
+          subjectPattern: ^[A-Z].{9,}$
+          subjectPatternError: |
+            The PR title will be used as the squash commit message.
+            Please ensure it follows conventional commits format:
+            "type(optional-scope): Subject starting with capital letter"

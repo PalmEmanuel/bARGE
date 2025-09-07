@@ -44,11 +44,7 @@ After making changes, ALWAYS perform these validation steps:
 6. Verify the bARGE Results Panel opens
 
 ### Command Testing
-- Test all bARGE commands via Command Palette (Ctrl+Shift+P):
-  - `bARGE: Open Results Panel`
-  - `bARGE: Run Query from Current File`
-  - `bARGE: Run Selected Query`
-  - `bARGE: Set Query Scope`
+- Test all bARGE commands via Command Palette (Ctrl+Shift+P).
 
 ### Authentication Scenarios
 - Verify Azure authentication works (requires Azure CLI or browser auth)
@@ -123,6 +119,120 @@ vsce package --no-yarn
 - `npm run pretest`: 8 seconds (use 20+ second timeout)
 - `vsce package`: 6 seconds (use 15+ second timeout)
 - `npm install -g @vscode/vsce`: 25 seconds (use 60+ second timeout)
+
+## Conventional Commits and Changelog
+
+### Commit Message Format
+bARGE follows the [Conventional Commits specification v1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) for consistent commit messages and automated changelog generation.
+
+All commits are validated towards the configuration in `commitlint.config.js` using `@commitlint/config-conventional`.
+
+All commits **MUST** have a subject in normal sentence case (capitalized first letter).
+
+#### Basic Structure
+```
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+#### Commit Types
+- **feat**: New feature for the user (triggers minor version bump)
+- **fix**: Bug fix for the user (triggers patch version bump)
+- **docs**: Documentation changes only
+- **style**: Code style changes (formatting, semicolons, etc.) - no code logic changes
+- **refactor**: Code changes that neither fix bugs nor add features
+- **test**: Add or modify tests
+- **chore**: Maintenance tasks, build changes, dependency updates
+- **perf**: Performance improvements
+- **ci**: CI/CD pipeline changes
+- **build**: Build system changes (esbuild, npm scripts, etc.)
+
+#### Breaking Changes
+- Add `!` after type/scope for breaking changes: `feat!: Redesign authentication API`
+- Include `BREAKING CHANGE:` in footer with description
+- Triggers major version bump in semantic versioning
+
+#### Examples
+```
+feat(auth): Add Azure account picker with tenant switching
+
+Implements comprehensive account selection dialog with:
+- Real-time tenant and subscription listing
+- Account change detection and session management
+- Improved error handling for authentication failures
+
+Closes #45
+
+fix(results): Resolve panel not updating after query execution
+
+The results panel was not refreshing when running queries from
+files due to incorrect event listener registration.
+
+refactor(types): Simplify QueryScope interface
+
+BREAKING CHANGE: QueryScope.subscriptions is now required array
+instead of optional parameter
+
+docs: Add conventional commits guidelines to development workflow
+
+chore(deps): Update @azure/identity to v4.0.1
+
+test(auth): Add unit tests for account selection scenarios
+```
+
+#### Scope Guidelines
+Common scopes for bARGE:
+- `auth`: Authentication and Azure service integration
+- `results`: Query results panel and data display
+- `panel`: Webview panels and UI components
+- `query`: KQL file handling and query execution
+- `config`: Configuration and settings
+- `build`: Build system and bundling
+- `test`: Testing infrastructure
+- `docs`: Documentation
+
+### Changelog Generation
+- Conventional commits enable automated changelog generation
+- Use `npm run changelog` (if available) to generate CHANGELOG.md
+- Changes are grouped by type: Features, Bug Fixes, Documentation, etc.
+- Breaking changes are prominently highlighted
+- Links to commits and issues are automatically included
+
+### Best Practices
+1. **Keep commits atomic**: One logical change per commit
+2. **Sentence casing**: Capitalize the first letter of the subject
+3. **Write clear descriptions**: Describe what and why, not how
+4. **Use present tense**: "Add feature" not "Added feature"
+5. **Reference issues**: Include "Closes #123" or "Fixes #456"
+6. **Limit subject line**: 50 characters or less for subject
+7. **Include breaking changes**: Always document breaking changes in footer
+8. **Consistent scoping**: Use established scopes for better organization
+
+### Automated Validation
+- **Commitlint**: Automatically validates commit messages using `@commitlint/config-conventional` with specific config found in `commitlint.config.js`
+- **Git Hooks**: Husky prevents commits that don't follow conventional format
+- **CI Validation**: Use `npm run commit-lint-ci` to validate PR commits
+- **Manual Check**: Use `npm run commit-lint` to validate recent commits
+
+### Development Workflow Integration
+```bash
+# Before committing changes
+npm run lint && npm run check-types
+
+# Commit with conventional format (automatically validated by commitlint)
+git add .
+git commit -m "feat(auth): implement status bar authentication indicator"
+
+# Validate recent commits manually (optional)
+npm run commit-lint
+
+# Package and test
+npm run package
+# Then test in Extension Development Host
+```
 
 ## Important Notes
 
