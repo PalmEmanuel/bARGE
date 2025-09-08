@@ -1,20 +1,6 @@
 const vscode = acquireVsCodeApi();
-const loadingGifUri = window.webviewConfig?.loadingGifUri || '';
 let currentResults = null;
 let sortState = { column: null, direction: null };
-
-// Preload the loading GIF for instant display
-let preloadedGifImage = null;
-if (loadingGifUri) {
-    preloadedGifImage = new Image();
-    preloadedGifImage.src = loadingGifUri;
-    // Force the browser to load the GIF completely
-    preloadedGifImage.onload = function() {
-    };
-    preloadedGifImage.onerror = function() {
-        console.warn('Failed to preload loading GIF');
-    };
-}
 
 function escapeHtml(text) {
     if (typeof text !== 'string') {
@@ -232,29 +218,10 @@ function showLoadingIndicator() {
             loadingOverlay._lottieAnimation = animation;
         } catch (error) {
             console.error('Failed to create Lottie animation:', error);
-            // Fallback to GIF if Lottie fails
-            createGifFallback(loadingAnimation);
         }
     } else {
-        console.warn('Lottie bundle not loaded, using GIF fallback');
-        // Fallback to GIF if Lottie bundle not available
-        createGifFallback(loadingAnimation);
+        console.warn('Lottie bundle not loaded');
     }
-}
-
-// Fallback function to create GIF-based loading
-function createGifFallback(container) {
-    const loadingImg = document.createElement('img');
-    loadingImg.alt = 'Loading...';
-    
-    // Use preloaded image if available for instant display
-    if (preloadedGifImage && preloadedGifImage.complete) {
-        loadingImg.src = preloadedGifImage.src;
-    } else {
-        loadingImg.src = loadingGifUri;
-    }
-    
-    container.appendChild(loadingImg);
 }
 
 function hideLoadingIndicator() {
