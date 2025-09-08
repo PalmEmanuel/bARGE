@@ -176,7 +176,8 @@ jobs:
           token: ${{ github.token }}
           commit-message: |
             chore(release): Release ${{ github.ref_name }}
-          title: Update files for ${{ github.ref_name }}
+          title: |
+            chore(release): Update files for ${{ github.ref_name }}
           body: Automatic update of files for release ${{ github.ref_name }}.
           labels: release
           base: main
