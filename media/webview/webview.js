@@ -83,7 +83,7 @@ function displayResults(result) {
 
     if (!result.columns || !result.data || result.data.length === 0) {
         tableContainer.innerHTML = '<div class="no-results">No results found.</div>';
-        resultsInfo.textContent = 'No results';
+        resultsInfo.textContent = 'No results.';
         exportBtn.style.display = 'none';
         return;
     }
