@@ -100,9 +100,6 @@ window.createLoadingAnimation = function(container) {
     const isLight = window.applyThemeClass();
     const animationData = isLight ? compassBlackAnimationData : compassWhiteAnimationData;
     
-    // Log which animation is being used (can be removed later)
-    const bodyClasses = document.body.className;
-    
     return lottie.loadAnimation({
         container: container,
         renderer: 'svg', // SVG for crisp scaling
