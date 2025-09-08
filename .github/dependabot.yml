@@ -5,16 +5,10 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "monday"
+      day: "saturday"
       time: "09:00"
-    open-pull-requests-limit: 10
-    reviewers:
-      - "PalmEmanuel"
-    assignees:
-      - "PalmEmanuel"
     commit-message:
-      prefix: "npm"
-      include: "scope"
+      prefix: "dev: Bump "
     labels:
       - "dependencies"
 
@@ -23,15 +17,9 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "monday"
+      day: "saturday"
       time: "09:00"
-    open-pull-requests-limit: 10
-    reviewers:
-      - "PalmEmanuel"
-    assignees:
-      - "PalmEmanuel"
     commit-message:
-      prefix: "github-actions"
-      include: "scope"
+      prefix: "dev: Bump "
     labels:
       - "dependencies"
