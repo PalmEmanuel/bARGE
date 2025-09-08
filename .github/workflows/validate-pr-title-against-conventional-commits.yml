@@ -30,7 +30,7 @@ jobs:
             chore
             perf
             ci
-            build
+            dev
             revert
           scopes: |
             auth
@@ -38,7 +38,7 @@ jobs:
             panel
             query
             config
-            build
+            dev
             test
             release
           requireScope: false

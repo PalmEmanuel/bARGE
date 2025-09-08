@@ -14,6 +14,7 @@ bARGE is a Visual Studio Code extension that brings Azure Resource Graph queryin
 - **Copy & Export**: Easily copy selected cells as formatted text or for Excel, or export entire results to CSV for further analysis.
 - **Scope Selection**: Choose the subscription or tenant scope for your queries.
 - **Authentication Options**: Authenticate using [DefaultAzureCredential](https://learn.microsoft.com/en-us/javascript/api/@azure/identity/defaultazurecredential?view=azure-node-latest) or VS Code's built-in Microsoft account provider.
+- **Adaptive Layout and Theme**: The results panel adapts to your VS Code layout for both vertical and horizontal splits, and respects your theme settings for light and dark mode.
 
 ## Installation
 
