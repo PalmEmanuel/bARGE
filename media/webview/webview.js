@@ -3,6 +3,20 @@ const loadingGifUri = window.webviewConfig?.loadingGifUri || '';
 let currentResults = null;
 let sortState = { column: null, direction: null };
 
+// Preload the loading GIF for instant display
+let preloadedGifImage = null;
+if (loadingGifUri) {
+    preloadedGifImage = new Image();
+    preloadedGifImage.src = loadingGifUri;
+    // Force the browser to load the GIF completely
+    preloadedGifImage.onload = function() {
+        console.log('Loading GIF preloaded successfully');
+    };
+    preloadedGifImage.onerror = function() {
+        console.warn('Failed to preload loading GIF');
+    };
+}
+
 function escapeHtml(text) {
     if (typeof text !== 'string') {
         text = String(text);
@@ -179,8 +193,11 @@ function showLoadingIndicator() {
     const contentWrapper = document.getElementById('contentWrapper');
     if (!contentWrapper) return;
 
-    // Remove any existing loading overlay
-    hideLoadingIndicator();
+    // Check if loading overlay already exists
+    const existingOverlay = document.getElementById('loadingOverlay');
+    if (existingOverlay) {
+        return; // Don't recreate if already showing
+    }
 
     const loadingOverlay = document.createElement('div');
     loadingOverlay.className = 'loading-overlay';
@@ -188,13 +205,35 @@ function showLoadingIndicator() {
 
     const randomMessage = getRandomLoadingMessage();
 
-    loadingOverlay.innerHTML =
-        '<div class="loading-content">' +
-        '<div class="loading-animation">' +
-        '<img src="' + loadingGifUri + '" alt="Loading..." />' +
-        '</div>' +
-        '<div class="loading-message">' + randomMessage + '</div>' +
-        '</div>';
+    // Create elements instead of using innerHTML to preserve GIF animation
+    const loadingContent = document.createElement('div');
+    loadingContent.className = 'loading-content';
+    
+    const loadingAnimation = document.createElement('div');
+    loadingAnimation.className = 'loading-animation';
+    
+    const loadingImg = document.createElement('img');
+    loadingImg.alt = 'Loading...';
+    
+    // Use preloaded image if available for instant display
+    if (preloadedGifImage && preloadedGifImage.complete) {
+        // Clone the preloaded image source for instant display
+        loadingImg.src = preloadedGifImage.src;
+        console.log('Using preloaded GIF for instant display');
+    } else {
+        // Fallback to original URI if preload not ready
+        loadingImg.src = loadingGifUri;
+        console.log('Preload not ready, using original GIF URI');
+    }
+    
+    const loadingMessage = document.createElement('div');
+    loadingMessage.className = 'loading-message';
+    loadingMessage.textContent = randomMessage;
+    
+    loadingAnimation.appendChild(loadingImg);
+    loadingContent.appendChild(loadingAnimation);
+    loadingContent.appendChild(loadingMessage);
+    loadingOverlay.appendChild(loadingContent);
 
     contentWrapper.style.position = 'relative';
     contentWrapper.appendChild(loadingOverlay);

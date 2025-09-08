@@ -210,7 +210,7 @@ export class BargePanel {
         );
 
         const loadingGifUri = this._panel.webview.asWebviewUri(
-            vscode.Uri.joinPath(this._extensionUri, 'media', 'webview', 'loadingbarge.gif')
+            vscode.Uri.joinPath(this._extensionUri, 'media', 'webview', 'compass-white-1024.gif')
         );
 
         // Replace placeholders
