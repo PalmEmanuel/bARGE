@@ -4,6 +4,16 @@ All notable changes to the bARGE Visual Studio Code extension will be documented
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [v1.0.0] - 2025-09-08
+### New Features
+- [`24b0471`](https://github.com/PalmEmanuel/bARGE/commit/24b0471f8283eab1422cce862831338f7a4a8cf2) - **panel**: Improved loading animation with dark & light mode support *(PR [#70](https://github.com/PalmEmanuel/bARGE/pull/70) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
+
+### Bug Fixes
+- [`797f7b3`](https://github.com/PalmEmanuel/bARGE/commit/797f7b334d8505e94206fdd4b4f491a58ddedd4f) - Right click menu now shows correct Copy options in details pane *(PR [#67](https://github.com/PalmEmanuel/bARGE/pull/67) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
+
+### Chores
+
+
 ## [v0.0.13] - 2025-09-07
 
 ### New Features
@@ -120,3 +130,4 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [v0.0.1] - 2025-08-30
 
 Initial release of bARGE, supporting basic functionality for logging in using [DefaultAzureCredential](https://learn.microsoft.com/en-us/javascript/api/@azure/identity/defaultazurecredential?view=azure-node-latest), running queries and displaying results in a table.
+[v1.0.0]: https://github.com/PalmEmanuel/bARGE/compare/v0.0.13...v1.0.0
