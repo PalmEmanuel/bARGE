@@ -158,6 +158,7 @@
     "watch:esbuild": "node esbuild.js --watch",
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "package": "npm run check-types && npm run lint && node esbuild.js --production",
+    "build-webview": "node esbuild-webview.js",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
@@ -189,6 +190,7 @@
   "dependencies": {
     "@azure/arm-subscriptions": "^5.1.0",
     "@azure/identity": "^4.11.1",
-    "@azure/msal-node": "^3.7.3"
+    "@azure/msal-node": "^3.7.3",
+    "lottie-web": "^5.13.0"
   }
 }

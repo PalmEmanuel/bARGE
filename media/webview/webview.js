@@ -1,5 +1,4 @@
 const vscode = acquireVsCodeApi();
-const loadingGifUri = window.webviewConfig?.loadingGifUri || '';
 let currentResults = null;
 let sortState = { column: null, direction: null };
 
@@ -70,7 +69,7 @@ function displayResults(result) {
 
     if (!result.columns || !result.data || result.data.length === 0) {
         tableContainer.innerHTML = '<div class="no-results">No results found.</div>';
-        resultsInfo.textContent = 'No results';
+        resultsInfo.textContent = 'No results.';
         exportBtn.style.display = 'none';
         return;
     }
@@ -179,8 +178,11 @@ function showLoadingIndicator() {
     const contentWrapper = document.getElementById('contentWrapper');
     if (!contentWrapper) return;
 
-    // Remove any existing loading overlay
-    hideLoadingIndicator();
+    // Check if loading overlay already exists
+    const existingOverlay = document.getElementById('loadingOverlay');
+    if (existingOverlay) {
+        return; // Don't recreate if already showing
+    }
 
     const loadingOverlay = document.createElement('div');
     loadingOverlay.className = 'loading-overlay';
@@ -188,21 +190,51 @@ function showLoadingIndicator() {
 
     const randomMessage = getRandomLoadingMessage();
 
-    loadingOverlay.innerHTML =
-        '<div class="loading-content">' +
-        '<div class="loading-animation">' +
-        '<img src="' + loadingGifUri + '" alt="Loading..." />' +
-        '</div>' +
-        '<div class="loading-message">' + randomMessage + '</div>' +
-        '</div>';
+    // Create elements for Lottie animation
+    const loadingContent = document.createElement('div');
+    loadingContent.className = 'loading-content';
+    
+    const loadingAnimation = document.createElement('div');
+    loadingAnimation.className = 'loading-animation';
+    loadingAnimation.id = 'lottie-loading-container';
+    
+    const loadingMessage = document.createElement('div');
+    loadingMessage.className = 'loading-message';
+    loadingMessage.textContent = randomMessage;
+    
+    loadingContent.appendChild(loadingAnimation);
+    loadingContent.appendChild(loadingMessage);
+    loadingOverlay.appendChild(loadingContent);
 
     contentWrapper.style.position = 'relative';
     contentWrapper.appendChild(loadingOverlay);
+
+    // Create Lottie animation
+    if (window.createLoadingAnimation) {
+        try {
+            const animation = window.createLoadingAnimation(loadingAnimation);
+            
+            // Store animation reference for cleanup
+            loadingOverlay._lottieAnimation = animation;
+        } catch (error) {
+            console.error('Failed to create Lottie animation:', error);
+        }
+    } else {
+        console.warn('Lottie bundle not loaded');
+    }
 }
 
 function hideLoadingIndicator() {
     const loadingOverlay = document.getElementById('loadingOverlay');
     if (loadingOverlay) {
+        // Clean up Lottie animation if it exists
+        if (loadingOverlay._lottieAnimation) {
+            try {
+                loadingOverlay._lottieAnimation.destroy();
+            } catch (error) {
+                console.warn('Error cleaning up Lottie animation:', error);
+            }
+        }
         loadingOverlay.remove();
     }
 }
