@@ -1,5 +1,4 @@
 const vscode = acquireVsCodeApi();
-const loadingGifUri = window.webviewConfig?.loadingGifUri || '';
 let currentResults = null;
 let sortState = { column: null, direction: null };
 
@@ -70,7 +69,7 @@ function displayResults(result) {
 
     if (!result.columns || !result.data || result.data.length === 0) {
         tableContainer.innerHTML = '<div class="no-results">No results found.</div>';
-        resultsInfo.textContent = 'No results';
+        resultsInfo.textContent = 'No results.';
         exportBtn.style.display = 'none';
         return;
     }
@@ -179,8 +178,11 @@ function showLoadingIndicator() {
     const contentWrapper = document.getElementById('contentWrapper');
     if (!contentWrapper) return;
 
-    // Remove any existing loading overlay
-    hideLoadingIndicator();
+    // Check if loading overlay already exists
+    const existingOverlay = document.getElementById('loadingOverlay');
+    if (existingOverlay) {
+        return; // Don't recreate if already showing
+    }
 
     const loadingOverlay = document.createElement('div');
     loadingOverlay.className = 'loading-overlay';
@@ -188,21 +190,51 @@ function showLoadingIndicator() {
 
     const randomMessage = getRandomLoadingMessage();
 
-    loadingOverlay.innerHTML =
-        '<div class="loading-content">' +
-        '<div class="loading-animation">' +
-        '<img src="' + loadingGifUri + '" alt="Loading..." />' +
-        '</div>' +
-        '<div class="loading-message">' + randomMessage + '</div>' +
-        '</div>';
+    // Create elements for Lottie animation
+    const loadingContent = document.createElement('div');
+    loadingContent.className = 'loading-content';
+    
+    const loadingAnimation = document.createElement('div');
+    loadingAnimation.className = 'loading-animation';
+    loadingAnimation.id = 'lottie-loading-container';
+    
+    const loadingMessage = document.createElement('div');
+    loadingMessage.className = 'loading-message';
+    loadingMessage.textContent = randomMessage;
+    
+    loadingContent.appendChild(loadingAnimation);
+    loadingContent.appendChild(loadingMessage);
+    loadingOverlay.appendChild(loadingContent);
 
     contentWrapper.style.position = 'relative';
     contentWrapper.appendChild(loadingOverlay);
+
+    // Create Lottie animation
+    if (window.createLoadingAnimation) {
+        try {
+            const animation = window.createLoadingAnimation(loadingAnimation);
+            
+            // Store animation reference for cleanup
+            loadingOverlay._lottieAnimation = animation;
+        } catch (error) {
+            console.error('Failed to create Lottie animation:', error);
+        }
+    } else {
+        console.warn('Lottie bundle not loaded');
+    }
 }
 
 function hideLoadingIndicator() {
     const loadingOverlay = document.getElementById('loadingOverlay');
     if (loadingOverlay) {
+        // Clean up Lottie animation if it exists
+        if (loadingOverlay._lottieAnimation) {
+            try {
+                loadingOverlay._lottieAnimation.destroy();
+            } catch (error) {
+                console.warn('Error cleaning up Lottie animation:', error);
+            }
+        }
         loadingOverlay.remove();
     }
 }
@@ -723,18 +755,39 @@ function handleDetailsContextMenu(event) {
     // Reset right-clicked cell since we're in details pane context
     rightClickedCell = null;
 
-    // Check if we're right-clicking on a property box or selected text
+    // Check if there's text selected
     const clickedElement = event.target;
-    const propertyElement = clickedElement.closest('.json-property');
     const selection = window.getSelection();
     const hasTextSelection = selection && selection.toString().trim().length > 0;
 
+    // If there's text selection, always use the text selection context menu
+    if (hasTextSelection) {
+        const contextMenu = createDetailsContextMenu();
+        positionContextMenu(event, contextMenu);
+        contextMenuVisible = true;
+        setTimeout(() => {
+            document.addEventListener('click', hideContextMenu, { once: true });
+            document.addEventListener('keydown', handleContextMenuKeydown, { once: true });
+        }, 0);
+        return;
+    }
+
+    // Check if we're right-clicking on a comparison cell (only when no text is selected)
+    const comparisonCell = clickedElement.closest('.comparison-cell');
+    if (comparisonCell) {
+        // Handle comparison cell context menu
+        handleComparisonCellContextMenu(event, comparisonCell);
+        return;
+    }
+
+    // Check if we're right-clicking on a property box
+    const propertyElement = clickedElement.closest('.json-property');
     let contextMenu;
-    if (propertyElement && !hasTextSelection) {
+    if (propertyElement) {
         // Right-clicked on a property box without text selection
         contextMenu = createPropertyContextMenu(propertyElement);
     } else {
-        // Right-clicked on selected text or general area
+        // Right-clicked on general area without text selection
         contextMenu = createDetailsContextMenu();
     }
 
@@ -1004,7 +1057,7 @@ function isJsonString(str) {
 // Copy selected text from details pane
 function copyDetailsSelection(text) {
     navigator.clipboard.writeText(text).then(() => {
-        showCopyFeedback();
+        // Copy successful - no feedback needed
     }).catch(err => {
         console.error('Failed to copy to clipboard:', err);
         fallbackCopyTextToClipboard(text);
@@ -1017,7 +1070,7 @@ function copyDetailsSelectionCompressed(text) {
         const parsed = JSON.parse(text);
         const compressed = JSON.stringify(parsed);
         navigator.clipboard.writeText(compressed).then(() => {
-            showCopyFeedback('compressed');
+            // Copy successful - no feedback needed
         }).catch(err => {
             console.error('Failed to copy to clipboard:', err);
             fallbackCopyTextToClipboard(compressed);
@@ -1136,21 +1189,21 @@ function copySelectedCellsWithHeaders() {
     });
 
     // Create header row
-    const headerRow = headers.join('\\t');
+    const headerRow = headers.join('\t');
 
     // Create data rows
     const rows = Object.keys(rowGroups).sort((a, b) => Number(a) - Number(b));
     const dataRows = rows.map(rowIndex => {
         const row = rowGroups[rowIndex];
-        return uniqueCols.map(colIndex => String(row[colIndex] || '')).join('\\t');
+        return uniqueCols.map(colIndex => String(row[colIndex] || '')).join('\t');
     });
 
     // Combine header and data
-    const copyText = [headerRow, ...dataRows].join('\\n');
+    const copyText = [headerRow, ...dataRows].join('\n');
 
     // Copy to clipboard
     navigator.clipboard.writeText(copyText).then(() => {
-        showCopyFeedback('with headers');
+        // Copy successful - no feedback needed
     }).catch(err => {
         console.error('Failed to copy to clipboard:', err);
         fallbackCopyTextToClipboard(copyText);
@@ -1195,11 +1248,11 @@ function copySelectedCellsFormatted() {
     });
 
     // Join with newlines for multi-cell selection, or just return single cell
-    const copyText = formattedCells.join('\\n\\n');
+    const copyText = formattedCells.join('\n\n');
 
     // Copy to clipboard
     navigator.clipboard.writeText(copyText).then(() => {
-        showCopyFeedback('formatted');
+        // Copy successful - no feedback needed
     }).catch(err => {
         console.error('Failed to copy to clipboard:', err);
         fallbackCopyTextToClipboard(copyText);
@@ -1227,7 +1280,7 @@ function copyRightClickedCell() {
 
     // Copy to clipboard
     navigator.clipboard.writeText(copyValue).then(() => {
-        showCopyFeedback('');
+        // Copy successful - no feedback needed
     }).catch(err => {
         console.error('Failed to copy to clipboard:', err);
         fallbackCopyTextToClipboard(copyValue);
@@ -1260,7 +1313,7 @@ function copyRightClickedCellFormatted() {
 
     // Copy to clipboard
     navigator.clipboard.writeText(copyValue).then(() => {
-        showCopyFeedback('formatted');
+        // Copy successful - no feedback needed
     }).catch(err => {
         console.error('Failed to copy to clipboard:', err);
         fallbackCopyTextToClipboard(copyValue);
@@ -1583,7 +1636,7 @@ function copySelectedCells() {
 
         // If it's a single row selection, just join the values with tabs
         if (rows.length === 1) {
-            return cols.map(colIndex => String(row[colIndex] || '')).join('\\t');
+            return cols.map(colIndex => String(row[colIndex] || '')).join('\t');
         }
 
         // For multiple rows, we need to handle gaps in column selection
@@ -1595,13 +1648,12 @@ function copySelectedCells() {
             rowData.push(String(row[i] || ''));
         }
 
-        return rowData.join('\\t');
-    }).join('\\n');
+        return rowData.join('\t');
+    }).join('\n');
 
     // Copy to clipboard
     navigator.clipboard.writeText(copyText).then(() => {
-        // Visual feedback that copy was successful
-        showCopyFeedback();
+        // Copy successful - no feedback needed
     }).catch(err => {
         console.error('Failed to copy to clipboard:', err);
         // Fallback for older browsers
@@ -2358,8 +2410,28 @@ function generateComparisonView(rowIndices) {
         html += '</td>';
 
         // Add value columns
-        values.forEach(value => {
-            html += '<td class="property-value">';
+        values.forEach((value, valueIndex) => {
+            // Create unique identifiers for comparison table cells
+            const comparisonRowIndex = Array.from(allProperties).sort().indexOf(property);
+            const comparisonColIndex = valueIndex;
+            
+            // Add tooltip value for the cell
+            let tooltipValue = '';
+            if (value === null || value === undefined) {
+                tooltipValue = 'null';
+            } else if (typeof value === 'object') {
+                tooltipValue = JSON.stringify(value, null, 2);
+            } else {
+                tooltipValue = String(value);
+            }
+            
+            html += '<td class="property-value comparison-cell" ' +
+                'data-tooltip="' + escapeHtml(tooltipValue).replace(/"/g, '&quot;') + '" ' +
+                'data-comparison-row="' + comparisonRowIndex + '" ' +
+                'data-comparison-col="' + comparisonColIndex + '" ' +
+                'data-original-row="' + rowIndices[valueIndex] + '" ' +
+                'data-property="' + escapeHtml(property) + '">';
+            
             if (value === null || value === undefined) {
                 html += '<span class="null-value">null</span>';
             } else if (typeof value === 'object') {
@@ -2462,6 +2534,108 @@ function formatAsJsonViewer(obj) {
 
     html += '</div>';
     return html;
+}
+
+// Comparison table cell functionality (no selection tracking needed)
+function handleComparisonCellContextMenu(event, cellElement) {
+    // Create comparison-specific context menu
+    const contextMenu = createComparisonContextMenu(cellElement);
+    
+    // Position and show context menu
+    positionContextMenu(event, contextMenu);
+    
+    // Set flag that context menu is visible
+    contextMenuVisible = true;
+    
+    // Add click outside listener to close menu
+    setTimeout(() => {
+        document.addEventListener('click', hideContextMenu, { once: true });
+        document.addEventListener('keydown', handleContextMenuKeydown, { once: true });
+    }, 0);
+}
+
+function createComparisonContextMenu(cellElement) {
+    if (customContextMenu) {
+        document.body.removeChild(customContextMenu);
+    }
+
+    customContextMenu = document.createElement('div');
+    customContextMenu.className = 'custom-context-menu';
+
+    // Prevent clicks on the menu itself from closing it
+    customContextMenu.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+
+    // Copy cell value option
+    const copyItem = document.createElement('div');
+    copyItem.className = 'context-menu-item';
+    copyItem.innerHTML = '<span>Copy</span>';
+    copyItem.addEventListener('click', () => {
+        copyComparisonCell(cellElement);
+        hideContextMenu();
+    });
+    customContextMenu.appendChild(copyItem);
+
+    // Copy compressed option (if cell contains JSON)
+    const objectValue = cellElement.querySelector('.object-value');
+    if (objectValue) {
+        const copyCompressedItem = document.createElement('div');
+        copyCompressedItem.className = 'context-menu-item';
+        copyCompressedItem.innerHTML = '<span>Copy Compressed</span>';
+        copyCompressedItem.addEventListener('click', () => {
+            copyComparisonCellCompressed(cellElement);
+            hideContextMenu();
+        });
+        customContextMenu.appendChild(copyCompressedItem);
+    }
+
+    document.body.appendChild(customContextMenu);
+    return customContextMenu;
+}
+
+function copyComparisonCell(cellElement) {
+    const tooltipValue = cellElement.getAttribute('data-tooltip');
+    const copyText = tooltipValue || '';
+
+    // Copy to clipboard
+    navigator.clipboard.writeText(copyText).then(() => {
+        // Copy successful - no feedback needed
+    }).catch(err => {
+        console.error('Failed to copy to clipboard:', err);
+        fallbackCopyTextToClipboard(copyText);
+    });
+}
+
+function copyComparisonCellCompressed(cellElement) {
+    const objectValue = cellElement.querySelector('.object-value');
+    let copyText = '';
+    
+    if (objectValue) {
+        // Try to compress JSON
+        try {
+            const parsed = JSON.parse(objectValue.textContent);
+            copyText = JSON.stringify(parsed);
+        } catch (e) {
+            copyText = objectValue.textContent;
+        }
+    } else {
+        const tooltipValue = cellElement.getAttribute('data-tooltip');
+        try {
+            const parsed = JSON.parse(tooltipValue);
+            copyText = JSON.stringify(parsed);
+        } catch (e) {
+            copyText = tooltipValue || '';
+        }
+    }
+
+    // Copy to clipboard
+    navigator.clipboard.writeText(copyText).then(() => {
+        // Copy successful - no feedback needed
+    }).catch(err => {
+        console.error('Failed to copy to clipboard:', err);
+        fallbackCopyTextToClipboard(copyText);
+    });
 }
 
 window.addEventListener('message', event => {

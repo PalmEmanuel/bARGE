@@ -209,14 +209,14 @@ export class BargePanel {
             vscode.Uri.joinPath(this._extensionUri, 'media', 'webview')
         );
 
-        const loadingGifUri = this._panel.webview.asWebviewUri(
-            vscode.Uri.joinPath(this._extensionUri, 'media', 'webview', 'loadingbarge.gif')
+        const webviewBundleUri = this._panel.webview.asWebviewUri(
+            vscode.Uri.joinPath(this._extensionUri, 'media', 'webview', 'webview-bundle.js')
         );
 
         // Replace placeholders
         html = html.replace(/{{NONCE}}/g, nonce);
         html = html.replace(/{{WEBVIEW_URI}}/g, webviewUri.toString());
-        html = html.replace(/{{LOADING_GIF_URI}}/g, loadingGifUri.toString());
+        html = html.replace(/{{WEBVIEW_BUNDLE_URI}}/g, webviewBundleUri.toString());
 
         return html;
     }

@@ -828,7 +828,8 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(var(--vscode-editor-background-rgb, 30, 30, 30), 0.7);
+            background: rgba(30, 30, 30, 0.8);
+            /* Default dark background - will be overridden by theme-specific rules */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -836,32 +837,76 @@
             backdrop-filter: blur(2px);
         }
 
+        /* Theme-adaptive loading overlay - match theme background colors */
+        body.vscode-light .loading-overlay,
+        body.detected-light-theme .loading-overlay {
+            background: rgba(255, 255, 255, 0.8) !important;
+            /* Light theme: light background that blends with light interface */
+        }
+
+        body.vscode-dark .loading-overlay,
+        body.detected-dark-theme .loading-overlay {
+            background: rgba(30, 30, 30, 0.8) !important;
+            /* Dark theme: dark background that blends with dark interface */
+        }
+
+        /* Additional check for light themes that might not have vscode-light class */
+        /* This uses CSS to detect if the editor background is light */
+        @supports (color: color(display-p3 1 1 1)) {
+            .loading-overlay {
+                background: light-dark(rgba(255, 255, 255, 0.8), rgba(30, 30, 30, 0.7));
+            }
+        }
+
         .loading-content {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 16px;
             color: var(--vscode-foreground);
             font-size: 0.9em;
             text-align: center;
+            margin-top: -10vh;
+            /* Move the entire loading indicator up */
+            position: relative;
+            /* Enable absolute positioning for message */
         }
 
         .loading-animation {
-            width: 128px;
-            height: 128px;
+            min-height: 240px;
+            height: min(80vh, 65vw);
+            aspect-ratio: 1;
             border-radius: 8px;
-            overflow: hidden;
         }
 
         .loading-animation img {
-            width: 100%;
-            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
             object-fit: contain;
+            border-radius: 8px;
+            /* Keep it simple - let the browser handle GIF rendering naturally */
         }
 
         .loading-message {
             font-weight: 500;
-            max-width: 200px;
+            font-size: clamp(14px, min(2.5vh, 4vw), 24px);
+            /* More conservative scaling: 14px minimum, 24px maximum */
+            /* Uses smaller of 2.5vh or 4vw to be responsive to both height and width */
+            position: absolute;
+            bottom: 15%;
+            /* Position message to overlap lower 15% of animation */
+            left: 50%;
+            transform: translateX(-50%);
+            /* Center horizontally */
+            z-index: 10;
+            /* Ensure text appears above animation */
+            width: 100%;
+            /* Allow full width for text centering */
+        }
+
+        /* Additional responsive sizing for narrow containers */
+        .content-wrapper.layout-horizontal .loading-message {
+            font-size: clamp(12px, min(2vh, 3vw), 20px);
+            /* Even smaller when in horizontal layout (details panel on right) */
         }
 
         .results-table tr:nth-child(even) {
@@ -993,7 +1038,7 @@
         <div class="content-wrapper" id="contentWrapper">
             <div class="table-section" id="tableSection">
                 <div id="tableContainer" class="table-container">
-                    <div class="no-results">No results to display</div>
+                    <div class="no-results">No results to display.</div>
                 </div>
             </div>
 
@@ -1039,9 +1084,9 @@
     <script nonce="{{NONCE}}">
         // Set global configuration for the webview JavaScript
         window.webviewConfig = {
-            loadingGifUri: '{{LOADING_GIF_URI}}'
         };
     </script>
+    <script nonce="{{NONCE}}" src="{{WEBVIEW_BUNDLE_URI}}"></script>
     <script nonce="{{NONCE}}" src="{{WEBVIEW_URI}}/webview.js"></script>
 </body>
 
