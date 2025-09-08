@@ -180,3 +180,4 @@ jobs:
           body: Automatic update of files for release ${{ github.ref_name }}.
           labels: release
           base: main
+          branch: release-${{ github.ref_name }}
