@@ -10,7 +10,6 @@ if (loadingGifUri) {
     preloadedGifImage.src = loadingGifUri;
     // Force the browser to load the GIF completely
     preloadedGifImage.onload = function() {
-        console.log('Loading GIF preloaded successfully');
     };
     preloadedGifImage.onerror = function() {
         console.warn('Failed to preload loading GIF');
@@ -205,43 +204,70 @@ function showLoadingIndicator() {
 
     const randomMessage = getRandomLoadingMessage();
 
-    // Create elements instead of using innerHTML to preserve GIF animation
+    // Create elements for Lottie animation
     const loadingContent = document.createElement('div');
     loadingContent.className = 'loading-content';
     
     const loadingAnimation = document.createElement('div');
     loadingAnimation.className = 'loading-animation';
-    
-    const loadingImg = document.createElement('img');
-    loadingImg.alt = 'Loading...';
-    
-    // Use preloaded image if available for instant display
-    if (preloadedGifImage && preloadedGifImage.complete) {
-        // Clone the preloaded image source for instant display
-        loadingImg.src = preloadedGifImage.src;
-        console.log('Using preloaded GIF for instant display');
-    } else {
-        // Fallback to original URI if preload not ready
-        loadingImg.src = loadingGifUri;
-        console.log('Preload not ready, using original GIF URI');
-    }
+    loadingAnimation.id = 'lottie-loading-container';
     
     const loadingMessage = document.createElement('div');
     loadingMessage.className = 'loading-message';
     loadingMessage.textContent = randomMessage;
     
-    loadingAnimation.appendChild(loadingImg);
     loadingContent.appendChild(loadingAnimation);
     loadingContent.appendChild(loadingMessage);
     loadingOverlay.appendChild(loadingContent);
 
     contentWrapper.style.position = 'relative';
     contentWrapper.appendChild(loadingOverlay);
+
+    // Create Lottie animation
+    if (window.createLoadingAnimation) {
+        try {
+            const animation = window.createLoadingAnimation(loadingAnimation);
+            
+            // Store animation reference for cleanup
+            loadingOverlay._lottieAnimation = animation;
+        } catch (error) {
+            console.error('Failed to create Lottie animation:', error);
+            // Fallback to GIF if Lottie fails
+            createGifFallback(loadingAnimation);
+        }
+    } else {
+        console.warn('Lottie bundle not loaded, using GIF fallback');
+        // Fallback to GIF if Lottie bundle not available
+        createGifFallback(loadingAnimation);
+    }
+}
+
+// Fallback function to create GIF-based loading
+function createGifFallback(container) {
+    const loadingImg = document.createElement('img');
+    loadingImg.alt = 'Loading...';
+    
+    // Use preloaded image if available for instant display
+    if (preloadedGifImage && preloadedGifImage.complete) {
+        loadingImg.src = preloadedGifImage.src;
+    } else {
+        loadingImg.src = loadingGifUri;
+    }
+    
+    container.appendChild(loadingImg);
 }
 
 function hideLoadingIndicator() {
     const loadingOverlay = document.getElementById('loadingOverlay');
     if (loadingOverlay) {
+        // Clean up Lottie animation if it exists
+        if (loadingOverlay._lottieAnimation) {
+            try {
+                loadingOverlay._lottieAnimation.destroy();
+            } catch (error) {
+                console.warn('Error cleaning up Lottie animation:', error);
+            }
+        }
         loadingOverlay.remove();
     }
 }
