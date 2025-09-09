@@ -52,10 +52,10 @@ suite('Extension Test Suite', () => {
 			assert.strictEqual(result.columns.length, 7, 'Should have 7 columns (all unique properties)');
 			assert.strictEqual(result.rows.length, 3, 'Should have 3 rows');
 
-			// Verify column names are sorted and include all properties
-			const expectedColumns = ['id', 'location', 'name', 'resourceGroup', 'sku', 'type', 'vmSize'];
-			const actualColumnNames = result.columns.map((col: any) => col.name).sort();
-			assert.deepStrictEqual(actualColumnNames, expectedColumns, 'Column names should match expected properties');
+			// Verify column names preserve order from first object, then additional properties
+			const expectedColumns = ['id', 'name', 'type', 'location', 'resourceGroup', 'vmSize', 'sku'];
+			const actualColumnNames = result.columns.map((col: any) => col.name);
+			assert.deepStrictEqual(actualColumnNames, expectedColumns, 'Column names should preserve order from first object');
 
 			// Verify column types
 			result.columns.forEach((col: any) => {
