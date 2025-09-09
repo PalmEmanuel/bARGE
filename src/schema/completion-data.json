@@ -1,0 +1,590 @@
+{
+  "tables": [
+    {
+      "label": "advisorresources",
+      "kind": "Table",
+      "detail": "Resources related to advisorresources",
+      "insertText": "advisorresources"
+    },
+    {
+      "label": "aksresources",
+      "kind": "Table",
+      "detail": "Resources related to aksresources",
+      "insertText": "aksresources"
+    },
+    {
+      "label": "alertsmanagementresources",
+      "kind": "Table",
+      "detail": "Resources related to alertsmanagementresources",
+      "insertText": "alertsmanagementresources"
+    },
+    {
+      "label": "appserviceresources",
+      "kind": "Table",
+      "detail": "Resources related to appserviceresources",
+      "insertText": "appserviceresources"
+    },
+    {
+      "label": "authorizationresources",
+      "kind": "Table",
+      "detail": "Resources related to authorizationresources",
+      "insertText": "authorizationresources"
+    },
+    {
+      "label": "awsresources",
+      "kind": "Table",
+      "detail": "Resources related to awsresources",
+      "insertText": "awsresources"
+    },
+    {
+      "label": "azurebusinesscontinuityresources",
+      "kind": "Table",
+      "detail": "Resources related to azurebusinesscontinuityresources",
+      "insertText": "azurebusinesscontinuityresources"
+    },
+    {
+      "label": "azuredevopsplatformresources",
+      "kind": "Table",
+      "detail": "Resources related to azuredevopsplatformresources",
+      "insertText": "azuredevopsplatformresources"
+    },
+    {
+      "label": "batchresources",
+      "kind": "Table",
+      "detail": "Resources related to batchresources",
+      "insertText": "batchresources"
+    },
+    {
+      "label": "capabilityresources",
+      "kind": "Table",
+      "detail": "Resources related to capabilityresources",
+      "insertText": "capabilityresources"
+    },
+    {
+      "label": "chaosresources",
+      "kind": "Table",
+      "detail": "Resources related to chaosresources",
+      "insertText": "chaosresources"
+    },
+    {
+      "label": "communitygalleryresources",
+      "kind": "Table",
+      "detail": "Resources related to communitygalleryresources",
+      "insertText": "communitygalleryresources"
+    },
+    {
+      "label": "computeresources",
+      "kind": "Table",
+      "detail": "Resources related to computeresources",
+      "insertText": "computeresources"
+    },
+    {
+      "label": "deploymentresources",
+      "kind": "Table",
+      "detail": "Resources related to deploymentresources",
+      "insertText": "deploymentresources"
+    },
+    {
+      "label": "desktopvirtualizationresources",
+      "kind": "Table",
+      "detail": "Resources related to desktopvirtualizationresources",
+      "insertText": "desktopvirtualizationresources"
+    },
+    {
+      "label": "dnsresources",
+      "kind": "Table",
+      "detail": "Resources related to dnsresources",
+      "insertText": "dnsresources"
+    },
+    {
+      "label": "edgeorderresources",
+      "kind": "Table",
+      "detail": "Resources related to edgeorderresources",
+      "insertText": "edgeorderresources"
+    },
+    {
+      "label": "elasticsanresources",
+      "kind": "Table",
+      "detail": "Resources related to elasticsanresources",
+      "insertText": "elasticsanresources"
+    },
+    {
+      "label": "extendedlocationresources",
+      "kind": "Table",
+      "detail": "Resources related to extendedlocationresources",
+      "insertText": "extendedlocationresources"
+    },
+    {
+      "label": "featureresources",
+      "kind": "Table",
+      "detail": "Resources related to featureresources",
+      "insertText": "featureresources"
+    },
+    {
+      "label": "guestconfigurationresources",
+      "kind": "Table",
+      "detail": "Resources related to guestconfigurationresources",
+      "insertText": "guestconfigurationresources"
+    },
+    {
+      "label": "healthresources",
+      "kind": "Table",
+      "detail": "Resources related to healthresources",
+      "insertText": "healthresources"
+    },
+    {
+      "label": "impactreportresources",
+      "kind": "Table",
+      "detail": "Resources related to impactreportresources",
+      "insertText": "impactreportresources"
+    },
+    {
+      "label": "insightresources",
+      "kind": "Table",
+      "detail": "Resources related to insightresources",
+      "insertText": "insightresources"
+    },
+    {
+      "label": "iotsecurityresources",
+      "kind": "Table",
+      "detail": "Resources related to iotsecurityresources",
+      "insertText": "iotsecurityresources"
+    },
+    {
+      "label": "kubernetesconfigurationresources",
+      "kind": "Table",
+      "detail": "Resources related to kubernetesconfigurationresources",
+      "insertText": "kubernetesconfigurationresources"
+    },
+    {
+      "label": "kustoresources",
+      "kind": "Table",
+      "detail": "Resources related to kustoresources",
+      "insertText": "kustoresources"
+    },
+    {
+      "label": "maintenanceresources",
+      "kind": "Table",
+      "detail": "Resources related to maintenanceresources",
+      "insertText": "maintenanceresources"
+    },
+    {
+      "label": "managedserviceresources",
+      "kind": "Table",
+      "detail": "Resources related to managedserviceresources",
+      "insertText": "managedserviceresources"
+    },
+    {
+      "label": "mirgateresources",
+      "kind": "Table",
+      "detail": "Resources related to mirgateresources",
+      "insertText": "mirgateresources"
+    },
+    {
+      "label": "networkresources",
+      "kind": "Table",
+      "detail": "Resources related to networkresources",
+      "insertText": "networkresources"
+    },
+    {
+      "label": "orbitalresources",
+      "kind": "Table",
+      "detail": "Resources related to orbitalresources",
+      "insertText": "orbitalresources"
+    },
+    {
+      "label": "patchassessmentresources",
+      "kind": "Table",
+      "detail": "Resources related to patchassessmentresources",
+      "insertText": "patchassessmentresources"
+    },
+    {
+      "label": "patchinstallationresources",
+      "kind": "Table",
+      "detail": "Resources related to patchinstallationresources",
+      "insertText": "patchinstallationresources"
+    },
+    {
+      "label": "policyresources",
+      "kind": "Table",
+      "detail": "Resources related to policyresources",
+      "insertText": "policyresources"
+    },
+    {
+      "label": "recoveryservicesresources",
+      "kind": "Table",
+      "detail": "Resources related to recoveryservicesresources",
+      "insertText": "recoveryservicesresources"
+    },
+    {
+      "label": "securityresources",
+      "kind": "Table",
+      "detail": "Resources related to securityresources",
+      "insertText": "securityresources"
+    },
+    {
+      "label": "servicefabricresources",
+      "kind": "Table",
+      "detail": "Resources related to servicefabricresources",
+      "insertText": "servicefabricresources"
+    },
+    {
+      "label": "servicehealthresources",
+      "kind": "Table",
+      "detail": "Resources related to servicehealthresources",
+      "insertText": "servicehealthresources"
+    },
+    {
+      "label": "sportresources",
+      "kind": "Table",
+      "detail": "Resources related to sportresources",
+      "insertText": "sportresources"
+    },
+    {
+      "label": "tagresources",
+      "kind": "Table",
+      "detail": "Resources related to tagresources",
+      "insertText": "tagresources"
+    },
+    {
+      "label": "insightsresources",
+      "kind": "Table",
+      "detail": "Azure Monitor insights and data collection rule associations",
+      "insertText": "insightsresources"
+    },
+    {
+      "label": "managedservicesresources",
+      "kind": "Table",
+      "detail": "Azure Resource Graph table: managedservicesresources",
+      "insertText": "managedservicesresources"
+    },
+    {
+      "label": "migrateresources",
+      "kind": "Table",
+      "detail": "Azure Resource Graph table: migrateresources",
+      "insertText": "migrateresources"
+    },
+    {
+      "label": "spotresources",
+      "kind": "Table",
+      "detail": "Azure Resource Graph table: spotresources",
+      "insertText": "spotresources"
+    },
+    {
+      "label": "supportresources",
+      "kind": "Table",
+      "detail": "Azure Resource Graph table: supportresources",
+      "insertText": "supportresources"
+    },
+    {
+      "label": "tagsresources",
+      "kind": "Table",
+      "detail": "Azure Resource Graph table: tagsresources",
+      "insertText": "tagsresources"
+    },
+    {
+      "label": "resources",
+      "kind": "Table",
+      "detail": "Main table containing all Azure resources across subscriptions",
+      "insertText": "resources"
+    },
+    {
+      "label": "resourcecontainers",
+      "kind": "Table",
+      "detail": "Contains management groups, subscriptions, and resource groups",
+      "insertText": "resourcecontainers"
+    }
+  ],
+  "operators": [
+    {
+      "label": "top",
+      "kind": "Keyword",
+      "detail": "Returns the first N rows after sorting",
+      "insertText": "top",
+      "category": "general"
+    },
+    {
+      "label": "take",
+      "kind": "Keyword",
+      "detail": "Returns the first N rows from the input",
+      "insertText": "take",
+      "category": "general"
+    },
+    {
+      "label": "join",
+      "kind": "Keyword",
+      "detail": "Combines rows from two tables based on matching values",
+      "insertText": "join",
+      "category": "general"
+    },
+    {
+      "label": "union",
+      "kind": "Keyword",
+      "detail": "Combines results from multiple tables or queries",
+      "insertText": "union",
+      "category": "general"
+    },
+    {
+      "label": "distinct",
+      "kind": "Keyword",
+      "detail": "Returns rows with distinct combinations of specified columns",
+      "insertText": "distinct",
+      "category": "general"
+    },
+    {
+      "label": "limit",
+      "kind": "Keyword",
+      "detail": "Limits the number of rows returned",
+      "insertText": "limit",
+      "category": "general"
+    },
+    {
+      "label": "project",
+      "kind": "Keyword",
+      "detail": "Selects and optionally renames columns",
+      "insertText": "project",
+      "category": "general"
+    },
+    {
+      "label": "where",
+      "kind": "Keyword",
+      "detail": "Filters rows based on a boolean condition",
+      "insertText": "where",
+      "category": "general"
+    },
+    {
+      "label": "order",
+      "kind": "Keyword",
+      "detail": "Orders result rows by one or more columns",
+      "insertText": "order",
+      "category": "general"
+    },
+    {
+      "label": "count",
+      "kind": "Keyword",
+      "detail": "Counts the number of rows in the input",
+      "insertText": "count",
+      "category": "general"
+    },
+    {
+      "label": "summarize",
+      "kind": "Keyword",
+      "detail": "Groups rows and applies aggregation functions",
+      "insertText": "summarize",
+      "category": "general"
+    },
+    {
+      "label": "extend",
+      "kind": "Keyword",
+      "detail": "Adds calculated columns to the result set",
+      "insertText": "extend",
+      "category": "general"
+    },
+    {
+      "label": "mv-expand",
+      "kind": "Keyword",
+      "detail": "Expands multi-value arrays or property bags into separate rows",
+      "insertText": "mv-expand",
+      "category": "general"
+    },
+    {
+      "label": "sort",
+      "kind": "Keyword",
+      "detail": "Orders result rows by one or more columns",
+      "insertText": "sort",
+      "category": "general"
+    }
+  ],
+  "functions": [
+    {
+      "label": "isnotnull",
+      "kind": "Function",
+      "detail": "Tests if value is not null",
+      "insertText": "isnotnull()",
+      "category": "conditional"
+    },
+    {
+      "label": "count",
+      "kind": "Function",
+      "detail": "Counts the number of values",
+      "insertText": "count()",
+      "category": "aggregation"
+    },
+    {
+      "label": "tostring",
+      "kind": "Function",
+      "detail": "Converts input to string representation",
+      "insertText": "tostring()",
+      "category": "conversion"
+    },
+    {
+      "label": "toint",
+      "kind": "Function",
+      "detail": "Converts input to integer",
+      "insertText": "toint()",
+      "category": "conversion"
+    },
+    {
+      "label": "todouble",
+      "kind": "Function",
+      "detail": "Converts input to double precision number",
+      "insertText": "todouble()",
+      "category": "conversion"
+    },
+    {
+      "label": "tobool",
+      "kind": "Function",
+      "detail": "Converts input to boolean",
+      "insertText": "tobool()",
+      "category": "conversion"
+    },
+    {
+      "label": "todatetime",
+      "kind": "Function",
+      "detail": "Converts input to datetime",
+      "insertText": "todatetime()",
+      "category": "conversion"
+    },
+    {
+      "label": "now",
+      "kind": "Function",
+      "detail": "Returns current UTC datetime",
+      "insertText": "now()",
+      "category": "datetime"
+    },
+    {
+      "label": "ago",
+      "kind": "Function",
+      "detail": "Returns datetime that is the specified timespan before now",
+      "insertText": "ago()",
+      "category": "datetime"
+    },
+    {
+      "label": "strlen",
+      "kind": "Function",
+      "detail": "Returns the length of the string",
+      "insertText": "strlen()",
+      "category": "string"
+    },
+    {
+      "label": "substring",
+      "kind": "Function",
+      "detail": "Extracts a substring from a string",
+      "insertText": "substring()",
+      "category": "string"
+    },
+    {
+      "label": "split",
+      "kind": "Function",
+      "detail": "Splits a string into substrings",
+      "insertText": "split()",
+      "category": "string"
+    },
+    {
+      "label": "replace",
+      "kind": "Function",
+      "detail": "Replaces all occurrences of a substring",
+      "insertText": "replace()",
+      "category": "string"
+    },
+    {
+      "label": "tolower",
+      "kind": "Function",
+      "detail": "Converts string to lowercase",
+      "insertText": "tolower()",
+      "category": "string"
+    },
+    {
+      "label": "toupper",
+      "kind": "Function",
+      "detail": "Converts string to uppercase",
+      "insertText": "toupper()",
+      "category": "string"
+    },
+    {
+      "label": "sum",
+      "kind": "Function",
+      "detail": "Calculates the sum of values",
+      "insertText": "sum()",
+      "category": "aggregation"
+    },
+    {
+      "label": "max",
+      "kind": "Function",
+      "detail": "Returns the maximum value",
+      "insertText": "max()",
+      "category": "aggregation"
+    },
+    {
+      "label": "min",
+      "kind": "Function",
+      "detail": "Returns the minimum value",
+      "insertText": "min()",
+      "category": "aggregation"
+    },
+    {
+      "label": "avg",
+      "kind": "Function",
+      "detail": "Calculates the average of values",
+      "insertText": "avg()",
+      "category": "aggregation"
+    },
+    {
+      "label": "make_list",
+      "kind": "Function",
+      "detail": "Creates a list of values",
+      "insertText": "make_list()",
+      "category": "aggregation"
+    },
+    {
+      "label": "make_set",
+      "kind": "Function",
+      "detail": "Creates a set of unique values",
+      "insertText": "make_set()",
+      "category": "aggregation"
+    },
+    {
+      "label": "parse_json",
+      "kind": "Function",
+      "detail": "Parses a JSON string",
+      "insertText": "parse_json()",
+      "category": "parsing"
+    },
+    {
+      "label": "bag_keys",
+      "kind": "Function",
+      "detail": "Returns keys from a property bag",
+      "insertText": "bag_keys()",
+      "category": "parsing"
+    },
+    {
+      "label": "extract",
+      "kind": "Function",
+      "detail": "Extracts a match using a regular expression",
+      "insertText": "extract()",
+      "category": "parsing"
+    },
+    {
+      "label": "isnull",
+      "kind": "Function",
+      "detail": "Tests if value is null",
+      "insertText": "isnull()",
+      "category": "conditional"
+    },
+    {
+      "label": "isempty",
+      "kind": "Function",
+      "detail": "Tests if value is empty",
+      "insertText": "isempty()",
+      "category": "conditional"
+    },
+    {
+      "label": "isnotempty",
+      "kind": "Function",
+      "detail": "Tests if value is not empty",
+      "insertText": "isnotempty()",
+      "category": "conditional"
+    }
+  ],
+  "resourceTypes": []
+}

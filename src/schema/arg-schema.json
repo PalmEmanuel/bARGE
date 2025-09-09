@@ -1,0 +1,460 @@
+{
+  "tables": {
+    "advisorresources": {
+      "name": "advisorresources",
+      "resourceTypes": [],
+      "description": "Resources related to advisorresources"
+    },
+    "aksresources": {
+      "name": "aksresources",
+      "resourceTypes": [],
+      "description": "Resources related to aksresources"
+    },
+    "alertsmanagementresources": {
+      "name": "alertsmanagementresources",
+      "resourceTypes": [],
+      "description": "Resources related to alertsmanagementresources"
+    },
+    "appserviceresources": {
+      "name": "appserviceresources",
+      "resourceTypes": [],
+      "description": "Resources related to appserviceresources"
+    },
+    "authorizationresources": {
+      "name": "authorizationresources",
+      "resourceTypes": [],
+      "description": "Resources related to authorizationresources"
+    },
+    "awsresources": {
+      "name": "awsresources",
+      "resourceTypes": [],
+      "description": "Resources related to awsresources"
+    },
+    "azurebusinesscontinuityresources": {
+      "name": "azurebusinesscontinuityresources",
+      "resourceTypes": [],
+      "description": "Resources related to azurebusinesscontinuityresources"
+    },
+    "azuredevopsplatformresources": {
+      "name": "azuredevopsplatformresources",
+      "resourceTypes": [],
+      "description": "Resources related to azuredevopsplatformresources"
+    },
+    "batchresources": {
+      "name": "batchresources",
+      "resourceTypes": [],
+      "description": "Resources related to batchresources"
+    },
+    "capabilityresources": {
+      "name": "capabilityresources",
+      "resourceTypes": [],
+      "description": "Resources related to capabilityresources"
+    },
+    "chaosresources": {
+      "name": "chaosresources",
+      "resourceTypes": [],
+      "description": "Resources related to chaosresources"
+    },
+    "communitygalleryresources": {
+      "name": "communitygalleryresources",
+      "resourceTypes": [],
+      "description": "Resources related to communitygalleryresources"
+    },
+    "computeresources": {
+      "name": "computeresources",
+      "resourceTypes": [],
+      "description": "Resources related to computeresources"
+    },
+    "deploymentresources": {
+      "name": "deploymentresources",
+      "resourceTypes": [],
+      "description": "Resources related to deploymentresources"
+    },
+    "desktopvirtualizationresources": {
+      "name": "desktopvirtualizationresources",
+      "resourceTypes": [],
+      "description": "Resources related to desktopvirtualizationresources"
+    },
+    "dnsresources": {
+      "name": "dnsresources",
+      "resourceTypes": [],
+      "description": "Resources related to dnsresources"
+    },
+    "edgeorderresources": {
+      "name": "edgeorderresources",
+      "resourceTypes": [],
+      "description": "Resources related to edgeorderresources"
+    },
+    "elasticsanresources": {
+      "name": "elasticsanresources",
+      "resourceTypes": [],
+      "description": "Resources related to elasticsanresources"
+    },
+    "extendedlocationresources": {
+      "name": "extendedlocationresources",
+      "resourceTypes": [],
+      "description": "Resources related to extendedlocationresources"
+    },
+    "featureresources": {
+      "name": "featureresources",
+      "resourceTypes": [],
+      "description": "Resources related to featureresources"
+    },
+    "guestconfigurationresources": {
+      "name": "guestconfigurationresources",
+      "resourceTypes": [],
+      "description": "Resources related to guestconfigurationresources"
+    },
+    "healthresources": {
+      "name": "healthresources",
+      "resourceTypes": [],
+      "description": "Resources related to healthresources"
+    },
+    "impactreportresources": {
+      "name": "impactreportresources",
+      "resourceTypes": [],
+      "description": "Resources related to impactreportresources"
+    },
+    "insightresources": {
+      "name": "insightresources",
+      "resourceTypes": [],
+      "description": "Resources related to insightresources"
+    },
+    "iotsecurityresources": {
+      "name": "iotsecurityresources",
+      "resourceTypes": [],
+      "description": "Resources related to iotsecurityresources"
+    },
+    "kubernetesconfigurationresources": {
+      "name": "kubernetesconfigurationresources",
+      "resourceTypes": [],
+      "description": "Resources related to kubernetesconfigurationresources"
+    },
+    "kustoresources": {
+      "name": "kustoresources",
+      "resourceTypes": [],
+      "description": "Resources related to kustoresources"
+    },
+    "maintenanceresources": {
+      "name": "maintenanceresources",
+      "resourceTypes": [],
+      "description": "Resources related to maintenanceresources"
+    },
+    "managedserviceresources": {
+      "name": "managedserviceresources",
+      "resourceTypes": [],
+      "description": "Resources related to managedserviceresources"
+    },
+    "mirgateresources": {
+      "name": "mirgateresources",
+      "resourceTypes": [],
+      "description": "Resources related to mirgateresources"
+    },
+    "networkresources": {
+      "name": "networkresources",
+      "resourceTypes": [],
+      "description": "Resources related to networkresources"
+    },
+    "orbitalresources": {
+      "name": "orbitalresources",
+      "resourceTypes": [],
+      "description": "Resources related to orbitalresources"
+    },
+    "patchassessmentresources": {
+      "name": "patchassessmentresources",
+      "resourceTypes": [],
+      "description": "Resources related to patchassessmentresources"
+    },
+    "patchinstallationresources": {
+      "name": "patchinstallationresources",
+      "resourceTypes": [],
+      "description": "Resources related to patchinstallationresources"
+    },
+    "policyresources": {
+      "name": "policyresources",
+      "resourceTypes": [],
+      "description": "Resources related to policyresources"
+    },
+    "recoveryservicesresources": {
+      "name": "recoveryservicesresources",
+      "resourceTypes": [],
+      "description": "Resources related to recoveryservicesresources"
+    },
+    "securityresources": {
+      "name": "securityresources",
+      "resourceTypes": [],
+      "description": "Resources related to securityresources"
+    },
+    "servicefabricresources": {
+      "name": "servicefabricresources",
+      "resourceTypes": [],
+      "description": "Resources related to servicefabricresources"
+    },
+    "servicehealthresources": {
+      "name": "servicehealthresources",
+      "resourceTypes": [],
+      "description": "Resources related to servicehealthresources"
+    },
+    "sportresources": {
+      "name": "sportresources",
+      "resourceTypes": [],
+      "description": "Resources related to sportresources"
+    },
+    "tagresources": {
+      "name": "tagresources",
+      "resourceTypes": [],
+      "description": "Resources related to tagresources"
+    },
+    "insightsresources": {
+      "name": "insightsresources",
+      "description": "Azure Monitor insights and data collection rule associations",
+      "properties": {}
+    },
+    "managedservicesresources": {
+      "name": "managedservicesresources",
+      "description": "Azure Resource Graph table: managedservicesresources",
+      "properties": {}
+    },
+    "migrateresources": {
+      "name": "migrateresources",
+      "description": "Azure Resource Graph table: migrateresources",
+      "properties": {}
+    },
+    "spotresources": {
+      "name": "spotresources",
+      "description": "Azure Resource Graph table: spotresources",
+      "properties": {}
+    },
+    "supportresources": {
+      "name": "supportresources",
+      "description": "Azure Resource Graph table: supportresources",
+      "properties": {}
+    },
+    "tagsresources": {
+      "name": "tagsresources",
+      "description": "Azure Resource Graph table: tagsresources",
+      "properties": {}
+    },
+    "resources": {
+      "name": "resources",
+      "description": "Main table containing all Azure resources across subscriptions",
+      "properties": {}
+    },
+    "resourcecontainers": {
+      "name": "resourcecontainers",
+      "description": "Contains management groups, subscriptions, and resource groups",
+      "properties": {}
+    }
+  },
+  "resourceTypes": {},
+  "operators": [
+    {
+      "name": "top",
+      "category": "general",
+      "description": "Returns the first N rows after sorting"
+    },
+    {
+      "name": "take",
+      "category": "general",
+      "description": "Returns the first N rows from the input"
+    },
+    {
+      "name": "join",
+      "category": "general",
+      "description": "Combines rows from two tables based on matching values"
+    },
+    {
+      "name": "union",
+      "category": "general",
+      "description": "Combines results from multiple tables or queries"
+    },
+    {
+      "name": "distinct",
+      "category": "general",
+      "description": "Returns rows with distinct combinations of specified columns"
+    },
+    {
+      "name": "limit",
+      "category": "general",
+      "description": "Limits the number of rows returned"
+    },
+    {
+      "name": "project",
+      "category": "general",
+      "description": "Selects and optionally renames columns"
+    },
+    {
+      "name": "where",
+      "category": "general",
+      "description": "Filters rows based on a boolean condition"
+    },
+    {
+      "name": "order",
+      "category": "general",
+      "description": "Orders result rows by one or more columns"
+    },
+    {
+      "name": "count",
+      "category": "general",
+      "description": "Counts the number of rows in the input"
+    },
+    {
+      "name": "summarize",
+      "category": "general",
+      "description": "Groups rows and applies aggregation functions"
+    },
+    {
+      "name": "extend",
+      "category": "general",
+      "description": "Adds calculated columns to the result set"
+    },
+    {
+      "name": "mv-expand",
+      "category": "general",
+      "description": "Expands multi-value arrays or property bags into separate rows"
+    },
+    {
+      "name": "sort",
+      "category": "general",
+      "description": "Orders result rows by one or more columns"
+    }
+  ],
+  "functions": [
+    {
+      "name": "isnotnull",
+      "category": "conditional",
+      "description": "Tests if value is not null"
+    },
+    {
+      "name": "count",
+      "category": "aggregation",
+      "description": "Counts the number of values"
+    },
+    {
+      "name": "tostring",
+      "category": "conversion",
+      "description": "Converts input to string representation"
+    },
+    {
+      "name": "toint",
+      "category": "conversion",
+      "description": "Converts input to integer"
+    },
+    {
+      "name": "todouble",
+      "category": "conversion",
+      "description": "Converts input to double precision number"
+    },
+    {
+      "name": "tobool",
+      "category": "conversion",
+      "description": "Converts input to boolean"
+    },
+    {
+      "name": "todatetime",
+      "category": "conversion",
+      "description": "Converts input to datetime"
+    },
+    {
+      "name": "now",
+      "category": "datetime",
+      "description": "Returns current UTC datetime"
+    },
+    {
+      "name": "ago",
+      "category": "datetime",
+      "description": "Returns datetime that is the specified timespan before now"
+    },
+    {
+      "name": "strlen",
+      "category": "string",
+      "description": "Returns the length of the string"
+    },
+    {
+      "name": "substring",
+      "category": "string",
+      "description": "Extracts a substring from a string"
+    },
+    {
+      "name": "split",
+      "category": "string",
+      "description": "Splits a string into substrings"
+    },
+    {
+      "name": "replace",
+      "category": "string",
+      "description": "Replaces all occurrences of a substring"
+    },
+    {
+      "name": "tolower",
+      "category": "string",
+      "description": "Converts string to lowercase"
+    },
+    {
+      "name": "toupper",
+      "category": "string",
+      "description": "Converts string to uppercase"
+    },
+    {
+      "name": "sum",
+      "category": "aggregation",
+      "description": "Calculates the sum of values"
+    },
+    {
+      "name": "max",
+      "category": "aggregation",
+      "description": "Returns the maximum value"
+    },
+    {
+      "name": "min",
+      "category": "aggregation",
+      "description": "Returns the minimum value"
+    },
+    {
+      "name": "avg",
+      "category": "aggregation",
+      "description": "Calculates the average of values"
+    },
+    {
+      "name": "make_list",
+      "category": "aggregation",
+      "description": "Creates a list of values"
+    },
+    {
+      "name": "make_set",
+      "category": "aggregation",
+      "description": "Creates a set of unique values"
+    },
+    {
+      "name": "parse_json",
+      "category": "parsing",
+      "description": "Parses a JSON string"
+    },
+    {
+      "name": "bag_keys",
+      "category": "parsing",
+      "description": "Returns keys from a property bag"
+    },
+    {
+      "name": "extract",
+      "category": "parsing",
+      "description": "Extracts a match using a regular expression"
+    },
+    {
+      "name": "isnull",
+      "category": "conditional",
+      "description": "Tests if value is null"
+    },
+    {
+      "name": "isempty",
+      "category": "conditional",
+      "description": "Tests if value is empty"
+    },
+    {
+      "name": "isnotempty",
+      "category": "conditional",
+      "description": "Tests if value is not empty"
+    }
+  ],
+  "lastUpdated": "2025-09-09T14:29:56.452Z"
+}

@@ -1,0 +1,150 @@
+{
+  "name": "Azure Resource Graph KQL",
+  "scopeName": "source.kql.arg",
+  "fileTypes": [
+    "kql"
+  ],
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#operators"
+    },
+    {
+      "include": "#functions"
+    },
+    {
+      "include": "#tables"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#numbers"
+    },
+    {
+      "include": "#properties"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.kql",
+          "match": "//.*$"
+        },
+        {
+          "name": "comment.block.kql",
+          "begin": "/\\*",
+          "end": "\\*/"
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.kql",
+          "match": "(?i)\\b(top|take|join|union|distinct|limit|project|where|order|count|summarize|extend|mv-expand|sort)\\b"
+        },
+        {
+          "name": "keyword.operator.logical.kql",
+          "match": "(?i)\\b(and|or|not)\\b"
+        },
+        {
+          "name": "keyword.operator.comparison.kql",
+          "match": "(==|!=|<>|<=|>=|<|>|=~|!~|contains|!contains|has|!has|hasprefix|!hasprefix|hassuffix|!hassuffix|in|!in|startswith|!startswith|endswith|!endswith|matches|regex)"
+        },
+        {
+          "name": "keyword.other.kql",
+          "match": "(?i)\\b(by|asc|desc|nulls|first|last|with|on|kind|inner|outer|left|right|semi|anti|fullouter|innerunique|leftouter|rightouter|leftanti|rightanti|leftsemi|rightsemi)\\b"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.pipe.kql",
+          "match": "\\|"
+        },
+        {
+          "name": "keyword.operator.assignment.kql",
+          "match": "="
+        },
+        {
+          "name": "keyword.operator.arithmetic.kql",
+          "match": "[+\\-*/%]"
+        }
+      ]
+    },
+    "functions": {
+      "patterns": [
+        {
+          "name": "support.function.builtin.kql",
+          "match": "(?i)\\b(isnotnull|count|tostring|toint|todouble|tobool|todatetime|now|ago|strlen|substring|split|replace|tolower|toupper|sum|max|min|avg|make_list|make_set|parse_json|bag_keys|extract|isnull|isempty|isnotempty)\\b"
+        }
+      ]
+    },
+    "tables": {
+      "patterns": [
+        {
+          "name": "support.class.table.kql",
+          "match": "(?i)\\b(advisorresources|aksresources|alertsmanagementresources|appserviceresources|authorizationresources|awsresources|azurebusinesscontinuityresources|azuredevopsplatformresources|batchresources|capabilityresources|chaosresources|communitygalleryresources|computeresources|deploymentresources|desktopvirtualizationresources|dnsresources|edgeorderresources|elasticsanresources|extendedlocationresources|featureresources|guestconfigurationresources|healthresources|impactreportresources|insightresources|iotsecurityresources|kubernetesconfigurationresources|kustoresources|maintenanceresources|managedserviceresources|mirgateresources|networkresources|orbitalresources|patchassessmentresources|patchinstallationresources|policyresources|recoveryservicesresources|securityresources|servicefabricresources|servicehealthresources|sportresources|tagresources|insightsresources|managedservicesresources|migrateresources|spotresources|supportresources|tagsresources|resources|resourcecontainers)\\b"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.kql",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.kql",
+              "match": "\\\\."
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.single.kql",
+          "begin": "'",
+          "end": "'",
+          "patterns": [
+            {
+              "name": "constant.character.escape.kql",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.kql",
+          "match": "\\b([0-9]+\\.?[0-9]*([eE][+-]?[0-9]+)?[fdm]?)\\b"
+        },
+        {
+          "name": "constant.numeric.hex.kql",
+          "match": "\\b0[xX][0-9a-fA-F]+\\b"
+        }
+      ]
+    },
+    "properties": {
+      "patterns": [
+        {
+          "name": "variable.other.property.kql",
+          "match": "(?i)\\b(id|name|type|kind|location|resourceGroup|subscriptionId|managedBy|sku|plan|properties|tags|tenantId|identity|zones|extendedLocation)\\b"
+        },
+        {
+          "name": "variable.other.property.dot.kql",
+          "match": "\\.[a-zA-Z_][a-zA-Z0-9_]*"
+        }
+      ]
+    }
+  }
+}

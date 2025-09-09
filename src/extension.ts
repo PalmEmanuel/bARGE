@@ -4,6 +4,8 @@ import * as vscode from 'vscode';
 import { AzureService } from './azure/azureService';
 import { BargePanel } from './bargePanel';
 import { StatusBarManager } from './statusBar';
+import { KQLCompletionProvider } from './kqlCompletionProvider';
+import { KQLHoverProvider } from './kqlHoverProvider';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -163,6 +165,28 @@ export function activate(context: vscode.ExtensionContext) {
 		authenticateCommand,
 		statusBar // Add status bar for proper cleanup
 	);
+
+	// Register KQL completion provider for .kql files
+	const kqlCompletionProvider = new KQLCompletionProvider();
+	const completionProviderDisposable = vscode.languages.registerCompletionItemProvider(
+		{ scheme: 'file', language: 'kql' },
+		kqlCompletionProvider,
+		'.', // Trigger on dot for property access
+		'|', // Trigger on pipe for operators
+		' ', // Trigger on space for general completions
+		'=', // Trigger on equals for comparisons
+		"'", // Trigger on quote for string values
+		'"'  // Trigger on double quote for string values
+	);
+	
+	// Register KQL hover provider for .kql files
+	const kqlHoverProvider = new KQLHoverProvider();
+	const hoverProviderDisposable = vscode.languages.registerHoverProvider(
+		{ scheme: 'file', language: 'kql' },
+		kqlHoverProvider
+	);
+	
+	context.subscriptions.push(completionProviderDisposable, hoverProviderDisposable);
 
 	// Auto-authenticate if configured
 	const config = vscode.workspace.getConfiguration('barge');
