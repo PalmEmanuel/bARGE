@@ -132,7 +132,7 @@ jobs:
 
       - name: Publish to VS Code Marketplace
         shell: pwsh
-        run: |
+        run: | # powershell
           $Parameters = @(
             # The --azure-credential option relies on DefaultAzureCredential (and we're logged into Azure CLI using OIDC)
             '--azure-credential'
@@ -156,7 +156,7 @@ jobs:
       - name: Get built VSIX filename
         id: vsix-file
         shell: pwsh
-        run: |
+        run: | # powershell
           $vsixFile = Get-ChildItem -Path . -Filter "*.vsix" | Select-Object -First 1
           echo "filename=$($vsixFile.Name)" >> $env:GITHUB_OUTPUT
           Write-Host "Found VSIX file: $($vsixFile.Name)"
