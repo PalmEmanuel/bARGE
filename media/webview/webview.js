@@ -55,11 +55,11 @@ function formatCellValue(cell) {
     };
 }
 
-function displayResults(result) {
+function displayResults(result, preserveDetailsPane = false) {
     currentResults = result;
 
-    // Close details pane when new query results are displayed
-    if (selectedDetailRowIndices.length > 0) {
+    // Close details pane when new query results are displayed, unless preserving it
+    if (!preserveDetailsPane && selectedDetailRowIndices.length > 0) {
         closeDetails();
     }
 
@@ -1865,8 +1865,11 @@ function reorderColumn(fromIndex, toIndex) {
     // Clear selection since column indices have changed
     clearSelection();
 
-    // Re-render the table
-    displayResults(currentResults);
+    // Re-render the table but preserve the details pane
+    displayResults(currentResults, true);
+    
+    // Update details panel content to reflect new column order
+    updateDetailsAfterSort();
 }
 
 function displayError(error, errorDetails) {
@@ -2366,6 +2369,26 @@ function generateComparisonView(rowIndices) {
         Object.keys(row).forEach(key => allProperties.add(key));
     });
 
+    // Use table column order instead of alphabetical sorting
+    // This maintains consistency with the main table and preserves KQL project order
+    const orderedProperties = [];
+    
+    // First, add properties in the order they appear in the table columns
+    if (currentResults && currentResults.columns) {
+        currentResults.columns.forEach(col => {
+            if (allProperties.has(col.name)) {
+                orderedProperties.push(col.name);
+            }
+        });
+    }
+    
+    // Then add any remaining properties that aren't in the table columns (edge case)
+    Array.from(allProperties).forEach(property => {
+        if (!orderedProperties.includes(property)) {
+            orderedProperties.push(property);
+        }
+    });
+
     let html = '<div class="comparison-viewer">';
     html += '<table class="comparison-table">';
     html += '<thead><tr>';
@@ -2383,7 +2406,7 @@ function generateComparisonView(rowIndices) {
     html += '</tr></thead><tbody>';
 
     // Create a row for each property
-    Array.from(allProperties).sort().forEach(property => {
+    orderedProperties.forEach(property => {
         html += '<tr class="property-row">';
 
         // Get values for this property across all selected rows
@@ -2447,6 +2470,29 @@ function generateComparisonView(rowIndices) {
 
     html += '</tbody></table></div>';
     return html;
+}
+
+function updateComparisonViewAfterColumnReorder() {
+    // Check if the comparison view is currently open
+    const detailsContent = document.getElementById('detailsContent');
+    if (!detailsContent || !detailsContent.classList.contains('comparison-view')) {
+        return; // Comparison view is not open, nothing to update
+    }
+    
+    // Check if we have selected rows for comparison
+    if (!selectedDetailRowIndices || selectedDetailRowIndices.length === 0) {
+        return; // No rows selected for comparison
+    }
+    
+    // Regenerate the comparison view with the new column order
+    const comparisonHtml = generateComparisonView(selectedDetailRowIndices);
+    detailsContent.innerHTML = comparisonHtml;
+    
+    // Re-initialize column resizing for the updated comparison table
+    initializeComparisonColumnResizing();
+    
+    // Re-initialize context menu for the updated content
+    initializeDetailsContextMenu();
 }
 
 function initializeComparisonColumnResizing() {

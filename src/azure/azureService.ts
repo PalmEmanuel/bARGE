@@ -534,13 +534,21 @@ export class AzureService {
             return { columns: [], rows: [] };
         }
 
-        // Get all unique property names from all objects
-        const allKeys = new Set<string>();
+        // Preserve column order from the first object (like Azure Portal ARG Explorer)
+        // This maintains the order specified in KQL project statements
+        const firstObjectKeys = Object.keys(objects[0]);
+        
+        // Get all unique property names from all objects, but maintain order from first object
+        const allKeys = new Set<string>(firstObjectKeys);
         objects.forEach(obj => {
             Object.keys(obj).forEach(key => allKeys.add(key));
         });
 
-        const columnNames = Array.from(allKeys).sort();
+        // Create column names array preserving the order from first object, then append any additional columns
+        const columnNames = [
+            ...firstObjectKeys,
+            ...Array.from(allKeys).filter(key => !firstObjectKeys.includes(key))
+        ];
 
         // Create column definitions
         const columns = columnNames.map(name => ({
