@@ -31,6 +31,12 @@ Always reference these instructions first and fallback to search or bash command
 - Create VSIX package: `vsce package --no-yarn` -- takes 6 seconds.
 - **NOTE**: May need to update `engines.vscode` version to match `@types/vscode` version if packaging fails.
 
+### Schema Generation
+
+In the file `scripts/generate-arg-schema.js`, a schema is generated for the Azure Resource Graph, used for IntelliSense and hover information.
+
+There must be no hard-coded table names, resource types or properties in the source code or the generation script. All schema data must come from the generated schema file at `src/schema/arg-schema.json` which is regularly updated.
+
 ## Validation Scenarios
 
 After making changes, ALWAYS perform these validation steps:
