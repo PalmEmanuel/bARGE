@@ -9,6 +9,8 @@ bARGE is a Visual Studio Code extension that brings Azure Resource Graph queryin
 ## Features
 
 - **Run KQL Queries**: Execute Kusto Query Language (KQL) queries against Azure Resource Graph directly from VS Code.
+- **Enhanced KQL Language Support**: Comprehensive syntax highlighting, intelligent completions, hover documentation, and signature help for KQL.
+- **Dynamic Schema Generation**: Automatic schema updates from Azure Resource Graph API with detailed resource type information.
 - **Results Panel**: View query results in a dedicated panel with sortable and resizable columns.
 - **Comparison**: Select two or more rows for comparison to see differences in their properties.
 - **Copy & Export**: Easily copy selected cells as formatted text or for Excel, or export entire results to CSV for further analysis.
@@ -84,6 +86,16 @@ The extension supports the following configuration options in VS Code settings:
 The default keybindings for executing queries are also possible to change.
 
 ## Development
+
+### Schema Generation
+
+bARGE includes automated Azure Resource Graph schema generation for enhanced language support:
+
+- **API-driven Updates**: Fetches current schema directly from Azure Resource Graph API
+- **Weekly Automation**: GitHub workflow updates schema weekly with new Azure resources
+- **Enhanced Completions**: Context-aware IntelliSense based on real Azure schema data
+
+See [AZURE_SCHEMA_GENERATION.md](AZURE_SCHEMA_GENERATION.md) for detailed documentation.
 
 ### Building from Source
 

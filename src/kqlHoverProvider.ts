@@ -3,10 +3,32 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 interface ARGSchema {
-    tables: Record<string, any>;
-    resourceTypes: Record<string, any>;
-    operators: Array<{ name: string; description: string; category: string; }>;
-    functions: Array<{ name: string; description: string; category: string; }>;
+    tables: Record<string, {
+        name: string;
+        description: string;
+        resourceTypes: string[];
+        examples?: string[];
+    }>;
+    resourceTypes: Record<string, {
+        table: string;
+        type: string;
+    }>;
+    operators: Array<{
+        name: string;
+        description: string;
+        category: string;
+        syntax?: string;
+        examples?: string[];
+        displayName?: string;
+        sourceUrl?: string;
+    }>;
+    functions: Array<{
+        name: string;
+        description: string;
+        category: string;
+        syntax?: string;
+        examples?: string[];
+    }>;
 }
 
 export class KQLHoverProvider implements vscode.HoverProvider {
@@ -98,7 +120,8 @@ export class KQLHoverProvider implements vscode.HoverProvider {
             markdown.appendMarkdown(`**Table: \`${tableName}\`**\n\n`);
             markdown.appendMarkdown(`${table.description}\n\n`);
             
-            if (table.resourceTypes && table.resourceTypes.length > 0) {
+            // Skip Resource Types section for the main "resources" table
+            if (tableName.toLowerCase() !== 'resources' && table.resourceTypes && table.resourceTypes.length > 0) {
                 markdown.appendMarkdown(`**Resource Types:**\n`);
                 const displayTypes = table.resourceTypes.slice(0, 5); // Show first 5
                 displayTypes.forEach((type: string) => {
@@ -110,7 +133,13 @@ export class KQLHoverProvider implements vscode.HoverProvider {
                 markdown.appendMarkdown('\n');
             }
 
-            markdown.appendMarkdown(`**Example:**\n\`\`\`kql\n${tableName}\n| where type == 'microsoft.compute/virtualmachines'\n| project name, location\n| limit 10\n\`\`\``);
+            // Use real examples from the schema if available
+            if (table.examples && table.examples.length > 0) {
+                markdown.appendMarkdown(`**Example:**\n\`\`\`kql\n${table.examples[0]}\n\`\`\``);
+            } else {
+                // Fallback generic example only if no real examples exist
+                markdown.appendMarkdown(`**Example:**\n\`\`\`kql\n${tableName}\n| take 10\n\`\`\``);
+            }
             return markdown;
         }
 
@@ -123,10 +152,14 @@ export class KQLHoverProvider implements vscode.HoverProvider {
             markdown.appendMarkdown(`*${operator.category}*\n\n`);
             markdown.appendMarkdown(`${operator.description}\n\n`);
             
-            // Add usage examples based on operator
-            const example = this.getOperatorExample(operator.name);
-            if (example) {
-                markdown.appendMarkdown(`**Example:**\n\`\`\`kql\n${example}\n\`\`\``);
+            // Use real examples from the schema if available
+            if ((operator as any).examples && (operator as any).examples.length > 0) {
+                markdown.appendMarkdown(`**Example:**\n\`\`\`kql\n${(operator as any).examples[0]}\n\`\`\``);
+            } else if ((operator as any).syntax) {
+                markdown.appendMarkdown(`**Syntax:**\n\`\`\`kql\n${(operator as any).syntax}\n\`\`\``);
+            } else {
+                // Fallback to minimal example only if no schema examples exist
+                markdown.appendMarkdown(`**Usage:**\n\`\`\`kql\n... | ${operator.name} ...\n\`\`\``);
             }
             
             return markdown;
@@ -141,10 +174,14 @@ export class KQLHoverProvider implements vscode.HoverProvider {
             markdown.appendMarkdown(`*${func.category}*\n\n`);
             markdown.appendMarkdown(`${func.description}\n\n`);
             
-            // Add usage examples based on function
-            const example = this.getFunctionExample(func.name);
-            if (example) {
-                markdown.appendMarkdown(`**Example:**\n\`\`\`kql\n${example}\n\`\`\``);
+            // Use real examples from the schema if available
+            if ((func as any).examples && (func as any).examples.length > 0) {
+                markdown.appendMarkdown(`**Example:**\n\`\`\`kql\n${(func as any).examples[0]}\n\`\`\``);
+            } else if ((func as any).syntax) {
+                markdown.appendMarkdown(`**Syntax:**\n\`\`\`kql\n${(func as any).syntax}\n\`\`\``);
+            } else {
+                // Fallback to minimal example only if no schema examples exist
+                markdown.appendMarkdown(`**Usage:**\n\`\`\`kql\n${func.name}()\n\`\`\``);
             }
             
             return markdown;
@@ -158,7 +195,16 @@ export class KQLHoverProvider implements vscode.HoverProvider {
                 markdown.isTrusted = true;
                 markdown.appendMarkdown(`**Resource Type: \`${word}\`**\n\n`);
                 markdown.appendMarkdown(`**Table:** \`${resourceType.table}\`\n\n`);
-                markdown.appendMarkdown(`**Example:**\n\`\`\`kql\nResources\n| where type == '${word}'\n| project name, location, properties\n\`\`\``);
+                
+                // Use table examples if available, otherwise show minimal usage
+                const tableInfo = this.schema.tables[resourceType.table];
+                if (tableInfo && tableInfo.examples && tableInfo.examples.length > 0) {
+                    // Find an example that uses this resource type, or use the first example
+                    const relevantExample = tableInfo.examples.find(ex => ex.includes(word)) || tableInfo.examples[0];
+                    markdown.appendMarkdown(`**Example:**\n\`\`\`kql\n${relevantExample}\n\`\`\``);
+                } else {
+                    markdown.appendMarkdown(`**Usage:**\n\`\`\`kql\n${resourceType.table}\n| where type == '${word}'\n\`\`\``);
+                }
                 return markdown;
             }
         }
@@ -168,55 +214,5 @@ export class KQLHoverProvider implements vscode.HoverProvider {
 
     private isInResourceTypeContext(line: string): boolean {
         return /type\s*(==|=~)\s*['"]/i.test(line);
-    }
-
-    private getOperatorExample(operatorName: string): string | null {
-        const examples: Record<string, string> = {
-            'where': 'Resources\n| where type == \'microsoft.compute/virtualmachines\'\n| where location =~ \'eastus\'',
-            'project': 'Resources\n| project name, location, resourceGroup',
-            'summarize': 'Resources\n| summarize count() by type, location',
-            'join': 'Resources\n| join kind=inner (\n    ResourceContainers\n    | where type == \'microsoft.resources/subscriptions\'\n) on subscriptionId',
-            'extend': 'Resources\n| extend resourceAge = datetime_diff(\'day\', now(), todatetime(properties.timeCreated))',
-            'order': 'Resources\n| order by name asc',
-            'sort': 'Resources\n| sort by name desc',
-            'limit': 'Resources\n| limit 100',
-            'take': 'Resources\n| take 50',
-            'top': 'Resources\n| top 10 by name',
-            'distinct': 'Resources\n| distinct type',
-            'count': 'Resources\n| count',
-            'union': 'Resources\n| union SecurityResources',
-            'mv-expand': 'Resources\n| mv-expand tags\n| project name, tagKey = tags.key, tagValue = tags.value'
-        };
-
-        return examples[operatorName.toLowerCase()] || null;
-    }
-
-    private getFunctionExample(functionName: string): string | null {
-        const examples: Record<string, string> = {
-            'tostring': 'Resources\n| extend idString = tostring(id)',
-            'toint': 'Resources\n| extend priority = toint(properties.priority)',
-            'tobool': 'Resources\n| extend isEnabled = tobool(properties.enabled)',
-            'contains': 'Resources\n| where name contains \'prod\'',
-            'startswith': 'Resources\n| where name startswith \'web-\'',
-            'endswith': 'Resources\n| where name endswith \'-prod\'',
-            'isnotnull': 'Resources\n| where isnotnull(properties.ipAddress)',
-            'isnull': 'Resources\n| where isnull(managedBy)',
-            'count': 'Resources\n| summarize totalResources = count()',
-            'dcount': 'Resources\n| summarize uniqueTypes = dcount(type)',
-            'sum': 'Resources\n| summarize totalSize = sum(properties.sizeInGB)',
-            'avg': 'Resources\n| summarize avgSize = avg(properties.sizeInGB)',
-            'min': 'Resources\n| summarize oldestCreated = min(properties.timeCreated)',
-            'max': 'Resources\n| summarize newestCreated = max(properties.timeCreated)',
-            'make_set': 'Resources\n| summarize allLocations = make_set(location) by resourceGroup',
-            'make_list': 'Resources\n| summarize allNames = make_list(name) by type',
-            'strcat': 'Resources\n| extend fullName = strcat(resourceGroup, \'/\', name)',
-            'split': 'Resources\n| extend nameParts = split(name, \'-\')',
-            'tolower': 'Resources\n| extend lowerName = tolower(name)',
-            'toupper': 'Resources\n| extend upperLocation = toupper(location)',
-            'now': 'Resources\n| extend currentTime = now()',
-            'ago': 'Resources\n| where properties.timeCreated > ago(30d)'
-        };
-
-        return examples[functionName.toLowerCase()] || null;
     }
 }
