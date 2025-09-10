@@ -2,7 +2,6 @@ const esbuild = require("esbuild");
 const fs = require('fs');
 const path = require('path');
 
-const production = process.argv.includes('--production');
 const watch = process.argv.includes('--watch');
 
 /**
@@ -68,8 +67,8 @@ async function main() {
 		],
 		bundle: true,
 		format: 'cjs',
-		minify: production,
-		sourcemap: !production,
+		minify: true,
+		sourcemap: false,
 		sourcesContent: false,
 		platform: 'node',
 		outfile: 'dist/extension.js',

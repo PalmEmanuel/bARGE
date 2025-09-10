@@ -8,6 +8,12 @@
  * - https://learn.microsoft.com/en-us/azure/governance/resource-graph/reference/supported-tables-resources - Get all tables
  * - https://learn.microsoft.com/en-us/azure/governance/resource-graph/concepts/query-language - Find all operators and links to their pages
  * - https://learn.microsoft.com/en-us/azure/governance/resource-graph/samples/samples-by-category - Get sample queries for all tables
+ * 
+ * Usage:
+ *   node generate-arg-schema.js                     # Full generation from documentation
+ *   node generate-arg-schema.js <bearer-token>      # Full generation using Azure API
+ *   node generate-arg-schema.js --examples-only     # Only refresh examples (faster)
+ *   node generate-arg-schema.js -e                  # Short form for examples-only
  */
 
 const https = require('https');
@@ -99,45 +105,50 @@ class ARGSchemaGenerator {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    async generateSchema() {
-        console.log('🔍 Starting dynamic Azure Resource Graph schema generation...');
+    async generateExamplesOnly() {
+        console.log('📚 Examples-only mode: Loading existing schema and refreshing examples...');
         
         try {
-            // Step 1: Parse all tables from the tables documentation
-            console.log('\n📋 Step 1: Parsing ARG tables...');
-            const tablesDoc = await this.fetchUrl(
-                'https://learn.microsoft.com/en-us/azure/governance/resource-graph/reference/supported-tables-resources'
-            );
-            await this.parseTables(tablesDoc);
+            // Step 1: Load existing schema
+            console.log('\n📂 Step 1: Loading existing schema files...');
+            await this.loadExistingSchema();
             
-            // Step 2: Parse operators from query language documentation
-            console.log('\n🔧 Step 2: Discovering KQL operators...');
-            const queryDoc = await this.fetchUrl(
-                'https://learn.microsoft.com/en-us/azure/governance/resource-graph/concepts/query-language'
-            );
-            const operatorLinks = await this.extractOperatorLinks(queryDoc);
-            
-            // Step 3: Fetch detailed information for each operator
-            console.log('\n� Step 3: Fetching operator definitions...');
-            await this.fetchOperatorDefinitions(operatorLinks);
-            
-            // Step 4: Extract functions dynamically
-            console.log('\n🔧 Step 4: Discovering KQL functions...');
-            await this.extractFunctions(queryDoc);
-            
-            // Step 5: Fetch and match sample queries to tables
-            console.log('\n📚 Step 5: Fetching sample queries...');
+            // Step 2: Fetch and match sample queries to tables
+            console.log('\n📚 Step 2: Fetching sample queries...');
             await this.fetchAndMatchSampleQueries();
             
-            // Step 6: Generate schema files
-            console.log('\n💾 Step 6: Writing schema files...');
+            // Step 3: Generate schema files with updated examples
+            console.log('\n💾 Step 3: Writing updated schema files...');
             await this.writeSchemaFiles();
             
-            console.log('\n✅ Dynamic schema generation complete!');
+            console.log('\n✅ Examples refresh complete!');
             this.printSummary();
             
         } catch (error) {
-            console.error('❌ Error generating schema:', error);
+            console.error('❌ Error refreshing examples:', error);
+            throw error;
+        }
+    }
+
+    async loadExistingSchema() {
+        const fs = require('fs').promises;
+        const outputDir = path.join(__dirname, '..', 'src', 'schema');
+        const schemaPath = path.join(outputDir, 'arg-schema.json');
+        
+        try {
+            console.log(`📂 Loading existing schema from: ${schemaPath}`);
+            const schemaContent = await fs.readFile(schemaPath, 'utf8');
+            this.schema = JSON.parse(schemaContent);
+            
+            console.log(`✅ Loaded existing schema with:`);
+            console.log(`   Tables: ${Object.keys(this.schema.tables).length}`);
+            console.log(`   Resource Types: ${Object.keys(this.schema.resourceTypes).length}`);
+            console.log(`   Operators: ${this.schema.operators.length}`);
+            console.log(`   Functions: ${this.schema.functions.length}`);
+            
+        } catch (error) {
+            console.error('❌ Failed to load existing schema:', error.message);
+            console.log('💡 Hint: Run the full generation first to create the schema files');
             throw error;
         }
     }
@@ -169,16 +180,11 @@ class ARGSchemaGenerator {
             if (tableName && this.isValidTableName(tableName)) {
                 console.log(`  🔍 Found table: ${tableName}`);
                 
-                // Extract description from the section
-                const description = this.extractTableDescription(sectionContent, tableName);
-                
                 // Extract resource types from the section (skip for main "resources" table)
                 let resourceTypes = this.extractResourceTypes(sectionContent);
                 
-                // Create table schema (exclude resourceTypes for main "resources" table)
                 const tableSchema = {
                     name: tableName,
-                    description: description,
                     examples: []
                 };
                 
@@ -369,8 +375,7 @@ class ARGSchemaGenerator {
                     
                     operatorLinks.push({
                         name: operatorName,
-                        url: fullUrl,
-                        displayName: linkText
+                        url: fullUrl
                     });
                     
                     console.log(`  🔗 Found operator: ${operatorName} -> ${fullUrl}`);
@@ -391,8 +396,7 @@ class ARGSchemaGenerator {
                 
                 operatorLinks.push({
                     name: operatorName,
-                    url: fullUrl,
-                    displayName: operatorName
+                    url: fullUrl
                 });
                 
                 console.log(`  � Found additional operator: ${operatorName} -> ${fullUrl}`);
@@ -813,14 +817,20 @@ class ARGSchemaGenerator {
         console.log('🔍 Extracting KQL code snippets...');
         const codeSnippets = [];
         
-        // Look for code blocks in various formats
+        // Look for code blocks in various formats used by Microsoft Learn
         const codeBlockPatterns = [
             // Pattern 1: Standard markdown code blocks
             /```\s*(?:kql|kusto)?\s*(.*?)```/gs,
-            // Pattern 2: HTML pre/code blocks
+            // Pattern 2: HTML pre/code blocks with language classes
             /<(?:pre|code)[^>]*class="[^"]*(?:lang-kql|lang-kusto|highlight)[^"]*"[^>]*>(.*?)<\/(?:pre|code)>/gs,
-            // Pattern 3: Any pre/code block that might contain KQL
-            /<(?:pre|code)[^>]*>(.*?)<\/(?:pre|code)>/gs
+            // Pattern 3: Microsoft Learn code blocks
+            /<code[^>]*data-lang="(?:kql|kusto)"[^>]*>(.*?)<\/code>/gs,
+            // Pattern 4: Div-based code blocks
+            /<div[^>]*class="[^"]*(?:code|highlight)[^"]*"[^>]*>.*?<code[^>]*>(.*?)<\/code>.*?<\/div>/gs,
+            // Pattern 5: Any pre/code block (broader catch)
+            /<(?:pre|code)[^>]*>(.*?)<\/(?:pre|code)>/gs,
+            // Pattern 6: Script tag code blocks (sometimes used for syntax highlighting)
+            /<script[^>]*type="application\/json"[^>]*data-lang="(?:kql|kusto)"[^>]*>(.*?)<\/script>/gs
         ];
         
         for (const pattern of codeBlockPatterns) {
@@ -830,8 +840,11 @@ class ARGSchemaGenerator {
                 const cleanCode = this.cleanCodeSnippet(rawCode);
                 
                 if (cleanCode && this.isKQLQuery(cleanCode)) {
-                    codeSnippets.push(cleanCode);
-                    console.log(`  ✅ Found KQL snippet (${cleanCode.length} chars)`);
+                    // Avoid duplicates
+                    if (!codeSnippets.some(existing => existing.trim() === cleanCode.trim())) {
+                        codeSnippets.push(cleanCode);
+                        console.log(`  ✅ Found KQL snippet (${cleanCode.length} chars): ${cleanCode.substring(0, 50)}...`);
+                    }
                 }
             }
         }
@@ -873,21 +886,36 @@ class ARGSchemaGenerator {
             return false; 
         }
         
+        // Remove comments and whitespace for analysis
+        const cleanCode = code.replace(/\/\/.*$/gm, '').trim();
+        if (cleanCode.length < 3) {
+            return false;
+        }
+        
         // Check for KQL characteristics
         const hasTableNames = Object.keys(this.schema.tables).some(table => 
-            new RegExp(`\\b${table}\\b`, 'i').test(code)
+            new RegExp(`\\b${table}\\b`, 'i').test(cleanCode)
         );
         
-        const hasOperators = this.schema.operators.some(op => 
-            new RegExp(`\\b${op.name}\\b`, 'i').test(code)
-        );
+        const hasOperators = this.schema.operators.length > 0 ? 
+            this.schema.operators.some(op => 
+                new RegExp(`\\b${op.name}\\b`, 'i').test(cleanCode)
+            ) : false;
         
-        const hasPipeOperator = code.includes('|');
-
-        return (hasTableNames || hasOperators || hasPipeOperator) && 
-               !code.includes('curl') && 
-               !code.includes('http://') && 
-               !code.includes('https://');
+        const hasPipeOperator = cleanCode.includes('|');
+        
+        // Check for common KQL operators even if not yet in schema
+        const hasCommonKQLOperators = /\b(where|project|extend|summarize|join|union|sort|take|limit|count|distinct)\b/i.test(cleanCode);
+        
+        // Check for obvious non-KQL content
+        const isNotKQL = /\b(curl|wget|http:\/\/|https:\/\/|<html|<script|SELECT\s+.*\s+FROM|INSERT\s+INTO|UPDATE\s+.*\s+SET)\b/i.test(cleanCode);
+        
+        if (isNotKQL) {
+            return false;
+        }
+        
+        // A snippet is likely KQL if it has any of these characteristics
+        return hasTableNames || hasOperators || hasPipeOperator || hasCommonKQLOperators;
     }
 
     matchSnippetsToTables(codeSnippets) {
@@ -1065,27 +1093,23 @@ class ARGSchemaGenerator {
             tables: Object.keys(this.schema.tables).map(name => ({
                 label: name,
                 kind: 'Table',
-                detail: this.schema.tables[name].description,
                 insertText: name
             })),
             operators: this.schema.operators.map(op => ({
                 label: op.name,
                 kind: 'Keyword',
-                detail: op.description,
                 insertText: op.name,
                 category: op.category
             })),
             functions: this.schema.functions.map(fn => ({
                 label: fn.name,
                 kind: 'Function',
-                detail: fn.description,
                 insertText: `${fn.name}()`,
                 category: fn.category
             })),
             resourceTypes: Object.keys(this.schema.resourceTypes).map(type => ({
                 label: type,
                 kind: 'Value',
-                detail: `Resource type in ${this.schema.resourceTypes[type].table} table`,
                 insertText: `'${type}'`
             })),
             properties: this.generatePropertyCompletions()
@@ -1104,36 +1128,6 @@ class ARGSchemaGenerator {
         const properties = [];
         const allPropertyNames = new Set();
         
-        // Add standard Azure resource properties
-        const standardProperties = [
-            { name: 'id', type: 'string', description: 'Resource ID' },
-            { name: 'name', type: 'string', description: 'Resource name' },
-            { name: 'type', type: 'string', description: 'Resource type' },
-            { name: 'kind', type: 'string', description: 'Resource kind' },
-            { name: 'location', type: 'string', description: 'Resource location' },
-            { name: 'resourceGroup', type: 'string', description: 'Resource group name' },
-            { name: 'subscriptionId', type: 'string', description: 'Subscription ID' },
-            { name: 'tenantId', type: 'string', description: 'Tenant ID' },
-            { name: 'managedBy', type: 'string', description: 'Managed by resource ID' },
-            { name: 'sku', type: 'object', description: 'Resource SKU' },
-            { name: 'plan', type: 'object', description: 'Resource plan' },
-            { name: 'properties', type: 'object', description: 'Resource properties' },
-            { name: 'tags', type: 'object', description: 'Resource tags' },
-            { name: 'identity', type: 'object', description: 'Resource identity' },
-            { name: 'zones', type: 'array', description: 'Availability zones' },
-            { name: 'extendedLocation', type: 'object', description: 'Extended location' }
-        ];
-
-        standardProperties.forEach(prop => {
-            properties.push({
-                label: prop.name,
-                kind: 'Property',
-                detail: `${prop.type}: ${prop.description}`,
-                insertText: prop.name
-            });
-            allPropertyNames.add(prop.name);
-        });
-
         // Add properties from detailed schema if available
         if (this.schema.resourceTypeProperties) {
             for (const [resourceType, resourceProps] of Object.entries(this.schema.resourceTypeProperties)) {
@@ -1142,7 +1136,6 @@ class ARGSchemaGenerator {
                         properties.push({
                             label: propName,
                             kind: 'Property',
-                            detail: `${propInfo.type || 'unknown'}: ${propInfo.description || `Property from ${resourceType}`}`,
                             insertText: propName,
                             resourceType: resourceType
                         });
@@ -1159,7 +1152,6 @@ class ARGSchemaGenerator {
                             properties.push({
                                 label: propName,
                                 kind: 'Property',
-                                detail: `Property from ${resourceType}`,
                                 insertText: propName,
                                 resourceType: resourceType
                             });
@@ -1190,14 +1182,8 @@ class ARGSchemaGenerator {
         const functions = this.schema.functions.map(fn => fn.name).filter(name => name).join('|');
         const tables = Object.keys(this.schema.tables).filter(name => name).join('|');
         
-        // Extract common properties from all sources
+        // Extract common properties from schema data only
         const allProperties = new Set();
-        
-        // Add standard Azure resource properties
-        ['id', 'name', 'type', 'kind', 'location', 'resourceGroup', 'subscriptionId', 'tenantId', 
-         'managedBy', 'sku', 'plan', 'properties', 'tags', 'identity', 'zones', 'extendedLocation'].forEach(prop => {
-            allProperties.add(prop);
-        });
         
         // Add properties from detailed schema if available
         if (this.schema.resourceTypeProperties) {
@@ -1358,7 +1344,7 @@ class ARGSchemaGenerator {
                     "patterns": [
                         {
                             "name": "variable.other.property.kql",
-                            "match": properties ? `(?i)\\b(${properties})\\b` : "(?i)\\b(id|name|type|location)\\b"
+                            "match": properties ? `(?i)\\b(${properties})\\b` : "(?i)\\b[a-zA-Z_][a-zA-Z0-9_]*\\b"
                         },
                         {
                             "name": "variable.other.property.dot.kql",
@@ -1603,52 +1589,6 @@ class ARGSchemaGenerator {
     }
 
     /**
-     * Parse the Azure API schema response into our internal format
-     * @deprecated - replaced by fetchDetailedSchemas
-     */
-    parseAzureSchemaResponse(schemaData) {
-        console.log('📊 Parsing Azure schema response...');
-        
-        const tables = {};
-        const resourceTypes = {};
-        
-        // The API returns table names as keys with arrays of resource types as values
-        for (const [tableName, resourceTypeArray] of Object.entries(schemaData)) {
-            console.log(`📋 Processing table: ${tableName} with ${resourceTypeArray.length} resource types`);
-            
-            // Create table entry
-            tables[tableName.toLowerCase()] = {
-                name: tableName,
-                displayName: this.formatTableDisplayName(tableName),
-                description: `${this.formatTableDisplayName(tableName)} table from Azure Resource Graph`,
-                category: 'Azure Resource Graph',
-                columns: {}, // Will be empty since API doesn't provide column details
-                resourceTypes: resourceTypeArray,
-                sampleQueries: []
-            };
-
-            // Process resource types for this table
-            for (const resourceType of resourceTypeArray) {
-                // Track resource types globally
-                if (!resourceTypes[resourceType]) {
-                    resourceTypes[resourceType] = {
-                        name: resourceType,
-                        displayName: resourceType,
-                        description: `${resourceType} resource type`,
-                        tables: []
-                    };
-                }
-                resourceTypes[resourceType].tables.push(tableName.toLowerCase());
-            }
-
-            console.log(`  ✅ Processed table '${tableName}' with ${resourceTypeArray.length} resource types`);
-        }
-
-        console.log(`🎯 Successfully parsed ${Object.keys(tables).length} tables and ${Object.keys(resourceTypes).length} resource types`);
-        return { tables, resourceTypes };
-    }
-
-    /**
      * Format table name for display (e.g., "advisorresources" -> "Advisor Resources")
      */
     formatTableDisplayName(tableName) {
@@ -1761,28 +1701,50 @@ class ARGSchemaGenerator {
 if (require.main === module) {
     const generator = new ARGSchemaGenerator();
     
-    // Check if bearer token is provided as command line argument
-    const bearerToken = process.argv[2];
+    // Parse command line arguments
+    const args = process.argv.slice(2);
+    const examplesOnly = args.includes('--examples-only') || args.includes('-e');
+    const showHelp = args.includes('--help') || args.includes('-h');
+    const bearerToken = args.find(arg => !arg.startsWith('--') && !arg.startsWith('-'));
     
-    if (bearerToken && bearerToken.startsWith('Bearer ')) {
+    if (showHelp) {
+        console.log(`
+Azure Resource Graph Schema Generator
+
+Usage:
+  node generate-arg-schema.js                     # Full generation from documentation
+  node generate-arg-schema.js <bearer-token>      # Full generation using Azure API
+  node generate-arg-schema.js --examples-only     # Only refresh examples (faster)
+  node generate-arg-schema.js -e                  # Short form for examples-only
+  node generate-arg-schema.js --help              # Show this help
+
+Options:
+  --examples-only, -e    Load existing schema and only refresh examples
+  --help, -h            Show this help message
+
+Examples:
+  node generate-arg-schema.js --examples-only
+  node generate-arg-schema.js eyJ0eXAiOiJKV1QiLCJhbGc...
+        `);
+    } else if (examplesOnly) {
+        console.log('📚 Examples-only mode: Loading existing schema and refreshing examples...');
+        generator.generateExamplesOnly().catch(console.error);
+    } else if (bearerToken && bearerToken.startsWith('Bearer ')) {
         console.log('🔑 Using provided bearer token for API-based generation...');
         generator.generateSchemaFromAPI(bearerToken.substring(7)).then(success => {
             if (!success) {
-                console.log('🔄 Falling back to documentation-based generation...');
-                generator.generateSchema().catch(console.error);
+                throw new Error('API-based schema generation failed.');
             }
         }).catch(console.error);
     } else if (bearerToken) {
         console.log('🔑 Using provided bearer token for API-based generation...');
         generator.generateSchemaFromAPI(bearerToken).then(success => {
             if (!success) {
-                console.log('🔄 Falling back to documentation-based generation...');
-                generator.generateSchema().catch(console.error);
+                throw new Error('API-based schema generation failed.');
             }
         }).catch(console.error);
     } else {
-        console.log('📚 No bearer token provided, using documentation-based generation...');
-        generator.generateSchema().catch(console.error);
+        throw new Error('API-based generation requires a valid bearer token. Use --help for usage details.');
     }
 }
 
