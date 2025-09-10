@@ -135,10 +135,12 @@ export class KQLHoverProvider implements vscode.HoverProvider {
 
             // Use real examples from the schema if available
             if (table.examples && table.examples.length > 0) {
-                markdown.appendMarkdown(`**Example:**\n\`\`\`kql\n${table.examples[0]}\n\`\`\``);
-            } else {
-                // Fallback generic example only if no real examples exist
-                markdown.appendMarkdown(`**Example:**\n\`\`\`kql\n${tableName}\n| take 10\n\`\`\``);
+                const exampleLabel = table.examples.length === 1 ? "Example" : "Examples";
+                if (table.examples.length === 1) {
+                    markdown.appendMarkdown(`**${exampleLabel}:**\n\`\`\`kql\n${table.examples[0]}\n\`\`\``);
+                } else {
+                    markdown.appendMarkdown(`**${exampleLabel}:**\n\`\`\`kql\n${table.examples[0]}\n\`\`\`\n\n\`\`\`kql\n${table.examples[1]}\n\`\`\``);
+                }
             }
             return markdown;
         }
@@ -153,13 +155,15 @@ export class KQLHoverProvider implements vscode.HoverProvider {
             markdown.appendMarkdown(`${operator.description}\n\n`);
             
             // Use real examples from the schema if available
-            if ((operator as any).examples && (operator as any).examples.length > 0) {
-                markdown.appendMarkdown(`**Example:**\n\`\`\`kql\n${(operator as any).examples[0]}\n\`\`\``);
-            } else if ((operator as any).syntax) {
-                markdown.appendMarkdown(`**Syntax:**\n\`\`\`kql\n${(operator as any).syntax}\n\`\`\``);
-            } else {
-                // Fallback to minimal example only if no schema examples exist
-                markdown.appendMarkdown(`**Usage:**\n\`\`\`kql\n... | ${operator.name} ...\n\`\`\``);
+            if (operator.examples && operator.examples.length > 0) {
+                const exampleLabel = operator.examples.length === 1 ? "Example" : "Examples";
+                if (operator.examples.length === 1) {
+                    markdown.appendMarkdown(`**${exampleLabel}:**\n\`\`\`kql\n${operator.examples[0]}\n\`\`\``);
+                } else {
+                    markdown.appendMarkdown(`**${exampleLabel}:**\n\`\`\`kql\n${operator.examples[0]}\n\`\`\`\n\n\`\`\`kql\n${operator.examples[1]}\n\`\`\``);
+                }
+            } else if (operator.syntax) {
+                markdown.appendMarkdown(`**Syntax:**\n\`\`\`kql\n${operator.syntax}\n\`\`\``);
             }
             
             return markdown;
@@ -175,13 +179,15 @@ export class KQLHoverProvider implements vscode.HoverProvider {
             markdown.appendMarkdown(`${func.description}\n\n`);
             
             // Use real examples from the schema if available
-            if ((func as any).examples && (func as any).examples.length > 0) {
-                markdown.appendMarkdown(`**Example:**\n\`\`\`kql\n${(func as any).examples[0]}\n\`\`\``);
-            } else if ((func as any).syntax) {
-                markdown.appendMarkdown(`**Syntax:**\n\`\`\`kql\n${(func as any).syntax}\n\`\`\``);
-            } else {
-                // Fallback to minimal example only if no schema examples exist
-                markdown.appendMarkdown(`**Usage:**\n\`\`\`kql\n${func.name}()\n\`\`\``);
+            if (func.examples && func.examples.length > 0) {
+                const exampleLabel = func.examples.length === 1 ? "Example" : "Examples";
+                if (func.examples.length === 1) {
+                    markdown.appendMarkdown(`**${exampleLabel}:**\n\`\`\`kql\n${func.examples[0]}\n\`\`\``);
+                } else {
+                    markdown.appendMarkdown(`**${exampleLabel}:**\n\`\`\`kql\n${func.examples[0]}\n\`\`\`\n\n\`\`\`kql\n${func.examples[1]}\n\`\`\``);
+                }
+            } else if (func.syntax) {
+                markdown.appendMarkdown(`**Syntax:**\n\`\`\`kql\n${func.syntax}\n\`\`\``);
             }
             
             return markdown;
