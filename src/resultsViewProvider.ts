@@ -212,6 +212,21 @@ export class ResultsViewProvider implements vscode.WebviewViewProvider {
         let currentResults = null;
         let sortState = { column: null, direction: null };
 
+        function formatTimestamp(timestamp) {
+            const date = new Date(timestamp);
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            
+            const month = months[date.getMonth()];
+            const day = date.getDate();
+            const year = date.getFullYear();
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            const seconds = date.getSeconds().toString().padStart(2, '0');
+            
+            return \`\${month} \${day}, \${year}, \${hours}:\${minutes}:\${seconds}\`;
+        }
+
         function displayResults(result) {
             currentResults = result;
             const tableContainer = document.getElementById('tableContainer');
@@ -227,7 +242,7 @@ export class ResultsViewProvider implements vscode.WebviewViewProvider {
 
             const executionTimeText = result.executionTimeMs ? 
                 \` • \${result.executionTimeMs}ms\` : '';
-            resultsInfo.textContent = \`\${result.totalRecords} results\${executionTimeText} • \${new Date(result.timestamp).toLocaleString()}\`;
+            resultsInfo.textContent = \`\${result.totalRecords} results\${executionTimeText} • \${formatTimestamp(result.timestamp)}\`;
             exportBtn.style.display = 'block';
             
             let tableHtml = '<table class="results-table"><thead><tr>';
