@@ -16,6 +16,9 @@ export class KustoLanguageServiceProvider implements
     private diagnosticCollection: vscode.DiagnosticCollection;
     private schemaData: any = null;
     private completionData: any = null;
+    private isHovering: boolean = false;
+    private currentHoverWord: string = '';
+    private cachedExamples: Map<string, any[]> = new Map();
 
     constructor() {
         this.diagnosticCollection = vscode.languages.createDiagnosticCollection('kusto-enhanced');
@@ -59,9 +62,6 @@ export class KustoLanguageServiceProvider implements
         }
     }
 
-    /**
-     * Enhanced completion provider with sophisticated KQL syntax understanding
-     */
     async provideCompletionItems(
         document: vscode.TextDocument,
         position: vscode.Position,
@@ -216,10 +216,18 @@ export class KustoLanguageServiceProvider implements
     ): Promise<vscode.Hover | null> {
         const wordRange = document.getWordRangeAtPosition(position);
         if (!wordRange) {
+            // Reset hover state when not on a word
+            this.resetHoverState();
             return null;
         }
 
         const word = document.getText(wordRange);
+        
+        // Reset hover state if we're hovering over a different word
+        if (this.currentHoverWord !== word.toLowerCase()) {
+            this.resetHoverState();
+        }
+        
         const hoverInfo = this.getKQLHoverInfo(word);
 
         if (hoverInfo) {
@@ -227,6 +235,15 @@ export class KustoLanguageServiceProvider implements
         }
 
         return null;
+    }
+
+    /**
+     * Reset hover state for new hover sessions
+     */
+    private resetHoverState(): void {
+        this.isHovering = false;
+        this.currentHoverWord = '';
+        this.cachedExamples.clear();
     }
 
     /**
@@ -406,12 +423,13 @@ export class KustoLanguageServiceProvider implements
     }
 
     /**
-     * Randomly select examples from a table's examples array
+     * Randomly select examples from a table's examples array with hover state tracking
+     * @param tableName Name of the table for cache key
      * @param examples Array of examples (can be strings or objects)
      * @param count Number of examples to select (default: 2)
      * @returns Array of selected examples
      */
-    private selectRandomExamples(examples: any[], count: number = 2): any[] {
+    private selectRandomExamples(tableName: string, examples: any[], count: number = 2): any[] {
         if (!examples || examples.length === 0) {
             return [];
         }
@@ -421,7 +439,14 @@ export class KustoLanguageServiceProvider implements
             return examples;
         }
         
-        // Randomly select examples without duplicates
+        const cacheKey = `${tableName}_${count}`;
+        
+        // If we're already hovering on the same word, return cached examples
+        if (this.isHovering && this.currentHoverWord === tableName && this.cachedExamples.has(cacheKey)) {
+            return this.cachedExamples.get(cacheKey)!;
+        }
+        
+        // New hover session - generate new random examples
         const selected: any[] = [];
         const availableIndices = [...Array(examples.length).keys()];
         
@@ -430,6 +455,11 @@ export class KustoLanguageServiceProvider implements
             const exampleIndex = availableIndices.splice(randomIndex, 1)[0];
             selected.push(examples[exampleIndex]);
         }
+        
+        // Cache the selection and update hover state
+        this.cachedExamples.set(cacheKey, selected);
+        this.isHovering = true;
+        this.currentHoverWord = tableName;
         
         return selected;
     }
@@ -477,26 +507,29 @@ export class KustoLanguageServiceProvider implements
                 if (table) {
                     let hoverContent = `**Table: \`${table.name}\`**\n\n`;
                     
-                    // Add description if available
-                    if (table.description) {
-                        hoverContent += `${table.description}\n\n`;
-                    }
-                    
                     // Add resource types section
                     if (table.name.toLowerCase() === 'resources') {
-                        // Special case for main resources table
-                        hoverContent += `**Resource Types:**\nMost Azure Resource Manager resource types and properties are here.\n\n`;
-                    } else if (table.resourceTypes && table.resourceTypes.length > 0) {
-                        // List specific resource types for specialized tables
-                        hoverContent += `**Resource Types:**\n`;
-                        const displayTypes = table.resourceTypes.slice(0, 5); // Show first 5
-                        displayTypes.forEach((type: string) => {
-                            hoverContent += `- \`${type}\`\n`;
-                        });
-                        if (table.resourceTypes.length > 5) {
-                            hoverContent += `- ... and ${table.resourceTypes.length - 5} more\n`;
+                        // Special case for main resources table - skip description, use resource types info instead
+                        hoverContent += `**Resource Types:**\n\n`;
+                        hoverContent += `Most Azure Resource Manager resource types and properties are here.\n\n`;
+                    } else {
+                        // Add description if available for non-resources tables
+                        if (table.description) {
+                            hoverContent += `${table.description}\n\n`;
                         }
-                        hoverContent += '\n';
+                        
+                        // List specific resource types for specialized tables
+                        if (table.resourceTypes && table.resourceTypes.length > 0) {
+                            hoverContent += `**Resource Types:**\n`;
+                            const displayTypes = table.resourceTypes.slice(0, 5); // Show first 5
+                            displayTypes.forEach((type: string) => {
+                                hoverContent += `- \`${type}\`\n`;
+                            });
+                            if (table.resourceTypes.length > 5) {
+                                hoverContent += `- ... and ${table.resourceTypes.length - 5} more\n`;
+                            }
+                            hoverContent += '\n';
+                        }
                     }
                     
                     // Add examples if available
@@ -511,8 +544,8 @@ export class KustoLanguageServiceProvider implements
                             throw new Error('Invalid example format');
                         };
 
-                        // Randomly select up to 2 examples for variety
-                        const selectedExamples = this.selectRandomExamples(table.examples, 2);
+                        // Randomly select up to 2 examples for variety (with caching for stability)
+                        const selectedExamples = this.selectRandomExamples(table.name, table.examples, 2);
                         
                         // Sort selected examples by length (shorter first)
                         if (selectedExamples.length > 1) {
