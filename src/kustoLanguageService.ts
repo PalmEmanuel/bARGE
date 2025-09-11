@@ -60,7 +60,7 @@ export class KustoLanguageServiceProvider implements
     }
 
     /**
-     * Enhanced completion provider with better KQL syntax understanding
+     * Enhanced completion provider with sophisticated KQL syntax understanding
      */
     async provideCompletionItems(
         document: vscode.TextDocument,
@@ -72,29 +72,138 @@ export class KustoLanguageServiceProvider implements
         const linePrefix = line.substring(0, position.character);
         const currentWord = this.getCurrentWord(linePrefix);
 
-        const completions: vscode.CompletionItem[] = [];
+        // Get contextual suggestions based on sophisticated analysis
+        const suggestions = this.getContextualSuggestions(linePrefix, currentWord);
+        
+        return suggestions;
+    }
 
-        // Enhanced KQL operators
-        if (this.isAfterPipe(linePrefix) || this.isStartOfQuery(linePrefix)) {
-            completions.push(...this.getKQLOperators());
+    /**
+     * Get contextual completion suggestions based on sophisticated KQL syntax analysis
+     */
+    private getContextualSuggestions(linePrefix: string, currentWord: string): vscode.CompletionItem[] {
+        const suggestions: vscode.CompletionItem[] = [];
+        const lowerCurrentWord = currentWord.toLowerCase();
+
+        // At start of line or after pipe - suggest tables and operators
+        if (this.isStartOfStatement(linePrefix)) {
+            suggestions.push(...this.filterCompletionItems(this.getARGTables(), lowerCurrentWord));
+            suggestions.push(...this.filterCompletionItems(this.getKQLOperators(), lowerCurrentWord));
+        }
+        
+        // After pipe - suggest operators
+        else if (this.isAfterPipe(linePrefix)) {
+            suggestions.push(...this.filterCompletionItems(this.getKQLOperators(), lowerCurrentWord));
+        }
+        
+        // In function context - suggest functions
+        else if (this.isInFunctionContext(linePrefix)) {
+            suggestions.push(...this.filterCompletionItems(this.getKQLFunctions(), lowerCurrentWord));
+        }
+        
+        // After 'type ==' or 'type =~' - suggest resource types
+        else if (this.isResourceTypeContext(linePrefix)) {
+            suggestions.push(...this.filterCompletionItems(this.getResourceTypes(), lowerCurrentWord));
+        }
+        
+        // In project, extend, where, or summarize by context - suggest properties and functions
+        else if (this.isPropertyContext(linePrefix)) {
+            suggestions.push(...this.getCommonColumns(lowerCurrentWord));
+            suggestions.push(...this.filterCompletionItems(this.getKQLFunctions(), lowerCurrentWord));
+            suggestions.push(...this.filterCompletionItems(this.getResourceTypes(), lowerCurrentWord));
+        }
+        
+        // Default: suggest common operators and functions
+        else {
+            suggestions.push(...this.filterCompletionItems(this.getKQLOperators(), lowerCurrentWord));
+            suggestions.push(...this.filterCompletionItems(this.getKQLFunctions(), lowerCurrentWord));
+            
+            // Add common column names
+            suggestions.push(...this.getCommonColumns(lowerCurrentWord));
         }
 
-        // Function completions with snippets
-        if (this.isInFunctionContext(linePrefix)) {
-            completions.push(...this.getKQLFunctions());
+        return suggestions;
+    }
+
+    /**
+     * Check if we're at the start of a statement
+     */
+    private isStartOfStatement(linePrefix: string): boolean {
+        const trimmed = linePrefix.trim();
+        return trimmed === '' || /^\s*\/\//.test(linePrefix);
+    }
+
+    /**
+     * Check if we're in a resource type context (after type == or type =~)
+     */
+    private isResourceTypeContext(linePrefix: string): boolean {
+        return /\btype\s*(==|=~)\s*['"]*[a-zA-Z0-9./]*$/i.test(linePrefix);
+    }
+
+    /**
+     * Filter completion items based on current word
+     */
+    private filterCompletionItems(items: vscode.CompletionItem[], filter: string): vscode.CompletionItem[] {
+        if (!filter) {
+            return items;
+        }
+        
+        return items.filter(item => {
+            const label = typeof item.label === 'string' ? item.label : item.label.label;
+            return label.toLowerCase().includes(filter) ||
+                   (item.detail && item.detail.toLowerCase().includes(filter));
+        });
+    }
+
+    /**
+     * Get common column completions
+     */
+    private getCommonColumns(filter: string): vscode.CompletionItem[] {
+        const commonColumns = [
+            { label: 'id', detail: 'Resource ID', insertText: 'id' },
+            { label: 'name', detail: 'Resource name', insertText: 'name' },
+            { label: 'type', detail: 'Resource type', insertText: 'type' },
+            { label: 'location', detail: 'Resource location', insertText: 'location' },
+            { label: 'resourceGroup', detail: 'Resource group', insertText: 'resourceGroup' },
+            { label: 'subscriptionId', detail: 'Subscription ID', insertText: 'subscriptionId' },
+            { label: 'tags', detail: 'Resource tags', insertText: 'tags' },
+            { label: 'properties', detail: 'Resource properties', insertText: 'properties' },
+            { label: 'sku', detail: 'Resource SKU', insertText: 'sku' },
+            { label: 'kind', detail: 'Resource kind', insertText: 'kind' }
+        ];
+
+        const items: vscode.CompletionItem[] = [];
+        for (const column of commonColumns) {
+            if (!filter || column.label.toLowerCase().includes(filter) || 
+                column.detail.toLowerCase().includes(filter)) {
+                const item = new vscode.CompletionItem(column.label, vscode.CompletionItemKind.Property);
+                item.detail = column.detail;
+                item.insertText = column.insertText;
+                item.sortText = `4_${column.label}`;
+                items.push(item);
+            }
         }
 
-        // Enhanced property completions
-        if (this.isPropertyContext(linePrefix)) {
-            completions.push(...this.getEnhancedProperties());
-        }
+        return items;
+    }
 
-        // Table completions
-        if (this.isStartOfQuery(linePrefix)) {
-            completions.push(...this.getARGTables());
+    /**
+     * Get resource type completions from schema data
+     */
+    private getResourceTypes(): vscode.CompletionItem[] {
+        const resourceTypes: vscode.CompletionItem[] = [];
+        
+        if (this.completionData?.resourceTypes) {
+            for (const rt of this.completionData.resourceTypes) {
+                const item = new vscode.CompletionItem(rt.label, vscode.CompletionItemKind.Value);
+                item.detail = rt.detail;
+                item.insertText = `'${rt.label}'`;
+                item.sortText = `5_${rt.label}`;
+                resourceTypes.push(item);
+            }
         }
-
-        return completions;
+        
+        return resourceTypes;
     }
 
     /**
@@ -212,6 +321,7 @@ export class KustoLanguageServiceProvider implements
                 item.detail = kw.category;
                 item.insertText = kw.label;
                 item.documentation = new vscode.MarkdownString(kw.category);
+                item.sortText = `2_${kw.label}`;
                 operators.push(item);
             }
         }
@@ -222,6 +332,7 @@ export class KustoLanguageServiceProvider implements
                 item.detail = op.category;
                 item.insertText = op.label;
                 item.documentation = new vscode.MarkdownString(op.category);
+                item.sortText = `2_${op.label}`;
                 operators.push(item);
             }
         }
@@ -242,6 +353,7 @@ export class KustoLanguageServiceProvider implements
                 item.detail = fn.detail;
                 item.insertText = new vscode.SnippetString(fn.insertText);
                 item.documentation = new vscode.MarkdownString(fn.detail);
+                item.sortText = `3_${fn.label}`;
                 functions.push(item);
             }
         }
@@ -285,6 +397,7 @@ export class KustoLanguageServiceProvider implements
                 item.detail = table.detail;
                 item.insertText = table.insertText;
                 item.documentation = new vscode.MarkdownString(table.detail);
+                item.sortText = `1_${table.label}`;
                 tables.push(item);
             }
         }
@@ -395,7 +508,7 @@ export class KustoLanguageServiceProvider implements
                             } else if (example && typeof example.code === 'string') {
                                 return example.code;
                             }
-                            return '[Invalid example format]';
+                            throw new Error('Invalid example format');
                         };
 
                         // Randomly select up to 2 examples for variety

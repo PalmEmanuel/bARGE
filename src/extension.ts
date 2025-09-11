@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 import { AzureService } from './azure/azureService';
 import { BargePanel } from './bargePanel';
 import { StatusBarManager } from './statusBar';
-import { KQLCompletionProvider } from './kqlCompletionProvider';
 import { KustoLanguageServiceProvider } from './kustoLanguageService';
 
 // This method is called when your extension is activated
@@ -164,24 +163,9 @@ export function activate(context: vscode.ExtensionContext) {
 		statusBar // Add status bar for proper cleanup
 	);
 
-	// Register KQL completion provider for .kql files
-	const kqlCompletionProvider = new KQLCompletionProvider();
-	const completionProviderDisposable = vscode.languages.registerCompletionItemProvider(
-		{ scheme: 'file', language: 'kql' },
-		kqlCompletionProvider,
-		'.', // Trigger on dot for property access
-		'|', // Trigger on pipe for operators
-		' ', // Trigger on space for general completions
-		'=', // Trigger on equals for comparisons
-		"'", // Trigger on quote for string values
-		'"'  // Trigger on double quote for string values
-	);
-	
 	// Register enhanced Kusto language service (includes hover, completion, signature help, formatting)
 	const kustoLanguageService = new KustoLanguageServiceProvider();
 	kustoLanguageService.register(context);
-	
-	context.subscriptions.push(completionProviderDisposable);
 
 	// Auto-authenticate if configured
 	const config = vscode.workspace.getConfiguration('barge');
