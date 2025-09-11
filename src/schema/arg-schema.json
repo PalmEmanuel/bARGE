@@ -10889,62 +10889,6 @@
   ],
   "functions": [
     {
-      "name": "__cast",
-      "category": "KQL Function"
-    },
-    {
-      "name": "__geo_length_to_s2cell_level",
-      "category": "KQL Function"
-    },
-    {
-      "name": "__geo_line_s2cell_covering_level",
-      "category": "KQL Function"
-    },
-    {
-      "name": "__geo_line_validate",
-      "category": "KQL Function"
-    },
-    {
-      "name": "__geo_polygon_s2cell_covering_level",
-      "category": "KQL Function"
-    },
-    {
-      "name": "__geo_polygon_validate",
-      "category": "KQL Function"
-    },
-    {
-      "name": "__hash_crc32",
-      "category": "KQL Function"
-    },
-    {
-      "name": "__hash_djb2",
-      "category": "KQL Function"
-    },
-    {
-      "name": "__hash_many_crc32",
-      "category": "KQL Function"
-    },
-    {
-      "name": "__hash_xxh64",
-      "category": "KQL Function"
-    },
-    {
-      "name": "__hll_normalize",
-      "category": "KQL Function"
-    },
-    {
-      "name": "__invoke",
-      "category": "KQL Function"
-    },
-    {
-      "name": "__ipv6_lookup_ranges",
-      "category": "KQL Function"
-    },
-    {
-      "name": "__lz4_compress_dynamic_array_to_base64_string",
-      "category": "KQL Function"
-    },
-    {
       "name": "abs",
       "category": "KQL Function"
     },

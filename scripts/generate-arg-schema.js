@@ -1302,7 +1302,8 @@ class ARGSchemaGenerator {
                 const functionList = kustoLanguage.Functions.All;
                 functionList.forEach(fn => {
                     const name = fn.name || fn.Name;
-                    if (name) {
+                    if (name && !name.startsWith('__')) {
+                        // Exclude internal double underscore functions not available in ARG
                         functions.add(name);
                     }
                 });
@@ -1313,7 +1314,8 @@ class ARGSchemaGenerator {
                 const aggregateList = kustoLanguage.Aggregates.All;
                 aggregateList.forEach(agg => {
                     const name = agg.name || agg.Name;
-                    if (name) {
+                    if (name && !name.startsWith('__')) {
+                        // Exclude internal double underscore aggregates not available in ARG
                         aggregates.add(name);
                     }
                 });
@@ -1451,7 +1453,7 @@ class ARGSchemaGenerator {
                 "operators": {
                     "patterns": [
                         {
-                            "name": "keyword.operator.kql",
+                            "name": "punctuation.operator.kql",
                             "match": `(${operatorsPattern})`
                         }
                     ]
