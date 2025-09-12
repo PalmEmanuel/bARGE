@@ -214,9 +214,7 @@ export class KustoLanguageServiceProvider implements
         position: vscode.Position,
         token: vscode.CancellationToken
     ): Promise<vscode.Hover | null> {
-        // Custom word pattern that includes hyphens for KQL operators like mv-apply
-        const customWordPattern = /[a-zA-Z_][a-zA-Z0-9_-]*/;
-        const wordRange = document.getWordRangeAtPosition(position, customWordPattern);
+        const wordRange = document.getWordRangeAtPosition(position);
         if (!wordRange) {
             // Reset hover state when not on a word
             this.resetHoverState();
@@ -472,128 +470,6 @@ export class KustoLanguageServiceProvider implements
         return selected;
     }
 
-    /**
-     * Find a function in both functions and aggregates arrays
-     */
-    private findFunction(lowerWord: string): any | null {
-        // Check regular functions first
-        if (this.schemaData.functions) {
-            const func = this.schemaData.functions.find((fn: any) => fn.name.toLowerCase() === lowerWord);
-            if (func) {
-                return func;
-            }
-        }
-        
-        // Check aggregates
-        if (this.schemaData.aggregates) {
-            const aggregate = this.schemaData.aggregates.find((agg: any) => agg.name.toLowerCase() === lowerWord);
-            if (aggregate) {
-                return aggregate;
-            }
-        }
-        
-        return null;
-    }
-
-    /**
-     * Format function hover information consistently
-     */
-    private formatFunctionHover(functionInfo: any): string {
-        // If we have enhanced documentation, use it
-        if (functionInfo.documentation) {
-            const doc = functionInfo.documentation;
-            let hoverContent = `## Function \`${doc.title}\`\n\n`;
-            hoverContent += `*${functionInfo.category}*\n\n`;
-            
-            // Description
-            if (doc.description) {
-                hoverContent += `${doc.description}\n\n`;
-            }
-            
-            // Add Microsoft Learn URL if available
-            if (doc.url) {
-                hoverContent += `[Details on Microsoft Learn](${doc.url}?wt.mc_id=DT-MVP-5005372)\n\n`;
-            }
-            
-            // Syntax
-            if (doc.syntax) {
-                hoverContent += `## Syntax\n\n${doc.syntax}\n\n`;
-            }
-            
-            // Parameters Table
-            if (doc.parametersTable) {
-                hoverContent += `## Parameters\n\n${doc.parametersTable}\n\n`;
-            }
-            
-            // Returns
-            if (doc.returnInfo) {
-                hoverContent += `## Returns\n\n${doc.returnInfo}\n\n`;
-            }
-            
-            // Example(s)
-            if (doc.example && doc.example.trim()) {
-                // Check if there are multiple examples (look for multiple code blocks or line breaks)
-                const hasMultipleExamples = doc.example.includes('```') || 
-                                          doc.example.split('\n').filter((line: string) => line.trim()).length > 3;
-                const exampleLabel = hasMultipleExamples ? "Examples" : "Example";
-                hoverContent += `## ${exampleLabel}\n\`\`\`kql\n${doc.example}\n\`\`\`\n\n`;
-            }
-            
-            return hoverContent;
-        } else {
-            // Fallback to old format
-            return `**Function: ${functionInfo.name}()** - ${functionInfo.category}`;
-        }
-    }
-
-    private formatOperatorHover(operatorInfo: any): string {
-        // If we have enhanced documentation, use it
-        if (operatorInfo.documentation) {
-            const doc = operatorInfo.documentation;
-            let hoverContent = `## Operator \`${doc.title}\`\n\n`;
-            hoverContent += `*${operatorInfo.category}*\n\n`;
-            
-            // Description
-            if (doc.description) {
-                hoverContent += `${doc.description}\n\n`;
-            }
-            
-            // Add Microsoft Learn URL if available
-            if (doc.url) {
-                hoverContent += `[Details on Microsoft Learn](${doc.url}?wt.mc_id=DT-MVP-5005372)\n\n`;
-            }
-            
-            // Syntax
-            if (doc.syntax) {
-                hoverContent += `## Syntax\n\n${doc.syntax}\n\n`;
-            }
-            
-            // Parameters Table
-            if (doc.parametersTable) {
-                hoverContent += `## Parameters\n\n${doc.parametersTable}\n\n`;
-            }
-            
-            // Returns
-            if (doc.returnInfo) {
-                hoverContent += `## Returns\n\n${doc.returnInfo}\n\n`;
-            }
-            
-            // Example(s)
-            if (doc.example && doc.example.trim()) {
-                // Check if there are multiple examples (look for multiple code blocks or line breaks)
-                const hasMultipleExamples = doc.example.includes('```') || 
-                                          doc.example.split('\n').filter((line: string) => line.trim()).length > 3;
-                const exampleLabel = hasMultipleExamples ? "Examples" : "Example";
-                hoverContent += `## ${exampleLabel}\n\`\`\`kql\n${doc.example}\n\`\`\`\n\n`;
-            }
-            
-            return hoverContent;
-        } else {
-            // Fallback to old format
-            return `**Operator: ${operatorInfo.name}** - ${operatorInfo.category}`;
-        }
-    }
-
     private getKQLHoverInfo(word: string, textAfterWord: string = ''): vscode.MarkdownString | null {
         const info = this.getKQLDocumentation(word.toLowerCase(), textAfterWord);
         if (info) {
@@ -609,36 +485,113 @@ export class KustoLanguageServiceProvider implements
         // Check schema data first if available
         if (this.schemaData) {
             // If we detect parentheses, prioritize function matching
-            if (hasParentheses) {
-                const functionInfo = this.findFunction(lowerWord);
-                if (functionInfo) {
-                    return this.formatFunctionHover(functionInfo);
+            if (hasParentheses && this.schemaData.functions) {
+                const func = this.schemaData.functions.find((fn: any) => fn.name.toLowerCase() === lowerWord);
+                if (func) {
+                    // If we have enhanced documentation, use it
+                    if (func.documentation) {
+                        const doc = func.documentation;
+                        let hoverContent = `## Function \`${doc.title}\`\n\n`;
+                        hoverContent += `*${func.category}*\n\n`;
+                        
+                        // Description
+                        if (doc.description) {
+                            hoverContent += `${doc.description}\n\n`;
+                        }
+                        
+                        // Syntax
+                        if (doc.syntax) {
+                            hoverContent += `## Syntax\n\n${doc.syntax}\n\n`;
+                        }
+                        
+                        // Parameters Table
+                        if (doc.parametersTable) {
+                            hoverContent += `## Parameters\n\n${doc.parametersTable}\n\n`;
+                        }
+                        
+                        // Returns
+                        if (doc.returnInfo) {
+                            hoverContent += `## Returns\n\n${doc.returnInfo}\n\n`;
+                        }
+                        
+                        // Example(s)
+                        if (doc.example && doc.example.trim()) {
+                            // Check if there are multiple examples (look for multiple code blocks or line breaks)
+                            const hasMultipleExamples = doc.example.includes('```') || 
+                                                      doc.example.split('\n').filter((line: string) => line.trim()).length > 3;
+                            const exampleLabel = hasMultipleExamples ? "Examples" : "Example";
+                            hoverContent += `## ${exampleLabel}\n\`\`\`kql\n${doc.example}\n\`\`\``;
+                        }
+                        
+                        return hoverContent;
+                    } else {
+                        // Fallback to old format
+                        return `**Function: ${func.name}()** - ${func.category}`;
+                    }
                 }
             }
             
-            // If no parentheses, prioritize keywords and operators over functions
-            if (!hasParentheses) {
-                // Check keywords first (where, project, contains, etc.)
-                if (this.schemaData.keywords) {
-                    const keyword = this.schemaData.keywords.find((kw: any) => kw.name.toLowerCase() === lowerWord);
-                    if (keyword) {
-                        return `**${keyword.name}** - ${keyword.category}`;
-                    }
-                }
-                
-                // Check operators 
-                if (this.schemaData.operators) {
-                    const operator = this.schemaData.operators.find((op: any) => op.name.toLowerCase() === lowerWord);
-                    if (operator) {
-                        return this.formatOperatorHover(operator);
-                    }
+            // Check keywords first (where, project, contains, etc.) - only if no parentheses
+            if (!hasParentheses && this.schemaData.keywords) {
+                const keyword = this.schemaData.keywords.find((kw: any) => kw.name.toLowerCase() === lowerWord);
+                if (keyword) {
+                    return `**${keyword.name}** - ${keyword.category}`;
                 }
             }
             
-            // Check functions/aggregates (fallback for general case)
-            const functionInfo = this.findFunction(lowerWord);
-            if (functionInfo) {
-                return this.formatFunctionHover(functionInfo);
+            // Check operators - only if no parentheses
+            if (!hasParentheses && this.schemaData.operators) {
+                const operator = this.schemaData.operators.find((op: any) => op.name.toLowerCase() === lowerWord);
+                if (operator) {
+                    return `**${operator.name}** - ${operator.category}`;
+                }
+            }
+            
+            // Check functions
+            if (this.schemaData.functions) {
+                const func = this.schemaData.functions.find((fn: any) => fn.name.toLowerCase() === lowerWord);
+                if (func) {
+                    // If we have enhanced documentation, use it
+                    if (func.documentation) {
+                        const doc = func.documentation;
+                        let hoverContent = `## Function \`${doc.title}\`\n\n`;
+                        hoverContent += `*${func.category}*\n\n`;
+                        
+                        // Description
+                        if (doc.description) {
+                            hoverContent += `${doc.description}\n\n`;
+                        }
+                        
+                        // Syntax
+                        if (doc.syntax) {
+                            hoverContent += `### Syntax\n\n${doc.syntax}\n\n`;
+                        }
+                        
+                        // Parameters Table
+                        if (doc.parametersTable) {
+                            hoverContent += `### Parameters\n\n${doc.parametersTable}\n\n`;
+                        }
+                        
+                        // Returns
+                        if (doc.returnInfo) {
+                            hoverContent += `### Returns\n\n${doc.returnInfo}\n\n`;
+                        }
+                        
+                        // Example(s)
+                        if (doc.example && doc.example.trim()) {
+                            // Check if there are multiple examples (look for multiple code blocks or line breaks)
+                            const hasMultipleExamples = doc.example.includes('```') || 
+                                                      doc.example.split('\n').filter((line: string) => line.trim()).length > 3;
+                            const exampleLabel = hasMultipleExamples ? "Examples" : "Example";
+                            hoverContent += `### ${exampleLabel}\n\`\`\`kql\n${doc.example}\n\`\`\``;
+                        }
+                        
+                        return hoverContent;
+                    } else {
+                        // Fallback to old format
+                        return `**${func.name}()**`;
+                    }
+                }
             }
             
             // Check tables
@@ -656,9 +609,7 @@ export class KustoLanguageServiceProvider implements
                         if (table.description) {
                             hoverContent += `${table.description}\n\n`;
                         }
-
-                        hoverContent += `[Details on Microsoft Learn](https://learn.microsoft.com/en-us/azure/governance/resource-graph/concepts/query-language?wt.mc_id=DT-MVP-5005372)\n\n`;
-
+                        
                         // List specific resource types for specialized tables
                         if (table.resourceTypes && table.resourceTypes.length > 0) {
                             hoverContent += `### Resource Types\n`;
@@ -670,8 +621,6 @@ export class KustoLanguageServiceProvider implements
                                 hoverContent += `- ... and ${table.resourceTypes.length - 5} more\n`;
                             }
                             hoverContent += '\n';
-
-                            hoverContent += `[Tables and Resources Reference](https://learn.microsoft.com/en-us/azure/governance/resource-graph/reference/supported-tables-resources?wt.mc_id=DT-MVP-5005372)\n\n`;
                         }
                     }
                     
@@ -1038,6 +987,8 @@ ${example2Code}
 
         // Add all disposables to context
         context.subscriptions.push(...this.disposables);
+        
+        console.log('Enhanced Kusto Language Service registered for bARGE');
     }
 
     /**

@@ -2130,9 +2130,10 @@ class ARGSchemaGenerator {
                 { "include": "#operators" },
                 { "include": "#functions" },
                 { "include": "#tables" },
+                { "include": "#properties" },
+                { "include": "#columns" },
                 { "include": "#strings" },
-                { "include": "#numbers" },
-                { "include": "#properties" }
+                { "include": "#numbers" }
             ],
             "repository": {
                 "comments": {
@@ -2199,6 +2200,17 @@ class ARGSchemaGenerator {
                 "strings": {
                     "patterns": [
                         {
+                            "name": "string.quoted.verbatim.kql",
+                            "begin": "@\"",
+                            "end": "\"",
+                            "patterns": [
+                                {
+                                    "name": "constant.character.escape.kql",
+                                    "match": "\"\""
+                                }
+                            ]
+                        },
+                        {
                             "name": "string.quoted.double.kql",
                             "begin": "\"",
                             "end": "\"",
@@ -2234,14 +2246,42 @@ class ARGSchemaGenerator {
                         }
                     ]
                 },
+                "columns": {
+                    "patterns": [
+                        {
+                            "name": "variable.other.column.assignment.kql",
+                            "match": "(?i)(?<!\\.)\\b\\w+(?=\\s*=|\\s*\\.)"
+                        },
+                        {
+                            "name": "variable.other.column.first.kql",
+                            "match": `(?i)(?<=\\b(?:${operatorsPattern}|${keywordsPattern})\\s+)(?<!\\.)\\w+(?=\\s*[,|\\.]|\\s*$)`
+                        },
+                        {
+                            "name": "variable.other.column.between.kql",
+                            "match": `(?i)(?<=\\b(?:${operatorsPattern}|${keywordsPattern})\\s+)(?<!\\.)\\w+(?=\\s+(?:${operatorsPattern}|${keywordsPattern})\\b|\\s*\\.)`
+                        },
+                        {
+                            "name": "variable.other.column.after.paren.kql",
+                            "match": `(?i)(?<=\\(\\s*)(?<!\\.)\\w+(?=\\s+(?:${operatorsPattern}|${keywordsPattern})\\b|\\s*\\.)`
+                        },
+                        {
+                            "name": "variable.other.column.function.kql",
+                            "match": "(?i)(?<=\\()\\s*(?<!\\.)\\w+(?=\\s*[,)\\.])"
+                        },
+                        {
+                            "name": "variable.other.column.function.kql",
+                            "match": "(?i)(?<=,\\s*)(?<!\\.)\\w+(?=\\s*[,)\\.])"
+                        },
+                        {
+                            "name": "variable.other.column.kql",
+                            "match": "(?i)(?<=,\\s*)(?<!\\.)\\w+(?=\\s*[,|\\.]|\\s*$)"
+                        }
+                    ]
+                },
                 "properties": {
                     "patterns": [
                         {
-                            "name": "variable.other.property.kql",
-                            "match": `(?i)\\b(${properties})\\b`
-                        },
-                        {
-                            "name": "variable.other.property.dot.kql",
+                            "name": "meta.other.property.kql",
                             "match": "\\.[a-zA-Z_][a-zA-Z0-9_]*"
                         }
                     ]
