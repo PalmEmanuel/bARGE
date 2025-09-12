@@ -496,12 +496,6 @@
       "category": "KQL Keyword"
     },
     {
-      "label": "as",
-      "kind": "Keyword",
-      "insertText": "as",
-      "category": "KQL Keyword"
-    },
-    {
       "label": "asc",
       "kind": "Keyword",
       "insertText": "asc",
@@ -529,12 +523,6 @@
       "label": "best_effort",
       "kind": "Keyword",
       "insertText": "best_effort",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "between",
-      "kind": "Keyword",
-      "insertText": "between",
       "category": "KQL Keyword"
     },
     {
@@ -616,33 +604,9 @@
       "category": "KQL Keyword"
     },
     {
-      "label": "consume",
-      "kind": "Keyword",
-      "insertText": "consume",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "contains",
-      "kind": "Keyword",
-      "insertText": "contains",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "contains_cs",
-      "kind": "Keyword",
-      "insertText": "contains_cs",
-      "category": "KQL Keyword"
-    },
-    {
       "label": "containscs",
       "kind": "Keyword",
       "insertText": "containscs",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "count",
-      "kind": "Keyword",
-      "insertText": "count",
       "category": "KQL Keyword"
     },
     {
@@ -673,12 +637,6 @@
       "label": "datascope",
       "kind": "Keyword",
       "insertText": "datascope",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "datatable",
-      "kind": "Keyword",
-      "insertText": "datatable",
       "category": "KQL Keyword"
     },
     {
@@ -730,12 +688,6 @@
       "category": "KQL Keyword"
     },
     {
-      "label": "distinct",
-      "kind": "Keyword",
-      "insertText": "distinct",
-      "category": "KQL Keyword"
-    },
-    {
       "label": "double",
       "kind": "Keyword",
       "insertText": "double",
@@ -766,39 +718,15 @@
       "category": "KQL Keyword"
     },
     {
-      "label": "endswith",
-      "kind": "Keyword",
-      "insertText": "endswith",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "endswith_cs",
-      "kind": "Keyword",
-      "insertText": "endswith_cs",
-      "category": "KQL Keyword"
-    },
-    {
       "label": "entity_group",
       "kind": "Keyword",
       "insertText": "entity_group",
       "category": "KQL Keyword"
     },
     {
-      "label": "evaluate",
-      "kind": "Keyword",
-      "insertText": "evaluate",
-      "category": "KQL Keyword"
-    },
-    {
       "label": "expandoutput",
       "kind": "Keyword",
       "insertText": "expandoutput",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "extend",
-      "kind": "Keyword",
-      "insertText": "extend",
       "category": "KQL Keyword"
     },
     {
@@ -814,27 +742,9 @@
       "category": "KQL Keyword"
     },
     {
-      "label": "externaldata",
-      "kind": "Keyword",
-      "insertText": "externaldata",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "facet",
-      "kind": "Keyword",
-      "insertText": "facet",
-      "category": "KQL Keyword"
-    },
-    {
       "label": "filter",
       "kind": "Keyword",
       "insertText": "filter",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "find",
-      "kind": "Keyword",
-      "insertText": "find",
       "category": "KQL Keyword"
     },
     {
@@ -862,21 +772,9 @@
       "category": "KQL Keyword"
     },
     {
-      "label": "fork",
-      "kind": "Keyword",
-      "insertText": "fork",
-      "category": "KQL Keyword"
-    },
-    {
       "label": "from",
       "kind": "Keyword",
       "insertText": "from",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "getschema",
-      "kind": "Keyword",
-      "insertText": "getschema",
       "category": "KQL Keyword"
     },
     {
@@ -895,30 +793,6 @@
       "label": "graph",
       "kind": "Keyword",
       "insertText": "graph",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "graph-mark-components",
-      "kind": "Keyword",
-      "insertText": "graph-mark-components",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "graph-match",
-      "kind": "Keyword",
-      "insertText": "graph-match",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "graph-shortest-paths",
-      "kind": "Keyword",
-      "insertText": "graph-shortest-paths",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "graph-to-table",
-      "kind": "Keyword",
-      "insertText": "graph-to-table",
       "category": "KQL Keyword"
     },
     {
@@ -949,54 +823,6 @@
       "label": "hardretention",
       "kind": "Keyword",
       "insertText": "hardretention",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "has",
-      "kind": "Keyword",
-      "insertText": "has",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "has_all",
-      "kind": "Keyword",
-      "insertText": "has_all",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "has_any",
-      "kind": "Keyword",
-      "insertText": "has_any",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "has_cs",
-      "kind": "Keyword",
-      "insertText": "has_cs",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "hasprefix",
-      "kind": "Keyword",
-      "insertText": "hasprefix",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "hasprefix_cs",
-      "kind": "Keyword",
-      "insertText": "hasprefix_cs",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "hassuffix",
-      "kind": "Keyword",
-      "insertText": "hassuffix",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "hassuffix_cs",
-      "kind": "Keyword",
-      "insertText": "hassuffix_cs",
       "category": "KQL Keyword"
     },
     {
@@ -1066,12 +892,6 @@
       "category": "KQL Keyword"
     },
     {
-      "label": "in",
-      "kind": "Keyword",
-      "insertText": "in",
-      "category": "KQL Keyword"
-    },
-    {
       "label": "inline_external_table",
       "kind": "Keyword",
       "insertText": "inline_external_table",
@@ -1108,12 +928,6 @@
       "category": "KQL Keyword"
     },
     {
-      "label": "invoke",
-      "kind": "Keyword",
-      "insertText": "invoke",
-      "category": "KQL Keyword"
-    },
-    {
       "label": "in~",
       "kind": "Keyword",
       "insertText": "in~",
@@ -1123,12 +937,6 @@
       "label": "isfuzzy",
       "kind": "Keyword",
       "insertText": "isfuzzy",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "join",
-      "kind": "Keyword",
-      "insertText": "join",
       "category": "KQL Keyword"
     },
     {
@@ -1198,30 +1006,6 @@
       "category": "KQL Keyword"
     },
     {
-      "label": "lookup",
-      "kind": "Keyword",
-      "insertText": "lookup",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "macro-expand",
-      "kind": "Keyword",
-      "insertText": "macro-expand",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "make-graph",
-      "kind": "Keyword",
-      "insertText": "make-graph",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "make-series",
-      "kind": "Keyword",
-      "insertText": "make-series",
-      "category": "KQL Keyword"
-    },
-    {
       "label": "matches regex",
       "kind": "Keyword",
       "insertText": "matches regex",
@@ -1255,18 +1039,6 @@
       "label": "missing",
       "kind": "Keyword",
       "insertText": "missing",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "mv-apply",
-      "kind": "Keyword",
-      "insertText": "mv-apply",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "mv-expand",
-      "kind": "Keyword",
-      "insertText": "mv-expand",
       "category": "KQL Keyword"
     },
     {
@@ -1378,30 +1150,6 @@
       "category": "KQL Keyword"
     },
     {
-      "label": "parse",
-      "kind": "Keyword",
-      "insertText": "parse",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "parse-kv",
-      "kind": "Keyword",
-      "insertText": "parse-kv",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "parse-where",
-      "kind": "Keyword",
-      "insertText": "parse-where",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "partition",
-      "kind": "Keyword",
-      "insertText": "partition",
-      "category": "KQL Keyword"
-    },
-    {
       "label": "partitioned-by",
       "kind": "Keyword",
       "insertText": "partitioned-by",
@@ -1438,48 +1186,6 @@
       "category": "KQL Keyword"
     },
     {
-      "label": "print",
-      "kind": "Keyword",
-      "insertText": "print",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "project",
-      "kind": "Keyword",
-      "insertText": "project",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "project-away",
-      "kind": "Keyword",
-      "insertText": "project-away",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "project-by-names",
-      "kind": "Keyword",
-      "insertText": "project-by-names",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "project-keep",
-      "kind": "Keyword",
-      "insertText": "project-keep",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "project-rename",
-      "kind": "Keyword",
-      "insertText": "project-rename",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "project-reorder",
-      "kind": "Keyword",
-      "insertText": "project-reorder",
-      "category": "KQL Keyword"
-    },
-    {
       "label": "project-smart",
       "kind": "Keyword",
       "insertText": "project-smart",
@@ -1504,21 +1210,9 @@
       "category": "KQL Keyword"
     },
     {
-      "label": "range",
-      "kind": "Keyword",
-      "insertText": "range",
-      "category": "KQL Keyword"
-    },
-    {
       "label": "real",
       "kind": "Keyword",
       "insertText": "real",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "reduce",
-      "kind": "Keyword",
-      "insertText": "reduce",
       "category": "KQL Keyword"
     },
     {
@@ -1531,12 +1225,6 @@
       "label": "relaxed",
       "kind": "Keyword",
       "insertText": "relaxed",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "render",
-      "kind": "Keyword",
-      "insertText": "render",
       "category": "KQL Keyword"
     },
     {
@@ -1588,24 +1276,6 @@
       "category": "KQL Keyword"
     },
     {
-      "label": "sample",
-      "kind": "Keyword",
-      "insertText": "sample",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "sample-distinct",
-      "kind": "Keyword",
-      "insertText": "sample-distinct",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "scan",
-      "kind": "Keyword",
-      "insertText": "scan",
-      "category": "KQL Keyword"
-    },
-    {
       "label": "scatterchart",
       "kind": "Keyword",
       "insertText": "scatterchart",
@@ -1621,18 +1291,6 @@
       "label": "seals",
       "kind": "Keyword",
       "insertText": "seals",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "search",
-      "kind": "Keyword",
-      "insertText": "search",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "serialize",
-      "kind": "Keyword",
-      "insertText": "serialize",
       "category": "KQL Keyword"
     },
     {
@@ -1678,12 +1336,6 @@
       "category": "KQL Keyword"
     },
     {
-      "label": "sort",
-      "kind": "Keyword",
-      "insertText": "sort",
-      "category": "KQL Keyword"
-    },
-    {
       "label": "sql",
       "kind": "Keyword",
       "insertText": "sql",
@@ -1693,18 +1345,6 @@
       "label": "stackedareachart",
       "kind": "Keyword",
       "insertText": "stackedareachart",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "startswith",
-      "kind": "Keyword",
-      "insertText": "startswith",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "startswith_cs",
-      "kind": "Keyword",
-      "insertText": "startswith_cs",
       "category": "KQL Keyword"
     },
     {
@@ -1732,21 +1372,9 @@
       "category": "KQL Keyword"
     },
     {
-      "label": "summarize",
-      "kind": "Keyword",
-      "insertText": "summarize",
-      "category": "KQL Keyword"
-    },
-    {
       "label": "tablepurge",
       "kind": "Keyword",
       "insertText": "tablepurge",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "take",
-      "kind": "Keyword",
-      "insertText": "take",
       "category": "KQL Keyword"
     },
     {
@@ -1789,24 +1417,6 @@
       "label": "to",
       "kind": "Keyword",
       "insertText": "to",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "top",
-      "kind": "Keyword",
-      "insertText": "top",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "top-hitters",
-      "kind": "Keyword",
-      "insertText": "top-hitters",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "top-nested",
-      "kind": "Keyword",
-      "insertText": "top-nested",
       "category": "KQL Keyword"
     },
     {
@@ -1870,12 +1480,6 @@
       "category": "KQL Keyword"
     },
     {
-      "label": "union",
-      "kind": "Keyword",
-      "insertText": "union",
-      "category": "KQL Keyword"
-    },
-    {
       "label": "uniqueid",
       "kind": "Keyword",
       "insertText": "uniqueid",
@@ -1915,12 +1519,6 @@
       "label": "views",
       "kind": "Keyword",
       "insertText": "views",
-      "category": "KQL Keyword"
-    },
-    {
-      "label": "where",
-      "kind": "Keyword",
-      "insertText": "where",
       "category": "KQL Keyword"
     },
     {
@@ -1973,6 +1571,534 @@
     }
   ],
   "operators": [
+    {
+      "label": "as",
+      "kind": "Operator",
+      "insertText": "as",
+      "category": "operator"
+    },
+    {
+      "label": "between",
+      "kind": "Operator",
+      "insertText": "between",
+      "category": "operator"
+    },
+    {
+      "label": "consume",
+      "kind": "Operator",
+      "insertText": "consume",
+      "category": "operator"
+    },
+    {
+      "label": "contains_cs",
+      "kind": "Operator",
+      "insertText": "contains_cs",
+      "category": "operator"
+    },
+    {
+      "label": "contains",
+      "kind": "Operator",
+      "insertText": "contains",
+      "category": "operator"
+    },
+    {
+      "label": "count",
+      "kind": "Operator",
+      "insertText": "count",
+      "category": "operator"
+    },
+    {
+      "label": "datatable",
+      "kind": "Operator",
+      "insertText": "datatable",
+      "category": "operator"
+    },
+    {
+      "label": "distinct",
+      "kind": "Operator",
+      "insertText": "distinct",
+      "category": "operator"
+    },
+    {
+      "label": "endswith_cs",
+      "kind": "Operator",
+      "insertText": "endswith_cs",
+      "category": "operator"
+    },
+    {
+      "label": "endswith",
+      "kind": "Operator",
+      "insertText": "endswith",
+      "category": "operator"
+    },
+    {
+      "label": "equals_cs",
+      "kind": "Operator",
+      "insertText": "equals_cs",
+      "category": "operator"
+    },
+    {
+      "label": "equals",
+      "kind": "Operator",
+      "insertText": "equals",
+      "category": "operator"
+    },
+    {
+      "label": "evaluate",
+      "kind": "Operator",
+      "insertText": "evaluate",
+      "category": "operator"
+    },
+    {
+      "label": "extend",
+      "kind": "Operator",
+      "insertText": "extend",
+      "category": "operator"
+    },
+    {
+      "label": "externaldata",
+      "kind": "Operator",
+      "insertText": "externaldata",
+      "category": "operator"
+    },
+    {
+      "label": "facet",
+      "kind": "Operator",
+      "insertText": "facet",
+      "category": "operator"
+    },
+    {
+      "label": "find",
+      "kind": "Operator",
+      "insertText": "find",
+      "category": "operator"
+    },
+    {
+      "label": "fork",
+      "kind": "Operator",
+      "insertText": "fork",
+      "category": "operator"
+    },
+    {
+      "label": "getschema",
+      "kind": "Operator",
+      "insertText": "getschema",
+      "category": "operator"
+    },
+    {
+      "label": "graph-mark-components",
+      "kind": "Operator",
+      "insertText": "graph-mark-components",
+      "category": "operator"
+    },
+    {
+      "label": "graph-match",
+      "kind": "Operator",
+      "insertText": "graph-match",
+      "category": "operator"
+    },
+    {
+      "label": "graph-shortest-paths",
+      "kind": "Operator",
+      "insertText": "graph-shortest-paths",
+      "category": "operator"
+    },
+    {
+      "label": "graph-to-table",
+      "kind": "Operator",
+      "insertText": "graph-to-table",
+      "category": "operator"
+    },
+    {
+      "label": "has_all",
+      "kind": "Operator",
+      "insertText": "has_all",
+      "category": "operator"
+    },
+    {
+      "label": "has_any",
+      "kind": "Operator",
+      "insertText": "has_any",
+      "category": "operator"
+    },
+    {
+      "label": "has_cs",
+      "kind": "Operator",
+      "insertText": "has_cs",
+      "category": "operator"
+    },
+    {
+      "label": "has",
+      "kind": "Operator",
+      "insertText": "has",
+      "category": "operator"
+    },
+    {
+      "label": "hasprefix_cs",
+      "kind": "Operator",
+      "insertText": "hasprefix_cs",
+      "category": "operator"
+    },
+    {
+      "label": "hasprefix",
+      "kind": "Operator",
+      "insertText": "hasprefix",
+      "category": "operator"
+    },
+    {
+      "label": "hassuffix_cs",
+      "kind": "Operator",
+      "insertText": "hassuffix_cs",
+      "category": "operator"
+    },
+    {
+      "label": "hassuffix",
+      "kind": "Operator",
+      "insertText": "hassuffix",
+      "category": "operator"
+    },
+    {
+      "label": "in_cs",
+      "kind": "Operator",
+      "insertText": "in_cs",
+      "category": "operator"
+    },
+    {
+      "label": "in",
+      "kind": "Operator",
+      "insertText": "in",
+      "category": "operator"
+    },
+    {
+      "label": "invoke",
+      "kind": "Operator",
+      "insertText": "invoke",
+      "category": "operator"
+    },
+    {
+      "label": "join",
+      "kind": "Operator",
+      "insertText": "join",
+      "category": "operator"
+    },
+    {
+      "label": "lookup",
+      "kind": "Operator",
+      "insertText": "lookup",
+      "category": "operator"
+    },
+    {
+      "label": "macro-expand",
+      "kind": "Operator",
+      "insertText": "macro-expand",
+      "category": "operator"
+    },
+    {
+      "label": "make-graph",
+      "kind": "Operator",
+      "insertText": "make-graph",
+      "category": "operator"
+    },
+    {
+      "label": "make-series",
+      "kind": "Operator",
+      "insertText": "make-series",
+      "category": "operator"
+    },
+    {
+      "label": "matches_regex",
+      "kind": "Operator",
+      "insertText": "matches_regex",
+      "category": "operator"
+    },
+    {
+      "label": "mv-apply",
+      "kind": "Operator",
+      "insertText": "mv-apply",
+      "category": "operator"
+    },
+    {
+      "label": "mv-expand",
+      "kind": "Operator",
+      "insertText": "mv-expand",
+      "category": "operator"
+    },
+    {
+      "label": "not_between",
+      "kind": "Operator",
+      "insertText": "not_between",
+      "category": "operator"
+    },
+    {
+      "label": "not_contains_cs",
+      "kind": "Operator",
+      "insertText": "not_contains_cs",
+      "category": "operator"
+    },
+    {
+      "label": "not_contains",
+      "kind": "Operator",
+      "insertText": "not_contains",
+      "category": "operator"
+    },
+    {
+      "label": "not_endswith_cs",
+      "kind": "Operator",
+      "insertText": "not_endswith_cs",
+      "category": "operator"
+    },
+    {
+      "label": "not_endswith",
+      "kind": "Operator",
+      "insertText": "not_endswith",
+      "category": "operator"
+    },
+    {
+      "label": "not_equals_cs",
+      "kind": "Operator",
+      "insertText": "not_equals_cs",
+      "category": "operator"
+    },
+    {
+      "label": "not_equals",
+      "kind": "Operator",
+      "insertText": "not_equals",
+      "category": "operator"
+    },
+    {
+      "label": "not_has_cs",
+      "kind": "Operator",
+      "insertText": "not_has_cs",
+      "category": "operator"
+    },
+    {
+      "label": "not_has",
+      "kind": "Operator",
+      "insertText": "not_has",
+      "category": "operator"
+    },
+    {
+      "label": "not_hasprefix_cs",
+      "kind": "Operator",
+      "insertText": "not_hasprefix_cs",
+      "category": "operator"
+    },
+    {
+      "label": "not_hasprefix",
+      "kind": "Operator",
+      "insertText": "not_hasprefix",
+      "category": "operator"
+    },
+    {
+      "label": "not_hassuffix_cs",
+      "kind": "Operator",
+      "insertText": "not_hassuffix_cs",
+      "category": "operator"
+    },
+    {
+      "label": "not_hassuffix",
+      "kind": "Operator",
+      "insertText": "not_hassuffix",
+      "category": "operator"
+    },
+    {
+      "label": "not_in_cs",
+      "kind": "Operator",
+      "insertText": "not_in_cs",
+      "category": "operator"
+    },
+    {
+      "label": "not_in",
+      "kind": "Operator",
+      "insertText": "not_in",
+      "category": "operator"
+    },
+    {
+      "label": "not_startswith_cs",
+      "kind": "Operator",
+      "insertText": "not_startswith_cs",
+      "category": "operator"
+    },
+    {
+      "label": "not_startswith",
+      "kind": "Operator",
+      "insertText": "not_startswith",
+      "category": "operator"
+    },
+    {
+      "label": "parse-kv",
+      "kind": "Operator",
+      "insertText": "parse-kv",
+      "category": "operator"
+    },
+    {
+      "label": "parse",
+      "kind": "Operator",
+      "insertText": "parse",
+      "category": "operator"
+    },
+    {
+      "label": "parse-where",
+      "kind": "Operator",
+      "insertText": "parse-where",
+      "category": "operator"
+    },
+    {
+      "label": "partition",
+      "kind": "Operator",
+      "insertText": "partition",
+      "category": "operator"
+    },
+    {
+      "label": "print",
+      "kind": "Operator",
+      "insertText": "print",
+      "category": "operator"
+    },
+    {
+      "label": "project-away",
+      "kind": "Operator",
+      "insertText": "project-away",
+      "category": "operator"
+    },
+    {
+      "label": "project-by-names",
+      "kind": "Operator",
+      "insertText": "project-by-names",
+      "category": "operator"
+    },
+    {
+      "label": "project-keep",
+      "kind": "Operator",
+      "insertText": "project-keep",
+      "category": "operator"
+    },
+    {
+      "label": "project",
+      "kind": "Operator",
+      "insertText": "project",
+      "category": "operator"
+    },
+    {
+      "label": "project-rename",
+      "kind": "Operator",
+      "insertText": "project-rename",
+      "category": "operator"
+    },
+    {
+      "label": "project-reorder",
+      "kind": "Operator",
+      "insertText": "project-reorder",
+      "category": "operator"
+    },
+    {
+      "label": "range",
+      "kind": "Operator",
+      "insertText": "range",
+      "category": "operator"
+    },
+    {
+      "label": "reduce",
+      "kind": "Operator",
+      "insertText": "reduce",
+      "category": "operator"
+    },
+    {
+      "label": "render",
+      "kind": "Operator",
+      "insertText": "render",
+      "category": "operator"
+    },
+    {
+      "label": "sample-distinct",
+      "kind": "Operator",
+      "insertText": "sample-distinct",
+      "category": "operator"
+    },
+    {
+      "label": "sample",
+      "kind": "Operator",
+      "insertText": "sample",
+      "category": "operator"
+    },
+    {
+      "label": "scan",
+      "kind": "Operator",
+      "insertText": "scan",
+      "category": "operator"
+    },
+    {
+      "label": "search",
+      "kind": "Operator",
+      "insertText": "search",
+      "category": "operator"
+    },
+    {
+      "label": "serialize",
+      "kind": "Operator",
+      "insertText": "serialize",
+      "category": "operator"
+    },
+    {
+      "label": "sort",
+      "kind": "Operator",
+      "insertText": "sort",
+      "category": "operator"
+    },
+    {
+      "label": "startswith_cs",
+      "kind": "Operator",
+      "insertText": "startswith_cs",
+      "category": "operator"
+    },
+    {
+      "label": "startswith",
+      "kind": "Operator",
+      "insertText": "startswith",
+      "category": "operator"
+    },
+    {
+      "label": "summarize",
+      "kind": "Operator",
+      "insertText": "summarize",
+      "category": "operator"
+    },
+    {
+      "label": "take",
+      "kind": "Operator",
+      "insertText": "take",
+      "category": "operator"
+    },
+    {
+      "label": "top-hitters",
+      "kind": "Operator",
+      "insertText": "top-hitters",
+      "category": "operator"
+    },
+    {
+      "label": "top-nested",
+      "kind": "Operator",
+      "insertText": "top-nested",
+      "category": "operator"
+    },
+    {
+      "label": "top",
+      "kind": "Operator",
+      "insertText": "top",
+      "category": "operator"
+    },
+    {
+      "label": "union",
+      "kind": "Operator",
+      "insertText": "union",
+      "category": "operator"
+    },
+    {
+      "label": "where",
+      "kind": "Operator",
+      "insertText": "where",
+      "category": "operator"
+    },
     {
       "label": "!",
       "kind": "Operator",

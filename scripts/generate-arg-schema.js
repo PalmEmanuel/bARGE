@@ -257,6 +257,8 @@ class ARGSchemaGenerator {
         // Track functions without documentation
         this.unmatchedFunctions = [];
         this.unmatchedAggregates = [];
+        this.unmatchedKeywords = [];
+        this.unmatchedOperators = [];
     }
 
     async fetchUrl(url, attempt = 1) {
@@ -416,13 +418,20 @@ class ARGSchemaGenerator {
         console.log(`   Aggregates: ${this.schema.aggregates?.length || 0}`);
         
         // Report documentation coverage
-        if (this.unmatchedFunctions.length > 0 || this.unmatchedAggregates.length > 0) {
+        if (this.unmatchedFunctions.length > 0 || this.unmatchedAggregates.length > 0 || 
+            this.unmatchedKeywords.length > 0 || this.unmatchedOperators.length > 0) {
             console.log('\n📝 Documentation Coverage:');
             if (this.unmatchedFunctions.length > 0) {
                 console.log(`   Unmatched Functions (${this.unmatchedFunctions.length}): ${this.unmatchedFunctions.join(', ')}`);
             }
             if (this.unmatchedAggregates.length > 0) {
                 console.log(`   Unmatched Aggregates (${this.unmatchedAggregates.length}): ${this.unmatchedAggregates.join(', ')}`);
+            }
+            if (this.unmatchedKeywords.length > 0) {
+                console.log(`   Unmatched Keywords (${this.unmatchedKeywords.length}): ${this.unmatchedKeywords.join(', ')}`);
+            }
+            if (this.unmatchedOperators.length > 0) {
+                console.log(`   Unmatched Operators (${this.unmatchedOperators.length}): ${this.unmatchedOperators.join(', ')}`);
             }
         }
     }
@@ -1368,89 +1377,56 @@ class ARGSchemaGenerator {
         console.log('\n🔍 Extracting KQL documentation from Microsoft Docs...');
         
         try {
-            const functionFiles = await this.fetchGitHubDirectoryContents(kqlDocsUrl);
-            const relevantFiles = functionFiles.filter(file => 
+            const allFiles = await this.fetchGitHubDirectoryContents(kqlDocsUrl);
+            
+            // Filter function files
+            const functionFiles = allFiles.filter(file => 
                 file.name.endsWith('-function.md') || 
                 file.name.endsWith('-aggregate-function.md') ||
                 file.name.endsWith('-aggregation-function.md')
             );
 
-            console.log(`📄 Found ${relevantFiles.length} function documentation files`);
+            // Filter operator files
+            const operatorFiles = allFiles.filter(file => 
+                file.name.endsWith('-operator.md')
+            );
+
+            console.log(`📄 Found ${functionFiles.length} function documentation files`);
+            console.log(`📄 Found ${operatorFiles.length} operator documentation files`);
 
             // Process functions and aggregates in parallel
-            const results = await Promise.all(relevantFiles.map(async (file) => {
+            const functionResults = await Promise.all(functionFiles.map(async (file) => {
                 const fileContent = await this.fetchGitHubFileContent(file.download_url);
                 const functionDoc = this.parseMarkdownDoc(fileContent, file.name);
                 
                 return { file: file.name, doc: functionDoc };
             }));
 
+            // Process operators in parallel
+            const operatorResults = await Promise.all(operatorFiles.map(async (file) => {
+                const fileContent = await this.fetchGitHubFileContent(file.download_url);
+                const operatorDoc = this.parseOperatorMarkdownDoc(fileContent, file.name);
+                
+                return { file: file.name, doc: operatorDoc };
+            }));
+
             // Separate functions from aggregates (only include successfully parsed ones)
-            const functionResults = results.filter(result => result.doc && result.doc.type === 'function').map(result => result.doc);
-            const aggregateResults = results.filter(result => result.doc && result.doc.type === 'aggregate').map(result => result.doc);
-
-            console.log(`\n📊 Documentation extraction results:`);
-            console.log(`  • Functions documented: ${functionResults.length}`);
-            console.log(`  • Aggregates documented: ${aggregateResults.length}`);
-
-            // Match with schema functions and track unmatched
-            let matchedFunctions = 0;
-            let matchedAggregates = 0;
-            const matchedFunctionsList = [];
-            const matchedAggregatesList = [];
-
-            for (const func of this.schema.functions) {
-                const docFunction = functionResults.find(doc => 
-                    doc.name === func.name || 
-                    doc.name === func.name.toLowerCase() ||
-                    func.name === doc.name.toLowerCase()
-                );
-                
-                if (docFunction) {
-                    func.documentation = docFunction.documentation;
-                    func.category = docFunction.category;
-                    matchedFunctionsList.push(func);
-                    matchedFunctions++;
-                } else {
-                    this.unmatchedFunctions.push(func.name);
-                }
-            }
-
-            for (const agg of this.schema.aggregates) {
-                const docAggregate = aggregateResults.find(doc => 
-                    doc.name === agg.name || 
-                    doc.name === agg.name.toLowerCase() ||
-                    agg.name === doc.name.toLowerCase()
-                );
-                
-                if (docAggregate) {
-                    agg.documentation = docAggregate.documentation;
-                    agg.category = docAggregate.category;
-                    matchedAggregatesList.push(agg);
-                    matchedAggregates++;
-                } else {
-                    this.unmatchedAggregates.push(agg.name);
-                }
-            }
-
-            // Update schema to only include matched functions and aggregates
-            this.schema.functions = matchedFunctionsList;
-            this.schema.aggregates = matchedAggregatesList;
-
-            const totalFunctions = matchedFunctions + this.unmatchedFunctions.length;
-            const totalAggregates = matchedAggregates + this.unmatchedAggregates.length;
-
-            console.log(`\n🔗 Documentation matching results:`);
-            console.log(`  • Functions matched: ${matchedFunctions}/${totalFunctions} (${this.unmatchedFunctions.length} excluded from schema)`);
-            console.log(`  • Aggregates matched: ${matchedAggregates}/${totalAggregates} (${this.unmatchedAggregates.length} excluded from schema)`);
+            const functionsDocumented = functionResults.filter(result => result.doc && result.doc.type === 'function').map(result => result.doc);
+            const aggregatesDocumented = functionResults.filter(result => result.doc && result.doc.type === 'aggregate').map(result => result.doc);
             
-            if (this.unmatchedFunctions.length > 0) {
-                console.log(`  • Unmatched functions: ${this.unmatchedFunctions.join(', ')}`);
-            }
-            
-            if (this.unmatchedAggregates.length > 0) {
-                console.log(`  • Unmatched aggregates: ${this.unmatchedAggregates.join(', ')}`);
-            }
+            // Get documented operators (only include successfully parsed ones)
+            const operatorsDocumented = operatorResults.filter(result => result.doc).map(result => result.doc);
+
+            console.log(`\n� Documentation extraction results:`);
+            console.log(`  • Functions documented: ${functionsDocumented.length}`);
+            console.log(`  • Aggregates documented: ${aggregatesDocumented.length}`);
+            console.log(`  • Operators documented: ${operatorsDocumented.length}`);
+
+            // Process operators first to migrate keywords to operators
+            await this.processOperatorDocumentation(operatorsDocumented);
+
+            // Then process functions and aggregates
+            await this.processFunctionDocumentation(functionsDocumented, aggregatesDocumented);
 
         } catch (error) {
             console.error('❌ Error extracting Microsoft Docs documentation:', error.message);
@@ -1482,12 +1458,231 @@ class ARGSchemaGenerator {
         // Use the original parseMarkdownDoc function to get structured data
         const parsedDoc = parseMarkdownDoc(content);
         
+        // Add Microsoft Learn URL
+        const urlSlug = filename.replace(/\.md$/, '');
+        const microsoftLearnUrl = `https://learn.microsoft.com/en-us/kusto/query/${urlSlug}`;
+        
         return {
             name: functionName,
             type: type,
             category: parsedDoc.category || (isAggregate ? 'KQL aggregate function' : 'KQL function'),
-            documentation: parsedDoc
+            documentation: {
+                ...parsedDoc,
+                url: microsoftLearnUrl
+            }
         };
+    }
+
+    parseOperatorMarkdownDoc(content, filename) {
+        // Extract operator name from filename
+        const nameMatch = filename.match(/^(.+?)-operator\.md$/);
+        if (!nameMatch) {
+            return null;
+        }
+        
+        const operatorName = nameMatch[1].replace(/-/g, '_');
+        
+        // Use the original parseMarkdownDoc function to get structured data
+        const parsedDoc = parseMarkdownDoc(content);
+        
+        // Trim " operator" from the title for cleaner display
+        if (parsedDoc.title && parsedDoc.title.toLowerCase().endsWith(' operator')) {
+            parsedDoc.title = parsedDoc.title.slice(0, -9).trim(); // Remove " operator" (9 characters)
+        }
+        
+        // Add Microsoft Learn URL
+        const urlSlug = filename.replace(/\.md$/, '');
+        const microsoftLearnUrl = `https://learn.microsoft.com/en-us/kusto/query/${urlSlug}`;
+        
+        return {
+            name: operatorName,
+            type: 'operator',
+            category: 'operator', // Fix: should be 'operator' not 'KQL operator'
+            documentation: {
+                ...parsedDoc,
+                url: microsoftLearnUrl
+            }
+        };
+    }
+
+    async processOperatorDocumentation(operatorsDocumented) {
+        console.log(`\n🔗 Processing operator documentation...`);
+        
+        let matchedOperators = 0;
+        const matchedOperatorsList = [];
+        const migratedFromKeywords = [];
+        const documentedOperatorNames = operatorsDocumented.map(op => op.name.toLowerCase());
+
+        for (const docOperator of operatorsDocumented) {
+            // Create variations for better matching (handle hyphens/underscores)
+            const docOperatorVariations = [
+                docOperator.name,
+                docOperator.name.toLowerCase(),
+                docOperator.name.replace(/_/g, '-'),
+                docOperator.name.replace(/_/g, '-').toLowerCase(),
+                docOperator.name.replace(/-/g, '_'),
+                docOperator.name.replace(/-/g, '_').toLowerCase()
+            ];
+            
+            // Check if this operator exists in our current operators list
+            let foundInOperators = this.schema.operators.find(op => {
+                const opVariations = [
+                    op.name,
+                    op.name.toLowerCase(),
+                    op.name.replace(/_/g, '-'),
+                    op.name.replace(/_/g, '-').toLowerCase(),
+                    op.name.replace(/-/g, '_'),
+                    op.name.replace(/-/g, '_').toLowerCase()
+                ];
+                return docOperatorVariations.some(docVar => opVariations.includes(docVar));
+            });
+
+            // Check if this operator exists in our keywords list (needs migration)
+            let foundInKeywords = this.schema.keywords.find(kw => {
+                const keywordName = typeof kw === 'object' ? kw.name : kw;
+                const keywordVariations = [
+                    keywordName,
+                    keywordName.toLowerCase(),
+                    keywordName.replace(/_/g, '-'),
+                    keywordName.replace(/_/g, '-').toLowerCase(),
+                    keywordName.replace(/-/g, '_'),
+                    keywordName.replace(/-/g, '_').toLowerCase()
+                ];
+                return docOperatorVariations.some(docVar => keywordVariations.includes(docVar));
+            });
+
+            if (foundInOperators) {
+                // Update existing operator with documentation
+                foundInOperators.documentation = docOperator.documentation;
+                foundInOperators.category = 'operator'; // Fix: always use 'operator'
+                matchedOperatorsList.push(foundInOperators);
+                matchedOperators++;
+            } else if (foundInKeywords) {
+                // Migrate keyword to operator
+                const keywordName = typeof foundInKeywords === 'object' ? foundInKeywords.name : foundInKeywords;
+                const newOperator = {
+                    name: keywordName, // Use the original keyword name format
+                    category: 'operator', // Fix: always use 'operator'
+                    documentation: docOperator.documentation
+                };
+                matchedOperatorsList.push(newOperator);
+                matchedOperators++;
+                migratedFromKeywords.push(keywordName);
+                
+                // Remove from keywords list
+                this.schema.keywords = this.schema.keywords.filter(kw => kw !== foundInKeywords);
+            } else {
+                // This is a new operator not in our lists
+                const newOperator = {
+                    name: docOperator.name,
+                    category: 'operator', // Fix: always use 'operator'
+                    documentation: docOperator.documentation
+                };
+                matchedOperatorsList.push(newOperator);
+                matchedOperators++;
+            }
+        }
+
+        // Add existing operators that didn't get documentation and track unmatched
+        for (const op of this.schema.operators) {
+            const matchedOp = matchedOperatorsList.find(matched => matched.name === op.name);
+            if (!matchedOp) {
+                // Check if this operator has documentation available
+                const hasDocumentation = documentedOperatorNames.includes(op.name.toLowerCase());
+                if (hasDocumentation) {
+                    // This should have matched but didn't - likely a naming mismatch
+                    matchedOperatorsList.push(op);
+                } else {
+                    // No documentation available for this operator
+                    matchedOperatorsList.push(op);
+                    this.unmatchedOperators.push(op.name);
+                }
+            }
+        }
+
+        // Update schema with documented operators
+        this.schema.operators = matchedOperatorsList;
+
+        console.log(`  • Operators documented: ${matchedOperators}`);
+        if (migratedFromKeywords.length > 0) {
+            console.log(`  • Migrated from keywords: ${migratedFromKeywords.join(', ')}`);
+        }
+        if (this.unmatchedOperators.length > 0) {
+            console.log(`  • Unmatched operators: ${this.unmatchedOperators.join(', ')}`);
+        }
+    }
+
+    async processFunctionDocumentation(functionsDocumented, aggregatesDocumented) {
+        console.log(`\n🔗 Processing function documentation...`);
+        
+        // Match with schema functions and track unmatched
+        let matchedFunctions = 0;
+        let matchedAggregates = 0;
+        const matchedFunctionsList = [];
+        const matchedAggregatesList = [];
+
+        for (const func of this.schema.functions) {
+            const docFunction = functionsDocumented.find(doc => 
+                doc.name === func.name || 
+                doc.name === func.name.toLowerCase() ||
+                func.name === doc.name.toLowerCase()
+            );
+            
+            if (docFunction) {
+                func.documentation = docFunction.documentation;
+                func.category = docFunction.category;
+                matchedFunctionsList.push(func);
+                matchedFunctions++;
+            } else {
+                this.unmatchedFunctions.push(func.name);
+            }
+        }
+
+        for (const agg of this.schema.aggregates) {
+            const docAggregate = aggregatesDocumented.find(doc => 
+                doc.name === agg.name || 
+                doc.name === agg.name.toLowerCase() ||
+                agg.name === doc.name.toLowerCase()
+            );
+            
+            if (docAggregate) {
+                agg.documentation = docAggregate.documentation;
+                agg.category = docAggregate.category;
+                matchedAggregatesList.push(agg);
+                matchedAggregates++;
+            } else {
+                this.unmatchedAggregates.push(agg.name);
+            }
+        }
+
+        // Update schema to only include matched functions and aggregates
+        this.schema.functions = matchedFunctionsList;
+        this.schema.aggregates = matchedAggregatesList;
+
+        const totalFunctions = matchedFunctions + this.unmatchedFunctions.length;
+        const totalAggregates = matchedAggregates + this.unmatchedAggregates.length;
+
+        console.log(`  • Functions matched: ${matchedFunctions}/${totalFunctions} (${this.unmatchedFunctions.length} excluded from schema)`);
+        console.log(`  • Aggregates matched: ${matchedAggregates}/${totalAggregates} (${this.unmatchedAggregates.length} excluded from schema)`);
+        
+        // Track remaining keywords that don't have documentation
+        for (const keyword of this.schema.keywords) {
+            if (typeof keyword === 'object' && keyword.name) {
+                // This keyword didn't get migrated to operators and has no documentation
+                this.unmatchedKeywords.push(keyword.name);
+            } else if (typeof keyword === 'string') {
+                // Simple string keyword
+                this.unmatchedKeywords.push(keyword);
+            }
+        }
+        
+        if (this.unmatchedFunctions.length > 0) {
+            console.log(`  • Unmatched functions: ${this.unmatchedFunctions.join(', ')}`);
+        }
+        
+        if (this.unmatchedAggregates.length > 0) {
+            console.log(`  • Unmatched aggregates: ${this.unmatchedAggregates.join(', ')}`);
+        }
     }
 
     extractCategoryFromTitle(content) {

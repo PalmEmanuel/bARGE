@@ -506,7 +506,11 @@ export class KustoLanguageServiceProvider implements
             // Description
             if (doc.description) {
                 hoverContent += `${doc.description}\n\n`;
-
+            }
+            
+            // Add Microsoft Learn URL if available
+            if (doc.url) {
+                hoverContent += `[Details on Microsoft Learn](${doc.url}?wt.mc_id=DT-MVP-5005372)\n\n`;
             }
             
             // Syntax
@@ -530,11 +534,61 @@ export class KustoLanguageServiceProvider implements
                 const hasMultipleExamples = doc.example.includes('```') || 
                                           doc.example.split('\n').filter((line: string) => line.trim()).length > 3;
                 const exampleLabel = hasMultipleExamples ? "Examples" : "Example";
-                hoverContent += `## ${exampleLabel}\n\`\`\`kql\n${doc.example}\n\`\`\``;
-            }            return hoverContent;
+                hoverContent += `## ${exampleLabel}\n\`\`\`kql\n${doc.example}\n\`\`\`\n\n`;
+            }
+            
+            return hoverContent;
         } else {
             // Fallback to old format
             return `**Function: ${functionInfo.name}()** - ${functionInfo.category}`;
+        }
+    }
+
+    private formatOperatorHover(operatorInfo: any): string {
+        // If we have enhanced documentation, use it
+        if (operatorInfo.documentation) {
+            const doc = operatorInfo.documentation;
+            let hoverContent = `## Operator \`${doc.title}\`\n\n`;
+            hoverContent += `*${operatorInfo.category}*\n\n`;
+            
+            // Description
+            if (doc.description) {
+                hoverContent += `${doc.description}\n\n`;
+            }
+            
+            // Add Microsoft Learn URL if available
+            if (doc.url) {
+                hoverContent += `[Details on Microsoft Learn](${doc.url}?wt.mc_id=DT-MVP-5005372)\n\n`;
+            }
+            
+            // Syntax
+            if (doc.syntax) {
+                hoverContent += `## Syntax\n\n${doc.syntax}\n\n`;
+            }
+            
+            // Parameters Table
+            if (doc.parametersTable) {
+                hoverContent += `## Parameters\n\n${doc.parametersTable}\n\n`;
+            }
+            
+            // Returns
+            if (doc.returnInfo) {
+                hoverContent += `## Returns\n\n${doc.returnInfo}\n\n`;
+            }
+            
+            // Example(s)
+            if (doc.example && doc.example.trim()) {
+                // Check if there are multiple examples (look for multiple code blocks or line breaks)
+                const hasMultipleExamples = doc.example.includes('```') || 
+                                          doc.example.split('\n').filter((line: string) => line.trim()).length > 3;
+                const exampleLabel = hasMultipleExamples ? "Examples" : "Example";
+                hoverContent += `## ${exampleLabel}\n\`\`\`kql\n${doc.example}\n\`\`\`\n\n`;
+            }
+            
+            return hoverContent;
+        } else {
+            // Fallback to old format
+            return `**Operator: ${operatorInfo.name}** - ${operatorInfo.category}`;
         }
     }
 
@@ -574,7 +628,7 @@ export class KustoLanguageServiceProvider implements
                 if (this.schemaData.operators) {
                     const operator = this.schemaData.operators.find((op: any) => op.name.toLowerCase() === lowerWord);
                     if (operator) {
-                        return `**${operator.name}** - ${operator.category}`;
+                        return this.formatOperatorHover(operator);
                     }
                 }
             }
@@ -600,7 +654,9 @@ export class KustoLanguageServiceProvider implements
                         if (table.description) {
                             hoverContent += `${table.description}\n\n`;
                         }
-                        
+
+                        hoverContent += `[Details on Microsoft Learn](https://learn.microsoft.com/en-us/azure/governance/resource-graph/concepts/query-language?wt.mc_id=DT-MVP-5005372)\n\n`;
+
                         // List specific resource types for specialized tables
                         if (table.resourceTypes && table.resourceTypes.length > 0) {
                             hoverContent += `### Resource Types\n`;
@@ -612,6 +668,8 @@ export class KustoLanguageServiceProvider implements
                                 hoverContent += `- ... and ${table.resourceTypes.length - 5} more\n`;
                             }
                             hoverContent += '\n';
+
+                            hoverContent += `[Tables and Resources Reference](https://learn.microsoft.com/en-us/azure/governance/resource-graph/reference/supported-tables-resources?wt.mc_id=DT-MVP-5005372)\n\n`;
                         }
                     }
                     
