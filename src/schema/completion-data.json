@@ -4326,375 +4326,21 @@
       "kind": "Function",
       "insertText": "zip()",
       "category": "KQL function"
-    },
-    {
-      "label": "all",
-      "kind": "Function",
-      "insertText": "all()",
-      "category": "KQL function"
-    },
-    {
-      "label": "any",
-      "kind": "Function",
-      "insertText": "any()",
-      "category": "KQL function"
-    },
-    {
-      "label": "array_iif",
-      "kind": "Function",
-      "insertText": "array_iif()",
-      "category": "KQL function"
-    },
-    {
-      "label": "array_strcat",
-      "kind": "Function",
-      "insertText": "array_strcat()",
-      "category": "KQL function"
-    },
-    {
-      "label": "arraylength",
-      "kind": "Function",
-      "insertText": "arraylength()",
-      "category": "KQL function"
-    },
-    {
-      "label": "bag_pack",
-      "kind": "Function",
-      "insertText": "bag_pack()",
-      "category": "KQL function"
-    },
-    {
-      "label": "bag_zip",
-      "kind": "Function",
-      "insertText": "bag_zip()",
-      "category": "KQL function"
-    },
-    {
-      "label": "base64_decodestring",
-      "kind": "Function",
-      "insertText": "base64_decodestring()",
-      "category": "KQL function"
-    },
-    {
-      "label": "base64_encodestring",
-      "kind": "Function",
-      "insertText": "base64_encodestring()",
-      "category": "KQL function"
-    },
-    {
-      "label": "columnifexists",
-      "kind": "Function",
-      "insertText": "columnifexists()",
-      "category": "KQL function"
-    },
-    {
-      "label": "current_cursor",
-      "kind": "Function",
-      "insertText": "current_cursor()",
-      "category": "KQL function"
-    },
-    {
-      "label": "current_node_id",
-      "kind": "Function",
-      "insertText": "current_node_id()",
-      "category": "KQL function"
-    },
-    {
-      "label": "cursor_current",
-      "kind": "Function",
-      "insertText": "cursor_current()",
-      "category": "KQL function"
-    },
-    {
-      "label": "datepart",
-      "kind": "Function",
-      "insertText": "datepart()",
-      "category": "KQL function"
-    },
-    {
-      "label": "datetime_list_timezones",
-      "kind": "Function",
-      "insertText": "datetime_list_timezones()",
-      "category": "KQL function"
-    },
-    {
-      "label": "dayofmonth",
-      "kind": "Function",
-      "insertText": "dayofmonth()",
-      "category": "KQL function"
-    },
-    {
-      "label": "dayofweek",
-      "kind": "Function",
-      "insertText": "dayofweek()",
-      "category": "KQL function"
-    },
-    {
-      "label": "dayofyear",
-      "kind": "Function",
-      "insertText": "dayofyear()",
-      "category": "KQL function"
-    },
-    {
-      "label": "entity_group",
-      "kind": "Function",
-      "insertText": "entity_group()",
-      "category": "KQL function"
-    },
-    {
-      "label": "extentid",
-      "kind": "Function",
-      "insertText": "extentid()",
-      "category": "KQL function"
-    },
-    {
-      "label": "extractall",
-      "kind": "Function",
-      "insertText": "extractall()",
-      "category": "KQL function"
-    },
-    {
-      "label": "extractjson",
-      "kind": "Function",
-      "insertText": "extractjson()",
-      "category": "KQL function"
-    },
-    {
-      "label": "floor",
-      "kind": "Function",
-      "insertText": "floor()",
-      "category": "KQL function"
-    },
-    {
-      "label": "getmonth",
-      "kind": "Function",
-      "insertText": "getmonth()",
-      "category": "KQL function"
-    },
-    {
-      "label": "gzip_compress_to_base64_string",
-      "kind": "Function",
-      "insertText": "gzip_compress_to_base64_string()",
-      "category": "KQL function"
-    },
-    {
-      "label": "gzip_decompress_from_base64_string",
-      "kind": "Function",
-      "insertText": "gzip_decompress_from_base64_string()",
-      "category": "KQL function"
-    },
-    {
-      "label": "hll_isvalid",
-      "kind": "Function",
-      "insertText": "hll_isvalid()",
-      "category": "KQL function"
-    },
-    {
-      "label": "hourofday",
-      "kind": "Function",
-      "insertText": "hourofday()",
-      "category": "KQL function"
-    },
-    {
-      "label": "iif",
-      "kind": "Function",
-      "insertText": "iif()",
-      "category": "KQL function"
-    },
-    {
-      "label": "inner_nodes",
-      "kind": "Function",
-      "insertText": "inner_nodes()",
-      "category": "KQL function"
-    },
-    {
-      "label": "isascii",
-      "kind": "Function",
-      "insertText": "isascii()",
-      "category": "KQL function"
-    },
-    {
-      "label": "iscolumnexists",
-      "kind": "Function",
-      "insertText": "iscolumnexists()",
-      "category": "KQL function"
-    },
-    {
-      "label": "labels",
-      "kind": "Function",
-      "insertText": "labels()",
-      "category": "KQL function"
-    },
-    {
-      "label": "make_string",
-      "kind": "Function",
-      "insertText": "make_string()",
-      "category": "KQL function"
-    },
-    {
-      "label": "map",
-      "kind": "Function",
-      "insertText": "map()",
-      "category": "KQL function"
-    },
-    {
-      "label": "node_degree_in",
-      "kind": "Function",
-      "insertText": "node_degree_in()",
-      "category": "KQL function"
-    },
-    {
-      "label": "node_degree_out",
-      "kind": "Function",
-      "insertText": "node_degree_out()",
-      "category": "KQL function"
-    },
-    {
-      "label": "node_id",
-      "kind": "Function",
-      "insertText": "node_id()",
-      "category": "KQL function"
-    },
-    {
-      "label": "notempty",
-      "kind": "Function",
-      "insertText": "notempty()",
-      "category": "KQL function"
-    },
-    {
-      "label": "notnull",
-      "kind": "Function",
-      "insertText": "notnull()",
-      "category": "KQL function"
-    },
-    {
-      "label": "pack_dictionary",
-      "kind": "Function",
-      "insertText": "pack_dictionary()",
-      "category": "KQL function"
-    },
-    {
-      "label": "parse_urlquery",
-      "kind": "Function",
-      "insertText": "parse_urlquery()",
-      "category": "KQL function"
-    },
-    {
-      "label": "parsejson",
-      "kind": "Function",
-      "insertText": "parsejson()",
-      "category": "KQL function"
-    },
-    {
-      "label": "parseurl",
-      "kind": "Function",
-      "insertText": "parseurl()",
-      "category": "KQL function"
-    },
-    {
-      "label": "parseurlquery",
-      "kind": "Function",
-      "insertText": "parseurlquery()",
-      "category": "KQL function"
-    },
-    {
-      "label": "percentiles_array_tdigest",
-      "kind": "Function",
-      "insertText": "percentiles_array_tdigest()",
-      "category": "KQL function"
-    },
-    {
-      "label": "replace",
-      "kind": "Function",
-      "insertText": "replace()",
-      "category": "KQL function"
-    },
-    {
-      "label": "row_rank",
-      "kind": "Function",
-      "insertText": "row_rank()",
-      "category": "KQL function"
-    },
-    {
-      "label": "rowstore_ordinal_range",
-      "kind": "Function",
-      "insertText": "rowstore_ordinal_range()",
-      "category": "KQL function"
-    },
-    {
-      "label": "set_equals",
-      "kind": "Function",
-      "insertText": "set_equals()",
-      "category": "KQL function"
-    },
-    {
-      "label": "tdigest_isvalid",
-      "kind": "Function",
-      "insertText": "tdigest_isvalid()",
-      "category": "KQL function"
-    },
-    {
-      "label": "tdigest_merge",
-      "kind": "Function",
-      "insertText": "tdigest_merge()",
-      "category": "KQL function"
-    },
-    {
-      "label": "to_utf8",
-      "kind": "Function",
-      "insertText": "to_utf8()",
-      "category": "KQL function"
-    },
-    {
-      "label": "toboolean",
-      "kind": "Function",
-      "insertText": "toboolean()",
-      "category": "KQL function"
-    },
-    {
-      "label": "todouble",
-      "kind": "Function",
-      "insertText": "todouble()",
-      "category": "KQL function"
-    },
-    {
-      "label": "todynamic",
-      "kind": "Function",
-      "insertText": "todynamic()",
-      "category": "KQL function"
-    },
-    {
-      "label": "toobject",
-      "kind": "Function",
-      "insertText": "toobject()",
-      "category": "KQL function"
-    },
-    {
-      "label": "totime",
-      "kind": "Function",
-      "insertText": "totime()",
-      "category": "KQL function"
-    },
-    {
-      "label": "weekofyear",
-      "kind": "Function",
-      "insertText": "weekofyear()",
-      "category": "KQL function"
-    },
-    {
-      "label": "zlib_compress_to_base64_string",
-      "kind": "Function",
-      "insertText": "zlib_compress_to_base64_string()",
-      "category": "KQL function"
-    },
-    {
-      "label": "zlib_decompress_from_base64_string",
-      "kind": "Function",
-      "insertText": "zlib_decompress_from_base64_string()",
-      "category": "KQL function"
     }
   ],
   "aggregates": [
+    {
+      "label": "arg_max",
+      "kind": "Function",
+      "insertText": "arg_max()",
+      "category": "Aggregation function"
+    },
+    {
+      "label": "arg_min",
+      "kind": "Function",
+      "insertText": "arg_min()",
+      "category": "Aggregation function"
+    },
     {
       "label": "avg",
       "kind": "Function",
@@ -4708,6 +4354,24 @@
       "category": "Aggregation function"
     },
     {
+      "label": "binary_all_and",
+      "kind": "Function",
+      "insertText": "binary_all_and()",
+      "category": "Aggregation function"
+    },
+    {
+      "label": "binary_all_or",
+      "kind": "Function",
+      "insertText": "binary_all_or()",
+      "category": "Aggregation function"
+    },
+    {
+      "label": "binary_all_xor",
+      "kind": "Function",
+      "insertText": "binary_all_xor()",
+      "category": "Aggregation function"
+    },
+    {
       "label": "buildschema",
       "kind": "Function",
       "insertText": "buildschema()",
@@ -4717,6 +4381,18 @@
       "label": "count",
       "kind": "Function",
       "insertText": "count()",
+      "category": "Aggregation function"
+    },
+    {
+      "label": "count_distinct",
+      "kind": "Function",
+      "insertText": "count_distinct()",
+      "category": "Aggregation function"
+    },
+    {
+      "label": "count_distinctif",
+      "kind": "Function",
+      "insertText": "count_distinctif()",
       "category": "Aggregation function"
     },
     {
@@ -4768,10 +4444,58 @@
       "category": "Aggregation function"
     },
     {
+      "label": "hll_if",
+      "kind": "Function",
+      "insertText": "hll_if()",
+      "category": "Aggregation function"
+    },
+    {
       "label": "hll_merge",
       "kind": "Function",
       "insertText": "hll_merge()",
-      "category": "KQL function"
+      "category": "Aggregation function"
+    },
+    {
+      "label": "make_bag",
+      "kind": "Function",
+      "insertText": "make_bag()",
+      "category": "Aggregation function"
+    },
+    {
+      "label": "make_bag_if",
+      "kind": "Function",
+      "insertText": "make_bag_if()",
+      "category": "Aggregation function"
+    },
+    {
+      "label": "make_list",
+      "kind": "Function",
+      "insertText": "make_list()",
+      "category": "Aggregation function"
+    },
+    {
+      "label": "make_list_if",
+      "kind": "Function",
+      "insertText": "make_list_if()",
+      "category": "Aggregation function"
+    },
+    {
+      "label": "make_list_with_nulls",
+      "kind": "Function",
+      "insertText": "make_list_with_nulls()",
+      "category": "Aggregation function"
+    },
+    {
+      "label": "make_set",
+      "kind": "Function",
+      "insertText": "make_set()",
+      "category": "Aggregation function"
+    },
+    {
+      "label": "make_set_if",
+      "kind": "Function",
+      "insertText": "make_set_if()",
+      "category": "Aggregation function"
     },
     {
       "label": "max",
@@ -4784,12 +4508,6 @@
       "kind": "Function",
       "insertText": "maxif()",
       "category": "Aggregation function"
-    },
-    {
-      "label": "merge_tdigest",
-      "kind": "Function",
-      "insertText": "merge_tdigest()",
-      "category": "KQL function"
     },
     {
       "label": "min",
@@ -4846,10 +4564,28 @@
       "category": "Aggregation function"
     },
     {
+      "label": "take_any",
+      "kind": "Function",
+      "insertText": "take_any()",
+      "category": "Aggregation function"
+    },
+    {
+      "label": "take_anyif",
+      "kind": "Function",
+      "insertText": "take_anyif()",
+      "category": "Aggregation function"
+    },
+    {
       "label": "tdigest",
       "kind": "Function",
       "insertText": "tdigest()",
       "category": "Aggregation function"
+    },
+    {
+      "label": "tdigest_merge",
+      "kind": "Function",
+      "insertText": "tdigest_merge()",
+      "category": "Aggregation functions"
     },
     {
       "label": "variance",
@@ -4874,192 +4610,6 @@
       "kind": "Function",
       "insertText": "variancepif()",
       "category": "Aggregation function"
-    },
-    {
-      "label": "any",
-      "kind": "Function",
-      "insertText": "any()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "anyif",
-      "kind": "Function",
-      "insertText": "anyif()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "arg_max",
-      "kind": "Function",
-      "insertText": "arg_max()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "arg_min",
-      "kind": "Function",
-      "insertText": "arg_min()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "argmax",
-      "kind": "Function",
-      "insertText": "argmax()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "argmin",
-      "kind": "Function",
-      "insertText": "argmin()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "binary_all_and",
-      "kind": "Function",
-      "insertText": "binary_all_and()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "binary_all_or",
-      "kind": "Function",
-      "insertText": "binary_all_or()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "binary_all_xor",
-      "kind": "Function",
-      "insertText": "binary_all_xor()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "cnt",
-      "kind": "Function",
-      "insertText": "cnt()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "count_distinct",
-      "kind": "Function",
-      "insertText": "count_distinct()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "count_distinctif",
-      "kind": "Function",
-      "insertText": "count_distinctif()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "hll_if",
-      "kind": "Function",
-      "insertText": "hll_if()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "make_bag",
-      "kind": "Function",
-      "insertText": "make_bag()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "make_bag_if",
-      "kind": "Function",
-      "insertText": "make_bag_if()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "make_dictionary",
-      "kind": "Function",
-      "insertText": "make_dictionary()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "make_list",
-      "kind": "Function",
-      "insertText": "make_list()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "make_list_if",
-      "kind": "Function",
-      "insertText": "make_list_if()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "make_list_with_nulls",
-      "kind": "Function",
-      "insertText": "make_list_with_nulls()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "make_set",
-      "kind": "Function",
-      "insertText": "make_set()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "make_set_if",
-      "kind": "Function",
-      "insertText": "make_set_if()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "makelist",
-      "kind": "Function",
-      "insertText": "makelist()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "makeset",
-      "kind": "Function",
-      "insertText": "makeset()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "passthrough",
-      "kind": "Function",
-      "insertText": "passthrough()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "percentile",
-      "kind": "Function",
-      "insertText": "percentile()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "percentiles_array",
-      "kind": "Function",
-      "insertText": "percentiles_array()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "percentilesw_array",
-      "kind": "Function",
-      "insertText": "percentilesw_array()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "percentilew",
-      "kind": "Function",
-      "insertText": "percentilew()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "take_any",
-      "kind": "Function",
-      "insertText": "take_any()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "take_anyif",
-      "kind": "Function",
-      "insertText": "take_anyif()",
-      "category": "Aggregate function"
-    },
-    {
-      "label": "tdigest_merge",
-      "kind": "Function",
-      "insertText": "tdigest_merge()",
-      "category": "Aggregate function"
     }
   ],
   "resourceTypes": [

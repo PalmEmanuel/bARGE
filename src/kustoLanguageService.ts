@@ -500,45 +500,28 @@ export class KustoLanguageServiceProvider implements
         // If we have enhanced documentation, use it
         if (functionInfo.documentation) {
             const doc = functionInfo.documentation;
-            let hoverContent = `## Function \`${doc.title}\`
-
-`;
-            hoverContent += `*${functionInfo.category}*
-
-`;
+            let hoverContent = `## Function \`${doc.title}\`\n\n`;
+            hoverContent += `*${functionInfo.category}*\n\n`;
             
             // Description
             if (doc.description) {
-                hoverContent += `${doc.description}
+                hoverContent += `${doc.description}\n\n`;
 
-`;
             }
             
             // Syntax
             if (doc.syntax) {
-                hoverContent += `## Syntax
-
-${doc.syntax}
-
-`;
+                hoverContent += `## Syntax\n\n${doc.syntax}\n\n`;
             }
             
             // Parameters Table
             if (doc.parametersTable) {
-                hoverContent += `## Parameters
-
-${doc.parametersTable}
-
-`;
+                hoverContent += `## Parameters\n\n${doc.parametersTable}\n\n`;
             }
             
             // Returns
             if (doc.returnInfo) {
-                hoverContent += `## Returns
-
-${doc.returnInfo}
-
-`;
+                hoverContent += `## Returns\n\n${doc.returnInfo}\n\n`;
             }
             
             // Example(s)
@@ -594,9 +577,6 @@ ${doc.returnInfo}
                         return `**${operator.name}** - ${operator.category}`;
                     }
                 }
-                
-                // Continue to check tables and other items if no keywords/operators found
-                // (Don't return null here - let it fall through to table checking)
             }
             
             // Check functions/aggregates (fallback for general case)

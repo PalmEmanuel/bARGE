@@ -59,7 +59,12 @@ function cleanFunctionTitle(title) {
         return title;
     }
     // Remove category information like "(aggregation function)" from the end
-    return title.replace(/\s*\([^)]+\)\s*$/, '').trim();
+    // Also remove " - (preview)" from the end
+    return title
+        .replace(/\s*\([^)]+\)\s*$/, '')
+        .replace(/\s+-\s*\(preview\)$/i, '')
+        .replace(/\s*-\s*$/i, '')  // Remove trailing " -" after removing preview
+        .trim();
 }
 
 // Focused documentation parser for Microsoft Docs
@@ -193,11 +198,17 @@ function parseMarkdownDoc(content) {
     
     example = processedExample;
     
-    // Extract category from raw title before cleaning
-    const extractedCategory = title ? extractCategoryFromTitle(title) : 'KQL function';
+    // First, remove preview suffix from title if present
+    let cleanedTitle = title;
+    if (title) {
+        cleanedTitle = title.replace(/\s+-\s*\(preview\)$/i, '').replace(/\s*-\s*$/i, '').trim();
+    }
+    
+    // Extract category from cleaned title (without preview suffix)
+    const extractedCategory = extractCategoryFromTitle(cleanedTitle);
     
     return {
-        title: cleanMarkdownLinks(cleanFunctionTitle(title)),
+        title: cleanMarkdownLinks(cleanFunctionTitle(cleanedTitle)),
         description: cleanMarkdownLinks(description),
         syntax: cleanMarkdownLinks(syntax),
         returnInfo: cleanMarkdownLinks(returnInfo),
@@ -242,6 +253,10 @@ class ARGSchemaGenerator {
         this.baseRetryDelay = 1000; // Start with 1 second
         this.maxRetryDelay = 10000; // Cap at 10 seconds
         this.timeoutMs = 10000; // 10 second timeout per request
+        
+        // Track functions without documentation
+        this.unmatchedFunctions = [];
+        this.unmatchedAggregates = [];
     }
 
     async fetchUrl(url, attempt = 1) {
@@ -399,6 +414,17 @@ class ARGSchemaGenerator {
         console.log(`   Operators: ${this.schema.operators?.length || 0}`);
         console.log(`   Functions: ${this.schema.functions?.length || 0}`);
         console.log(`   Aggregates: ${this.schema.aggregates?.length || 0}`);
+        
+        // Report documentation coverage
+        if (this.unmatchedFunctions.length > 0 || this.unmatchedAggregates.length > 0) {
+            console.log('\n📝 Documentation Coverage:');
+            if (this.unmatchedFunctions.length > 0) {
+                console.log(`   Unmatched Functions (${this.unmatchedFunctions.length}): ${this.unmatchedFunctions.join(', ')}`);
+            }
+            if (this.unmatchedAggregates.length > 0) {
+                console.log(`   Unmatched Aggregates (${this.unmatchedAggregates.length}): ${this.unmatchedAggregates.join(', ')}`);
+            }
+        }
     }
 
     async generateResourcesOnly() {
@@ -1307,46 +1333,12 @@ class ARGSchemaGenerator {
             this.schema.keywords = kustoElements.keywords.map(name => ({ name, category: 'KQL Keyword' }));
             this.schema.operators = kustoElements.operators.map(name => ({ name, category: 'KQL Operator' }));
             
-            // Extract enhanced documentation for functions
-            console.log('📚 Extracting enhanced function documentation...');
-            const functionsWithDocs = await this.extractMicrosoftDocsDocumentation(kustoElements.functions);
+            // Set up basic functions and aggregates first
+            this.schema.functions = kustoElements.functions.map(name => ({ name, category: 'Function' }));
+            this.schema.aggregates = kustoElements.aggregates.map(name => ({ name, category: 'Aggregate' }));
             
-            // Extract enhanced documentation for aggregates
-            console.log('📚 Extracting enhanced aggregate documentation...');
-            const aggregatesWithDocs = await this.extractMicrosoftDocsDocumentation(kustoElements.aggregates);
-            
-            // Merge documented functions with basic function list
-            const functionMap = new Map();
-            
-            // Add documented functions first
-            functionsWithDocs.forEach(func => {
-                functionMap.set(func.name, func);
-            });
-            
-            // Add any remaining functions without documentation
-            kustoElements.functions.forEach(name => {
-                if (!functionMap.has(name)) {
-                    functionMap.set(name, { name, category: 'KQL function' });
-                }
-            });
-            
-            // Merge documented aggregates with basic aggregate list
-            const aggregateMap = new Map();
-            
-            // Add documented aggregates first
-            aggregatesWithDocs.forEach(agg => {
-                aggregateMap.set(agg.name, agg);
-            });
-            
-            // Add any remaining aggregates without documentation
-            kustoElements.aggregates.forEach(name => {
-                if (!aggregateMap.has(name)) {
-                    aggregateMap.set(name, { name, category: 'Aggregate function' });
-                }
-            });
-            
-            this.schema.functions = Array.from(functionMap.values());
-            this.schema.aggregates = Array.from(aggregateMap.values());
+            // Extract enhanced documentation for functions and aggregates
+            await this.extractMicrosoftDocsDocumentation();
             
         } catch (error) {
             console.warn('⚠️ Could not extract Kusto language elements:', error.message);
@@ -1369,6 +1361,198 @@ class ARGSchemaGenerator {
         await this.generateTextMateGrammar();
 
         console.log(`📁 Schema files written to: ${outputDir}`);
+    }
+
+    async extractMicrosoftDocsDocumentation() {
+        const kqlDocsUrl = 'https://api.github.com/repos/MicrosoftDocs/dataexplorer-docs/contents/data-explorer/kusto/query';
+        console.log('\n🔍 Extracting KQL documentation from Microsoft Docs...');
+        
+        try {
+            const functionFiles = await this.fetchGitHubDirectoryContents(kqlDocsUrl);
+            const relevantFiles = functionFiles.filter(file => 
+                file.name.endsWith('-function.md') || 
+                file.name.endsWith('-aggregate-function.md') ||
+                file.name.endsWith('-aggregation-function.md')
+            );
+
+            console.log(`📄 Found ${relevantFiles.length} function documentation files`);
+
+            // Process functions and aggregates in parallel
+            const results = await Promise.all(relevantFiles.map(async (file) => {
+                const fileContent = await this.fetchGitHubFileContent(file.download_url);
+                const functionDoc = this.parseMarkdownDoc(fileContent, file.name);
+                
+                return { file: file.name, doc: functionDoc };
+            }));
+
+            // Separate functions from aggregates (only include successfully parsed ones)
+            const functionResults = results.filter(result => result.doc && result.doc.type === 'function').map(result => result.doc);
+            const aggregateResults = results.filter(result => result.doc && result.doc.type === 'aggregate').map(result => result.doc);
+
+            console.log(`\n📊 Documentation extraction results:`);
+            console.log(`  • Functions documented: ${functionResults.length}`);
+            console.log(`  • Aggregates documented: ${aggregateResults.length}`);
+
+            // Match with schema functions and track unmatched
+            let matchedFunctions = 0;
+            let matchedAggregates = 0;
+            const matchedFunctionsList = [];
+            const matchedAggregatesList = [];
+
+            for (const func of this.schema.functions) {
+                const docFunction = functionResults.find(doc => 
+                    doc.name === func.name || 
+                    doc.name === func.name.toLowerCase() ||
+                    func.name === doc.name.toLowerCase()
+                );
+                
+                if (docFunction) {
+                    func.documentation = docFunction.documentation;
+                    func.category = docFunction.category;
+                    matchedFunctionsList.push(func);
+                    matchedFunctions++;
+                } else {
+                    this.unmatchedFunctions.push(func.name);
+                }
+            }
+
+            for (const agg of this.schema.aggregates) {
+                const docAggregate = aggregateResults.find(doc => 
+                    doc.name === agg.name || 
+                    doc.name === agg.name.toLowerCase() ||
+                    agg.name === doc.name.toLowerCase()
+                );
+                
+                if (docAggregate) {
+                    agg.documentation = docAggregate.documentation;
+                    agg.category = docAggregate.category;
+                    matchedAggregatesList.push(agg);
+                    matchedAggregates++;
+                } else {
+                    this.unmatchedAggregates.push(agg.name);
+                }
+            }
+
+            // Update schema to only include matched functions and aggregates
+            this.schema.functions = matchedFunctionsList;
+            this.schema.aggregates = matchedAggregatesList;
+
+            const totalFunctions = matchedFunctions + this.unmatchedFunctions.length;
+            const totalAggregates = matchedAggregates + this.unmatchedAggregates.length;
+
+            console.log(`\n🔗 Documentation matching results:`);
+            console.log(`  • Functions matched: ${matchedFunctions}/${totalFunctions} (${this.unmatchedFunctions.length} excluded from schema)`);
+            console.log(`  • Aggregates matched: ${matchedAggregates}/${totalAggregates} (${this.unmatchedAggregates.length} excluded from schema)`);
+            
+            if (this.unmatchedFunctions.length > 0) {
+                console.log(`  • Unmatched functions: ${this.unmatchedFunctions.join(', ')}`);
+            }
+            
+            if (this.unmatchedAggregates.length > 0) {
+                console.log(`  • Unmatched aggregates: ${this.unmatchedAggregates.join(', ')}`);
+            }
+
+        } catch (error) {
+            console.error('❌ Error extracting Microsoft Docs documentation:', error.message);
+        }
+    }
+
+    async fetchGitHubDirectoryContents(url) {
+        const response = await this.fetchUrl(url);
+        return JSON.parse(response);
+    }
+
+    async fetchGitHubFileContent(url) {
+        return await this.fetchUrl(url);
+    }
+
+    parseMarkdownDoc(content, filename) {
+        // Extract function name from filename
+        const nameMatch = filename.match(/^(.+?)(?:-(function|aggregate-function|aggregation-function))\.md$/);
+        if (!nameMatch) {
+            return null;
+        }
+        
+        const functionName = nameMatch[1].replace(/-/g, '_');
+        
+        // Determine type from filename
+        const isAggregate = filename.includes('aggregate') || filename.includes('aggregation');
+        const type = isAggregate ? 'aggregate' : 'function';
+        
+        // Use the original parseMarkdownDoc function to get structured data
+        const parsedDoc = parseMarkdownDoc(content);
+        
+        return {
+            name: functionName,
+            type: type,
+            category: parsedDoc.category || (isAggregate ? 'KQL aggregate function' : 'KQL function'),
+            documentation: parsedDoc
+        };
+    }
+
+    extractCategoryFromTitle(content) {
+        // Extract the first H1 title from the markdown
+        const titleMatch = content.match(/^#\s+(.+)$/m);
+        if (!titleMatch) {
+            return null;
+        }
+        
+        const title = titleMatch[1].trim();
+        
+        // Look for category patterns in the title
+        const categoryPatterns = [
+            /(.+?)\s+function$/i,
+            /(.+?)\s+aggregate\s*function$/i,
+            /(.+?)\s+aggregation\s*function$/i,
+            /(.+?)\s+operator$/i
+        ];
+        
+        for (const pattern of categoryPatterns) {
+            const match = title.match(pattern);
+            if (match) {
+                // Convert to sentence case (first letter uppercase, rest lowercase)
+                const category = match[1].trim();
+                return category.charAt(0).toUpperCase() + category.slice(1).toLowerCase();
+            }
+        }
+        
+        return null;
+    }
+
+    cleanFunctionTitle(title) {
+        // Remove category suffixes from titles
+        return title
+            .replace(/\s+function$/i, '')
+            .replace(/\s+aggregate\s*function$/i, '')
+            .replace(/\s+aggregation\s*function$/i, '')
+            .replace(/\s+operator$/i, '')
+            .replace(/\s+-\s*\(preview\)$/i, '')  // Remove " - (preview)" from the end
+            .replace(/\s*-\s*$/i, '')  // Remove trailing " -" after removing preview
+            .trim();
+    }
+
+    cleanMarkdownLinks(content) {
+        if (!content) {
+            return '';
+        }
+        
+        return content
+            // Remove moniker ranges
+            .replace(/:::moniker\s+range="[^"]*":::\s*/g, '')
+            .replace(/:::moniker-end:::\s*/g, '')
+            
+            // Convert markdown links to plain text, preserving the link text
+            .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+            
+            // Remove reference-style links
+            .replace(/\[([^\]]+)\]\[[^\]]*\]/g, '$1')
+            
+            // Clean up table alignment (dynamic replacement for any number of dashes)
+            .replace(/^\|[\s\-:]*\|$/gm, '')
+            
+            // Remove extra whitespace and empty lines
+            .replace(/\n\s*\n\s*\n/g, '\n\n')
+            .trim();
     }
 
     async generateCompletionData(outputDir) {
@@ -1556,94 +1740,6 @@ class ARGSchemaGenerator {
             functions: Array.from(functions).sort(),
             aggregates: Array.from(aggregates).sort()
         };
-    }
-
-    async extractMicrosoftDocsDocumentation(functionNames) {
-        console.log('📚 Extracting documentation from Microsoft Docs...');
-        
-        try {
-            // Get list of documentation files
-            const repoUrl = 'https://api.github.com/repos/MicrosoftDocs/dataexplorer-docs/contents/data-explorer/kusto/query';
-            const fileListResponse = await this.fetchUrl(repoUrl);
-            const files = JSON.parse(fileListResponse).filter(file => 
-                file.name.endsWith('-function.md') || file.name.endsWith('-operator.md') || file.name.endsWith('-aggregation-function.md')
-            );
-            
-            console.log(`📄 Found ${files.length} documentation files`);
-            
-            // Find functions that have documentation
-            const matchedFunctions = [];
-            functionNames.forEach(funcName => {
-                const searchPatterns = [
-                    `${funcName.toLowerCase()}-function.md`,
-                    `${funcName.toLowerCase().replace(/_/g, '-')}-function.md`,
-                    `${funcName.toLowerCase()}-aggregation-function.md`
-                ];
-                
-                for (const pattern of searchPatterns) {
-                    const file = files.find(f => f.name === pattern);
-                    if (file) {
-                        matchedFunctions.push({
-                            name: funcName,
-                            file: file
-                        });
-                        break;
-                    }
-                }
-            });
-            
-            console.log(`✅ Found ${matchedFunctions.length} functions with documentation`);
-            console.log(`📥 Extracting documentation for all ${matchedFunctions.length} functions...`);
-            
-            const extractedDocs = [];
-            let successCount = 0;
-            let errorCount = 0;
-            
-            for (let i = 0; i < matchedFunctions.length; i++) {
-                const func = matchedFunctions[i];
-                
-                // Progress indicator every 50 functions
-                if (i % 50 === 0) {
-                    console.log(`📥 Progress: ${i}/${matchedFunctions.length} (${((i / matchedFunctions.length) * 100).toFixed(1)}%)`);
-                }
-                
-                try {
-                    const rawUrl = `https://raw.githubusercontent.com/MicrosoftDocs/dataexplorer-docs/main/data-explorer/kusto/query/${func.file.name}`;
-                    const content = await this.fetchUrl(rawUrl);
-                    
-                    if (content) {
-                        const documentation = parseMarkdownDoc(content);
-                        
-                        // Use the category extracted during parsing (from raw title)
-                        const category = documentation.category || 'KQL function';
-                        
-                        extractedDocs.push({
-                            name: func.name,
-                            category: category,
-                            documentation: documentation
-                        });
-                        successCount++;
-                    } else {
-                        console.warn(`⚠️ Empty content for ${func.name}`);
-                        errorCount++;
-                    }
-                    
-                    // Small delay to be respectful to GitHub API
-                    await this.delay(50);
-                    
-                } catch (error) {
-                    console.error(`❌ Error extracting ${func.name}: ${error.message}`);
-                    errorCount++;
-                }
-            }
-            
-            console.log(`📊 Documentation extraction complete: ${successCount} success, ${errorCount} errors`);
-            return extractedDocs;
-            
-        } catch (error) {
-            console.error('❌ Error extracting Microsoft Docs documentation:', error.message);
-            return [];
-        }
     }
 
     async generateTextMateGrammar() {

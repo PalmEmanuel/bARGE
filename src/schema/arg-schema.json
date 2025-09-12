@@ -15829,253 +15829,37 @@
         "category": "KQL function",
         "sourceLength": 2369
       }
-    },
-    {
-      "name": "all",
-      "category": "KQL function"
-    },
-    {
-      "name": "any",
-      "category": "KQL function"
-    },
-    {
-      "name": "array_iif",
-      "category": "KQL function"
-    },
-    {
-      "name": "array_strcat",
-      "category": "KQL function"
-    },
-    {
-      "name": "arraylength",
-      "category": "KQL function"
-    },
-    {
-      "name": "bag_pack",
-      "category": "KQL function"
-    },
-    {
-      "name": "bag_zip",
-      "category": "KQL function"
-    },
-    {
-      "name": "base64_decodestring",
-      "category": "KQL function"
-    },
-    {
-      "name": "base64_encodestring",
-      "category": "KQL function"
-    },
-    {
-      "name": "columnifexists",
-      "category": "KQL function"
-    },
-    {
-      "name": "current_cursor",
-      "category": "KQL function"
-    },
-    {
-      "name": "current_node_id",
-      "category": "KQL function"
-    },
-    {
-      "name": "cursor_current",
-      "category": "KQL function"
-    },
-    {
-      "name": "datepart",
-      "category": "KQL function"
-    },
-    {
-      "name": "datetime_list_timezones",
-      "category": "KQL function"
-    },
-    {
-      "name": "dayofmonth",
-      "category": "KQL function"
-    },
-    {
-      "name": "dayofweek",
-      "category": "KQL function"
-    },
-    {
-      "name": "dayofyear",
-      "category": "KQL function"
-    },
-    {
-      "name": "entity_group",
-      "category": "KQL function"
-    },
-    {
-      "name": "extentid",
-      "category": "KQL function"
-    },
-    {
-      "name": "extractall",
-      "category": "KQL function"
-    },
-    {
-      "name": "extractjson",
-      "category": "KQL function"
-    },
-    {
-      "name": "floor",
-      "category": "KQL function"
-    },
-    {
-      "name": "getmonth",
-      "category": "KQL function"
-    },
-    {
-      "name": "gzip_compress_to_base64_string",
-      "category": "KQL function"
-    },
-    {
-      "name": "gzip_decompress_from_base64_string",
-      "category": "KQL function"
-    },
-    {
-      "name": "hll_isvalid",
-      "category": "KQL function"
-    },
-    {
-      "name": "hourofday",
-      "category": "KQL function"
-    },
-    {
-      "name": "iif",
-      "category": "KQL function"
-    },
-    {
-      "name": "inner_nodes",
-      "category": "KQL function"
-    },
-    {
-      "name": "isascii",
-      "category": "KQL function"
-    },
-    {
-      "name": "iscolumnexists",
-      "category": "KQL function"
-    },
-    {
-      "name": "labels",
-      "category": "KQL function"
-    },
-    {
-      "name": "make_string",
-      "category": "KQL function"
-    },
-    {
-      "name": "map",
-      "category": "KQL function"
-    },
-    {
-      "name": "node_degree_in",
-      "category": "KQL function"
-    },
-    {
-      "name": "node_degree_out",
-      "category": "KQL function"
-    },
-    {
-      "name": "node_id",
-      "category": "KQL function"
-    },
-    {
-      "name": "notempty",
-      "category": "KQL function"
-    },
-    {
-      "name": "notnull",
-      "category": "KQL function"
-    },
-    {
-      "name": "pack_dictionary",
-      "category": "KQL function"
-    },
-    {
-      "name": "parse_urlquery",
-      "category": "KQL function"
-    },
-    {
-      "name": "parsejson",
-      "category": "KQL function"
-    },
-    {
-      "name": "parseurl",
-      "category": "KQL function"
-    },
-    {
-      "name": "parseurlquery",
-      "category": "KQL function"
-    },
-    {
-      "name": "percentiles_array_tdigest",
-      "category": "KQL function"
-    },
-    {
-      "name": "replace",
-      "category": "KQL function"
-    },
-    {
-      "name": "row_rank",
-      "category": "KQL function"
-    },
-    {
-      "name": "rowstore_ordinal_range",
-      "category": "KQL function"
-    },
-    {
-      "name": "set_equals",
-      "category": "KQL function"
-    },
-    {
-      "name": "tdigest_isvalid",
-      "category": "KQL function"
-    },
-    {
-      "name": "tdigest_merge",
-      "category": "KQL function"
-    },
-    {
-      "name": "to_utf8",
-      "category": "KQL function"
-    },
-    {
-      "name": "toboolean",
-      "category": "KQL function"
-    },
-    {
-      "name": "todouble",
-      "category": "KQL function"
-    },
-    {
-      "name": "todynamic",
-      "category": "KQL function"
-    },
-    {
-      "name": "toobject",
-      "category": "KQL function"
-    },
-    {
-      "name": "totime",
-      "category": "KQL function"
-    },
-    {
-      "name": "weekofyear",
-      "category": "KQL function"
-    },
-    {
-      "name": "zlib_compress_to_base64_string",
-      "category": "KQL function"
-    },
-    {
-      "name": "zlib_decompress_from_base64_string",
-      "category": "KQL function"
     }
   ],
   "aggregates": [
+    {
+      "name": "arg_max",
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "arg_max()",
+        "description": "Finds a row in the table that maximizes the specified expression. It returns all columns of the input table or specified columns.\n\n> **Deprecated aliases:** argmax()",
+        "syntax": "`arg_max` `(`*ExprToMaximize*`,` *\\** | *ExprToReturn*  [`,` ...]`)`",
+        "returnInfo": "Returns a row in the table that maximizes the specified expression *ExprToMaximize*, and the values of columns specified in *ExprToReturn*.\n\n> [!TIP]\n> To see the maximal value only, use the max() function.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *ExprToMaximize* | `string` |  *True* | The expression for which the maximum value is determined. |\n| *ExprToReturn* | `string` |  *True* | The expression determines which columns' values are returned, from the row that has the maximum value for *ExprToMaximize*.  Use a wildcard `*` to return all columns. |",
+        "example": "",
+        "category": "Aggregation function",
+        "sourceLength": 7861
+      }
+    },
+    {
+      "name": "arg_min",
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "arg_min()",
+        "description": "Finds a row in the table that minimizes the specified expression. It returns all columns of the input table or specified columns.\n\n> **Deprecated aliases:** argmin()",
+        "syntax": "`arg_min` `(`*ExprToMinimize*`,` *\\** | *ExprToReturn*  [`,` ...]`)`",
+        "returnInfo": "Returns a row in the table that minimizes *ExprToMinimize*, and the values of columns specified in *ExprToReturn*. Use or `*` to return the entire row.\n\n> [!TIP]\n> To see the minimal value only, use the min() function.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *ExprToMinimize*| `string` |  *True* | The expression for which the minimum value is determined. |\n| *ExprToReturn* | `string` |  *True* | The expression determines which columns' values are returned, from the row that has the minimum value for *ExprToMinimize*.  Use a wildcard `*` to return all columns. |\n\nWhen *ExprToMinimize* is null for all rows in a table, one row in the table is picked. Otherwise, rows where *ExprToMinimize* is null are ignored.",
+        "example": "StormEvents \n| summarize arg_min(BeginLat, BeginLocation) by State\n\nStormEvents\n| where DeathsDirect > 0\n| summarize arg_min(StartTime, *) by State\n\ndatatable(Fruit: string, Color: string, Version: int) [\n    \"Apple\", \"Red\", 1,\n    \"Apple\", \"Green\", int(null),\n    \"Banana\", \"Yellow\", int(null),\n    \"Banana\", \"Green\", int(null),\n    \"Pear\", \"Brown\", 1,\n    \"Pear\", \"Green\", 2,\n]\n| summarize arg_min(Version, *) by Fruit",
+        "category": "Aggregation function",
+        "sourceLength": 7632
+      }
+    },
     {
       "name": "avg",
       "category": "Aggregation function",
@@ -16105,6 +15889,48 @@
       }
     },
     {
+      "name": "binary_all_and",
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "binary_all_and()",
+        "description": "Accumulates values using the binary `AND` operation for each summarization group, or in total if a group isn't specified.",
+        "syntax": "`binary_all_and` `(`*expr*`)`",
+        "returnInfo": "Returns an aggregated value using the binary `AND` operation over records for each summarization group, or in total if a group isn't specified.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr* | `long` |  *True* | The value used for the binary `AND`  calculation. |",
+        "example": "datatable(num:long)\n[\n  0xFFFFFFFF, \n  0xFFFFF00F,\n  0xCFFFFFFD,\n  0xFAFEFFFF,\n]\n| summarize result = toupper(tohex(binary_all_and(num)))",
+        "category": "Aggregation function",
+        "sourceLength": 2209
+      }
+    },
+    {
+      "name": "binary_all_or",
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "binary_all_or()",
+        "description": "Accumulates values using the binary `OR` operation for each summarization group, or in total if a group isn't specified.",
+        "syntax": "`binary_all_or` `(`*expr*`)`",
+        "returnInfo": "Returns an aggregated value using the binary `OR` operation over records for each summarization group, or in total if a group isn't specified.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr* | `long` |  *True* | The value used for the binary `OR`  calculation. |",
+        "example": "datatable(num:long)\n[\n  0x88888008,\n  0x42000000,\n  0x00767000,\n  0x00000005, \n]\n| summarize result = toupper(tohex(binary_all_or(num)))",
+        "category": "Aggregation function",
+        "sourceLength": 2258
+      }
+    },
+    {
+      "name": "binary_all_xor",
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "binary_all_xor()",
+        "description": "Accumulates values using the binary `XOR` operation for each summarization group, or in total if a group is not specified.",
+        "syntax": "`binary_all_xor` `(`*expr*`)`",
+        "returnInfo": "Returns a value that is aggregated using the binary `XOR` operation over records for each summarization group, or in total if a group isn't specified.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr* | `long` |  *True* | The value used for the binary `XOR`  calculation. |",
+        "example": "datatable(num:long)\n[\n  0x44404440,\n  0x1E1E1E1E,\n  0x90ABBA09,\n  0x000B105A,\n]\n| summarize result = toupper(tohex(binary_all_xor(num)))",
+        "category": "Aggregation function",
+        "sourceLength": 2248
+      }
+    },
+    {
       "name": "buildschema",
       "category": "Aggregation function",
       "documentation": {
@@ -16130,6 +15956,34 @@
         "example": "StormEvents\n| summarize Count=count() by State",
         "category": "Aggregation function",
         "sourceLength": 2436
+      }
+    },
+    {
+      "name": "count_distinct",
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "count_distinct()",
+        "description": "Counts unique values specified by the scalar expression per summary group, or the total number of unique values if the summary group is omitted.\n\nIf you only need an estimation of unique values count, we recommend using the less resource-consuming `dcount` aggregation function.\n\nTo count only records for which a predicate returns `true`, use the count_distinctif aggregation function.\n\n> [!NOTE]\n>\n> * This function is limited to 100M unique values. An attempt to apply the function on an expression returning too many values produce a runtime error (HRESULT: 0x80DA0012).\n:::moniker range=\"azure-data-explorer\"\n> * Function performance can be degraded when operating on multiple data sources from different clusters.\n::: moniker-end\n:::moniker range=\"microsoft-fabric\"\n> * Function performance can be degraded when operating on multiple data sources from different Eventhouses.\n::: moniker-end",
+        "syntax": "`count_distinct` `(`*expr*`)`",
+        "returnInfo": "Long integer value indicating the number of unique values of *expr* per summary group.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr*| scalar |  *True* | The expression whose unique values are to be counted. |",
+        "example": "StormEvents\n| summarize UniqueEvents=count_distinct(EventType) by State\n| top 5 by UniqueEvents",
+        "category": "Aggregation function",
+        "sourceLength": 3433
+      }
+    },
+    {
+      "name": "count_distinctif",
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "count_distinctif()",
+        "description": "Conditionally counts unique values specified by the scalar expression per summary group, or the total number of unique values if the summary group is omitted. Only records for which *predicate* evaluates to `true` are counted.\n\nIf you only need an estimation of unique values count, we recommend using the less resource-consuming dcountif aggregation function.\n\n> [!NOTE]\n>\n> * This function is limited to 100M unique values. An attempt to apply the function on an expression returning too many values produces a runtime error (HRESULT: 0x80DA0012).\n:::moniker range=\"azure-data-explorer\"\n> * Function performance can be degraded when operating on multiple data sources from different clusters.\n::: moniker-end\n:::moniker range=\"microsoft-fabric\"\n> * Function performance can be degraded when operating on multiple data sources from different Eventhouses.\n::: moniker-end",
+        "syntax": "`count_distinctif` `(`*expr*`,` *predicate*`)`",
+        "returnInfo": "Integer value indicating the number of unique values of *expr* per summary group, for all records for which the *predicate* evaluates to `true`.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr*| scalar |  *True* | The expression whose unique values are to be counted. |\n| *predicate* | `string` |  *True* | The expression used to filter records to be aggregated. |",
+        "example": "StormEvents\n| summarize UniqueFatalEvents=count_distinctif(EventType,(DeathsDirect + DeathsIndirect)>0) by State\n| where UniqueFatalEvents > 0\n| top 5 by UniqueFatalEvents",
+        "category": "Aggregation function",
+        "sourceLength": 3749
       }
     },
     {
@@ -16245,17 +16099,129 @@
       }
     },
     {
+      "name": "hll_if",
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "hll_if()",
+        "description": "Calculates the intermediate results of `dcount` in records for which the *predicate* evaluates to `true`.\n\nRead about the underlying algorithm (*H*yper*L*og*L*og) and the estimation accuracy.",
+        "syntax": "`hll_if` `(`*expr*, *predicate* [`,` *accuracy*]`)`",
+        "returnInfo": "Returns the intermediate results of distinct count of *Expr* for which *Predicate* evaluates to `true`.\n\n> [!NOTE]\n> - The results of hll(), hll_if(), and hll_merge() can be stored and later retrieved. For example, you might want to create a daily unique user summary, which can then be used to calculate weekly counts.\n> However, the precise binary representation of these results might change over time. There's no guarantee that these functions produce identical results for identical inputs, and therefore we don't advise relying on them.\n> - Use the `hll_merge` function to merge more than one `hll` intermediate result. Only works with `hll` output.\n> - Use `dcount_hll`, to calculate the distinct count from `hll`,`hll_merge`, or `hll_if` aggregation functions.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr* | `string` |  *True* | The expression used for the aggregation calculation. |\n| *predicate* | `string` |  *True* | The *Expr* used to filter records to add to the intermediate result of `dcount`. |\n| *accuracy* | `int` |   | The value that controls the balance between speed and accuracy. If unspecified, the default value is `1`. For supported values, see Estimation accuracy. |",
+        "example": "StormEvents\n| where State in (\"IOWA\", \"KANSAS\")\n| summarize hll_flood = hll_if(Source, EventType == \"Flood\") by State\n| project State, SourcesOfFloodEvents = dcount_hll(hll_flood)",
+        "category": "Aggregation function",
+        "sourceLength": 3788
+      }
+    },
+    {
       "name": "hll_merge",
-      "category": "KQL function",
+      "category": "Aggregation function",
       "documentation": {
         "title": "hll_merge()",
-        "description": "Merges HLL results. This is the scalar version of the aggregate version `hll_merge()`.\n\nRead about the underlying algorithm (*H*yper*L*og*L*og) and estimation accuracy.\n\n> [!IMPORTANT]\n> The results of hll(), hll_if(), and hll_merge() can be stored and later retrieved. For example, you might want to create a daily unique users summary, which can then be used to calculate weekly counts.\n> However, the precise binary representation of these results can change over time. There's no guarantee that these functions produce identical results for identical inputs, and therefore we don't advise relying on them.",
-        "syntax": "`hll_merge(` *hll*`,` *hll2*`,` [ *hll3*`,` ... ]`)`",
-        "returnInfo": "Returns one HLL value. The value is the result of merging the columns *hll*, *hll2*, ... *hllN*.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*hll*, *hll2*, ... | `string` | *True*|The column names containing HLL values to merge. The function expects between 2-64 arguments.|",
-        "example": "range x from 1 to 10 step 1 \n| extend y = x + 10\n| summarize hll_x = hll(x), hll_y = hll(y)\n| project merged = hll_merge(hll_x, hll_y)\n| project dcount_hll(merged)",
-        "category": "KQL function",
-        "sourceLength": 2729
+        "description": "Merges HLL results across the group into a single HLL value.\n\n> [!NOTE]\n> You can't merge hll values that were created using different accuracy values. For more information, see hll().\n\nFor more information, see the underlying algorithm (*H*yper*L*og*L*og) and estimation accuracy.",
+        "syntax": "`hll_merge` `(`*hll*`)`",
+        "returnInfo": "The function returns the merged HLL values of *hll* across the group.\n\n> [!NOTE]\n> - The results of hll(), hll_if(), and hll_merge() can be stored and later retrieved. For example, you might want to create a daily unique user summary, which can then be used to calculate weekly counts.\n> However, the precise binary representation of these results might change over time. There's no guarantee that these functions produce identical results for identical inputs, and therefore we don't advise relying on them.\n> - Use the dcount_hll function to calculate the `dcount` from hll() and hll_merge() aggregation functions.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*hll*| `string` | *True*|The column name containing HLL values to merge.|",
+        "example": "StormEvents\n| summarize hllRes = hll(DamageProperty) by bin(StartTime,10m)\n| summarize hllMerged = hll_merge(hllRes)",
+        "category": "Aggregation function",
+        "sourceLength": 3222
+      }
+    },
+    {
+      "name": "make_bag",
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "make_bag()",
+        "description": "Creates a `dynamic` JSON property bag (dictionary) of all the values of *expr* in the group.",
+        "syntax": "`make_bag` `(`*expr* [`,` *maxSize*]`)`",
+        "returnInfo": "Returns a `dynamic` JSON property bag (dictionary) of all the values of *Expr* in the group, which are property bags. Nondictionary values are skipped.\nIf a key appears in more than one row, an arbitrary value, out of the possible values for this key, is selected.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr* | `dynamic` |  *True* | The expression used for the aggregation calculation. |\n| *maxSize* | `int` |  | The limit on the maximum number of elements returned. The default and max value is 1048576. |\n\n> [!NOTE]\n> `make_dictionary()` has been deprecated in favor of `make_bag()`. The legacy version has a default *maxSize* limit of 128.",
+        "example": "let T = datatable(prop:string, value:string)\n[\n    \"prop01\", \"val_a\",\n    \"prop02\", \"val_b\",\n    \"prop03\", \"val_c\",\n];\nT\n| extend p = bag_pack(prop, value)\n| summarize dict=make_bag(p)\n\nlet T = datatable(prop:string, value:string)\n[\n    \"prop01\", \"val_a\",\n    \"prop02\", \"val_b\",\n    \"prop03\", \"val_c\",\n];\nT\n| extend p = bag_pack(prop, value)\n| summarize bag=make_bag(p)\n| evaluate bag_unpack(bag)",
+        "category": "Aggregation function",
+        "sourceLength": 3630
+      }
+    },
+    {
+      "name": "make_bag_if",
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "make_bag_if()",
+        "description": "Creates a `dynamic` JSON property bag (dictionary) of *expr* values in records for which *predicate* evaluates to `true`.",
+        "syntax": "`make_bag_if(`*expr*`,` *predicate* [`,` *maxSize*]`)`",
+        "returnInfo": "Returns a `dynamic` JSON property bag (dictionary) of *expr* values in records for which *predicate* evaluates to `true`. Nondictionary values are skipped.\nIf a key appears in more than one row, an arbitrary value, out of the possible values for this key, are selected.\n\n> [!NOTE]\n> This function without the predicate is similar to `make_bag`.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr* | `dynamic` |  *True* | The expression used for the aggregation calculation. |\n| *predicate* | `bool` |  *True* | The predicate that evaluates to `true`, in order for *expr* to be added to the result. |\n| *maxSize* | `int` |  | The limit on the maximum number of elements returned. The default and max value is 1048576. |",
+        "example": "let T = datatable(prop:string, value:string, predicate:bool)\n[\n    \"prop01\", \"val_a\", true,\n    \"prop02\", \"val_b\", false,\n    \"prop03\", \"val_c\", true\n];\nT\n| extend p = bag_pack(prop, value)\n| summarize dict=make_bag_if(p, predicate)\n\nlet T = datatable(prop:string, value:string, predicate:bool)\n[\n    \"prop01\", \"val_a\", true,\n    \"prop02\", \"val_b\", false,\n    \"prop03\", \"val_c\", true\n];\nT\n| extend p = bag_pack(prop, value)\n| summarize bag=make_bag_if(p, predicate)\n| evaluate bag_unpack(bag)",
+        "category": "Aggregation function",
+        "sourceLength": 3963
+      }
+    },
+    {
+      "name": "make_list",
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "make_list()",
+        "description": "Creates a `dynamic` array of all the values of *expr* in the group.\n\n> **Deprecated aliases:** makelist()",
+        "syntax": "`make_list(`*expr* [`,` *maxSize*]`)`",
+        "returnInfo": "Returns a `dynamic` array of all the values of *expr* in the group.\nIf the input to the `summarize` operator isn't sorted, the order of elements in the resulting array is undefined.\nIf the input to the `summarize` operator is sorted, the order of elements in the resulting array tracks that of the input.\n\n> [!TIP]\n> Use the `array_sort_asc()` or `array_sort_desc()` function to create an ordered list by some key.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr* | `dynamic` |  *True* | The expression used for the aggregation calculation. |\n| *maxSize* | `int` |  | The maximum number of elements returned. The default and max value is 1048576. |\n\n> [!NOTE]\n> The deprecated version has a default *maxSize* limit of 128.",
+        "example": "",
+        "category": "Aggregation function",
+        "sourceLength": 5936
+      }
+    },
+    {
+      "name": "make_list_if",
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "make_list_if()",
+        "description": "Creates a `dynamic` array of *expr* values in the group for which *predicate* evaluates to `true`.",
+        "syntax": "`make_list_if(`*expr*`,` *predicate* [`,` *maxSize*]`)`",
+        "returnInfo": "Returns a `dynamic` array of *expr* values in the group for which *predicate* evaluates to `true`.\nIf the input to the `summarize` operator isn't sorted, the order of elements in the resulting array is undefined.\nIf the input to the `summarize` operator is sorted, the order of elements in the resulting array tracks that of the input.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr* | `string` |  *True* | The expression used for the aggregation calculation. |\n| *predicate* | `string` |  *True* | A predicate that has to evaluate to `true` in order for *expr* to be added to the result. |\n| *maxSize* | integer |  | The maximum number of elements returned. The default and max value is 1048576. |",
+        "example": "let T = datatable(name:string, day_of_birth:long)\n[\n   \"John\", 9,\n   \"Paul\", 18,\n   \"George\", 25,\n   \"Ringo\", 7\n];\nT\n| summarize make_list_if(name, strlen(name) > 4)",
+        "category": "Aggregation function",
+        "sourceLength": 2786
+      }
+    },
+    {
+      "name": "make_list_with_nulls",
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "make_list_with_nulls()",
+        "description": "Creates a `dynamic` array of all the values of *expr* in the group, including null values.",
+        "syntax": "`make_list_with_nulls(`*expr*`)`",
+        "returnInfo": "Returns a `dynamic` JSON object (array) of all the values of *expr* in the group, including null values.\nIf the input to the `summarize` operator isn't sorted, the order of elements in the resulting array is undefined.\nIf the input to the `summarize` operator is sorted, the order of elements in the resulting array tracks that of the input.\n\n> [!TIP]\n> Use the `array_sort_asc()` or `array_sort_desc()` function to create an ordered list by some key.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr* | `string` |  *True* | The expression that to use to create the array. |",
+        "example": "let shapes = datatable (name:string , sideCount: int)\n[\n    \"triangle\", int(null),\n    \"square\", 4,\n    \"rectangle\", 4,\n    \"pentagon\", 5,\n    \"hexagon\", 6,\n    \"heptagon\", 7,\n    \"octagon\", 8,\n    \"nonagon\", 9,\n    \"decagon\", 10\n];\nshapes\n| summarize mylist = make_list_with_nulls(sideCount)",
+        "category": "Aggregation function",
+        "sourceLength": 2572
+      }
+    },
+    {
+      "name": "make_set",
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "make_set()",
+        "description": "Creates a `dynamic` array of the set of distinct values that *expr* takes in the group.\n\n> **Deprecated aliases:** makeset()",
+        "syntax": "`make_set(`*expr* [`,` *maxSize*]`)`",
+        "returnInfo": "Returns a `dynamic` array of the set of distinct values that *expr* takes in the group.\nThe array's sort order is undefined.\n\n> [!TIP]\n> To only count distinct values, use dcount() or count_distinct().",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr* | `string` |  *True* | The expression used for the aggregation calculation. |\n| *maxSize* | `int` |  | The maximum number of elements returned. The default and max value is 1048576. |\n\n> [!NOTE]\n> The deprecated version has a default *maxSize* limit of 128.",
+        "example": "",
+        "category": "Aggregation function",
+        "sourceLength": 4929
+      }
+    },
+    {
+      "name": "make_set_if",
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "make_set_if()",
+        "description": "Creates a `dynamic` array of the set of distinct values that *expr* takes in records for which *predicate* evaluates to `true`.",
+        "syntax": "`make_set_if(`*expr*`,` *predicate* [`,` *maxSize*]`)`",
+        "returnInfo": "Returns a `dynamic` array of the set of distinct values that *expr* takes in records for which *predicate* evaluates to `true`. The array's sort order is undefined.\n\n> [!TIP]\n> To only count the distinct values, use dcountif().",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr* | `string` |  *True* | The expression used for the aggregation calculation. |\n| *predicate* | `string` |  *True* | A predicate that has to evaluate to `true` in order for *expr* to be added to the result. |\n| *maxSize* | `int` |  | The maximum number of elements returned. The default and max value is 1048576. |",
+        "example": "let T = datatable(name:string, day_of_birth:long)\n[\n   \"John\", 9,\n   \"Paul\", 18,\n   \"George\", 25,\n   \"Ringo\", 7\n];\nT\n| summarize make_set_if(name, strlen(name) > 4)",
+        "category": "Aggregation function",
+        "sourceLength": 2889
       }
     },
     {
@@ -16284,20 +16250,6 @@
         "example": "StormEvents\n| extend Damage=DamageCrops + DamageProperty, Deaths=DeathsDirect + DeathsIndirect\n| summarize MaxDamageNoCasualties=maxif(Damage, Deaths == 0) by State",
         "category": "Aggregation function",
         "sourceLength": 2692
-      }
-    },
-    {
-      "name": "merge_tdigest",
-      "category": "KQL function",
-      "documentation": {
-        "title": "merge_tdigest()",
-        "description": "Merges `tdigest` results (scalar version of the aggregate version `tdigest_merge()`).\n\nRead more about the underlying algorithm (T-Digest) and the estimated error here.\n\n> The `merge_tdigest()` and `tdigest_merge()` functions are equivalent\n\n> [!IMPORTANT]\n>The results of tdigest() and tdigest_merge() can be stored and later retrieved. For example, you may want to create daily percentiles summary, which can then be used to calculate weekly percentiles.\n> However, the precise binary representation of these results may change over time. There's no guarantee that these functions will produce identical results for identical inputs, and therefore we don't advise relying on them.",
-        "syntax": "`merge_tdigest(`*exprs*`)`",
-        "returnInfo": "The result for merging the columns `*Expr1*`, `*Expr2*`, ... `*ExprN*` to one `tdigest`.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *exprs* | `dynamic` |  *True* | One or more comma-separated column references that have the `tdigest` values to be merged. |",
-        "example": "range x from 1 to 10 step 1 \n| extend y = x + 10\n| summarize tdigestX = tdigest(x), tdigestY = tdigest(y)\n| project merged = merge_tdigest(tdigestX, tdigestY)\n| project percentile_tdigest(merged, 100, typeof(long))",
-        "category": "KQL function",
-        "sourceLength": 2457
       }
     },
     {
@@ -16427,6 +16379,34 @@
       }
     },
     {
+      "name": "take_any",
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "take_any()",
+        "description": "Arbitrarily chooses one record for each group in a summarize operator,\nand returns the value of one or more expressions over each such record.\n\n> **Deprecated aliases:** any()\n\n> [!NOTE]\n> The deprecated version adds `any_` prefix to the columns returned by the `any()` aggregation.",
+        "syntax": "`take_any(`*expr_1* [`,` *expr_2* ...]`)`\n\n`take_any(`*`)`",
+        "returnInfo": "The `take_any` aggregation function returns the values of the expressions calculated\nfor each of the records selected Indeterministically from each group of the summarize operator.\n\nIf the `*` argument is provided, the function behaves as if the expressions are all columns\nof the input to the summarize operator barring the group-by columns, if any.\n\nThis function is useful when you want to get a sample value of one or more columns\nper value of the compound group key.\n\nWhen the function is provided with a single column reference, it will attempt to\nreturn a non-null/non-empty value, if such value is present.\n\nAs a result of the indeterministic nature of this function, using this function multiple times in\na single application of the `summarize` operator isn't equivalent to using\nthis function a single time with multiple expressions. The former may have each application\nselect a different record, while the latter guarantees that all values are calculated\nover a single record (per distinct group).",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr_N* | `string` |  *True* | The expression used for selecting a record. If the wildcard value (`*`) is given in place of an expression, all records will be selected.|",
+        "example": "StormEvents\n| summarize take_any(State)\n\nStormEvents\n| project StartTime, EpisodeId, State, EventType\n| summarize take_any(*)\n\nStormEvents\n| where State startswith \"A\"\n| project StartTime, EpisodeId, State, EventType\n| summarize take_any(*) by State",
+        "category": "Aggregation function",
+        "sourceLength": 4761
+      }
+    },
+    {
+      "name": "take_anyif",
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "take_anyif()",
+        "description": "Arbitrarily selects one record for each group in a summarize operator in records for which the *predicate*\nis 'true'. The function returns the value of an expression over each such record.\n\nThis function is useful when you want to get a sample value of one column per value of the compound group key, subject to some predicate that is *true*. If such a value is present, the function attempts to return a non-null/non-empty value.\n\n> **Deprecated aliases:** anyif()\n\n> [!NOTE]\n> The deprecated version adds `any_` prefix to the columns returned by the `any()` aggregation.",
+        "syntax": "`take_anyif(` *expr*`,` *predicate* `)`",
+        "returnInfo": "The `take_anyif` aggregation function returns the value of the expression calculated\nfor each of the records randomly selected from each group of the summarize operator. Only records for which *predicate* returns 'true' may be selected. If the predicate doesn't return 'true', a null value is produced.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr* | `string` |  *True* | The expression used for selecting a record. |\n| *predicate* | `string` |  *True* | Indicates which records may be considered for evaluation. |",
+        "example": "StormEvents\n| summarize take_anyif(EventType, EventNarrative has 'strong wind')",
+        "category": "Aggregation function",
+        "sourceLength": 2744
+      }
+    },
+    {
       "name": "tdigest",
       "category": "Aggregation function",
       "documentation": {
@@ -16438,6 +16418,20 @@
         "example": "",
         "category": "Aggregation function",
         "sourceLength": 6437
+      }
+    },
+    {
+      "name": "tdigest_merge",
+      "category": "Aggregation functions",
+      "documentation": {
+        "title": "tdigest_merge()",
+        "description": "Merges tdigest results across the group.\n\nFor more information about the underlying algorithm (T-Digest) and the estimated error, see estimation error in percentiles.\n\n> The `tdigest_merge()` and `merge_tdigest()` functions are equivalent\n\n> [!IMPORTANT]\n>The results of tdigest() and tdigest_merge() can be stored and later retrieved. For example, you may want to create daily percentiles summary, which can then be used to calculate weekly percentiles.\n> However, the precise binary representation of these results may change over time. There's no guarantee that these functions will produce identical results for identical inputs, and therefore we don't advise relying on them.",
+        "syntax": "`tdigest_merge(`*expr*`)`",
+        "returnInfo": "Returns the merged tdigest values of *expr* across the group.\n\n> [!NOTE]\n>\n> * Use the function percentile_tdigest() to calculate the percentiles from the `tdigest_merge` results.\n> * All tdigests that are included in the same group must be of the same type.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*expr* | `string` |  *True* | The expression used for the aggregation calculation.|",
+        "example": "StormEvents\n| summarize PreAggDamageProperty=tdigest(DamageProperty) by State\n| summarize tdigest_merge(PreAggDamageProperty)",
+        "category": "Aggregation functions",
+        "sourceLength": 4694
       }
     },
     {
@@ -16495,130 +16489,6 @@
         "category": "Aggregation function",
         "sourceLength": 2047
       }
-    },
-    {
-      "name": "any",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "anyif",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "arg_max",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "arg_min",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "argmax",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "argmin",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "binary_all_and",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "binary_all_or",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "binary_all_xor",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "cnt",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "count_distinct",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "count_distinctif",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "hll_if",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "make_bag",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "make_bag_if",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "make_dictionary",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "make_list",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "make_list_if",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "make_list_with_nulls",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "make_set",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "make_set_if",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "makelist",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "makeset",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "passthrough",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "percentile",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "percentiles_array",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "percentilesw_array",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "percentilew",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "take_any",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "take_anyif",
-      "category": "Aggregate function"
-    },
-    {
-      "name": "tdigest_merge",
-      "category": "Aggregate function"
     }
   ],
   "lastUpdated": "2025-09-11T13:20:42.137Z"
