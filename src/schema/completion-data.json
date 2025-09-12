@@ -2213,2853 +2213,2853 @@
       "label": "abs",
       "kind": "Function",
       "insertText": "abs()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "acos",
       "kind": "Function",
       "insertText": "acos()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "ago",
       "kind": "Function",
       "insertText": "ago()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "around",
       "kind": "Function",
       "insertText": "around()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "array_concat",
       "kind": "Function",
       "insertText": "array_concat()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "array_iff",
       "kind": "Function",
       "insertText": "array_iff()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "array_index_of",
       "kind": "Function",
       "insertText": "array_index_of()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "array_length",
       "kind": "Function",
       "insertText": "array_length()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "array_reverse",
       "kind": "Function",
       "insertText": "array_reverse()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "array_rotate_left",
       "kind": "Function",
       "insertText": "array_rotate_left()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "array_rotate_right",
       "kind": "Function",
       "insertText": "array_rotate_right()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "array_shift_left",
       "kind": "Function",
       "insertText": "array_shift_left()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "array_shift_right",
       "kind": "Function",
       "insertText": "array_shift_right()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "array_slice",
       "kind": "Function",
       "insertText": "array_slice()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "array_sort_asc",
       "kind": "Function",
       "insertText": "array_sort_asc()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "array_sort_desc",
       "kind": "Function",
       "insertText": "array_sort_desc()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "array_split",
       "kind": "Function",
       "insertText": "array_split()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "array_sum",
       "kind": "Function",
       "insertText": "array_sum()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "asin",
       "kind": "Function",
       "insertText": "asin()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "assert",
       "kind": "Function",
       "insertText": "assert()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "atan",
       "kind": "Function",
       "insertText": "atan()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "atan2",
       "kind": "Function",
       "insertText": "atan2()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "bag_has_key",
       "kind": "Function",
       "insertText": "bag_has_key()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "bag_keys",
       "kind": "Function",
       "insertText": "bag_keys()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "bag_merge",
       "kind": "Function",
       "insertText": "bag_merge()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "bag_pack_columns",
       "kind": "Function",
       "insertText": "bag_pack_columns()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "bag_remove_keys",
       "kind": "Function",
       "insertText": "bag_remove_keys()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "bag_set_key",
       "kind": "Function",
       "insertText": "bag_set_key()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "base64_decode_toarray",
       "kind": "Function",
       "insertText": "base64_decode_toarray()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "base64_decode_toguid",
       "kind": "Function",
       "insertText": "base64_decode_toguid()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "base64_decode_tostring",
       "kind": "Function",
       "insertText": "base64_decode_tostring()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "base64_encode_fromarray",
       "kind": "Function",
       "insertText": "base64_encode_fromarray()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "base64_encode_fromguid",
       "kind": "Function",
       "insertText": "base64_encode_fromguid()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "base64_encode_tostring",
       "kind": "Function",
       "insertText": "base64_encode_tostring()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "beta_cdf",
       "kind": "Function",
       "insertText": "beta_cdf()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "beta_inv",
       "kind": "Function",
       "insertText": "beta_inv()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "beta_pdf",
       "kind": "Function",
       "insertText": "beta_pdf()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "bin",
       "kind": "Function",
       "insertText": "bin()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "bin_at",
       "kind": "Function",
       "insertText": "bin_at()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "bin_auto",
       "kind": "Function",
       "insertText": "bin_auto()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "binary_and",
       "kind": "Function",
       "insertText": "binary_and()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "binary_not",
       "kind": "Function",
       "insertText": "binary_not()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "binary_or",
       "kind": "Function",
       "insertText": "binary_or()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "binary_shift_left",
       "kind": "Function",
       "insertText": "binary_shift_left()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "binary_shift_right",
       "kind": "Function",
       "insertText": "binary_shift_right()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "binary_xor",
       "kind": "Function",
       "insertText": "binary_xor()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "bitset_count_ones",
       "kind": "Function",
       "insertText": "bitset_count_ones()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "case",
       "kind": "Function",
       "insertText": "case()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "ceiling",
       "kind": "Function",
       "insertText": "ceiling()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "cluster",
       "kind": "Function",
       "insertText": "cluster()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "coalesce",
       "kind": "Function",
       "insertText": "coalesce()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "column_ifexists",
       "kind": "Function",
       "insertText": "column_ifexists()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "column_names_of",
       "kind": "Function",
       "insertText": "column_names_of()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "convert_angle",
       "kind": "Function",
       "insertText": "convert_angle()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "convert_energy",
       "kind": "Function",
       "insertText": "convert_energy()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "convert_force",
       "kind": "Function",
       "insertText": "convert_force()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "convert_length",
       "kind": "Function",
       "insertText": "convert_length()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "convert_mass",
       "kind": "Function",
       "insertText": "convert_mass()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "convert_speed",
       "kind": "Function",
       "insertText": "convert_speed()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "convert_temperature",
       "kind": "Function",
       "insertText": "convert_temperature()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "convert_volume",
       "kind": "Function",
       "insertText": "convert_volume()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "cos",
       "kind": "Function",
       "insertText": "cos()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "cot",
       "kind": "Function",
       "insertText": "cot()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "countof",
       "kind": "Function",
       "insertText": "countof()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "current_cluster_endpoint",
       "kind": "Function",
       "insertText": "current_cluster_endpoint()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "current_database",
       "kind": "Function",
       "insertText": "current_database()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "current_principal",
       "kind": "Function",
       "insertText": "current_principal()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "current_principal_details",
       "kind": "Function",
       "insertText": "current_principal_details()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "current_principal_is_member_of",
       "kind": "Function",
       "insertText": "current_principal_is_member_of()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "cursor_after",
       "kind": "Function",
       "insertText": "cursor_after()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "cursor_before_or_at",
       "kind": "Function",
       "insertText": "cursor_before_or_at()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "database",
       "kind": "Function",
       "insertText": "database()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "datetime_add",
       "kind": "Function",
       "insertText": "datetime_add()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "datetime_diff",
       "kind": "Function",
       "insertText": "datetime_diff()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "datetime_local_to_utc",
       "kind": "Function",
       "insertText": "datetime_local_to_utc()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "datetime_part",
       "kind": "Function",
       "insertText": "datetime_part()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "datetime_utc_to_local",
       "kind": "Function",
       "insertText": "datetime_utc_to_local()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "dcount_hll",
       "kind": "Function",
       "insertText": "dcount_hll()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "degrees",
       "kind": "Function",
       "insertText": "degrees()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "dynamic_to_json",
       "kind": "Function",
       "insertText": "dynamic_to_json()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "endofday",
       "kind": "Function",
       "insertText": "endofday()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "endofmonth",
       "kind": "Function",
       "insertText": "endofmonth()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "endofweek",
       "kind": "Function",
       "insertText": "endofweek()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "endofyear",
       "kind": "Function",
       "insertText": "endofyear()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "erf",
       "kind": "Function",
       "insertText": "erf()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "erfc",
       "kind": "Function",
       "insertText": "erfc()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "estimate_data_size",
       "kind": "Function",
       "insertText": "estimate_data_size()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "exp",
       "kind": "Function",
       "insertText": "exp()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "exp10",
       "kind": "Function",
       "insertText": "exp10()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "exp2",
       "kind": "Function",
       "insertText": "exp2()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "extent_id",
       "kind": "Function",
       "insertText": "extent_id()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "extent_tags",
       "kind": "Function",
       "insertText": "extent_tags()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "external_table",
       "kind": "Function",
       "insertText": "external_table()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "extract",
       "kind": "Function",
       "insertText": "extract()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "extract_all",
       "kind": "Function",
       "insertText": "extract_all()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "extract_json",
       "kind": "Function",
       "insertText": "extract_json()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "format_bytes",
       "kind": "Function",
       "insertText": "format_bytes()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "format_datetime",
       "kind": "Function",
       "insertText": "format_datetime()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "format_ipv4",
       "kind": "Function",
       "insertText": "format_ipv4()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "format_ipv4_mask",
       "kind": "Function",
       "insertText": "format_ipv4_mask()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "format_timespan",
       "kind": "Function",
       "insertText": "format_timespan()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "gamma",
       "kind": "Function",
       "insertText": "gamma()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_angle",
       "kind": "Function",
       "insertText": "geo_angle()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_azimuth",
       "kind": "Function",
       "insertText": "geo_azimuth()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_closest_point_on_line",
       "kind": "Function",
       "insertText": "geo_closest_point_on_line()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_closest_point_on_polygon",
       "kind": "Function",
       "insertText": "geo_closest_point_on_polygon()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_distance_2points",
       "kind": "Function",
       "insertText": "geo_distance_2points()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_distance_point_to_line",
       "kind": "Function",
       "insertText": "geo_distance_point_to_line()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_distance_point_to_polygon",
       "kind": "Function",
       "insertText": "geo_distance_point_to_polygon()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_from_wkt",
       "kind": "Function",
       "insertText": "geo_from_wkt()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_geohash_neighbors",
       "kind": "Function",
       "insertText": "geo_geohash_neighbors()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_geohash_to_central_point",
       "kind": "Function",
       "insertText": "geo_geohash_to_central_point()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_geohash_to_polygon",
       "kind": "Function",
       "insertText": "geo_geohash_to_polygon()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_h3cell_children",
       "kind": "Function",
       "insertText": "geo_h3cell_children()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_h3cell_level",
       "kind": "Function",
       "insertText": "geo_h3cell_level()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_h3cell_neighbors",
       "kind": "Function",
       "insertText": "geo_h3cell_neighbors()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_h3cell_parent",
       "kind": "Function",
       "insertText": "geo_h3cell_parent()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_h3cell_rings",
       "kind": "Function",
       "insertText": "geo_h3cell_rings()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_h3cell_to_central_point",
       "kind": "Function",
       "insertText": "geo_h3cell_to_central_point()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_h3cell_to_polygon",
       "kind": "Function",
       "insertText": "geo_h3cell_to_polygon()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_info_from_ip_address",
       "kind": "Function",
       "insertText": "geo_info_from_ip_address()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_intersection_2lines",
       "kind": "Function",
       "insertText": "geo_intersection_2lines()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_intersection_2polygons",
       "kind": "Function",
       "insertText": "geo_intersection_2polygons()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_intersection_line_with_polygon",
       "kind": "Function",
       "insertText": "geo_intersection_line_with_polygon()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_intersects_2lines",
       "kind": "Function",
       "insertText": "geo_intersects_2lines()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_intersects_2polygons",
       "kind": "Function",
       "insertText": "geo_intersects_2polygons()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_intersects_line_with_polygon",
       "kind": "Function",
       "insertText": "geo_intersects_line_with_polygon()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_line_buffer",
       "kind": "Function",
       "insertText": "geo_line_buffer()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_line_centroid",
       "kind": "Function",
       "insertText": "geo_line_centroid()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_line_densify",
       "kind": "Function",
       "insertText": "geo_line_densify()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_line_interpolate_point",
       "kind": "Function",
       "insertText": "geo_line_interpolate_point()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_line_length",
       "kind": "Function",
       "insertText": "geo_line_length()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_line_locate_point",
       "kind": "Function",
       "insertText": "geo_line_locate_point()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_line_simplify",
       "kind": "Function",
       "insertText": "geo_line_simplify()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_line_to_s2cells",
       "kind": "Function",
       "insertText": "geo_line_to_s2cells()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_point_buffer",
       "kind": "Function",
       "insertText": "geo_point_buffer()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_point_in_circle",
       "kind": "Function",
       "insertText": "geo_point_in_circle()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_point_in_polygon",
       "kind": "Function",
       "insertText": "geo_point_in_polygon()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_point_to_geohash",
       "kind": "Function",
       "insertText": "geo_point_to_geohash()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_point_to_h3cell",
       "kind": "Function",
       "insertText": "geo_point_to_h3cell()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_point_to_s2cell",
       "kind": "Function",
       "insertText": "geo_point_to_s2cell()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_polygon_area",
       "kind": "Function",
       "insertText": "geo_polygon_area()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_polygon_buffer",
       "kind": "Function",
       "insertText": "geo_polygon_buffer()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_polygon_centroid",
       "kind": "Function",
       "insertText": "geo_polygon_centroid()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_polygon_densify",
       "kind": "Function",
       "insertText": "geo_polygon_densify()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_polygon_perimeter",
       "kind": "Function",
       "insertText": "geo_polygon_perimeter()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_polygon_simplify",
       "kind": "Function",
       "insertText": "geo_polygon_simplify()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_polygon_to_h3cells",
       "kind": "Function",
       "insertText": "geo_polygon_to_h3cells()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_polygon_to_s2cells",
       "kind": "Function",
       "insertText": "geo_polygon_to_s2cells()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_s2cell_neighbors",
       "kind": "Function",
       "insertText": "geo_s2cell_neighbors()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_s2cell_to_central_point",
       "kind": "Function",
       "insertText": "geo_s2cell_to_central_point()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_s2cell_to_polygon",
       "kind": "Function",
       "insertText": "geo_s2cell_to_polygon()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_simplify_polygons_array",
       "kind": "Function",
       "insertText": "geo_simplify_polygons_array()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_union_lines_array",
       "kind": "Function",
       "insertText": "geo_union_lines_array()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "geo_union_polygons_array",
       "kind": "Function",
       "insertText": "geo_union_polygons_array()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "gettype",
       "kind": "Function",
       "insertText": "gettype()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "getyear",
       "kind": "Function",
       "insertText": "getyear()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "graph",
       "kind": "Function",
       "insertText": "graph()",
-      "category": "KQL Function"
+      "category": "Preview"
     },
     {
       "label": "has_any_index",
       "kind": "Function",
       "insertText": "has_any_index()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "has_any_ipv4",
       "kind": "Function",
       "insertText": "has_any_ipv4()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "has_any_ipv4_prefix",
       "kind": "Function",
       "insertText": "has_any_ipv4_prefix()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "has_ipv4",
       "kind": "Function",
       "insertText": "has_ipv4()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "has_ipv4_prefix",
       "kind": "Function",
       "insertText": "has_ipv4_prefix()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "hash",
       "kind": "Function",
       "insertText": "hash()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "hash_combine",
       "kind": "Function",
       "insertText": "hash_combine()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "hash_many",
       "kind": "Function",
       "insertText": "hash_many()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "hash_md5",
       "kind": "Function",
       "insertText": "hash_md5()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "hash_sha1",
       "kind": "Function",
       "insertText": "hash_sha1()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "hash_sha256",
       "kind": "Function",
       "insertText": "hash_sha256()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "hash_xxhash64",
       "kind": "Function",
       "insertText": "hash_xxhash64()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "hll_merge",
       "kind": "Function",
       "insertText": "hll_merge()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "iff",
       "kind": "Function",
       "insertText": "iff()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "indexof",
       "kind": "Function",
       "insertText": "indexof()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "indexof_regex",
       "kind": "Function",
       "insertText": "indexof_regex()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "ingestion_time",
       "kind": "Function",
       "insertText": "ingestion_time()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "ipv4_compare",
       "kind": "Function",
       "insertText": "ipv4_compare()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "ipv4_is_in_any_range",
       "kind": "Function",
       "insertText": "ipv4_is_in_any_range()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "ipv4_is_in_range",
       "kind": "Function",
       "insertText": "ipv4_is_in_range()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "ipv4_is_match",
       "kind": "Function",
       "insertText": "ipv4_is_match()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "ipv4_is_private",
       "kind": "Function",
       "insertText": "ipv4_is_private()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "ipv4_netmask_suffix",
       "kind": "Function",
       "insertText": "ipv4_netmask_suffix()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "ipv4_range_to_cidr_list",
       "kind": "Function",
       "insertText": "ipv4_range_to_cidr_list()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "ipv6_compare",
       "kind": "Function",
       "insertText": "ipv6_compare()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "ipv6_is_in_any_range",
       "kind": "Function",
       "insertText": "ipv6_is_in_any_range()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "ipv6_is_in_range",
       "kind": "Function",
       "insertText": "ipv6_is_in_range()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "ipv6_is_match",
       "kind": "Function",
       "insertText": "ipv6_is_match()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "isempty",
       "kind": "Function",
       "insertText": "isempty()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "isfinite",
       "kind": "Function",
       "insertText": "isfinite()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "isinf",
       "kind": "Function",
       "insertText": "isinf()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "isnan",
       "kind": "Function",
       "insertText": "isnan()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "isnotempty",
       "kind": "Function",
       "insertText": "isnotempty()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "isnotnull",
       "kind": "Function",
       "insertText": "isnotnull()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "isnull",
       "kind": "Function",
       "insertText": "isnull()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "isutf8",
       "kind": "Function",
       "insertText": "isutf8()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "jaccard_index",
       "kind": "Function",
       "insertText": "jaccard_index()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "log",
       "kind": "Function",
       "insertText": "log()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "log10",
       "kind": "Function",
       "insertText": "log10()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "log2",
       "kind": "Function",
       "insertText": "log2()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "loggamma",
       "kind": "Function",
       "insertText": "loggamma()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "make_datetime",
       "kind": "Function",
       "insertText": "make_datetime()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "make_timespan",
       "kind": "Function",
       "insertText": "make_timespan()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "materialized_view",
       "kind": "Function",
       "insertText": "materialized_view()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "max_of",
       "kind": "Function",
       "insertText": "max_of()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "merge_tdigest",
       "kind": "Function",
       "insertText": "merge_tdigest()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "min_of",
       "kind": "Function",
       "insertText": "min_of()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "monthofyear",
       "kind": "Function",
       "insertText": "monthofyear()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "new_guid",
       "kind": "Function",
       "insertText": "new_guid()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "next",
       "kind": "Function",
       "insertText": "next()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "not",
       "kind": "Function",
       "insertText": "not()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "now",
       "kind": "Function",
       "insertText": "now()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "pack",
       "kind": "Function",
       "insertText": "pack()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "pack_all",
       "kind": "Function",
       "insertText": "pack_all()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "pack_array",
       "kind": "Function",
       "insertText": "pack_array()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "parse_command_line",
       "kind": "Function",
       "insertText": "parse_command_line()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "parse_csv",
       "kind": "Function",
       "insertText": "parse_csv()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "parse_ipv4",
       "kind": "Function",
       "insertText": "parse_ipv4()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "parse_ipv4_mask",
       "kind": "Function",
       "insertText": "parse_ipv4_mask()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "parse_ipv6",
       "kind": "Function",
       "insertText": "parse_ipv6()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "parse_ipv6_mask",
       "kind": "Function",
       "insertText": "parse_ipv6_mask()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "parse_json",
       "kind": "Function",
       "insertText": "parse_json()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "parse_path",
       "kind": "Function",
       "insertText": "parse_path()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "parse_url",
       "kind": "Function",
       "insertText": "parse_url()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "parse_user_agent",
       "kind": "Function",
       "insertText": "parse_user_agent()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "parse_version",
       "kind": "Function",
       "insertText": "parse_version()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "parse_xml",
       "kind": "Function",
       "insertText": "parse_xml()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "percentile_tdigest",
       "kind": "Function",
       "insertText": "percentile_tdigest()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "percentrank_tdigest",
       "kind": "Function",
       "insertText": "percentrank_tdigest()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "pi",
       "kind": "Function",
       "insertText": "pi()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "pow",
       "kind": "Function",
       "insertText": "pow()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "prev",
       "kind": "Function",
       "insertText": "prev()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "punycode_domain_from_string",
       "kind": "Function",
       "insertText": "punycode_domain_from_string()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "punycode_domain_to_string",
       "kind": "Function",
       "insertText": "punycode_domain_to_string()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "punycode_from_string",
       "kind": "Function",
       "insertText": "punycode_from_string()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "punycode_to_string",
       "kind": "Function",
       "insertText": "punycode_to_string()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "radians",
       "kind": "Function",
       "insertText": "radians()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "rand",
       "kind": "Function",
       "insertText": "rand()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "range",
       "kind": "Function",
       "insertText": "range()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "rank_tdigest",
       "kind": "Function",
       "insertText": "rank_tdigest()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "regex_quote",
       "kind": "Function",
       "insertText": "regex_quote()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "repeat",
       "kind": "Function",
       "insertText": "repeat()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "replace_regex",
       "kind": "Function",
       "insertText": "replace_regex()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "replace_string",
       "kind": "Function",
       "insertText": "replace_string()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "replace_strings",
       "kind": "Function",
       "insertText": "replace_strings()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "reverse",
       "kind": "Function",
       "insertText": "reverse()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "round",
       "kind": "Function",
       "insertText": "round()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "row_cumsum",
       "kind": "Function",
       "insertText": "row_cumsum()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "row_number",
       "kind": "Function",
       "insertText": "row_number()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "row_rank_dense",
       "kind": "Function",
       "insertText": "row_rank_dense()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "row_rank_min",
       "kind": "Function",
       "insertText": "row_rank_min()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "row_window_session",
       "kind": "Function",
       "insertText": "row_window_session()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_abs",
       "kind": "Function",
       "insertText": "series_abs()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_acos",
       "kind": "Function",
       "insertText": "series_acos()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_add",
       "kind": "Function",
       "insertText": "series_add()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_asin",
       "kind": "Function",
       "insertText": "series_asin()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_atan",
       "kind": "Function",
       "insertText": "series_atan()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_ceiling",
       "kind": "Function",
       "insertText": "series_ceiling()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_cos",
       "kind": "Function",
       "insertText": "series_cos()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_cosine_similarity",
       "kind": "Function",
       "insertText": "series_cosine_similarity()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_decompose",
       "kind": "Function",
       "insertText": "series_decompose()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_decompose_anomalies",
       "kind": "Function",
       "insertText": "series_decompose_anomalies()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_decompose_forecast",
       "kind": "Function",
       "insertText": "series_decompose_forecast()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_divide",
       "kind": "Function",
       "insertText": "series_divide()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_dot_product",
       "kind": "Function",
       "insertText": "series_dot_product()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_equals",
       "kind": "Function",
       "insertText": "series_equals()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_exp",
       "kind": "Function",
       "insertText": "series_exp()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_fft",
       "kind": "Function",
       "insertText": "series_fft()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_fill_backward",
       "kind": "Function",
       "insertText": "series_fill_backward()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_fill_const",
       "kind": "Function",
       "insertText": "series_fill_const()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_fill_forward",
       "kind": "Function",
       "insertText": "series_fill_forward()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_fill_linear",
       "kind": "Function",
       "insertText": "series_fill_linear()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_fir",
       "kind": "Function",
       "insertText": "series_fir()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_fit_2lines",
       "kind": "Function",
       "insertText": "series_fit_2lines()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_fit_2lines_dynamic",
       "kind": "Function",
       "insertText": "series_fit_2lines_dynamic()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_fit_line",
       "kind": "Function",
       "insertText": "series_fit_line()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_fit_line_dynamic",
       "kind": "Function",
       "insertText": "series_fit_line_dynamic()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_fit_poly",
       "kind": "Function",
       "insertText": "series_fit_poly()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_floor",
       "kind": "Function",
       "insertText": "series_floor()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_greater",
       "kind": "Function",
       "insertText": "series_greater()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_greater_equals",
       "kind": "Function",
       "insertText": "series_greater_equals()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_ifft",
       "kind": "Function",
       "insertText": "series_ifft()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_iir",
       "kind": "Function",
       "insertText": "series_iir()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_less",
       "kind": "Function",
       "insertText": "series_less()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_less_equals",
       "kind": "Function",
       "insertText": "series_less_equals()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_log",
       "kind": "Function",
       "insertText": "series_log()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_magnitude",
       "kind": "Function",
       "insertText": "series_magnitude()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_multiply",
       "kind": "Function",
       "insertText": "series_multiply()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_not_equals",
       "kind": "Function",
       "insertText": "series_not_equals()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_outliers",
       "kind": "Function",
       "insertText": "series_outliers()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_pearson_correlation",
       "kind": "Function",
       "insertText": "series_pearson_correlation()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_periods_detect",
       "kind": "Function",
       "insertText": "series_periods_detect()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_periods_validate",
       "kind": "Function",
       "insertText": "series_periods_validate()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_pow",
       "kind": "Function",
       "insertText": "series_pow()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_product",
       "kind": "Function",
       "insertText": "series_product()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_seasonal",
       "kind": "Function",
       "insertText": "series_seasonal()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_sign",
       "kind": "Function",
       "insertText": "series_sign()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_sin",
       "kind": "Function",
       "insertText": "series_sin()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_stats",
       "kind": "Function",
       "insertText": "series_stats()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_stats_dynamic",
       "kind": "Function",
       "insertText": "series_stats_dynamic()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_subtract",
       "kind": "Function",
       "insertText": "series_subtract()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_sum",
       "kind": "Function",
       "insertText": "series_sum()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "series_tan",
       "kind": "Function",
       "insertText": "series_tan()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "set_difference",
       "kind": "Function",
       "insertText": "set_difference()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "set_has_element",
       "kind": "Function",
       "insertText": "set_has_element()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "set_intersect",
       "kind": "Function",
       "insertText": "set_intersect()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "set_union",
       "kind": "Function",
       "insertText": "set_union()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "sign",
       "kind": "Function",
       "insertText": "sign()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "sin",
       "kind": "Function",
       "insertText": "sin()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "split",
       "kind": "Function",
       "insertText": "split()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "sqrt",
       "kind": "Function",
       "insertText": "sqrt()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "startofday",
       "kind": "Function",
       "insertText": "startofday()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "startofmonth",
       "kind": "Function",
       "insertText": "startofmonth()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "startofweek",
       "kind": "Function",
       "insertText": "startofweek()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "startofyear",
       "kind": "Function",
       "insertText": "startofyear()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "stored_query_result",
       "kind": "Function",
       "insertText": "stored_query_result()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "strcat",
       "kind": "Function",
       "insertText": "strcat()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "strcat_array",
       "kind": "Function",
       "insertText": "strcat_array()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "strcat_delim",
       "kind": "Function",
       "insertText": "strcat_delim()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "strcmp",
       "kind": "Function",
       "insertText": "strcmp()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "string_size",
       "kind": "Function",
       "insertText": "string_size()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "strlen",
       "kind": "Function",
       "insertText": "strlen()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "strrep",
       "kind": "Function",
       "insertText": "strrep()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "substring",
       "kind": "Function",
       "insertText": "substring()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "table",
       "kind": "Function",
       "insertText": "table()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "tan",
       "kind": "Function",
       "insertText": "tan()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "tobool",
       "kind": "Function",
       "insertText": "tobool()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "todatetime",
       "kind": "Function",
       "insertText": "todatetime()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "todecimal",
       "kind": "Function",
       "insertText": "todecimal()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "toguid",
       "kind": "Function",
       "insertText": "toguid()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "tohex",
       "kind": "Function",
       "insertText": "tohex()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "toint",
       "kind": "Function",
       "insertText": "toint()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "tolong",
       "kind": "Function",
       "insertText": "tolong()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "tolower",
       "kind": "Function",
       "insertText": "tolower()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "toreal",
       "kind": "Function",
       "insertText": "toreal()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "tostring",
       "kind": "Function",
       "insertText": "tostring()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "totimespan",
       "kind": "Function",
       "insertText": "totimespan()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "toupper",
       "kind": "Function",
       "insertText": "toupper()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "translate",
       "kind": "Function",
       "insertText": "translate()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "treepath",
       "kind": "Function",
       "insertText": "treepath()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "trim",
       "kind": "Function",
       "insertText": "trim()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "trim_end",
       "kind": "Function",
       "insertText": "trim_end()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "trim_start",
       "kind": "Function",
       "insertText": "trim_start()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "unicode_codepoints_from_string",
       "kind": "Function",
       "insertText": "unicode_codepoints_from_string()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "unicode_codepoints_to_string",
       "kind": "Function",
       "insertText": "unicode_codepoints_to_string()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "unixtime_microseconds_todatetime",
       "kind": "Function",
       "insertText": "unixtime_microseconds_todatetime()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "unixtime_milliseconds_todatetime",
       "kind": "Function",
       "insertText": "unixtime_milliseconds_todatetime()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "unixtime_nanoseconds_todatetime",
       "kind": "Function",
       "insertText": "unixtime_nanoseconds_todatetime()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "unixtime_seconds_todatetime",
       "kind": "Function",
       "insertText": "unixtime_seconds_todatetime()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "url_decode",
       "kind": "Function",
       "insertText": "url_decode()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "url_encode",
       "kind": "Function",
       "insertText": "url_encode()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "url_encode_component",
       "kind": "Function",
       "insertText": "url_encode_component()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "week_of_year",
       "kind": "Function",
       "insertText": "week_of_year()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "welch_test",
       "kind": "Function",
       "insertText": "welch_test()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "zip",
       "kind": "Function",
       "insertText": "zip()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "all",
       "kind": "Function",
       "insertText": "all()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "any",
       "kind": "Function",
       "insertText": "any()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "array_iif",
       "kind": "Function",
       "insertText": "array_iif()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "array_strcat",
       "kind": "Function",
       "insertText": "array_strcat()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "arraylength",
       "kind": "Function",
       "insertText": "arraylength()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "bag_pack",
       "kind": "Function",
       "insertText": "bag_pack()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "bag_zip",
       "kind": "Function",
       "insertText": "bag_zip()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "base64_decodestring",
       "kind": "Function",
       "insertText": "base64_decodestring()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "base64_encodestring",
       "kind": "Function",
       "insertText": "base64_encodestring()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "columnifexists",
       "kind": "Function",
       "insertText": "columnifexists()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "current_cursor",
       "kind": "Function",
       "insertText": "current_cursor()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "current_node_id",
       "kind": "Function",
       "insertText": "current_node_id()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "cursor_current",
       "kind": "Function",
       "insertText": "cursor_current()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "datepart",
       "kind": "Function",
       "insertText": "datepart()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "datetime_list_timezones",
       "kind": "Function",
       "insertText": "datetime_list_timezones()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "dayofmonth",
       "kind": "Function",
       "insertText": "dayofmonth()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "dayofweek",
       "kind": "Function",
       "insertText": "dayofweek()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "dayofyear",
       "kind": "Function",
       "insertText": "dayofyear()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "entity_group",
       "kind": "Function",
       "insertText": "entity_group()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "extentid",
       "kind": "Function",
       "insertText": "extentid()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "extractall",
       "kind": "Function",
       "insertText": "extractall()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "extractjson",
       "kind": "Function",
       "insertText": "extractjson()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "floor",
       "kind": "Function",
       "insertText": "floor()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "getmonth",
       "kind": "Function",
       "insertText": "getmonth()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "gzip_compress_to_base64_string",
       "kind": "Function",
       "insertText": "gzip_compress_to_base64_string()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "gzip_decompress_from_base64_string",
       "kind": "Function",
       "insertText": "gzip_decompress_from_base64_string()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "hll_isvalid",
       "kind": "Function",
       "insertText": "hll_isvalid()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "hourofday",
       "kind": "Function",
       "insertText": "hourofday()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "iif",
       "kind": "Function",
       "insertText": "iif()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "inner_nodes",
       "kind": "Function",
       "insertText": "inner_nodes()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "isascii",
       "kind": "Function",
       "insertText": "isascii()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "iscolumnexists",
       "kind": "Function",
       "insertText": "iscolumnexists()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "labels",
       "kind": "Function",
       "insertText": "labels()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "make_string",
       "kind": "Function",
       "insertText": "make_string()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "map",
       "kind": "Function",
       "insertText": "map()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "node_degree_in",
       "kind": "Function",
       "insertText": "node_degree_in()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "node_degree_out",
       "kind": "Function",
       "insertText": "node_degree_out()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "node_id",
       "kind": "Function",
       "insertText": "node_id()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "notempty",
       "kind": "Function",
       "insertText": "notempty()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "notnull",
       "kind": "Function",
       "insertText": "notnull()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "pack_dictionary",
       "kind": "Function",
       "insertText": "pack_dictionary()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "parse_urlquery",
       "kind": "Function",
       "insertText": "parse_urlquery()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "parsejson",
       "kind": "Function",
       "insertText": "parsejson()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "parseurl",
       "kind": "Function",
       "insertText": "parseurl()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "parseurlquery",
       "kind": "Function",
       "insertText": "parseurlquery()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "percentiles_array_tdigest",
       "kind": "Function",
       "insertText": "percentiles_array_tdigest()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "replace",
       "kind": "Function",
       "insertText": "replace()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "row_rank",
       "kind": "Function",
       "insertText": "row_rank()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "rowstore_ordinal_range",
       "kind": "Function",
       "insertText": "rowstore_ordinal_range()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "set_equals",
       "kind": "Function",
       "insertText": "set_equals()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "tdigest_isvalid",
       "kind": "Function",
       "insertText": "tdigest_isvalid()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "tdigest_merge",
       "kind": "Function",
       "insertText": "tdigest_merge()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "to_utf8",
       "kind": "Function",
       "insertText": "to_utf8()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "toboolean",
       "kind": "Function",
       "insertText": "toboolean()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "todouble",
       "kind": "Function",
       "insertText": "todouble()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "todynamic",
       "kind": "Function",
       "insertText": "todynamic()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "toobject",
       "kind": "Function",
       "insertText": "toobject()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "totime",
       "kind": "Function",
       "insertText": "totime()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "weekofyear",
       "kind": "Function",
       "insertText": "weekofyear()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "zlib_compress_to_base64_string",
       "kind": "Function",
       "insertText": "zlib_compress_to_base64_string()",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "label": "zlib_decompress_from_base64_string",
       "kind": "Function",
       "insertText": "zlib_decompress_from_base64_string()",
-      "category": "KQL Function"
+      "category": "KQL function"
     }
   ],
   "aggregates": [
     {
-      "label": "any",
-      "kind": "Function",
-      "insertText": "any()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "anyif",
-      "kind": "Function",
-      "insertText": "anyif()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "arg_max",
-      "kind": "Function",
-      "insertText": "arg_max()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "arg_min",
-      "kind": "Function",
-      "insertText": "arg_min()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "argmax",
-      "kind": "Function",
-      "insertText": "argmax()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "argmin",
-      "kind": "Function",
-      "insertText": "argmin()",
-      "category": "Aggregate Function"
-    },
-    {
       "label": "avg",
       "kind": "Function",
       "insertText": "avg()",
-      "category": "Aggregate Function"
+      "category": "Aggregation function"
     },
     {
       "label": "avgif",
       "kind": "Function",
       "insertText": "avgif()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "binary_all_and",
-      "kind": "Function",
-      "insertText": "binary_all_and()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "binary_all_or",
-      "kind": "Function",
-      "insertText": "binary_all_or()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "binary_all_xor",
-      "kind": "Function",
-      "insertText": "binary_all_xor()",
-      "category": "Aggregate Function"
+      "category": "Aggregation function"
     },
     {
       "label": "buildschema",
       "kind": "Function",
       "insertText": "buildschema()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "cnt",
-      "kind": "Function",
-      "insertText": "cnt()",
-      "category": "Aggregate Function"
+      "category": "Aggregation function"
     },
     {
       "label": "count",
       "kind": "Function",
       "insertText": "count()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "count_distinct",
-      "kind": "Function",
-      "insertText": "count_distinct()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "count_distinctif",
-      "kind": "Function",
-      "insertText": "count_distinctif()",
-      "category": "Aggregate Function"
+      "category": "Aggregation function"
     },
     {
       "label": "countif",
       "kind": "Function",
       "insertText": "countif()",
-      "category": "Aggregate Function"
+      "category": "Aggregation function"
     },
     {
       "label": "covariance",
       "kind": "Function",
       "insertText": "covariance()",
-      "category": "Aggregate Function"
+      "category": "Aggregation function"
     },
     {
       "label": "covarianceif",
       "kind": "Function",
       "insertText": "covarianceif()",
-      "category": "Aggregate Function"
+      "category": "Aggregation function"
     },
     {
       "label": "covariancep",
       "kind": "Function",
       "insertText": "covariancep()",
-      "category": "Aggregate Function"
+      "category": "Aggregation function"
     },
     {
       "label": "covariancepif",
       "kind": "Function",
       "insertText": "covariancepif()",
-      "category": "Aggregate Function"
+      "category": "Aggregation function"
     },
     {
       "label": "dcount",
       "kind": "Function",
       "insertText": "dcount()",
-      "category": "Aggregate Function"
+      "category": "Aggregation function"
     },
     {
       "label": "dcountif",
       "kind": "Function",
       "insertText": "dcountif()",
-      "category": "Aggregate Function"
+      "category": "Aggregation function"
     },
     {
       "label": "hll",
       "kind": "Function",
       "insertText": "hll()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "hll_if",
-      "kind": "Function",
-      "insertText": "hll_if()",
-      "category": "Aggregate Function"
+      "category": "Aggregation function"
     },
     {
       "label": "hll_merge",
       "kind": "Function",
       "insertText": "hll_merge()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "make_bag",
-      "kind": "Function",
-      "insertText": "make_bag()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "make_bag_if",
-      "kind": "Function",
-      "insertText": "make_bag_if()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "make_dictionary",
-      "kind": "Function",
-      "insertText": "make_dictionary()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "make_list",
-      "kind": "Function",
-      "insertText": "make_list()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "make_list_if",
-      "kind": "Function",
-      "insertText": "make_list_if()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "make_list_with_nulls",
-      "kind": "Function",
-      "insertText": "make_list_with_nulls()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "make_set",
-      "kind": "Function",
-      "insertText": "make_set()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "make_set_if",
-      "kind": "Function",
-      "insertText": "make_set_if()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "makelist",
-      "kind": "Function",
-      "insertText": "makelist()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "makeset",
-      "kind": "Function",
-      "insertText": "makeset()",
-      "category": "Aggregate Function"
+      "category": "KQL function"
     },
     {
       "label": "max",
       "kind": "Function",
       "insertText": "max()",
-      "category": "Aggregate Function"
+      "category": "Aggregation function"
     },
     {
       "label": "maxif",
       "kind": "Function",
       "insertText": "maxif()",
-      "category": "Aggregate Function"
+      "category": "Aggregation function"
     },
     {
       "label": "merge_tdigest",
       "kind": "Function",
       "insertText": "merge_tdigest()",
-      "category": "Aggregate Function"
+      "category": "KQL function"
     },
     {
       "label": "min",
       "kind": "Function",
       "insertText": "min()",
-      "category": "Aggregate Function"
+      "category": "Aggregation function"
     },
     {
       "label": "minif",
       "kind": "Function",
       "insertText": "minif()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "passthrough",
-      "kind": "Function",
-      "insertText": "passthrough()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "percentile",
-      "kind": "Function",
-      "insertText": "percentile()",
-      "category": "Aggregate Function"
+      "category": "Aggregation function"
     },
     {
       "label": "percentiles",
       "kind": "Function",
       "insertText": "percentiles()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "percentiles_array",
-      "kind": "Function",
-      "insertText": "percentiles_array()",
-      "category": "Aggregate Function"
+      "category": "Aggregation function"
     },
     {
       "label": "percentilesw",
       "kind": "Function",
       "insertText": "percentilesw()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "percentilesw_array",
-      "kind": "Function",
-      "insertText": "percentilesw_array()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "percentilew",
-      "kind": "Function",
-      "insertText": "percentilew()",
-      "category": "Aggregate Function"
+      "category": "Aggregation function"
     },
     {
       "label": "stdev",
       "kind": "Function",
       "insertText": "stdev()",
-      "category": "Aggregate Function"
+      "category": "Aggregation function"
     },
     {
       "label": "stdevif",
       "kind": "Function",
       "insertText": "stdevif()",
-      "category": "Aggregate Function"
+      "category": "Aggregation function"
     },
     {
       "label": "stdevp",
       "kind": "Function",
       "insertText": "stdevp()",
-      "category": "Aggregate Function"
+      "category": "Aggregation function"
     },
     {
       "label": "sum",
       "kind": "Function",
       "insertText": "sum()",
-      "category": "Aggregate Function"
+      "category": "Aggregation function"
     },
     {
       "label": "sumif",
       "kind": "Function",
       "insertText": "sumif()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "take_any",
-      "kind": "Function",
-      "insertText": "take_any()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "take_anyif",
-      "kind": "Function",
-      "insertText": "take_anyif()",
-      "category": "Aggregate Function"
+      "category": "Aggregation function"
     },
     {
       "label": "tdigest",
       "kind": "Function",
       "insertText": "tdigest()",
-      "category": "Aggregate Function"
-    },
-    {
-      "label": "tdigest_merge",
-      "kind": "Function",
-      "insertText": "tdigest_merge()",
-      "category": "Aggregate Function"
+      "category": "Aggregation function"
     },
     {
       "label": "variance",
       "kind": "Function",
       "insertText": "variance()",
-      "category": "Aggregate Function"
+      "category": "Aggregation function"
     },
     {
       "label": "varianceif",
       "kind": "Function",
       "insertText": "varianceif()",
-      "category": "Aggregate Function"
+      "category": "Aggregation function"
     },
     {
       "label": "variancep",
       "kind": "Function",
       "insertText": "variancep()",
-      "category": "Aggregate Function"
+      "category": "Aggregation function"
     },
     {
       "label": "variancepif",
       "kind": "Function",
       "insertText": "variancepif()",
-      "category": "Aggregate Function"
+      "category": "Aggregation function"
+    },
+    {
+      "label": "any",
+      "kind": "Function",
+      "insertText": "any()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "anyif",
+      "kind": "Function",
+      "insertText": "anyif()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "arg_max",
+      "kind": "Function",
+      "insertText": "arg_max()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "arg_min",
+      "kind": "Function",
+      "insertText": "arg_min()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "argmax",
+      "kind": "Function",
+      "insertText": "argmax()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "argmin",
+      "kind": "Function",
+      "insertText": "argmin()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "binary_all_and",
+      "kind": "Function",
+      "insertText": "binary_all_and()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "binary_all_or",
+      "kind": "Function",
+      "insertText": "binary_all_or()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "binary_all_xor",
+      "kind": "Function",
+      "insertText": "binary_all_xor()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "cnt",
+      "kind": "Function",
+      "insertText": "cnt()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "count_distinct",
+      "kind": "Function",
+      "insertText": "count_distinct()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "count_distinctif",
+      "kind": "Function",
+      "insertText": "count_distinctif()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "hll_if",
+      "kind": "Function",
+      "insertText": "hll_if()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "make_bag",
+      "kind": "Function",
+      "insertText": "make_bag()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "make_bag_if",
+      "kind": "Function",
+      "insertText": "make_bag_if()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "make_dictionary",
+      "kind": "Function",
+      "insertText": "make_dictionary()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "make_list",
+      "kind": "Function",
+      "insertText": "make_list()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "make_list_if",
+      "kind": "Function",
+      "insertText": "make_list_if()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "make_list_with_nulls",
+      "kind": "Function",
+      "insertText": "make_list_with_nulls()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "make_set",
+      "kind": "Function",
+      "insertText": "make_set()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "make_set_if",
+      "kind": "Function",
+      "insertText": "make_set_if()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "makelist",
+      "kind": "Function",
+      "insertText": "makelist()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "makeset",
+      "kind": "Function",
+      "insertText": "makeset()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "passthrough",
+      "kind": "Function",
+      "insertText": "passthrough()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "percentile",
+      "kind": "Function",
+      "insertText": "percentile()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "percentiles_array",
+      "kind": "Function",
+      "insertText": "percentiles_array()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "percentilesw_array",
+      "kind": "Function",
+      "insertText": "percentilesw_array()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "percentilew",
+      "kind": "Function",
+      "insertText": "percentilew()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "take_any",
+      "kind": "Function",
+      "insertText": "take_any()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "take_anyif",
+      "kind": "Function",
+      "insertText": "take_anyif()",
+      "category": "Aggregate function"
+    },
+    {
+      "label": "tdigest_merge",
+      "kind": "Function",
+      "insertText": "tdigest_merge()",
+      "category": "Aggregate function"
     }
   ],
   "resourceTypes": [

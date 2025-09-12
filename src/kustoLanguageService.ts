@@ -228,7 +228,13 @@ export class KustoLanguageServiceProvider implements
             this.resetHoverState();
         }
         
-        const hoverInfo = this.getKQLHoverInfo(word);
+        // Get the line text to check for context (like parentheses)
+        const lineText = document.lineAt(position).text;
+        const wordStart = wordRange.start.character;
+        const wordEnd = wordRange.end.character;
+        const textAfterWord = lineText.substring(wordEnd).trim();
+        
+        const hoverInfo = this.getKQLHoverInfo(word, textAfterWord);
 
         if (hoverInfo) {
             return new vscode.Hover(hoverInfo, wordRange);
@@ -464,80 +470,140 @@ export class KustoLanguageServiceProvider implements
         return selected;
     }
 
-    private getKQLHoverInfo(word: string): vscode.MarkdownString | null {
-        const info = this.getKQLDocumentation(word.toLowerCase());
+    /**
+     * Find a function in both functions and aggregates arrays
+     */
+    private findFunction(lowerWord: string): any | null {
+        // Check regular functions first
+        if (this.schemaData.functions) {
+            const func = this.schemaData.functions.find((fn: any) => fn.name.toLowerCase() === lowerWord);
+            if (func) {
+                return func;
+            }
+        }
+        
+        // Check aggregates
+        if (this.schemaData.aggregates) {
+            const aggregate = this.schemaData.aggregates.find((agg: any) => agg.name.toLowerCase() === lowerWord);
+            if (aggregate) {
+                return aggregate;
+            }
+        }
+        
+        return null;
+    }
+
+    /**
+     * Format function hover information consistently
+     */
+    private formatFunctionHover(functionInfo: any): string {
+        // If we have enhanced documentation, use it
+        if (functionInfo.documentation) {
+            const doc = functionInfo.documentation;
+            let hoverContent = `## Function ${doc.title}
+
+`;
+            hoverContent += `*${functionInfo.category}*
+
+`;
+            
+            // Description
+            if (doc.description) {
+                hoverContent += `${doc.description}
+
+`;
+            }
+            
+            // Syntax
+            if (doc.syntax) {
+                hoverContent += `## Syntax
+
+${doc.syntax}
+
+`;
+            }
+            
+            // Parameters Table
+            if (doc.parametersTable) {
+                hoverContent += `## Parameters
+
+${doc.parametersTable}
+
+`;
+            }
+            
+            // Returns
+            if (doc.returnInfo) {
+                hoverContent += `## Returns
+
+${doc.returnInfo}
+
+`;
+            }
+            
+            // Example(s)
+            if (doc.example && doc.example.trim()) {
+                // Check if there are multiple examples (look for multiple code blocks or line breaks)
+                const hasMultipleExamples = doc.example.includes('```') || 
+                                          doc.example.split('\n').filter((line: string) => line.trim()).length > 3;
+                const exampleLabel = hasMultipleExamples ? "Examples" : "Example";
+                hoverContent += `## ${exampleLabel}\n\`\`\`kql\n${doc.example}\n\`\`\``;
+            }            return hoverContent;
+        } else {
+            // Fallback to old format
+            return `**Function: ${functionInfo.name}()** - ${functionInfo.category}`;
+        }
+    }
+
+    private getKQLHoverInfo(word: string, textAfterWord: string = ''): vscode.MarkdownString | null {
+        const info = this.getKQLDocumentation(word.toLowerCase(), textAfterWord);
         if (info) {
             return new vscode.MarkdownString(info);
         }
         return null;
     }
 
-    private getKQLDocumentation(word: string): string | null {
+    private getKQLDocumentation(word: string, textAfterWord: string = ''): string | null {
         const lowerWord = word.toLowerCase();
+        const hasParentheses = textAfterWord.startsWith('(');
         
         // Check schema data first if available
         if (this.schemaData) {
-            // Check keywords first (where, project, contains, etc.)
-            if (this.schemaData.keywords) {
-                const keyword = this.schemaData.keywords.find((kw: any) => kw.name.toLowerCase() === lowerWord);
-                if (keyword) {
-                    return `**${keyword.name}** - ${keyword.category}`;
+            // If we detect parentheses, prioritize function matching
+            if (hasParentheses) {
+                const functionInfo = this.findFunction(lowerWord);
+                if (functionInfo) {
+                    return this.formatFunctionHover(functionInfo);
                 }
             }
             
-            // Check operators
-            if (this.schemaData.operators) {
-                const operator = this.schemaData.operators.find((op: any) => op.name.toLowerCase() === lowerWord);
-                if (operator) {
-                    return `**${operator.name}** - ${operator.category}`;
-                }
-            }
-            
-            // Check functions
-            if (this.schemaData.functions) {
-                const func = this.schemaData.functions.find((fn: any) => fn.name.toLowerCase() === lowerWord);
-                if (func) {
-                    // If we have enhanced documentation, use it
-                    if (func.documentation) {
-                        const doc = func.documentation;
-                        let hoverContent = `## Function \`${doc.title}\`\n\n`;
-                        hoverContent += `*${func.category}*\n\n`;
-                        
-                        // Description
-                        if (doc.description) {
-                            hoverContent += `${doc.description}\n\n`;
-                        }
-                        
-                        // Syntax
-                        if (doc.syntax) {
-                            hoverContent += `### Syntax\n\n${doc.syntax}\n\n`;
-                        }
-                        
-                        // Parameters Table
-                        if (doc.parametersTable) {
-                            hoverContent += `### Parameters\n\n${doc.parametersTable}\n\n`;
-                        }
-                        
-                        // Returns
-                        if (doc.returnInfo) {
-                            hoverContent += `### Returns\n\n${doc.returnInfo}\n\n`;
-                        }
-                        
-                        // Example(s)
-                        if (doc.example && doc.example.trim()) {
-                            // Check if there are multiple examples (look for multiple code blocks or line breaks)
-                            const hasMultipleExamples = doc.example.includes('```') || 
-                                                      doc.example.split('\n').filter((line: string) => line.trim()).length > 3;
-                            const exampleLabel = hasMultipleExamples ? "Examples" : "Example";
-                            hoverContent += `### ${exampleLabel}\n\`\`\`kql\n${doc.example}\n\`\`\``;
-                        }
-                        
-                        return hoverContent;
-                    } else {
-                        // Fallback to old format
-                        return `**${func.name}()**`;
+            // If no parentheses, prioritize keywords and operators over functions
+            if (!hasParentheses) {
+                // Check keywords first (where, project, contains, etc.)
+                if (this.schemaData.keywords) {
+                    const keyword = this.schemaData.keywords.find((kw: any) => kw.name.toLowerCase() === lowerWord);
+                    if (keyword) {
+                        return `**${keyword.name}** - ${keyword.category}`;
                     }
                 }
+                
+                // Check operators 
+                if (this.schemaData.operators) {
+                    const operator = this.schemaData.operators.find((op: any) => op.name.toLowerCase() === lowerWord);
+                    if (operator) {
+                        return `**${operator.name}** - ${operator.category}`;
+                    }
+                }
+                
+                // If no keywords or operators found and no parentheses, still return null
+                // This ensures count without parentheses doesn't show function documentation
+                return null;
+            }
+            
+            // Check functions/aggregates (fallback for general case)
+            const functionInfo = this.findFunction(lowerWord);
+            if (functionInfo) {
+                return this.formatFunctionHover(functionInfo);
             }
             
             // Check tables

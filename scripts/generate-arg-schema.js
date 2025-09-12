@@ -34,11 +34,23 @@ function cleanMarkdownLinks(text) {
         .replace(/>\s*!\s*INCLUDE\s+\[[^\]]+\]/g, '') // Remove > !INCLUDE [name] directives
         .replace(/!\s*INCLUDE\s+\[[^\]]+\]/g, '') // Remove !INCLUDE [name] directives
         .replace(/:heavy_check_mark:/g, '*True*') // Replace emoji with italicized True
-        .replace(/\|--/g, '|:--') // Convert table alignment to left-aligned (add colon to start of each column)
-        .replace(/\|---/g, '|:---') // Convert table alignment to left-aligned (3 dashes)
-        .replace(/\|----/g, '|:----') // Convert table alignment to left-aligned (4 dashes)
+        .replace(/\|(-{2,})/g, '|:$1') // Convert table alignment to left-aligned (add colon to start of any column with 2+ dashes)
+        // Remove moniker ranges like "::: moniker range="..." ... ::: moniker-end"
+        .replace(/::: moniker range="[^"]*"\s*[\s\S]*?::: moniker-end/g, '')
         .replace(/\n\s*\n\s*\n/g, '\n\n') // Collapse multiple newlines
         .trim();
+}
+
+// Extract category from function title and apply sentence casing
+function extractCategoryFromTitle(title) {
+    // Look for patterns like "count() (aggregation function)" or "bin() (scalar function)"
+    const match = title.match(/\(([^)]+)\)$/);
+    if (match) {
+        const category = match[1].trim();
+        // Apply sentence casing: first letter uppercase, rest lowercase
+        return category.charAt(0).toUpperCase() + category.slice(1).toLowerCase();
+    }
+    return 'KQL function'; // Default fallback
 }
 
 // Focused documentation parser for Microsoft Docs
@@ -1286,6 +1298,10 @@ class ARGSchemaGenerator {
             console.log('📚 Extracting enhanced function documentation...');
             const functionsWithDocs = await this.extractMicrosoftDocsDocumentation(kustoElements.functions);
             
+            // Extract enhanced documentation for aggregates
+            console.log('📚 Extracting enhanced aggregate documentation...');
+            const aggregatesWithDocs = await this.extractMicrosoftDocsDocumentation(kustoElements.aggregates);
+            
             // Merge documented functions with basic function list
             const functionMap = new Map();
             
@@ -1297,14 +1313,28 @@ class ARGSchemaGenerator {
             // Add any remaining functions without documentation
             kustoElements.functions.forEach(name => {
                 if (!functionMap.has(name)) {
-                    functionMap.set(name, { name, category: 'KQL Function' });
+                    functionMap.set(name, { name, category: 'KQL function' });
+                }
+            });
+            
+            // Merge documented aggregates with basic aggregate list
+            const aggregateMap = new Map();
+            
+            // Add documented aggregates first
+            aggregatesWithDocs.forEach(agg => {
+                aggregateMap.set(agg.name, agg);
+            });
+            
+            // Add any remaining aggregates without documentation
+            kustoElements.aggregates.forEach(name => {
+                if (!aggregateMap.has(name)) {
+                    aggregateMap.set(name, { name, category: 'Aggregate function' });
                 }
             });
             
             this.schema.functions = Array.from(functionMap.values());
-            this.schema.aggregates = kustoElements.aggregates.map(name => ({ name, category: 'Aggregate Function' }));
+            this.schema.aggregates = Array.from(aggregateMap.values());
             
-            console.log(`✅ Enhanced function documentation: ${functionsWithDocs.length} with docs, ${this.schema.functions.length} total`);
         } catch (error) {
             console.warn('⚠️ Could not extract Kusto language elements:', error.message);
             this.schema.keywords = [];
@@ -1523,7 +1553,7 @@ class ARGSchemaGenerator {
             const repoUrl = 'https://api.github.com/repos/MicrosoftDocs/dataexplorer-docs/contents/data-explorer/kusto/query';
             const fileListResponse = await this.fetchUrl(repoUrl);
             const files = JSON.parse(fileListResponse).filter(file => 
-                file.name.endsWith('-function.md') || file.name.endsWith('-operator.md')
+                file.name.endsWith('-function.md') || file.name.endsWith('-operator.md') || file.name.endsWith('-aggregation-function.md')
             );
             
             console.log(`📄 Found ${files.length} documentation files`);
@@ -1533,7 +1563,8 @@ class ARGSchemaGenerator {
             functionNames.forEach(funcName => {
                 const searchPatterns = [
                     `${funcName.toLowerCase()}-function.md`,
-                    `${funcName.toLowerCase().replace(/_/g, '-')}-function.md`
+                    `${funcName.toLowerCase().replace(/_/g, '-')}-function.md`,
+                    `${funcName.toLowerCase()}-aggregation-function.md`
                 ];
                 
                 for (const pattern of searchPatterns) {
@@ -1570,9 +1601,14 @@ class ARGSchemaGenerator {
                     if (content) {
                         const documentation = parseMarkdownDoc(content);
                         
+                        // Extract category from title if available
+                        const category = documentation.title ? 
+                            extractCategoryFromTitle(documentation.title) : 
+                            'KQL function';
+                        
                         extractedDocs.push({
                             name: func.name,
-                            category: 'KQL Function',
+                            category: category,
                             documentation: documentation
                         });
                         successCount++;
@@ -1634,7 +1670,34 @@ class ARGSchemaGenerator {
         });
         const operatorsPattern = escapedOperators.join('|');
         
-        const allFunctions = [...kustoElements.functions, ...kustoElements.aggregates].join('|');
+        const allFunctions = [...kustoElements.functions, ...kustoElements.aggregates];
+        const allFunctionsSet = new Set(allFunctions.map(f => f.toLowerCase()));
+        const allKeywordsSet = new Set(keywords.map(k => k.toLowerCase()));
+        const allOperatorsSet = new Set(operators.map(o => o.toLowerCase()));
+        
+        // Find words that can be both functions AND keywords/operators
+        const ambiguousWords = [];
+        allFunctions.forEach(func => {
+            const lowerFunc = func.toLowerCase();
+            if (allKeywordsSet.has(lowerFunc) || allOperatorsSet.has(lowerFunc)) {
+                ambiguousWords.push(func);
+            }
+        });
+        
+        // Separate ambiguous functions from pure functions
+        const pureKeywords = keywords.filter(kw => !allFunctionsSet.has(kw.toLowerCase()));
+        const pureOperators = operators.filter(op => !allFunctionsSet.has(op.toLowerCase()));
+        const pureFunctions = allFunctions.filter(func => {
+            const lowerFunc = func.toLowerCase();
+            return !allKeywordsSet.has(lowerFunc) && !allOperatorsSet.has(lowerFunc);
+        });
+        
+        const allFunctionsPattern = allFunctions.join('|');
+        const pureKeywordsPattern = pureKeywords.map(kw => kw.replace(/[\\^$.|?*+(){}\[\]]/g, '\\$&')).join('|');
+        const pureOperatorsPattern = pureOperators.map(op => op.replace(/[\\^$.|?*+(){}\[\]]/g, '\\$&')).join('|');
+        const pureFunctionsPattern = pureFunctions.join('|');
+        const ambiguousWordsPattern = ambiguousWords.join('|');
+        
         const tables = Object.keys(this.schema.tables).filter(name => name).join('|');
         
         // Extract common properties from schema data only
@@ -1683,6 +1746,8 @@ class ARGSchemaGenerator {
             "fileTypes": ["kql"],
             "patterns": [
                 { "include": "#comments" },
+                { "include": "#function_calls" },
+                { "include": "#ambiguous_keywords_as_keywords" },
                 { "include": "#keywords" },
                 { "include": "#operators" },
                 { "include": "#functions" },
@@ -1705,11 +1770,27 @@ class ARGSchemaGenerator {
                         }
                     ]
                 },
+                "function_calls": {
+                    "patterns": [
+                        {
+                            "name": "support.function.builtin.kql",
+                            "match": `(?i)\\b(${allFunctionsPattern})(?=\\s*\\()`
+                        }
+                    ]
+                },
+                "ambiguous_keywords_as_keywords": {
+                    "patterns": [
+                        {
+                            "name": "keyword.control.kql",
+                            "match": `(?i)\\b(${ambiguousWordsPattern})(?!\\s*\\()`
+                        }
+                    ]
+                },
                 "keywords": {
                     "patterns": [
                         {
                             "name": "keyword.control.kql",
-                            "match": `(?i)\\b(${keywordsPattern})\\b`
+                            "match": `(?i)\\b(${pureKeywordsPattern})\\b`
                         }
                     ]
                 },
@@ -1717,7 +1798,7 @@ class ARGSchemaGenerator {
                     "patterns": [
                         {
                             "name": "punctuation.operator.kql",
-                            "match": `(${operatorsPattern})`
+                            "match": `(${pureOperatorsPattern})`
                         }
                     ]
                 },
@@ -1725,7 +1806,7 @@ class ARGSchemaGenerator {
                     "patterns": [
                         {
                             "name": "support.function.builtin.kql",
-                            "match": `(?i)\\b(${allFunctions})\\b`
+                            "match": `(?i)\\b(${pureFunctionsPattern})\\b`
                         }
                     ]
                 },

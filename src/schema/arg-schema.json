@@ -10890,7 +10890,7 @@
   "functions": [
     {
       "name": "abs",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "abs()",
         "description": "Calculates the absolute value of the input.",
@@ -10903,7 +10903,7 @@
     },
     {
       "name": "acos",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "acos()",
         "description": "Calculates the angle whose cosine is the specified number. Inverse operation of `cos()`.",
@@ -10916,7 +10916,7 @@
     },
     {
       "name": "ago",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "ago()",
         "description": "Subtracts the given timespan from the current UTC time.\n\nLike `now()`, if you use `ago()` multiple times in a single query statement, the current UTC time\nbeing referenced is the same across all uses.",
@@ -10929,7 +10929,7 @@
     },
     {
       "name": "around",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "around()",
         "description": "Creates a `bool` value indicating if the first argument is within a range around the center value.",
@@ -10942,7 +10942,7 @@
     },
     {
       "name": "array_concat",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "array_concat()",
         "description": "Concatenates many dynamic arrays to a single array.",
@@ -10955,7 +10955,7 @@
     },
     {
       "name": "array_iff",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "array_iff()",
         "description": "Element-wise `iif` function on dynamic arrays.\n\n> The `array_iff()` and `array_iif()` functions are equivalent",
@@ -10968,7 +10968,7 @@
     },
     {
       "name": "array_index_of",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "array_index_of()",
         "description": "Searches an array for the specified item, and returns its position.",
@@ -10981,7 +10981,7 @@
     },
     {
       "name": "array_length",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "array_length()",
         "description": "Calculates the number of elements in a dynamic array.\n\n> **Deprecated aliases:** arraylength()",
@@ -10994,7 +10994,7 @@
     },
     {
       "name": "array_reverse",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "array_reverse()",
         "description": "Reverses the order of the elements in a dynamic array.",
@@ -11007,7 +11007,7 @@
     },
     {
       "name": "array_rotate_left",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "array_rotate_left()",
         "description": "Rotates values inside a `dynamic` array to the left.",
@@ -11020,7 +11020,7 @@
     },
     {
       "name": "array_rotate_right",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "array_rotate_right()",
         "description": "Rotates values inside a `dynamic` array to the right.",
@@ -11033,7 +11033,7 @@
     },
     {
       "name": "array_shift_left",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "array_shift_left()",
         "description": "Shifts the values inside a dynamic array to the left.",
@@ -11046,7 +11046,7 @@
     },
     {
       "name": "array_shift_right",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "array_shift_right()",
         "description": "Shifts the values inside a dynamic array to the right.",
@@ -11059,7 +11059,7 @@
     },
     {
       "name": "array_slice",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "array_slice()",
         "description": "Extracts a slice of a dynamic array.",
@@ -11072,7 +11072,7 @@
     },
     {
       "name": "array_sort_asc",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "array_sort_asc()",
         "description": "Receives one or more arrays. Sorts the first array in ascending order. Orders the remaining arrays to match the reordered first array.",
@@ -11085,7 +11085,7 @@
     },
     {
       "name": "array_sort_desc",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "array_sort_desc()",
         "description": "Receives one or more arrays. Sorts the first array in descending order. Orders the remaining arrays to match the reordered first array.",
@@ -11098,7 +11098,7 @@
     },
     {
       "name": "array_split",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "array_split()",
         "description": "Splits an array to multiple arrays according to the split indices and packs the generated array in a dynamic array.",
@@ -11111,7 +11111,7 @@
     },
     {
       "name": "array_sum",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "array_sum()",
         "description": "Calculates the sum of elements in a dynamic array.",
@@ -11124,7 +11124,7 @@
     },
     {
       "name": "asin",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "asin()",
         "description": "Calculates the angle whose sine is the specified number, or the arc sine. This is the inverse operation of `sin()`.",
@@ -11137,7 +11137,7 @@
     },
     {
       "name": "assert",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "assert()",
         "description": "Checks for a condition. If the condition is false, outputs error messages and fails the query.\n\n> [!NOTE]\n> The `assert` function gets evaluated during the query analysis phase, before optimizations such as constant-folding and predicate short-circuiting get applied.\n\n> [!NOTE]\n> The parameters given to `assert` must be evaluated to constants during the query analysis phase. In other words, it can be constructed from other expressions referencing constants only, and can't be bound to row-context.",
@@ -11150,7 +11150,7 @@
     },
     {
       "name": "atan",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "atan()",
         "description": "Returns the angle whose tangent is the specified number. This is the inverse operation of `tan()`.",
@@ -11163,7 +11163,7 @@
     },
     {
       "name": "atan2",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "atan2()",
         "description": "Calculates the angle, in radians, between the positive x-axis and the ray from the origin to the point (y, x).",
@@ -11176,7 +11176,7 @@
     },
     {
       "name": "bag_has_key",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "bag_has_key()",
         "description": "Checks whether a dynamic property bag object contains a given key.",
@@ -11189,7 +11189,7 @@
     },
     {
       "name": "bag_keys",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "bag_keys()",
         "description": "Enumerates all the root keys in a dynamic property bag object.",
@@ -11202,7 +11202,7 @@
     },
     {
       "name": "bag_merge",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "bag_merge()",
         "description": "The function merges multiple `dynamic` property bags into a single `dynamic` property bag object, consolidating all properties from the input bags.",
@@ -11215,7 +11215,7 @@
     },
     {
       "name": "bag_pack_columns",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "bag_pack_columns()",
         "description": "Creates a dynamic property bag object from a list of columns.",
@@ -11228,7 +11228,7 @@
     },
     {
       "name": "bag_remove_keys",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "bag_remove_keys()",
         "description": "Removes keys and associated values from a `dynamic` property bag.",
@@ -11241,7 +11241,7 @@
     },
     {
       "name": "bag_set_key",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "bag_set_key()",
         "description": "bag_set_key() receives a `dynamic` property-bag, a key and a value. The function sets the given key in the bag to the given value. The function overrides any existing value in case the key already exists.",
@@ -11254,7 +11254,7 @@
     },
     {
       "name": "base64_decode_toarray",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "base64_decode_toarray()",
         "description": "Decodes a base64 string to an array of long values.",
@@ -11267,7 +11267,7 @@
     },
     {
       "name": "base64_decode_toguid",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "base64_decode_toguid()",
         "description": "Decodes a base64 string to a GUID.",
@@ -11280,7 +11280,7 @@
     },
     {
       "name": "base64_decode_tostring",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "base64_decode_tostring()",
         "description": "Decodes a base64 string to a UTF-8 string.\n\n> **Deprecated aliases:** base64_decodestring()",
@@ -11293,7 +11293,7 @@
     },
     {
       "name": "base64_encode_fromarray",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "base64_encode_fromarray()",
         "description": "Encodes a base64 string from a bytes array.",
@@ -11306,7 +11306,7 @@
     },
     {
       "name": "base64_encode_fromguid",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "base64_encode_fromguid()",
         "description": "Encodes a GUID to a base64 string.",
@@ -11319,7 +11319,7 @@
     },
     {
       "name": "base64_encode_tostring",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "base64_encode_tostring()",
         "description": "Encodes a string as base64 string.\n\n> **Deprecated aliases:** base64_encodestring()",
@@ -11332,7 +11332,7 @@
     },
     {
       "name": "beta_cdf",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "beta_cdf()",
         "description": "Returns the standard cumulative beta distribution function.\n\nIf *probability* = `beta_cdf(`*x*,...`)`, then `beta_inv(`*probability*,...`)` = *x*.\n\nThe beta distribution is commonly used to study variation in the percentage of something across samples, such as the fraction of the day people spend watching television.",
@@ -11345,7 +11345,7 @@
     },
     {
       "name": "beta_inv",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "beta_inv()",
         "description": "Returns the inverse of the beta cumulative probability density function.\n\nIf *probability* = `beta_cdf(`*x*,...`)`, then `beta_inv(`*probability*,...`)` = *x*.\n\nThe beta distribution can be used in project planning to model probable completion times given an expected completion time and variability.",
@@ -11358,7 +11358,7 @@
     },
     {
       "name": "beta_pdf",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "beta_pdf()",
         "description": "Returns the probability density beta function.\n\nThe beta distribution is commonly used to study variation in the percentage of something across samples, such as the fraction of the day people spend watching television.",
@@ -11371,7 +11371,7 @@
     },
     {
       "name": "bin",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "bin()",
         "description": "Rounds values down to an integer multiple of a given bin size.\n\nUsed frequently in combination with `summarize by ...`.\nIf you have a scattered set of values, they'll be grouped into a smaller set of specific values.\n\n> The `bin()` and `floor()` functions are equivalent",
@@ -11384,7 +11384,7 @@
     },
     {
       "name": "bin_at",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "bin_at()",
         "description": "Returns the value rounded down to the nearest bin size, which is aligned to a fixed reference point.\n\nIn contrast to the bin() function, where the point of alignment is predefined, bin_at() allows you to define a fixed point for alignment. Results can align before or after the fixed point.",
@@ -11397,7 +11397,7 @@
     },
     {
       "name": "bin_auto",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "bin_auto()",
         "description": "Rounds values down to a fixed-size bin, with control over the bin size and starting point provided by a query property.",
@@ -11410,7 +11410,7 @@
     },
     {
       "name": "binary_and",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "binary_and()",
         "description": "Performs a bitwise `AND` operation on two values.",
@@ -11423,7 +11423,7 @@
     },
     {
       "name": "binary_not",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "binary_not()",
         "description": "Performs a bitwise negation operation on a given value.",
@@ -11436,7 +11436,7 @@
     },
     {
       "name": "binary_or",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "binary_or()",
         "description": "Performs a bitwise `or` operation on two values.",
@@ -11449,7 +11449,7 @@
     },
     {
       "name": "binary_shift_left",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "binary_shift_left()",
         "description": "Performs a binary shift left operation on a pair of numbers.",
@@ -11462,7 +11462,7 @@
     },
     {
       "name": "binary_shift_right",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "binary_shift_right()",
         "description": "Performs a binary shift right operation on a pair of numbers.",
@@ -11475,7 +11475,7 @@
     },
     {
       "name": "binary_xor",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "binary_xor()",
         "description": "Performs a bitwise `xor` operation on two values.",
@@ -11488,7 +11488,7 @@
     },
     {
       "name": "bitset_count_ones",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "bitset_count_ones()",
         "description": "Performs a bitwise operation on the binary representation of a number.",
@@ -11501,7 +11501,7 @@
     },
     {
       "name": "case",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "case()",
         "description": "Evaluates a list of predicates and returns the first result expression whose predicate is satisfied.\n\nIf none of the predicates return `true`, the result of the `else` expression is returned.\nAll `predicate` arguments must be expressions that evaluate to a  `boolean` value.\nAll `then` arguments and the `else` argument must be of the same type.",
@@ -11514,7 +11514,7 @@
     },
     {
       "name": "ceiling",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "ceiling()",
         "description": "Calculates the smallest integer greater than, or equal to, the specified numeric expression.",
@@ -11527,7 +11527,7 @@
     },
     {
       "name": "cluster",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "cluster()",
         "description": ":::moniker range=\"azure-data-explorer\"\nChanges the reference of the query to a remote cluster. To access a database within the same cluster, use the database() function. For more information, see cross-database and cross-cluster queries.\n:::moniker-end\n\n:::moniker range=\"microsoft-fabric\"\nChanges the reference of the query to a remote Eventhouse. To access a database within the same Eventhouse, use the database() function. For more information, see cross-database and cross-cluster queries.\n<!-- Update link to the correct version for Fabric -->\n:::moniker-end",
@@ -11540,7 +11540,7 @@
     },
     {
       "name": "coalesce",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "coalesce()",
         "description": "Evaluates a list of expressions and returns the first non-null (or non-empty for string) expression.",
@@ -11553,7 +11553,7 @@
     },
     {
       "name": "column_ifexists",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "column_ifexists()",
         "description": "Displays the column, if the column exists. Otherwise, it returns the default column.\n\n> **Deprecated aliases:** columnifexists()",
@@ -11566,7 +11566,7 @@
     },
     {
       "name": "column_names_of",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "column_names_of()",
         "description": "Returns the column names of a tabular expression.",
@@ -11579,7 +11579,7 @@
     },
     {
       "name": "convert_angle",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "convert_angle",
         "description": "Converts an angle value from one unit to another.",
@@ -11592,7 +11592,7 @@
     },
     {
       "name": "convert_energy",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "convert_energy",
         "description": "Converts an energy value from one unit to another.",
@@ -11605,7 +11605,7 @@
     },
     {
       "name": "convert_force",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "convert_force",
         "description": "Converts a force value from one unit to another.",
@@ -11618,7 +11618,7 @@
     },
     {
       "name": "convert_length",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "convert_length",
         "description": "Converts a length value from one unit to another.",
@@ -11631,7 +11631,7 @@
     },
     {
       "name": "convert_mass",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "convert_mass",
         "description": "Converts a mass value from one unit to another.",
@@ -11644,7 +11644,7 @@
     },
     {
       "name": "convert_speed",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "convert_speed",
         "description": "Converts a speed value from one unit to another.",
@@ -11657,7 +11657,7 @@
     },
     {
       "name": "convert_temperature",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "convert_temperature",
         "description": "Converts a temperature value from one unit to another.",
@@ -11670,7 +11670,7 @@
     },
     {
       "name": "convert_volume",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "convert_volume",
         "description": "Converts a volume value from one unit to another.",
@@ -11683,7 +11683,7 @@
     },
     {
       "name": "cos",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "cos()",
         "description": "Performs a cosine operation on the input value.\nThe angle is specified in radians.",
@@ -11696,7 +11696,7 @@
     },
     {
       "name": "cot",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "cot()",
         "description": "Calculates the trigonometric cotangent of the specified angle, in radians.",
@@ -11709,7 +11709,7 @@
     },
     {
       "name": "countof",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "countof()",
         "description": "Counts occurrences of a substring in a string. Plain string matches may overlap; regex matches don't.",
@@ -11722,7 +11722,7 @@
     },
     {
       "name": "current_cluster_endpoint",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "current_cluster_endpoint()",
         "description": ":::moniker range=\"azure-data-explorer || azure-monitor || microsoft-sentinel\"\nProvides the network endpoint (DNS name) of the current cluster being queried.\n::: moniker-end\n\n:::moniker range=\"microsoft-fabric\"\nProvides the network endpoint (DNS name) of the current Eventhouse being queried.\n::: moniker-end",
@@ -11735,7 +11735,7 @@
     },
     {
       "name": "current_database",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "current_database()",
         "description": "PRovides the name of the database in scope (database that all query\nentities are resolved against if no other database is specified).",
@@ -11748,7 +11748,7 @@
     },
     {
       "name": "current_principal",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "current_principal()",
         "description": "Provides the current principal name that runs the query.",
@@ -11761,7 +11761,7 @@
     },
     {
       "name": "current_principal_details",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "current_principal_details()",
         "description": "Provides details of the principal running the query.",
@@ -11774,7 +11774,7 @@
     },
     {
       "name": "current_principal_is_member_of",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "current_principal_is_member_of()",
         "description": "Checks group membership or principal identity of the current principal running the query.",
@@ -11787,7 +11787,7 @@
     },
     {
       "name": "cursor_after",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "cursor_after()",
         "description": "A predicate runs over the records of a table to compare their ingestion time against a database cursor.\n\n> [!NOTE]\n> This function can only be invoked on records of a table that has the\nIngestionTime policy enabled.",
@@ -11800,7 +11800,7 @@
     },
     {
       "name": "cursor_before_or_at",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "cursor_before_or_at()",
         "description": "A predicate function runs over the records of a table to compare their ingestion time against the database cursor time.\n\n> [!NOTE]\n> This function can only be invoked on records of a table that has the\nIngestionTime policy enabled.",
@@ -11813,7 +11813,7 @@
     },
     {
       "name": "database",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "database()",
         "description": ":::moniker range=\"azure-data-explorer\"\nChanges the reference of the query to a specific database within the cluster scope.\n\n> [!NOTE]\n>\n> * For more information, see cross-database and cross-cluster queries.\n> * For accessing remote cluster and remote database, see `cluster()` scope function.\n:::moniker-end\n\n:::moniker range=\"microsoft-fabric\"\nChanges the reference of the query to a specific database within the Eventhouse scope.\n<!-- add link in the note to the Cross-database and cross-Eventhouse doc once it is created -->\n> [!NOTE]\n>\n> * For accessing remote cluster and remote database, see `cluster()` scope function.\n:::moniker-end\n``",
@@ -11826,7 +11826,7 @@
     },
     {
       "name": "datetime_add",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "datetime_add()",
         "description": "Calculates a new datetime from a specified period multiplied by a specified amount, added to, or subtracted from a specified datetime.",
@@ -11839,7 +11839,7 @@
     },
     {
       "name": "datetime_diff",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "datetime_diff()",
         "description": "Calculates the number of the specified periods between two datetime values.",
@@ -11852,7 +11852,7 @@
     },
     {
       "name": "datetime_local_to_utc",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "datetime_local_to_utc()",
         "description": "Converts local datetime to UTC datetime using a time-zone specification.",
@@ -11865,7 +11865,7 @@
     },
     {
       "name": "datetime_part",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "datetime_part()",
         "description": "Extracts the requested date part as an integer value.\n\n> **Deprecated aliases:** datepart()",
@@ -11878,7 +11878,7 @@
     },
     {
       "name": "datetime_utc_to_local",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "datetime_utc_to_local()",
         "description": "Converts UTC datetime to local datetime using a time-zone specification.",
@@ -11891,7 +11891,7 @@
     },
     {
       "name": "dcount_hll",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "dcount_hll()",
         "description": "Calculates the distinct count from results generated by hll or hll_merge.\n\nRead about the underlying algorithm (*H*yper*L*og*L*og) and estimation accuracy.",
@@ -11904,7 +11904,7 @@
     },
     {
       "name": "degrees",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "degrees()",
         "description": "Converts angle value in radians into value in degrees, using the formula `degrees = (180 / PI ) * angle_in_radians`.",
@@ -11917,7 +11917,7 @@
     },
     {
       "name": "dynamic_to_json",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "dynamic_to_json()",
         "description": "Converts a scalar value of type `dynamic` to a canonical `string` representation.",
@@ -11930,7 +11930,7 @@
     },
     {
       "name": "endofday",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "endofday()",
         "description": "Provides the end of the day containing the date, shifted by an offset, if provided.",
@@ -11943,7 +11943,7 @@
     },
     {
       "name": "endofmonth",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "endofmonth()",
         "description": "Provides the end of the month containing the date, shifted by an offset, if provided.",
@@ -11956,7 +11956,7 @@
     },
     {
       "name": "endofweek",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "endofweek()",
         "description": "Provides the end of the week containing the date, shifted by an offset, if provided.\n\nLast day of the week is considered to be a Saturday.",
@@ -11969,7 +11969,7 @@
     },
     {
       "name": "endofyear",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "endofyear()",
         "description": "Provides the end of the year containing the date, shifted by an offset, if provided.",
@@ -11982,7 +11982,7 @@
     },
     {
       "name": "erf",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "erf()",
         "description": "Returns the error function of the input.",
@@ -11995,7 +11995,7 @@
     },
     {
       "name": "erfc",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "erfc()",
         "description": "Provides the complementary error function of the input.",
@@ -12008,7 +12008,7 @@
     },
     {
       "name": "estimate_data_size",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "estimate_data_size()",
         "description": "Provides an estimated data size in bytes for the selected columns of a tabular expression.",
@@ -12021,7 +12021,7 @@
     },
     {
       "name": "exp",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "exp()",
         "description": "The base-e exponential function of x, which is e raised to the power x: e^x.",
@@ -12034,7 +12034,7 @@
     },
     {
       "name": "exp10",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "exp10()",
         "description": "The base-10 exponential function of x, which is 10 raised to the power x: 10^x.",
@@ -12047,7 +12047,7 @@
     },
     {
       "name": "exp2",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "exp2()",
         "description": "The base-2 exponential function of x, which is 2 raised to the power x: 2^x.",
@@ -12060,7 +12060,7 @@
     },
     {
       "name": "extent_id",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "extent_id()",
         "description": "Provides a unique identifier for the data shard (\"extent\") containing the current record at the time the query was run.\n\nApplying this function to calculated data that isn't attached to a data shard returns an empty guid (all zeros).\n\n> **Deprecated aliases:** extentid()\n\n> [!CAUTION]\n>\n> The value returned by this function isn't guaranteed to remain stable over time. The system continuously performs data grooming operations in the background\n> and these can result with changes to existing extents and their IDs.",
@@ -12073,7 +12073,7 @@
     },
     {
       "name": "extent_tags",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "extent_tags()",
         "description": "Provides a dynamic array with the extent tags of the extent that the current record is in.\n\nIf you apply this function to calculated data, which isn't attached to a data shard, returns an empty value.",
@@ -12086,7 +12086,7 @@
     },
     {
       "name": "external_table",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "external_table()",
         "description": "References an external table by name.\n\n> [!NOTE]\n>\n> The `external_table` function has similar restrictions as the table function.\n> Standard query limits apply to external table queries as well.\n\nTo accelerate queries over external delta tables, see Query acceleration policy.",
@@ -12099,7 +12099,7 @@
     },
     {
       "name": "extract",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "extract()",
         "description": "Get a match for a regular expression from a source string.\n\nOptionally, convert the extracted substring to the indicated type.",
@@ -12112,7 +12112,7 @@
     },
     {
       "name": "extract_all",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "extract_all()",
         "description": "Get all matches for a regular expression from a source string.\nOptionally, retrieve a subset of matching groups.\n\n```kusto\nprint extract_all(@\"(\\d+)\", \"a set of numbers: 123, 567 and 789\") // results with the dynamic array [\"123\", \"567\", \"789\"]\n```\n\n> **Deprecated aliases:** extractall()",
@@ -12125,7 +12125,7 @@
     },
     {
       "name": "extract_json",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "extract_json()",
         "description": "Get a specified element out of a JSON text using a path expression.\n\nOptionally convert the extracted string to a specific type.\n\n> The `extract_json()` and `extractjson()` functions are equivalent",
@@ -12138,7 +12138,7 @@
     },
     {
       "name": "format_bytes",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "format_bytes()",
         "description": "Formats a number as a string representing data size in bytes.",
@@ -12151,7 +12151,7 @@
     },
     {
       "name": "format_datetime",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "format_datetime()",
         "description": "Formats a datetime according to the provided format.",
@@ -12164,7 +12164,7 @@
     },
     {
       "name": "format_ipv4",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "format_ipv4()",
         "description": "Parses the input with a netmask and returns a string representing the IPv4 address.",
@@ -12177,7 +12177,7 @@
     },
     {
       "name": "format_ipv4_mask",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "format_ipv4_mask()",
         "description": "Parses the input with a netmask and returns a string representing the IPv4 address in CIDR notation.",
@@ -12190,7 +12190,7 @@
     },
     {
       "name": "format_timespan",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "format_timespan()",
         "description": "Formats a timespan according to the provided format.",
@@ -12203,7 +12203,7 @@
     },
     {
       "name": "gamma",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "gamma()",
         "description": "Computes the gamma function for the provided *number*.",
@@ -12216,7 +12216,7 @@
     },
     {
       "name": "geo_angle",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_angle()",
         "description": "Calculates clockwise angle in radians between two lines on Earth. The first line is [point1, point2] and the second line is [point2, point3].",
@@ -12229,7 +12229,7 @@
     },
     {
       "name": "geo_azimuth",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_azimuth()",
         "description": "Calculates clockwise angle in radians between the line from point1 to true north and a line from point1 to point2 on Earth.",
@@ -12242,7 +12242,7 @@
     },
     {
       "name": "geo_closest_point_on_line",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_closest_point_on_line()",
         "description": "Calculates a point on a line or a multiline, which is closest to a given point on Earth.",
@@ -12255,7 +12255,7 @@
     },
     {
       "name": "geo_closest_point_on_polygon",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_closest_point_on_polygon()",
         "description": "Calculates a point on a polygon or a multipolygon, which is closest to a given point on Earth.",
@@ -12268,7 +12268,7 @@
     },
     {
       "name": "geo_distance_2points",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_distance_2points()",
         "description": "Calculates the shortest distance in meters between two geospatial coordinates on Earth.",
@@ -12281,7 +12281,7 @@
     },
     {
       "name": "geo_distance_point_to_line",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_distance_point_to_line()",
         "description": "Calculates the shortest distance in meters between a coordinate and a line or multiline on Earth.",
@@ -12294,7 +12294,7 @@
     },
     {
       "name": "geo_distance_point_to_polygon",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_distance_point_to_polygon()",
         "description": "Calculates the shortest distance between a coordinate and a polygon or a multipolygon on Earth.",
@@ -12307,7 +12307,7 @@
     },
     {
       "name": "geo_from_wkt",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_from_wkt()",
         "description": "Converts Well-known text (WKT) string to GeoJSON shape.",
@@ -12320,7 +12320,7 @@
     },
     {
       "name": "geo_geohash_neighbors",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_geohash_neighbors()",
         "description": "Calculates Geohash neighbors.\n\nRead more about `geohash`.",
@@ -12333,7 +12333,7 @@
     },
     {
       "name": "geo_geohash_to_central_point",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_geohash_to_central_point()",
         "description": "Calculates the geospatial coordinates that represent the center of a geohash rectangular area.\n\nRead more about `geohash`.",
@@ -12346,7 +12346,7 @@
     },
     {
       "name": "geo_geohash_to_polygon",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_geohash_to_polygon()",
         "description": "Calculates the polygon that represents the geohash rectangular area.\n\nRead more about geohash.",
@@ -12359,7 +12359,7 @@
     },
     {
       "name": "geo_h3cell_children",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_h3cell_children()",
         "description": "Calculates the H3 cell children.\n\nRead more about H3 Cell.",
@@ -12372,7 +12372,7 @@
     },
     {
       "name": "geo_h3cell_level",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_h3cell_level()",
         "description": "Calculates the H3 cell resolution.\n\nRead more about H3 Cell.",
@@ -12385,7 +12385,7 @@
     },
     {
       "name": "geo_h3cell_neighbors",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_h3cell_neighbors()",
         "description": "Calculates the H3 cell neighbors.\n\nRead more about H3 Cell.",
@@ -12398,7 +12398,7 @@
     },
     {
       "name": "geo_h3cell_parent",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_h3cell_parent()",
         "description": "Calculates the H3 cell parent.\n\nRead more about H3 Cell.",
@@ -12411,7 +12411,7 @@
     },
     {
       "name": "geo_h3cell_rings",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_h3cell_rings()",
         "description": "Calculates the H3 cell Rings.\n\nRead more about H3 Cell.",
@@ -12424,7 +12424,7 @@
     },
     {
       "name": "geo_h3cell_to_central_point",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_h3cell_to_central_point()",
         "description": "Calculates the geospatial coordinates that represent the center of an H3 Cell.\n\nRead more about H3 Cell.",
@@ -12437,7 +12437,7 @@
     },
     {
       "name": "geo_h3cell_to_polygon",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_h3cell_to_polygon()",
         "description": "Calculates the polygon that represents the H3 Cell rectangular area.\n\nRead more about H3 Cell.",
@@ -12450,7 +12450,7 @@
     },
     {
       "name": "geo_info_from_ip_address",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_info_from_ip_address()",
         "description": "Retrieves geolocation information about IPv4 or IPv6 addresses.",
@@ -12463,7 +12463,7 @@
     },
     {
       "name": "geo_intersection_2lines",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_intersection_2lines()",
         "description": "Calculates the intersection of two lines or multilines.",
@@ -12476,7 +12476,7 @@
     },
     {
       "name": "geo_intersection_2polygons",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_intersection_2polygons()",
         "description": "Calculates the intersection of two polygons or multipolygons.",
@@ -12489,7 +12489,7 @@
     },
     {
       "name": "geo_intersection_line_with_polygon",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_intersection_line_with_polygon()",
         "description": "Calculates the intersection of a line or a multiline with a polygon or a multipolygon.",
@@ -12502,7 +12502,7 @@
     },
     {
       "name": "geo_intersects_2lines",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_intersects_2lines()",
         "description": "Calculates whether two lines or multilines intersect.",
@@ -12515,7 +12515,7 @@
     },
     {
       "name": "geo_intersects_2polygons",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_intersects_2polygons()",
         "description": "Calculates whether two polygons or multipolygons intersect.",
@@ -12528,7 +12528,7 @@
     },
     {
       "name": "geo_intersects_line_with_polygon",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_intersects_line_with_polygon()",
         "description": "Calculates whether a line or multiline intersect with a polygon or a multipolygon.",
@@ -12541,7 +12541,7 @@
     },
     {
       "name": "geo_line_buffer",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_line_buffer()",
         "description": "Calculates polygon or multipolygon that contains all points within the given radius of the input line or multiline on Earth.",
@@ -12554,7 +12554,7 @@
     },
     {
       "name": "geo_line_centroid",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_line_centroid()",
         "description": "Calculates the centroid of a line or a multiline on Earth.",
@@ -12567,7 +12567,7 @@
     },
     {
       "name": "geo_line_densify",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_line_densify()",
         "description": "Converts planar lines or multiline edges to geodesics by adding intermediate points.",
@@ -12580,7 +12580,7 @@
     },
     {
       "name": "geo_line_interpolate_point",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_line_interpolate_point()",
         "description": "Calculates a point at fraction value on a line on Earth.",
@@ -12593,7 +12593,7 @@
     },
     {
       "name": "geo_line_length",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_line_length()",
         "description": "Calculates the total length of a line or a multiline on Earth.",
@@ -12606,7 +12606,7 @@
     },
     {
       "name": "geo_line_locate_point",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_line_locate_point()",
         "description": "Calculates fraction value as a ratio of a line length from line start till a point on a line which is closest to a given point and a whole line length on Earth.",
@@ -12619,7 +12619,7 @@
     },
     {
       "name": "geo_line_simplify",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_line_simplify()",
         "description": "Simplifies a line or a multiline by replacing nearly straight chains of short edges with a single long edge on Earth.",
@@ -12632,7 +12632,7 @@
     },
     {
       "name": "geo_line_to_s2cells",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_line_to_s2cells()",
         "description": "Calculates S2 cell tokens that cover a line or multiline on Earth. This function is a useful geospatial join tool.\n\nRead more about S2 cell hierarchy.",
@@ -12645,7 +12645,7 @@
     },
     {
       "name": "geo_point_buffer",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_point_buffer()",
         "description": "Calculates polygon that contains all points within the given radius of the point on Earth.",
@@ -12658,7 +12658,7 @@
     },
     {
       "name": "geo_point_in_circle",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_point_in_circle()",
         "description": "Calculates whether the geospatial coordinates are inside a circle on Earth.",
@@ -12671,7 +12671,7 @@
     },
     {
       "name": "geo_point_in_polygon",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_point_in_polygon()",
         "description": "Calculates whether the geospatial coordinates are inside a polygon or a multipolygon on Earth.",
@@ -12684,7 +12684,7 @@
     },
     {
       "name": "geo_point_to_geohash",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_point_to_geohash()",
         "description": "Calculates the geohash string value of a geographic location.\n\nRead more about geohash.",
@@ -12697,7 +12697,7 @@
     },
     {
       "name": "geo_point_to_h3cell",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_point_to_h3cell()",
         "description": "Calculates the H3 Cell token string value of a geographic location.\n\nRead more about H3 Cell.",
@@ -12710,7 +12710,7 @@
     },
     {
       "name": "geo_point_to_s2cell",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_point_to_s2cell()",
         "description": "Calculates the S2 cell token string value of a geographic location.\n\nRead more about S2 cell hierarchy.\nS2 cell can be a useful geospatial clustering tool. An S2 cell is a cell on a spherical surface and it has geodesic edges. S2 cells are part of a hierarchy dividing up the Earth's surface. They have a maximum of 31 levels, ranging from zero to 30, which define the number of times a cell is subdivided. Levels range from the largest coverage on level zero with area coverage of 85,011,012.19km², to the lowest coverage of 0.44 cm² at level 30. As S2 cells are subdivided at higher levels, the cell center is preserved well. Two geographic locations can be very close to each other but they have different S2 cell tokens.\n\n>[!NOTE]\n> If you invoke the geo_s2cell_to_central_point() function on an S2 cell token string that was calculated on longitude x and latitude y, the function won't necessarily return x and y.\n\nRead more about S2 cell hierarchy.",
@@ -12723,7 +12723,7 @@
     },
     {
       "name": "geo_polygon_area",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_polygon_area()",
         "description": "Calculates the area of a polygon or a multipolygon on Earth.",
@@ -12736,7 +12736,7 @@
     },
     {
       "name": "geo_polygon_buffer",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_polygon_buffer()",
         "description": "Calculates polygon or multipolygon that contains all points within the given radius of the input polygon or multipolygon on Earth.",
@@ -12749,7 +12749,7 @@
     },
     {
       "name": "geo_polygon_centroid",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_polygon_centroid()",
         "description": "Calculates the centroid of a polygon or a multipolygon on Earth.",
@@ -12762,7 +12762,7 @@
     },
     {
       "name": "geo_polygon_densify",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_polygon_densify()",
         "description": "Converts polygon or multipolygon planar edges to geodesics by adding intermediate points.",
@@ -12775,7 +12775,7 @@
     },
     {
       "name": "geo_polygon_perimeter",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_polygon_perimeter()",
         "description": "Calculates the length of the boundary of a polygon or a multipolygon on Earth.",
@@ -12788,7 +12788,7 @@
     },
     {
       "name": "geo_polygon_simplify",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_polygon_simplify()",
         "description": "Simplifies a polygon or a multipolygon by replacing nearly straight chains of short edges with a single long edge on Earth.",
@@ -12801,7 +12801,7 @@
     },
     {
       "name": "geo_polygon_to_h3cells",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_polygon_to_h3cells()",
         "description": "Converts polygon to H3 cells. This function is a useful geospatial join and visualization tool.",
@@ -12814,7 +12814,7 @@
     },
     {
       "name": "geo_polygon_to_s2cells",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_polygon_to_s2cells()",
         "description": "Calculates S2 cell tokens that cover a polygon or multipolygon on Earth. This function is a useful geospatial join tool.\n\nRead more about S2 cell hierarchy.",
@@ -12827,7 +12827,7 @@
     },
     {
       "name": "geo_s2cell_neighbors",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_s2cell_neighbors()",
         "description": "Calculates S2 cell neighbors.\n\nRead more about S2 cell hierarchy.",
@@ -12840,7 +12840,7 @@
     },
     {
       "name": "geo_s2cell_to_central_point",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_s2cell_to_central_point()",
         "description": "Calculates the geospatial coordinates that represent the center of an S2 cell.\n\nRead more about S2 cell hierarchy.",
@@ -12853,7 +12853,7 @@
     },
     {
       "name": "geo_s2cell_to_polygon",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_s2cell_to_polygon()",
         "description": "Calculates the polygon that represents the S2 Cell rectangular area.\n\nRead more about S2 Cells.",
@@ -12866,7 +12866,7 @@
     },
     {
       "name": "geo_simplify_polygons_array",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_simplify_polygons_array()",
         "description": "Simplifies polygons by replacing nearly straight chains of short edges with a single long edge on Earth.",
@@ -12879,7 +12879,7 @@
     },
     {
       "name": "geo_union_lines_array",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_union_lines_array()",
         "description": "Calculates the union of lines or multilines on Earth.",
@@ -12892,7 +12892,7 @@
     },
     {
       "name": "geo_union_polygons_array",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "geo_union_polygons_array()",
         "description": "Calculates the union of polygons or multipolygons on Earth.",
@@ -12905,7 +12905,7 @@
     },
     {
       "name": "gettype",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "gettype()",
         "description": "Returns the runtime type of its single argument.\n\nThe runtime type may be different than the nominal (static) type for expressions whose nominal type is `dynamic`; in such cases `gettype()` can be useful to reveal the type of the actual value (how the value is encoded in memory).",
@@ -12918,7 +12918,7 @@
     },
     {
       "name": "getyear",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "getyear()",
         "description": "Returns the year part of the `datetime` argument.",
@@ -12931,7 +12931,7 @@
     },
     {
       "name": "graph",
-      "category": "KQL Function",
+      "category": "Preview",
       "documentation": {
         "title": "graph function (preview)",
         "description": "> [!NOTE]\n> This feature is currently in public preview. Functionality and syntax are subject to change before General Availability.\n\nThe `graph` function is an intrinsic function that enables querying of a persisted graph entity, similar to the `cluster()`, `database()`, `external_table()`, and `table()` functions. It supports retrieving either the most recent snapshot of the graph, a specific snapshot, or creating a transient graph from the model.",
@@ -12944,7 +12944,7 @@
     },
     {
       "name": "has_any_index",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "has_any_index()",
         "description": "Searches the string for items specified in the array and returns the position in the array of the first item found in the string.",
@@ -12957,7 +12957,7 @@
     },
     {
       "name": "has_any_ipv4",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "has_any_ipv4()",
         "description": "Returns a value indicating whether one of specified IPv4 addresses appears in a text.\n\nIP address entrances in a text must be properly delimited with non-alphanumeric characters. For example, properly delimited IP addresses are:\n\n* \"These requests came from: 192.168.1.1, 10.1.1.115 and 10.1.1.201\"\n* \"05:04:54 127.0.0.1 GET /favicon.ico 404\"",
@@ -12970,7 +12970,7 @@
     },
     {
       "name": "has_any_ipv4_prefix",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "has_any_ipv4_prefix()",
         "description": "Returns a boolean value indicating whether one of specified IPv4 address prefixes appears in a text.\n\nIP address entrances in a text must be properly delimited with non-alphanumeric characters. For example, properly delimited IP addresses are:\n\n* \"These requests came from: 192.168.1.1, 10.1.1.115 and 10.1.1.201\"\n* \"05:04:54 127.0.0.1 GET /favicon.ico 404\"",
@@ -12983,7 +12983,7 @@
     },
     {
       "name": "has_ipv4",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "has_ipv4()",
         "description": "Returns a value indicating whether a specified IPv4 address appears in a text.\n\nIP address entrances in a text must be properly delimited with non-alphanumeric characters. For example, properly delimited IP addresses are:\n\n* \"These requests came from: 192.168.1.1, 10.1.1.115 and 10.1.1.201\"\n* \"05:04:54 127.0.0.1 GET /favicon.ico 404\"",
@@ -12996,7 +12996,7 @@
     },
     {
       "name": "has_ipv4_prefix",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "has_ipv4_prefix()",
         "description": "Returns a value indicating whether a specified IPv4 address prefix appears in a text.\n\nA valid IP address prefix is either a complete IPv4 address (`192.168.1.11`) or its prefix ending with a dot (`192.`, `192.168.` or `192.168.1.`).\n\nIP address entrances in a text must be properly delimited with nonalphanumeric characters. For example, properly delimited IP addresses are:\n\n* \"These requests came from: 192.168.1.1, 10.1.1.115 and 10.1.1.201\"\n* \"05:04:54 127.0.0.1 GET /favicon.ico 404\"",
@@ -13009,7 +13009,7 @@
     },
     {
       "name": "hash",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "hash()",
         "description": "Returns a hash value for the input value.\n\n> [!NOTE]\n>\n> * The function calculates hashes using the xxhash64 algorithm, but this may change. It's recommended to only use this function within a single query.\n> * If you need to persist a combined hash, it's recommended to use hash_sha256(), hash_sha1(), or hash_md5() and combine the hashes with a bitwise operator. These functions are more complex to calculate than `hash()`.",
@@ -13022,7 +13022,7 @@
     },
     {
       "name": "hash_combine",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "hash_combine()",
         "description": "Combines hash values of two or more hashes.",
@@ -13035,7 +13035,7 @@
     },
     {
       "name": "hash_many",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "hash_many()",
         "description": "Returns a combined hash value of multiple values.",
@@ -13048,7 +13048,7 @@
     },
     {
       "name": "hash_md5",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "hash_md5()",
         "description": "Returns an MD5 hash value of the input.",
@@ -13061,7 +13061,7 @@
     },
     {
       "name": "hash_sha1",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "hash_sha1()",
         "description": "Returns a sha1 hash value of the source input.",
@@ -13074,7 +13074,7 @@
     },
     {
       "name": "hash_sha256",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "hash_sha256()",
         "description": "Returns a sha256 hash value of the source input.",
@@ -13087,7 +13087,7 @@
     },
     {
       "name": "hash_xxhash64",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "hash_xxhash64()",
         "description": "Returns an xxhash64 value for the input value.",
@@ -13100,7 +13100,7 @@
     },
     {
       "name": "hll_merge",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "hll_merge()",
         "description": "Merges HLL results. This is the scalar version of the aggregate version `hll_merge()`.\n\nRead about the underlying algorithm (*H*yper*L*og*L*og) and estimation accuracy.\n\n> [!IMPORTANT]\n> The results of hll(), hll_if(), and hll_merge() can be stored and later retrieved. For example, you might want to create a daily unique users summary, which can then be used to calculate weekly counts.\n> However, the precise binary representation of these results can change over time. There's no guarantee that these functions produce identical results for identical inputs, and therefore we don't advise relying on them.",
@@ -13113,7 +13113,7 @@
     },
     {
       "name": "iff",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "iff()",
         "description": "Returns the *:::no-loc text=\"then\":::* value when the *:::no-loc text=\"if\":::* condition evaluates to `true`, otherwise it returns the *:::no-loc text=\"else\":::* value.\n\n> The `iff()` and `iif()` functions are equivalent.",
@@ -13126,7 +13126,7 @@
     },
     {
       "name": "indexof",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "indexof()",
         "description": "Reports the zero-based index of the first occurrence of a specified string within the input string. The `indexof()` function is case-sensitive. To perform a case-insensitive search, consider using `tolower()` or `toupper()` on both inputs.\n\nFor more information, see `indexof_regex()`.",
@@ -13139,7 +13139,7 @@
     },
     {
       "name": "indexof_regex",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "indexof_regex()",
         "description": "Returns the zero-based index of the first occurrence of a specified lookup regular expression within the input string.\n\nSee `indexof()`.",
@@ -13152,10 +13152,10 @@
     },
     {
       "name": "ingestion_time",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "ingestion_time()",
-        "description": "::: moniker range=\"microsoft-fabric  || azure-data-explorer\"\n\nReturns the approximate datetime in UTC format indicating when the current record was ingested. \n\nThis function must be used in the context of a table or a materialized view. Otherwise, this function produces null values.\n\nIf IngestionTime policy was not enabled when the data was ingested, the function returns null values.\n\n::: moniker-end\n\n::: moniker range=\"azure-monitor || microsoft-sentinel\"\n\nRetrieves the `datetime` when the record was ingested and ready for query.\n\n::: moniker-end\n\n> [!NOTE]\n> The value returned by this function is only approximate, as the ingestion process may take several minutes to complete and multiple ingestion activities may take place concurrently. To process all records of a table with exactly-once guarantees, use database cursors.\n\n> [!TIP]\n> The ingestion_time() function returns values according to the service clock as measured when ingestion was completed. As a result, this value cannot be used to \"order\" ingestion operations, as two operations that overlap in time might have any ordering of these values. If ordering records is important for application semantics, one should ensure that the table has a timestamp column as measured by the source of the data instead of relying on the ingestion_time() value.",
+        "description": "> [!NOTE]\n> The value returned by this function is only approximate, as the ingestion process may take several minutes to complete and multiple ingestion activities may take place concurrently. To process all records of a table with exactly-once guarantees, use database cursors.\n\n> [!TIP]\n> The ingestion_time() function returns values according to the service clock as measured when ingestion was completed. As a result, this value cannot be used to \"order\" ingestion operations, as two operations that overlap in time might have any ordering of these values. If ordering records is important for application semantics, one should ensure that the table has a timestamp column as measured by the source of the data instead of relying on the ingestion_time() value.",
         "syntax": "`ingestion_time()`",
         "returnInfo": "A `datetime` value specifying the approximate time of ingestion into a table.",
         "parametersTable": "",
@@ -13165,7 +13165,7 @@
     },
     {
       "name": "ipv4_compare",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "ipv4_compare()",
         "description": "Compares two IPv4 strings. The two IPv4 strings are parsed and compared while accounting for the combined IP-prefix mask calculated from argument prefixes, and the optional `PrefixMask` argument.",
@@ -13178,7 +13178,7 @@
     },
     {
       "name": "ipv4_is_in_any_range",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "ipv4_is_in_any_range()",
         "description": "Checks whether IPv4 string address is in any of the specified IPv4 address ranges.",
@@ -13191,7 +13191,7 @@
     },
     {
       "name": "ipv4_is_in_range",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "ipv4_is_in_range()",
         "description": "Checks if IPv4 string address is in IPv4-prefix notation range.",
@@ -13204,7 +13204,7 @@
     },
     {
       "name": "ipv4_is_match",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "ipv4_is_match()",
         "description": "Matches two IPv4 strings. The two IPv4 strings are parsed and compared while accounting for the combined IP-prefix mask calculated from argument prefixes, and the optional `prefix` argument.",
@@ -13217,7 +13217,7 @@
     },
     {
       "name": "ipv4_is_private",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "ipv4_is_private()",
         "description": "Checks if the IPv4 string address belongs to a set of private network IPs.\n\nPrivate network addresses were originally defined to help delay IPv4 address exhaustion. IP packets originating from or addressed to a private IP address can't be routed through the public internet.",
@@ -13230,7 +13230,7 @@
     },
     {
       "name": "ipv4_netmask_suffix",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "ipv4_netmask_suffix()",
         "description": "Returns the value of the IPv4 netmask suffix from an IPv4 string address.",
@@ -13243,7 +13243,7 @@
     },
     {
       "name": "ipv4_range_to_cidr_list",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "ipv4_range_to_cidr_list()",
         "description": "Converts a IPv4 address range denoted by starting and ending IPv4 addresses to a list of IPv4 ranges in CIDR notation.",
@@ -13256,7 +13256,7 @@
     },
     {
       "name": "ipv6_compare",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "ipv6_compare()",
         "description": "Compares two IPv6 or IPv4 network address strings. The two IPv6 strings are parsed and compared while accounting for the combined IP-prefix mask calculated from argument prefixes, and the optional `prefix` argument.\n\n>[!Note]\n> The function can accept and compare arguments representing both IPv6 and IPv4 network addresses. However, if the caller knows that arguments are in IPv4 format, use ipv4_is_compare() function. This function will result in better runtime performance.",
@@ -13269,7 +13269,7 @@
     },
     {
       "name": "ipv6_is_in_any_range",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "ipv6_is_in_any_range()",
         "description": "Checks whether an IPv6 string address is in any of the specified IPv6 address ranges.",
@@ -13282,7 +13282,7 @@
     },
     {
       "name": "ipv6_is_in_range",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "ipv6_is_in_range()",
         "description": "Checks if an IPv6 string address is in the IPv6-prefix notation range.",
@@ -13295,7 +13295,7 @@
     },
     {
       "name": "ipv6_is_match",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "ipv6_is_match()",
         "description": "Matches two IPv6 or IPv4 network address strings. The two IPv6/IPv4 strings are parsed and compared while accounting for the combined IP-prefix mask calculated from argument prefixes, and the optional `prefix` argument.\n\n> [!NOTE]\n> The function can accept and compare arguments representing both IPv6 and IPv4 network addresses. If the caller knows that arguments are in IPv4 format, use the ipv4_is_match() function. This function will result in better runtime performance.",
@@ -13308,7 +13308,7 @@
     },
     {
       "name": "isempty",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "isempty()",
         "description": "Returns `true` if the argument is an empty string or is null.",
@@ -13321,7 +13321,7 @@
     },
     {
       "name": "isfinite",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "isfinite()",
         "description": "Returns whether the input is a finite value, meaning it's not infinite or NaN.",
@@ -13334,7 +13334,7 @@
     },
     {
       "name": "isinf",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "isinf()",
         "description": "Returns whether the input is an infinite (positive or negative) value.",
@@ -13347,7 +13347,7 @@
     },
     {
       "name": "isnan",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "isnan()",
         "description": "Returns whether the input is a Not-a-Number (NaN) value.",
@@ -13360,7 +13360,7 @@
     },
     {
       "name": "isnotempty",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "isnotempty()",
         "description": "Returns `true` if the argument isn't an empty string, and it isn't null.\n\n> **Deprecated aliases:** notempty()",
@@ -13373,7 +13373,7 @@
     },
     {
       "name": "isnotnull",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "isnotnull()",
         "description": "Returns `true` if the argument isn't null.\n\n> **Deprecated aliases:** notnull()",
@@ -13386,7 +13386,7 @@
     },
     {
       "name": "isnull",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "isnull()",
         "description": "Evaluates an expression and returns a Boolean result indicating whether the value is null.\n\n> [!NOTE]\n> String values can't be null. Use isempty to determine if a value of type `string` is empty or not.",
@@ -13399,7 +13399,7 @@
     },
     {
       "name": "isutf8",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "isutf8()",
         "description": "Returns `true` if the argument is a valid UTF8 string.",
@@ -13412,7 +13412,7 @@
     },
     {
       "name": "jaccard_index",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "jaccard_index()",
         "description": "Calculates the Jaccard index of two input sets.",
@@ -13425,7 +13425,7 @@
     },
     {
       "name": "log",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "log()",
         "description": "The natural logarithm is the base-e logarithm: the inverse of the natural exponential function (exp).",
@@ -13438,7 +13438,7 @@
     },
     {
       "name": "log10",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "log10()",
         "description": "`log10()` returns the common (base-10) logarithm of the input.",
@@ -13451,7 +13451,7 @@
     },
     {
       "name": "log2",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "log2()",
         "description": "The logarithm is the base-2 logarithm: the inverse of the exponential function (exp) with base 2.",
@@ -13464,7 +13464,7 @@
     },
     {
       "name": "loggamma",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "loggamma()",
         "description": "Computes log of the absolute value of the gamma function",
@@ -13477,7 +13477,7 @@
     },
     {
       "name": "make_datetime",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "make_datetime()",
         "description": "Creates a datetime scalar value between the specified date and time.",
@@ -13490,7 +13490,7 @@
     },
     {
       "name": "make_timespan",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "make_timespan()",
         "description": "Creates a timespan scalar value from the specified time period.",
@@ -13503,7 +13503,7 @@
     },
     {
       "name": "materialized_view",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "materialized_view()",
         "description": "References the materialized part of a materialized view.\n\nThe `materialized_view()` function supports a way of querying the *materialized* part only of the view, while specifying the max latency the user is willing to tolerate. This option isn't guaranteed to return the most up-to-date records, but should always be more performant than querying the entire view. This function is useful for scenarios in which you're willing to sacrifice some freshness for performance, for example in telemetry dashboards.",
@@ -13516,7 +13516,7 @@
     },
     {
       "name": "max_of",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "max_of()",
         "description": "Returns the maximum value of all argument expressions.",
@@ -13529,7 +13529,7 @@
     },
     {
       "name": "merge_tdigest",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "merge_tdigest()",
         "description": "Merges `tdigest` results (scalar version of the aggregate version `tdigest_merge()`).\n\nRead more about the underlying algorithm (T-Digest) and the estimated error here.\n\n> The `merge_tdigest()` and `tdigest_merge()` functions are equivalent\n\n> [!IMPORTANT]\n>The results of tdigest() and tdigest_merge() can be stored and later retrieved. For example, you may want to create daily percentiles summary, which can then be used to calculate weekly percentiles.\n> However, the precise binary representation of these results may change over time. There's no guarantee that these functions will produce identical results for identical inputs, and therefore we don't advise relying on them.",
@@ -13542,7 +13542,7 @@
     },
     {
       "name": "min_of",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "min_of()",
         "description": "Returns the minimum value of several evaluated scalar expressions.",
@@ -13555,7 +13555,7 @@
     },
     {
       "name": "monthofyear",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "monthofyear()",
         "description": "Returns the integer number from 1-12 representing the month number of the given year.\n\n> The `monthofyear()` and `getmonth()` functions are equivalent",
@@ -13568,7 +13568,7 @@
     },
     {
       "name": "new_guid",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "new_guid()",
         "description": "Returns a random GUID (Globally Unique Identifier).",
@@ -13581,7 +13581,7 @@
     },
     {
       "name": "next",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "next()",
         "description": "Returns the value of a column in a row that is at some offset following the\ncurrent row in a serialized row set.",
@@ -13594,7 +13594,7 @@
     },
     {
       "name": "not",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "not()",
         "description": "Reverses the value of its `bool` argument.",
@@ -13607,7 +13607,7 @@
     },
     {
       "name": "now",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "now()",
         "description": "Returns the current UTC time, optionally offset by a given timespan.\n\nThe current UTC time will stay the same across all uses of `now()` in a single query statement, even if there's technically a small time difference between when each `now()` runs.",
@@ -13620,7 +13620,7 @@
     },
     {
       "name": "pack",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "bag_pack()",
         "description": "Creates a dynamic property bag object from a list of keys and values.\n\n> **Deprecated aliases**: pack(), pack_dictionary()",
@@ -13633,7 +13633,7 @@
     },
     {
       "name": "pack_all",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "pack_all()",
         "description": "Creates a dynamic property bag object from all the columns of the tabular expression.\n\n> [!NOTE]\n> The representation of the returned object isn't guaranteed to be byte-level-compatible between runs. For example, properties that appear in the bag may appear in a different order.",
@@ -13646,7 +13646,7 @@
     },
     {
       "name": "pack_array",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "pack_array()",
         "description": "Packs all input values into a dynamic array.",
@@ -13659,7 +13659,7 @@
     },
     {
       "name": "parse_command_line",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "parse_command_line()",
         "description": "Parses a Unicode command-line string and returns a dynamic array of the command-line arguments.",
@@ -13672,7 +13672,7 @@
     },
     {
       "name": "parse_csv",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "parse_csv()",
         "description": "Splits a given string representing a single record of comma-separated values and returns a string array with these values.",
@@ -13685,7 +13685,7 @@
     },
     {
       "name": "parse_ipv4",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "parse_ipv4()",
         "description": "Converts IPv4 string to a signed 64-bit wide long number representation in big-endian order.",
@@ -13698,7 +13698,7 @@
     },
     {
       "name": "parse_ipv4_mask",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "parse_ipv4_mask()",
         "description": "Converts the input string of IPv4 and netmask to a signed, 64-bit wide, long number representation in big-endian order.",
@@ -13711,7 +13711,7 @@
     },
     {
       "name": "parse_ipv6",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "parse_ipv6()",
         "description": "Converts IPv6 or IPv4 string to a canonical IPv6 string representation.",
@@ -13724,7 +13724,7 @@
     },
     {
       "name": "parse_ipv6_mask",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "parse_ipv6_mask()",
         "description": "Converts IPv6/IPv4 string and netmask to a canonical IPv6 string representation.",
@@ -13737,7 +13737,7 @@
     },
     {
       "name": "parse_json",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "parse_json()",
         "description": "Interprets a `string` as a JSON value and returns the value as `dynamic`. If possible, the value is converted into relevant data types.  For strict parsing with no data type conversion, use extract() or extract_json() functions.\n\nIt's better to use the parse_json() function over the extract_json() function when you need to extract more than one element of a JSON compound object. Use dynamic() when possible.\n\n> **Deprecated aliases:** parsejson(), toobject(), todynamic()",
@@ -13750,7 +13750,7 @@
     },
     {
       "name": "parse_path",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "parse_path()",
         "description": "Parses a file path `string` and returns a `dynamic` object that contains the following parts of the path:\n\n* Scheme\n* RootPath\n* DirectoryPath\n* DirectoryName\n* Filename\n* Extension\n* AlternateDataStreamName\n\nIn addition to the simple paths with both types of slashes, the function supports paths with:\n\n* Schemas. For example, \"file://...\"\n* Shared paths. For example, \"\\\\shareddrive\\users...\"\n* Long paths. For example, \"\\\\?\\C:...\"\"\n* Alternate data streams. For example, \"file1.exe:file2.exe\"",
@@ -13763,7 +13763,7 @@
     },
     {
       "name": "parse_url",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "parse_url()",
         "description": "Parses an absolute URL `string` and returns a `dynamic` object contains URL parts.\n\n> **Deprecated aliases:** parseurl()",
@@ -13776,7 +13776,7 @@
     },
     {
       "name": "parse_user_agent",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "parse_user_agent()",
         "description": "Interprets a user-agent string, which identifies the user's browser and provides certain system details to servers hosting the websites the user visits. The result is returned as `dynamic`.",
@@ -13789,7 +13789,7 @@
     },
     {
       "name": "parse_version",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "parse_version()",
         "description": "Converts the input string representation of a version number into a decimal number that can be compared.",
@@ -13802,7 +13802,7 @@
     },
     {
       "name": "parse_xml",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "parse_xml()",
         "description": "Interprets a `string` as an XML value, converts the value to a JSON, and returns the value as `dynamic`.",
@@ -13815,7 +13815,7 @@
     },
     {
       "name": "percentile_tdigest",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "percentile_tdigest()",
         "description": "Calculates the percentile result from the `tdigest` results (which was generated by tdigest() or tdigest_merge())",
@@ -13828,7 +13828,7 @@
     },
     {
       "name": "percentrank_tdigest",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "percentrank_tdigest()",
         "description": "Calculates the approximate rank of the value in a set, where rank is expressed as a percentage of the set's size.\nThis function can be viewed as the inverse of the percentile.",
@@ -13841,7 +13841,7 @@
     },
     {
       "name": "pi",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "pi()",
         "description": "Returns the constant value of Pi.",
@@ -13854,7 +13854,7 @@
     },
     {
       "name": "pow",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "pow()",
         "description": "Returns a result of raising to power",
@@ -13867,7 +13867,7 @@
     },
     {
       "name": "prev",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "prev()",
         "description": "Returns the value of a specific column in a specified row.\nThe specified row is at a specified offset from the current row in a serialized row set.",
@@ -13880,7 +13880,7 @@
     },
     {
       "name": "punycode_domain_from_string",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "punycode_domain_from_string()",
         "description": "Decodes input string from encoded Internationalized Domain Name in Applications (IDNA) punycode form.",
@@ -13893,7 +13893,7 @@
     },
     {
       "name": "punycode_domain_to_string",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "punycode_domain_to_string()",
         "description": "Encodes Internationalized Domain Name in Applications (IDNA) string to Punycode form.",
@@ -13906,7 +13906,7 @@
     },
     {
       "name": "punycode_from_string",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "punycode_from_string()",
         "description": "Encodes input string to Punycode form.\nThe result string contains only ASCII characters. The result string doesn't start with \"xn--\".",
@@ -13919,7 +13919,7 @@
     },
     {
       "name": "punycode_to_string",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "punycode_to_string()",
         "description": "Decodes input string from punycode form. The string shouldn't contain the initial xn--, and must contain only ASCII characters.",
@@ -13932,7 +13932,7 @@
     },
     {
       "name": "radians",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "radians()",
         "description": "Converts angle value in degrees into value in radians, using formula `radians = (PI / 180 ) * angle_in_degrees`",
@@ -13945,7 +13945,7 @@
     },
     {
       "name": "rand",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "rand()",
         "description": "Returns a random number.\n\n```kusto\nrand()\nrand(1000)\n```",
@@ -13958,7 +13958,7 @@
     },
     {
       "name": "range",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "range()",
         "description": "Generates a dynamic array holding a series of equally spaced values.",
@@ -13971,7 +13971,7 @@
     },
     {
       "name": "rank_tdigest",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "rank_tdigest()",
         "description": "Calculates the approximate rank of the value in a set.\nRank of value `v` in a set `S` is defined as count of members of `S` that are smaller or equal to `v`, `S` is represented by its `tdigest`.",
@@ -13984,7 +13984,7 @@
     },
     {
       "name": "regex_quote",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "regex_quote()",
         "description": "Returns a string that escapes all regular expression characters.",
@@ -13997,7 +13997,7 @@
     },
     {
       "name": "repeat",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "repeat()",
         "description": "Generates a dynamic array containing a series comprised of repeated numbers.",
@@ -14010,7 +14010,7 @@
     },
     {
       "name": "replace_regex",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "replace_regex()",
         "description": "Replaces all regular expression matches with a specified pattern.\n\n> **Deprecated aliases:** replace()",
@@ -14023,7 +14023,7 @@
     },
     {
       "name": "replace_string",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "replace_string()",
         "description": "Replaces all string matches with a specified string.\n\n> **Deprecated aliases:** replace()\n\nTo replace multiple strings, see replace_strings().",
@@ -14036,7 +14036,7 @@
     },
     {
       "name": "replace_strings",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "replace_strings()",
         "description": "Replaces all strings matches with specified strings.\n\nTo replace an individual string, see replace_string().",
@@ -14049,7 +14049,7 @@
     },
     {
       "name": "reverse",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "reverse()",
         "description": "Function reverses the order of the input string.\nIf the input value isn't of type `string`, then the function forcibly casts the value to type `string`.",
@@ -14062,7 +14062,7 @@
     },
     {
       "name": "round",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "round()",
         "description": "Returns the rounded number to the specified precision.",
@@ -14075,7 +14075,7 @@
     },
     {
       "name": "row_cumsum",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "row_cumsum()",
         "description": "Calculates the cumulative sum of a column in a serialized row set.",
@@ -14088,7 +14088,7 @@
     },
     {
       "name": "row_number",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "row_number()",
         "description": "Returns the current row's index in a serialized row set.\n\nThe row index starts by default at `1` for the first row, and is incremented by `1` for each additional row.\nOptionally, the row index can start at a different value than `1`.\nAdditionally, the row index may be reset according to some provided predicate.",
@@ -14101,7 +14101,7 @@
     },
     {
       "name": "row_rank_dense",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "row_rank_dense()",
         "description": "Returns the current row's dense rank in a serialized row set.\n\nThe row rank starts by default at `1` for the first row, and is incremented by `1` whenever the provided *Term* is different than the previous row's *Term*.",
@@ -14114,7 +14114,7 @@
     },
     {
       "name": "row_rank_min",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "row_rank_min()",
         "description": "Returns the current row's minimal rank in a serialized row set.\n\nThe rank is the minimal row number that the current row's *Term* appears in.",
@@ -14127,7 +14127,7 @@
     },
     {
       "name": "row_window_session",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "row_window_session()",
         "description": "Calculates session start values of a column in a serialized row set.",
@@ -14140,7 +14140,7 @@
     },
     {
       "name": "series_abs",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_abs()",
         "description": "Calculates the element-wise absolute value of the numeric series input.",
@@ -14153,7 +14153,7 @@
     },
     {
       "name": "series_acos",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_acos()",
         "description": "Calculates the element-wise arccosine function of the numeric series input.",
@@ -14166,7 +14166,7 @@
     },
     {
       "name": "series_add",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_add()",
         "description": "Calculates the element-wise addition of two numeric series inputs.",
@@ -14179,7 +14179,7 @@
     },
     {
       "name": "series_asin",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_asin()",
         "description": "Calculates the element-wise arcsine function of the numeric series input.",
@@ -14192,7 +14192,7 @@
     },
     {
       "name": "series_atan",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_atan()",
         "description": "Calculates the element-wise arctangent function of the numeric series input.",
@@ -14205,7 +14205,7 @@
     },
     {
       "name": "series_ceiling",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_ceiling()",
         "description": "Calculates the element-wise ceiling function of the numeric series input.",
@@ -14218,7 +14218,7 @@
     },
     {
       "name": "series_cos",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_cos()",
         "description": "Calculates the element-wise cosine function of the numeric series input.",
@@ -14231,7 +14231,7 @@
     },
     {
       "name": "series_cosine_similarity",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_cosine_similarity()",
         "description": "Calculate the cosine similarity of two numerical vectors.\n\nThe function `series_cosine_similarity()` takes two numeric series as input, and calculates their cosine similarity.",
@@ -14244,7 +14244,7 @@
     },
     {
       "name": "series_decompose",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_decompose()",
         "description": "Applies a decomposition transformation on a series.  \n\nTakes an expression containing a series (dynamic numerical array) as input and decomposes it to seasonal, trend, and residual components.",
@@ -14257,7 +14257,7 @@
     },
     {
       "name": "series_decompose_anomalies",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_decompose_anomalies()",
         "description": "Anomaly Detection is based on series decomposition.\nFor more information, see series_decompose().\n\nThe function takes an expression containing a series (dynamic numerical array) as input, and extracts anomalous points with scores.",
@@ -14270,7 +14270,7 @@
     },
     {
       "name": "series_decompose_forecast",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_decompose_forecast()",
         "description": "Forecast based on series decomposition.\n\nTakes an expression containing a series (dynamic numerical array) as input, and predicts the values of the last trailing points. For more information, see series_decompose.",
@@ -14283,7 +14283,7 @@
     },
     {
       "name": "series_divide",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_divide()",
         "description": "Calculates the element-wise division of two numeric series inputs.",
@@ -14296,7 +14296,7 @@
     },
     {
       "name": "series_dot_product",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_dot_product()",
         "description": "Calculates the dot product of two numeric series.\n\nThe function `series_dot_product()` takes two numeric series as input, and calculates their dot product.",
@@ -14309,7 +14309,7 @@
     },
     {
       "name": "series_equals",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_equals()",
         "description": "Calculates the element-wise equals (`==`) logic operation of two numeric series inputs.",
@@ -14322,7 +14322,7 @@
     },
     {
       "name": "series_exp",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_exp()",
         "description": "Calculates the element-wise base-e exponential function (e^x) of the numeric series input.",
@@ -14335,7 +14335,7 @@
     },
     {
       "name": "series_fft",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_fft()",
         "description": "Applies the Fast Fourier Transform (FFT) on a series.  \n\nThe series_fft() function takes a series of complex numbers in the time/spatial domain and transforms it to the frequency domain using the Fast Fourier Transform. The transformed complex series represents the magnitude and phase of the frequencies appearing in the original series. Use the complementary function series_ifft to transform from the frequency domain back to the time/spatial domain.",
@@ -14348,7 +14348,7 @@
     },
     {
       "name": "series_fill_backward",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_fill_backward()",
         "description": "Performs a backward fill interpolation of missing values in a series.\n\nAn expression containing dynamic numerical array is the input. The function replaces all instances of missing_value_placeholder with the nearest value from its right side (other than missing_value_placeholder), and returns the resulting array. The rightmost instances of missing_value_placeholder are preserved.",
@@ -14361,7 +14361,7 @@
     },
     {
       "name": "series_fill_const",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_fill_const()",
         "description": "Replaces missing values in a series with a specified constant value.\n\nTakes an expression containing dynamic numerical array as input, replaces all instances of missing_value_placeholder with the specified constant_value and returns the resulting array.",
@@ -14374,7 +14374,7 @@
     },
     {
       "name": "series_fill_forward",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_fill_forward()",
         "description": "Performs a forward fill interpolation of missing values in a series.\n\nAn expression containing dynamic numerical array is the input. The function replaces all instances of missing_value_placeholder with the nearest value from its left side other than missing_value_placeholder, and returns the resulting array. The leftmost instances of missing_value_placeholder are preserved.",
@@ -14387,7 +14387,7 @@
     },
     {
       "name": "series_fill_linear",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_fill_linear()",
         "description": "Linearly interpolates missing values in a series.\n\nTakes an expression containing dynamic numerical array as input, does linear interpolation for all instances of missing_value_placeholder, and returns the resulting array. If the beginning and end of the array contain missing_value_placeholder, then it's replaced with the nearest value other than missing_value_placeholder. This feature can be turned off. If the whole array consists of the missing_value_placeholder, the array is filled with constant_value, or 0 if not specified.",
@@ -14400,7 +14400,7 @@
     },
     {
       "name": "series_fir",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_fir()",
         "description": "Applies a Finite Impulse Response (FIR) filter on a series.  \n\nThe function takes an expression containing a dynamic numerical array as input and applies a Finite Impulse Response filter. By specifying the `filter` coefficients, it can be used for calculating a moving average, smoothing, change-detection, and many more use cases. The function takes the column containing the dynamic array and a static dynamic array of the filter's coefficients as input, and applies the filter on the column. It outputs a new dynamic array column, containing the filtered output.",
@@ -14413,7 +14413,7 @@
     },
     {
       "name": "series_fit_2lines",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_fit_2lines()",
         "description": "Applies a two segmented linear regression on a series, returning multiple columns.  \n\nTakes an expression containing dynamic numerical array as input and applies a two segmented linear regression in order to identify and quantify a trend change in a series. The function iterates on the series indexes. In each iteration, the function splits the series to two parts, fits a separate line (using series_fit_line()) to each part, and calculates the total r-square. The best split is the one that maximized r-square; the function returns its parameters:\n\n|Parameter  |Description  |\n|:---------|:---------|\n|`rsquare`     | R-square is standard measure of the fit quality. It's a number in the range [0-1], where 1 - is the best possible fit, and 0 means the data is unordered and don't fit any line.        |\n|`split_idx`     |   The index of breaking point to two segments (zero-based).      |\n|`variance`     | Variance of the input data.        |\n|`rvariance`     | Residual variance, which is the variance between the input data values the approximated ones (by the two line segments).        |\n|`line_fit`     | Numerical array holding a series of values of the best fitted line. The series length is equal to the length of the input array. It's mainly used for charting.        |\n|`right_rsquare`     | R-square of the line on the right side of the split, see series_fit_line().        |\n|`right_slope`     | Slope of the right approximated line (of the form y=ax+b).         |\n|`right_interception`     |  Interception of the approximated left line (b from y=ax+b).       |\n|`right_variance`    | Variance of the input data on the right side of the split.        |\n|`right_rvariance`     | Residual variance of the input data on the right side of the split.        |\n|`left_rsquare`     | R-square of the line on the left side of the split, see series_fit_line().        |\n|`left_slope`    | Slope of the left approximated line (of the form y=ax+b).        |\n|`left_interception`     |   Interception of the approximated left line (of the form y=ax+b).      |\n|`left_variance`     | Variance of the input data on the left side of the split.        |\n|`left_rvariance`     | Residual variance of the input data on the left side of the split.        |\n\n> [!NOTE]\n> This function returns multiple columns an so cannot be used as an argument for another function.",
@@ -14426,7 +14426,7 @@
     },
     {
       "name": "series_fit_2lines_dynamic",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_fit_2lines_dynamic()",
         "description": "Applies two segments linear regression on a series, returning a dynamic object.  \n\nTakes an expression containing dynamic numerical array as input and applies two segments linear regression in order to identify and quantify trend changes in a series. The function iterates on the series indexes. In each iteration, it splits the series to two parts, and fits a separate line using series_fit_line() or series_fit_line_dynamic(). The function fits the lines to each of the two parts, and calculates the total R-squared value. The best split is the one that maximizes R-squared. The function returns its parameters in dynamic value with the following content:\n\n* `rsquare`: R-squared is a standard measure of the fit quality. It's a number in the range of [0-1], where 1 is the best possible fit, and 0 means the data is unordered and don't fit any line.\n* `split_idx`: the index of breaking point to two segments (zero-based).\n* `variance`: variance of the input data.\n* `rvariance`: residual variance that is the variance between the input data values the approximated ones (by the two line segments).\n* `line_fit`: numerical array holding a series of values of the best fitted line. The series length is equal to the length of the input array. It's used for charting.\n* `right.rsquare`: r-square of the line on the right side of the split, see series_fit_line() or series_fit_line_dynamic().\n* `right.slope`: slope of the right approximated line (of the form y=ax+b).\n* `right.interception`: interception of the approximated left line (b from y=ax+b).\n* `right.variance`: variance of the input data on the right side of the split.\n* `right.rvariance`: residual variance of the input data on the right side of the split.\n* `left.rsquare`: r-square of the line on the left side of the split, see [series_fit_line()].(series-fit-line-function.md) or series_fit_line_dynamic().\n* `left.slope`: slope of the left approximated line (of the form y=ax+b).\n* `left.interception`: interception of the approximated left line (of the form y=ax+b).\n* `left.variance`: variance of the input data on the left side of the split.\n* `left.rvariance`: residual variance of the input data on the left side of the split.\n\nThis operator is similar to series_fit_2lines. Unlike `series-fit-2lines`, it returns a dynamic bag.",
@@ -14439,7 +14439,7 @@
     },
     {
       "name": "series_fit_line",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_fit_line()",
         "description": "Applies linear regression on a series, returning multiple columns.  \n\nTakes an expression containing dynamic numerical array as input and does linear regression to find the line that best fits it. This function should be used on time series arrays, fitting the output of make-series operator. The function generates the following columns:\n\n* `rsquare`: r-square is a standard measure of the fit quality. The value's a number in the range [0-1], where 1 - is the best possible fit, and 0 means the data is unordered and doesn't fit any line.\n* `slope`: Slope of the approximated line (\"a\" from y=ax+b).\n* `variance`: Variance of the input data.\n* `rvariance`: Residual variance that is the variance between the input data values the approximated ones.\n* `interception`: Interception of the approximated line (\"b\" from y=ax+b).\n* `line_fit`: Numerical array holding a series of values of the best fitted line. The series length is equal to the length of the input array. The value's used for charting.",
@@ -14452,7 +14452,7 @@
     },
     {
       "name": "series_fit_line_dynamic",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_fit_line_dynamic()",
         "description": "Applies linear regression on a series, returning dynamic object.  \n\nTakes an expression containing dynamic numerical array as input, and does linear regression to find the line that best fits it. This function should be used on time series arrays, fitting the output of make-series operator. It generates a dynamic value with the following content:\n\n* `rsquare`: r-square is a standard measure of the fit quality. It's a number in the range [0-1], where 1 is the best possible fit, and 0 means the data is unordered and doesn't fit any line\n* `slope`: Slope of the approximated line (the *a*-value from *y=ax+b*)\n* `variance`: Variance of the input data\n* `rvariance`: Residual variance that is the variance between the input data values and the approximated ones.\n* `interception`: Interception of the approximated line (the *b*-value from *y=ax+b*)\n* `line_fit`: Numerical array containing a series of values of the best fit line. The series length is equal to the length of the input array. It's used mainly for charting.\n\nThis operator is similar to series_fit_line, but unlike `series-fit-line` it returns a dynamic bag.",
@@ -14465,7 +14465,7 @@
     },
     {
       "name": "series_fit_poly",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_fit_poly()",
         "description": "Applies a polynomial regression from an independent variable (x_series) to a dependent variable (y_series). This function takes a table containing multiple series (dynamic numerical arrays) and generates the best fit high-order polynomial for each series using polynomial regression.\n\n> [!TIP]\n>\n> * For linear regression of an evenly spaced series, as created by make-series operator, use the simpler function series_fit_line(). See Example 2.\n> * If *x_series* is supplied, and the regression is done for a high degree, consider normalizing to the [0-1] range. See Example 3.\n> * If *x_series* is of datetime type, it must be converted to double and normalized. See Example 3.\n> * For reference implementation of polynomial regression using inline Python, see series_fit_poly_fl().",
@@ -14478,7 +14478,7 @@
     },
     {
       "name": "series_floor",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_floor()",
         "description": "Calculates the element-wise floor function of the numeric series input.",
@@ -14491,7 +14491,7 @@
     },
     {
       "name": "series_greater",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_greater()",
         "description": "Calculates the element-wise greater (`>`) logic operation of two numeric series inputs.",
@@ -14504,7 +14504,7 @@
     },
     {
       "name": "series_greater_equals",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_greater_equals()",
         "description": "Calculates the element-wise greater or equals (`>=`) logic operation of two numeric series inputs.",
@@ -14517,7 +14517,7 @@
     },
     {
       "name": "series_ifft",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_ifft()",
         "description": "Applies the Inverse Fast Fourier Transform (IFFT) on a series.  \n\nThe series_ifft() function takes a series of complex numbers in the frequency domain and transforms it back to the time/spatial domain using the Fast Fourier Transform. This function is the complementary function of series_fft. Commonly the original series is transformed to the frequency domain for spectral processing and then back to the time/spatial domain.",
@@ -14530,7 +14530,7 @@
     },
     {
       "name": "series_iir",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_iir()",
         "description": "Applies an Infinite Impulse Response filter on a series.  \n\nThe function takes an expression containing dynamic numerical array as input, and applies an Infinite Impulse Response filter. By specifying the filter coefficients, you can use the function to:\n\n* calculate the cumulative sum of the series\n* apply smoothing operations\n* apply various high-pass, band-pass, and low-pass filters\n\nThe function takes as input the column containing the dynamic array and two static dynamic arrays of the filter's *denominators* and *numerators* coefficients, and applies the filter on the column. It outputs a new dynamic array column, containing the filtered output.",
@@ -14543,7 +14543,7 @@
     },
     {
       "name": "series_less",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_less()",
         "description": "Calculates the element-wise less (`<`) logic operation of two numeric series inputs.",
@@ -14556,7 +14556,7 @@
     },
     {
       "name": "series_less_equals",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_less_equals()",
         "description": "Calculates the element-wise less or equal (`<=`) logic operation of two numeric series inputs.",
@@ -14569,7 +14569,7 @@
     },
     {
       "name": "series_log",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_log()",
         "description": "Calculates the element-wise natural logarithm function (base-e) of the numeric series input.",
@@ -14582,7 +14582,7 @@
     },
     {
       "name": "series_magnitude",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_magnitude()",
         "description": "Calculates the magnitude#Euclidean_vector_space) of series elements. This is equivalent to the square root of the dot product of the series with itself.",
@@ -14595,7 +14595,7 @@
     },
     {
       "name": "series_multiply",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_multiply()",
         "description": "Calculates the element-wise multiplication of two numeric series inputs.",
@@ -14608,7 +14608,7 @@
     },
     {
       "name": "series_not_equals",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_not_equals()",
         "description": "Calculates the element-wise not equals (`!=`) logic operation of two numeric series inputs.",
@@ -14621,7 +14621,7 @@
     },
     {
       "name": "series_outliers",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_outliers()",
         "description": "Scores anomaly points in a series.\n\nThe function takes an expression with a dynamic numerical array as input, and generates a dynamic numeric array of the same length. Each value of the array indicates a score of a possible anomaly, using \"Tukey's test\". A value greater than 1.5 in the same element of the input indicates a rise anomaly. A value less than -1.5 indicates a decline anomaly.",
@@ -14634,7 +14634,7 @@
     },
     {
       "name": "series_pearson_correlation",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_pearson_correlation()",
         "description": "Calculates the pearson correlation coefficient of two numeric series inputs.\n\nSee: Pearson correlation coefficient.",
@@ -14647,7 +14647,7 @@
     },
     {
       "name": "series_periods_detect",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_periods_detect()",
         "description": "Finds the most significant periods within a time series.\n\nThe series_periods_detect() function is useful for detecting periodic patterns in data, such as daily, weekly, or monthly cycles.",
@@ -14660,7 +14660,7 @@
     },
     {
       "name": "series_periods_validate",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_periods_validate()",
         "description": "Checks whether a time series contains periodic patterns of given lengths.  \n\nOften a metric measuring the traffic of an application is characterized by a weekly or daily period. This period can be confirmed by running `series_periods_validate()` that checks for a weekly and daily period.",
@@ -14673,7 +14673,7 @@
     },
     {
       "name": "series_pow",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_pow()",
         "description": "Calculates the element-wise power of two numeric series inputs.",
@@ -14686,7 +14686,7 @@
     },
     {
       "name": "series_product",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_product()",
         "description": "Calculates the product of series elements.",
@@ -14699,7 +14699,7 @@
     },
     {
       "name": "series_seasonal",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_seasonal()",
         "description": "Calculates the seasonal component of a series, according to the detected or given seasonal period.",
@@ -14712,7 +14712,7 @@
     },
     {
       "name": "series_sign",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_sign()",
         "description": "Calculates the element-wise sign of the numeric series input.",
@@ -14725,7 +14725,7 @@
     },
     {
       "name": "series_sin",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_sin()",
         "description": "Calculates the element-wise sine of the numeric series input.",
@@ -14738,7 +14738,7 @@
     },
     {
       "name": "series_stats",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_stats()",
         "description": "Returns statistics for a numerical series in a table with a column for each statistic.\n\n> [!NOTE]\n> This function returns multiple values. If you only need a single value, such as the average, consider using series_stats_dynamic.",
@@ -14751,7 +14751,7 @@
     },
     {
       "name": "series_stats_dynamic",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_stats_dynamic()",
         "description": "Returns statistics for a series in a dynamic object.",
@@ -14764,7 +14764,7 @@
     },
     {
       "name": "series_subtract",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_subtract()",
         "description": "Calculates the element-wise subtraction of two numeric series inputs.",
@@ -14777,7 +14777,7 @@
     },
     {
       "name": "series_sum",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_sum()",
         "description": "Calculates the sum of series elements.",
@@ -14790,7 +14790,7 @@
     },
     {
       "name": "series_tan",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "series_tan()",
         "description": "Calculates the element-wise tangent of the numeric series input.",
@@ -14803,7 +14803,7 @@
     },
     {
       "name": "set_difference",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "set_difference()",
         "description": "Returns a `dynamic` (JSON) array of the set of all distinct values that are in the first array but aren't in other arrays - (((arr1 \\ arr2) \\ arr3) \\ ...).",
@@ -14816,7 +14816,7 @@
     },
     {
       "name": "set_has_element",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "set_has_element()",
         "description": "Determines whether the specified set contains the specified element.",
@@ -14829,7 +14829,7 @@
     },
     {
       "name": "set_intersect",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "set_intersect()",
         "description": "Returns a `dynamic` array of the set of all distinct values that are in all arrays - (arr1 ∩ arr2 ∩ ...).",
@@ -14842,7 +14842,7 @@
     },
     {
       "name": "set_union",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "set_union()",
         "description": "Returns a `dynamic` array of the set of all distinct values that are in any of the arrays - (arr1 ∪ arr2 ∪ ...).",
@@ -14855,7 +14855,7 @@
     },
     {
       "name": "sign",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "sign()",
         "description": "Returns the sign of the numeric expression.",
@@ -14868,7 +14868,7 @@
     },
     {
       "name": "sin",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "sin()",
         "description": "Returns the sine function value of the specified angle. The angle is specified in radians.",
@@ -14881,7 +14881,7 @@
     },
     {
       "name": "split",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "split()",
         "description": "The `split()` function takes a string and splits it into substrings based on a specified delimiter, returning the substrings in an array. Optionally, you can retrieve a specific substring by specifying its index.",
@@ -14894,7 +14894,7 @@
     },
     {
       "name": "sqrt",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "sqrt()",
         "description": "Returns the square root of the input.",
@@ -14907,7 +14907,7 @@
     },
     {
       "name": "startofday",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "startofday()",
         "description": "Returns the start of the day containing the date, shifted by an offset, if provided.",
@@ -14920,7 +14920,7 @@
     },
     {
       "name": "startofmonth",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "startofmonth()",
         "description": "Returns the start of the month containing the date, shifted by an offset, if provided.",
@@ -14933,7 +14933,7 @@
     },
     {
       "name": "startofweek",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "startofweek()",
         "description": "Returns the start of the week containing the date, shifted by an offset, if provided.\n\nStart of the week is considered to be a Sunday.",
@@ -14946,7 +14946,7 @@
     },
     {
       "name": "startofyear",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "startofyear()",
         "description": "Returns the start of the year containing the date, shifted by an offset, if provided.",
@@ -14959,7 +14959,7 @@
     },
     {
       "name": "stored_query_result",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "stored_query_result()",
         "description": "Retrieves a previously created stored query result.\n\nTo set a stored query result, see .set stored_query_result command.",
@@ -14972,7 +14972,7 @@
     },
     {
       "name": "strcat",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "strcat()",
         "description": "Concatenates between 1 and 64 arguments.",
@@ -14985,7 +14985,7 @@
     },
     {
       "name": "strcat_array",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "strcat_array()",
         "description": "Creates a concatenated string of array values using a specified delimiter.",
@@ -14998,7 +14998,7 @@
     },
     {
       "name": "strcat_delim",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "strcat_delim()",
         "description": "Concatenates between 2 and 64 arguments, using a specified delimiter as the first argument.",
@@ -15011,7 +15011,7 @@
     },
     {
       "name": "strcmp",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "strcmp()",
         "description": "Compares two strings.\n\nThe function starts comparing the first character of each string. If they're equal to each other, it continues with the following pairs until the characters differ or until the end of shorter string is reached.",
@@ -15024,7 +15024,7 @@
     },
     {
       "name": "string_size",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "string_size()",
         "description": "Returns the size, in bytes, of the input string.",
@@ -15037,7 +15037,7 @@
     },
     {
       "name": "strlen",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "strlen()",
         "description": "Returns the length, in characters, of the input string.\n\n> [!NOTE]\n> This function counts Unicode code points.",
@@ -15050,7 +15050,7 @@
     },
     {
       "name": "strrep",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "strrep()",
         "description": "Replicates a string the number of times specified.",
@@ -15063,7 +15063,7 @@
     },
     {
       "name": "substring",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "substring()",
         "description": "Extracts a substring from the source string starting from some index to the end of the string.\n\nOptionally, the length of the requested substring can be specified.",
@@ -15076,7 +15076,7 @@
     },
     {
       "name": "table",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "table()",
         "description": "The table() function references a table by providing its name as an expression of type `string`.",
@@ -15089,7 +15089,7 @@
     },
     {
       "name": "tan",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "tan()",
         "description": "Returns the tangent value of the specified number.",
@@ -15102,7 +15102,7 @@
     },
     {
       "name": "tobool",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "tobool()",
         "description": "Convert inputs to boolean (signed 8-bit) representation.\n\n> The `tobool()` and `toboolean()` functions are equivalent\n\n> [!NOTE]\n> When possible, use bool literals instead.",
@@ -15115,7 +15115,7 @@
     },
     {
       "name": "todatetime",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "todatetime()",
         "description": "Converts the input to a datetime scalar value.\n\n> [!NOTE]\n>\n> * To learn more about supported data and time formats and syntax, see The datetime data type.\n> * When possible, use datetime literals instead of the `todatetime()` function.",
@@ -15128,7 +15128,7 @@
     },
     {
       "name": "todecimal",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "todecimal()",
         "description": "Converts the input to a decimal number representation.\n\n> [!NOTE]\n> When possible, use decimal literals instead.",
@@ -15141,7 +15141,7 @@
     },
     {
       "name": "toguid",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "toguid()",
         "description": "Converts a string to a `guid` scalar.\n\n> [!NOTE]\n> When possible, use guid literals instead.",
@@ -15154,7 +15154,7 @@
     },
     {
       "name": "tohex",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "tohex()",
         "description": "Converts input to a hexadecimal string.",
@@ -15167,7 +15167,7 @@
     },
     {
       "name": "toint",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "toint()",
         "description": "Converts the input to an integer value (signed 32-bit) number representation.\n\n> [!NOTE]\n> When possible, use int literals instead.",
@@ -15180,7 +15180,7 @@
     },
     {
       "name": "tolong",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "tolong()",
         "description": "Converts the input value to a long (signed 64-bit) number representation.\n\n> [!NOTE]\n> When possible, use long literals instead.",
@@ -15193,7 +15193,7 @@
     },
     {
       "name": "tolower",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "tolower()",
         "description": "Converts the input string to lower case.",
@@ -15206,7 +15206,7 @@
     },
     {
       "name": "toreal",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "toreal()",
         "description": "Converts the input expression to a value of type real.\n\n> The `todouble()` and `toreal()` functions are equivalent.\n\n> [!NOTE]\n> When possible, use real literals instead.",
@@ -15219,7 +15219,7 @@
     },
     {
       "name": "tostring",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "tostring()",
         "description": "Converts the input to a string representation.",
@@ -15232,7 +15232,7 @@
     },
     {
       "name": "totimespan",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "totimespan()",
         "description": "Converts the input to a timespan scalar value.\n\n> **Deprecated aliases:** totime()\n\n> [!NOTE]\n> When possible, we recommend using timespan literals instead.",
@@ -15245,7 +15245,7 @@
     },
     {
       "name": "toupper",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "toupper()",
         "description": "Converts a string to upper case.",
@@ -15258,7 +15258,7 @@
     },
     {
       "name": "translate",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "translate()",
         "description": "Replaces a set of characters ('searchList') with another set of characters ('replacementList') in a given a string.\nThe function searches for characters in the 'searchList' and replaces them with the corresponding characters in 'replacementList'",
@@ -15271,7 +15271,7 @@
     },
     {
       "name": "treepath",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "treepath()",
         "description": "Enumerates all the path expressions that identify leaves in a dynamic object.",
@@ -15284,7 +15284,7 @@
     },
     {
       "name": "trim",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "trim()",
         "description": "Removes all leading and trailing matches of the specified regular expression.",
@@ -15297,7 +15297,7 @@
     },
     {
       "name": "trim_end",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "trim_end()",
         "description": "Removes trailing match of the specified regular expression.",
@@ -15310,7 +15310,7 @@
     },
     {
       "name": "trim_start",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "trim_start()",
         "description": "Removes leading match of the specified regular expression.",
@@ -15323,7 +15323,7 @@
     },
     {
       "name": "unicode_codepoints_from_string",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "unicode_codepoints_from_string()",
         "description": "Returns a dynamic array of the Unicode codepoints of the input string. This function is the inverse operation of `unicode_codepoints_to_string()` function.\n\n> **Deprecated aliases:** to_utf8()",
@@ -15336,7 +15336,7 @@
     },
     {
       "name": "unicode_codepoints_to_string",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "unicode_codepoints_to_string()",
         "description": "Returns the string represented by the Unicode codepoints. This function is the inverse operation of `unicode_codepoints_from_string()` function.\n\n> **Deprecated aliases:** make_string()",
@@ -15349,7 +15349,7 @@
     },
     {
       "name": "unixtime_microseconds_todatetime",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "unixtime_microseconds_todatetime()",
         "description": "Converts unix-epoch microseconds to UTC datetime.",
@@ -15362,7 +15362,7 @@
     },
     {
       "name": "unixtime_milliseconds_todatetime",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "unixtime_milliseconds_todatetime()",
         "description": "Converts unix-epoch milliseconds to UTC datetime.",
@@ -15375,7 +15375,7 @@
     },
     {
       "name": "unixtime_nanoseconds_todatetime",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "unixtime_nanoseconds_todatetime()",
         "description": "Converts unix-epoch nanoseconds to UTC datetime.",
@@ -15388,7 +15388,7 @@
     },
     {
       "name": "unixtime_seconds_todatetime",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "unixtime_seconds_todatetime()",
         "description": "Converts unix-epoch seconds to UTC datetime.",
@@ -15401,7 +15401,7 @@
     },
     {
       "name": "url_decode",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "url_decode()",
         "description": "The function converts an encoded URL into a regular URL representation.\n\nFor more information about URL encoding and decoding, see Percent-encoding.",
@@ -15414,7 +15414,7 @@
     },
     {
       "name": "url_encode",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "url_encode()",
         "description": "The function converts characters of the input URL into a format that can be transmitted over the internet.\nDiffers from url_encode_component by encoding spaces as '+' and not as '%20' (see application/x-www-form-urlencoded here).\n\nFor more information about URL encoding and decoding, see Percent-encoding.",
@@ -15427,7 +15427,7 @@
     },
     {
       "name": "url_encode_component",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "url_encode_component()",
         "description": "The function converts characters of the input URL into a format that can be transmitted over the internet. Differs from url_encode by encoding spaces as '%20' and not as '+'.\n\nFor more information about URL encoding and decoding, see Percent-encoding.",
@@ -15440,7 +15440,7 @@
     },
     {
       "name": "week_of_year",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "week_of_year()",
         "description": "Returns an integer that represents the week number. The week number is calculated from the first week of a year, which is the one that includes the first Thursday, according to ISO 8601.\n\n **Deprecated aliases:** weekofyear()\n\n> [!NOTE]\n> `weekofyear()` wasn't ISO 8601 compliant; the first week of a year was defined as the week with the year's first Wednesday in it.",
@@ -15453,7 +15453,7 @@
     },
     {
       "name": "welch_test",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "welch_test()",
         "description": "Computes the p_value of the Welch-test function",
@@ -15466,7 +15466,7 @@
     },
     {
       "name": "zip",
-      "category": "KQL Function",
+      "category": "KQL function",
       "documentation": {
         "title": "zip()",
         "description": "The `zip` function accepts any number of `dynamic` arrays, and returns an\narray whose elements are each an array holding the elements of the input\narrays of the same index.",
@@ -15479,493 +15479,763 @@
     },
     {
       "name": "all",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "any",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "array_iif",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "array_strcat",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "arraylength",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "bag_pack",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "bag_zip",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "base64_decodestring",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "base64_encodestring",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "columnifexists",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "current_cursor",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "current_node_id",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "cursor_current",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "datepart",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "datetime_list_timezones",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "dayofmonth",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "dayofweek",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "dayofyear",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "entity_group",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "extentid",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "extractall",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "extractjson",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "floor",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "getmonth",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "gzip_compress_to_base64_string",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "gzip_decompress_from_base64_string",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "hll_isvalid",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "hourofday",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "iif",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "inner_nodes",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "isascii",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "iscolumnexists",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "labels",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "make_string",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "map",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "node_degree_in",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "node_degree_out",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "node_id",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "notempty",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "notnull",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "pack_dictionary",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "parse_urlquery",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "parsejson",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "parseurl",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "parseurlquery",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "percentiles_array_tdigest",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "replace",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "row_rank",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "rowstore_ordinal_range",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "set_equals",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "tdigest_isvalid",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "tdigest_merge",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "to_utf8",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "toboolean",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "todouble",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "todynamic",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "toobject",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "totime",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "weekofyear",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "zlib_compress_to_base64_string",
-      "category": "KQL Function"
+      "category": "KQL function"
     },
     {
       "name": "zlib_decompress_from_base64_string",
-      "category": "KQL Function"
+      "category": "KQL function"
     }
   ],
   "aggregates": [
     {
-      "name": "any",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "anyif",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "arg_max",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "arg_min",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "argmax",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "argmin",
-      "category": "Aggregate Function"
-    },
-    {
       "name": "avg",
-      "category": "Aggregate Function"
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "avg() (aggregation function)",
+        "description": "Calculates the average (arithmetic mean) of *expr* across the group.",
+        "syntax": "`avg(`*expr*`)`",
+        "returnInfo": "Returns the average value of *expr* across the group.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr* | `string` |  *True* | The expression used for aggregation calculation. Records with `null` values are ignored and not included in the calculation. |",
+        "example": "StormEvents\n| summarize AvgDamageToCrops = avg(DamageCrops) by State",
+        "sourceLength": 2566
+      }
     },
     {
       "name": "avgif",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "binary_all_and",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "binary_all_or",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "binary_all_xor",
-      "category": "Aggregate Function"
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "avgif() (aggregation function)",
+        "description": "Calculates the average of *expr* in records for which *predicate* evaluates to `true`.",
+        "syntax": "`avgif` `(`*expr*`,` *predicate*`)`",
+        "returnInfo": "Returns the average value of *expr* in records where *predicate* evaluates to `true`.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr* | `string` |  *True* | The expression used for aggregation calculation. Records with `null` values are ignored and not included in the calculation. |\n| *predicate* | `string` |  *True* | The predicate that if true, the *expr* calculated value is added to the average. |",
+        "example": "StormEvents\n| summarize Averagedamage=tolong(avg( DamageCrops)),AverageWhenDamage=tolong(avgif(DamageCrops,DamageCrops >0)) by State",
+        "sourceLength": 3158
+      }
     },
     {
       "name": "buildschema",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "cnt",
-      "category": "Aggregate Function"
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "buildschema() (aggregation function)",
+        "description": "Builds the minimal schema that admits all values of *DynamicExpr*.",
+        "syntax": "`buildschema` `(`*DynamicExpr*`)`",
+        "returnInfo": "Returns the minimal schema that admits all values of *DynamicExpr*.\n\n> [!TIP]\n> If the input is a JSON string, use the parse_json() function to convert the JSON to a dynamic value. Otherwise, an error might occur.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*DynamicExpr*| `dynamic` |  *True* | Expression used for the aggregation calculation.",
+        "example": "datatable(value: dynamic) [\n    dynamic({\"x\":1, \"y\":3.5}),\n    dynamic({\"x\":\"somevalue\", \"z\":[1, 2, 3]}),\n    dynamic({\"y\":{\"w\":\"zzz\"}, \"t\":[\"aa\", \"bb\"], \"z\":[\"foo\"]})\n]\n| summarize buildschema(value)",
+        "sourceLength": 3099
+      }
     },
     {
       "name": "count",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "count_distinct",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "count_distinctif",
-      "category": "Aggregate Function"
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "count() (aggregation function)",
+        "description": "Counts the number of records per summarization group, or total if summarization is done without grouping.",
+        "syntax": "`count()`",
+        "returnInfo": "Returns a count of the records per summarization group, or in total if summarization is done without grouping.",
+        "parametersTable": "",
+        "example": "StormEvents\n| summarize Count=count() by State",
+        "sourceLength": 2436
+      }
     },
     {
       "name": "countif",
-      "category": "Aggregate Function"
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "countif() (aggregation function)",
+        "description": "Counts the rows in which *predicate* evaluates to `true`.",
+        "syntax": "`countif` `(`*predicate*`)`",
+        "returnInfo": "Returns a count of rows in which *predicate* evaluates to `true`.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *predicate*| `string` |  *True* | The expression used for aggregation calculation. The value can be any scalar expression with a return type of bool.",
+        "example": "",
+        "sourceLength": 3137
+      }
     },
     {
       "name": "covariance",
-      "category": "Aggregate Function"
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "covariance() (aggregation function)",
+        "description": "Calculates the sample covariance of two random variables *expr1* and *expr2*.\n\nThe following formula is used:\n\n:::image type=\"content\" source=\"media/covariance-aggfunction/covariance-sample.png\" alt-text=\"Image showing a covariance sample formula.\":::",
+        "syntax": "`covariance(`*expr1* `,` *expr2 `)`",
+        "returnInfo": "Returns the covariance value of *expr1* and *expr2*.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*expr1* | `real` |  *True* | First random variable expression.|\n|*expr2* | `real` |  *True* | Second random variable expression.|",
+        "example": "datatable(x:real, y:real) [\n    1.0, 14.0,\n    2.0, 10.0,\n    3.0, 17.0,\n    4.0, 20.0,\n    5.0, 50.0,\n]\n| summarize covariance(x, y)",
+        "sourceLength": 2099
+      }
     },
     {
       "name": "covarianceif",
-      "category": "Aggregate Function"
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "covarianceif() (aggregation function)",
+        "description": "Calculates the sample covariance of two random variables *expr1* and *expr2* in records for which *predicate* evaluates to `true`.\n\nThe following formula is used:\n\n:::image type=\"content\" source=\"media/covariance-aggfunction/covariance-sample.png\" alt-text=\"Equation showing a covariance sample formula.\":::",
+        "syntax": "`covarianceif(`*expr1* `,` *expr2 `,` *predicate*`)`",
+        "returnInfo": "Returns the covariance value of *expr1* and *expr2* in records for which *predicate* evaluates to `true`.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*expr1* | `real` |  *True* | First random variable expression.|\n|*expr2* | `real` |  *True* | Second random variable expression.|\n|*predicate*| `string` |  *True* | If *predicate* evaluates to `true`, values of *expr1* and *expr2* will be added to the covariance.|",
+        "example": "range x from 1 to 100 step 1\n| extend y = iff(x % 2 == 0, x * 2, x * 3)\n| summarize covarianceif(x, y, x % 3 == 0)",
+        "sourceLength": 2502
+      }
     },
     {
       "name": "covariancep",
-      "category": "Aggregate Function"
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "covariancep() (aggregation function)",
+        "description": "Calculates the population covariance of two random variables *expr1* and *expr2*.\n\nThe following formula is used:\n\n:::image type=\"content\" source=\"media/covariancep-aggfunction/covariance-population.png\" alt-text=\"Image showing a covariance population formula.\" :::",
+        "syntax": "`covariancep(`*expr1* `,` *expr2* `)`",
+        "returnInfo": "Returns the covariance value of *expr1* and *expr2*.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*expr1* | `real` |  *True* | First random variable expression.|\n|*expr2* | `real` |  *True* | Second random variable expression.|",
+        "example": "datatable(x:real, y:real) [\n    1.0, 14.0,\n    2.0, 10.0,\n    3.0, 17.0,\n    4.0, 20.0,\n    5.0, 50.0,\n]\n| summarize covariancep(x, y)",
+        "sourceLength": 2071
+      }
     },
     {
       "name": "covariancepif",
-      "category": "Aggregate Function"
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "covariancepif() (aggregation function)",
+        "description": "Calculates the sample covariance of two random variables *expr1* and *expr2* in records for which *predicate* evaluates to `true`.\n\nThe following formula is used:\n\n:::image type=\"content\" source=\"media/covariancep-aggfunction/covariance-population.png\" alt-text=\"Equation showing a covariance population formula.\":::",
+        "syntax": "`covariancepif(`*expr1* `,` *expr2 `,` *predicate*`)`",
+        "returnInfo": "Returns the covariance value of *expr1* and *expr2* in records for which *predicate* evaluates to `true`.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*expr1* | `real` |  *True* | First random variable expression.|\n|*expr2* | `real` |  *True* | Second random variable expression.|\n|*predicate*| `string` |  *True* | If *predicate* evaluates to `true`, values of *expr1* and *expr2* will be added to the covariance.|",
+        "example": "range x from 1 to 100 step 1\n| extend y = iff(x % 2 == 0, x * 2, x * 3)\n| summarize covariancepif(x, y, x % 3 == 0)",
+        "sourceLength": 2612
+      }
     },
     {
       "name": "dcount",
-      "category": "Aggregate Function"
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "dcount() (aggregation function)",
+        "description": "Calculates an estimate of the number of distinct values that are taken by a scalar expression in the summary group.\n\n> [!NOTE]\n> The `dcount()` aggregation function is primarily useful for estimating the cardinality of huge sets. It trades accuracy for performance, and might return a result that varies between executions. The order of inputs might have an effect on its output.",
+        "syntax": "`dcount` `(`*expr*[`,` *accuracy*]`)`",
+        "returnInfo": "Returns an estimate of the number of distinct values of *expr* in the group.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr*| `string` |  *True* | The input whose distinct values are to be counted. |\n| *accuracy* | `int` |   | The value that defines the requested estimation accuracy. The default value is `1`. See Estimation accuracy for supported values. |",
+        "example": "StormEvents\n| summarize DifferentEvents=dcount(EventType) by State\n| order by DifferentEvents",
+        "sourceLength": 3292
+      }
     },
     {
       "name": "dcountif",
-      "category": "Aggregate Function"
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "dcountif() (aggregation function)",
+        "description": "Estimates the number of distinct values of *expr* for rows in which *predicate* evaluates to `true`.",
+        "syntax": "`dcountif` `(`*expr*, *predicate*, [`,` *accuracy*]`)`",
+        "returnInfo": "Returns an estimate of the number of distinct values of *expr* for rows in which *predicate* evaluates to `true`.\n\n> [!TIP]\n> `dcountif()` might return an error in cases where all, or none of the rows pass the `Predicate` expression.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr* | `string` |  *True* | The expression used for the aggregation calculation. |\n| *predicate* | `string` |  *True* | The expression used to filter rows. |\n| *accuracy* | `int` |  | The control between speed and accuracy. If unspecified, the default value is `1`. See Estimation accuracy for supported values. |",
+        "example": "StormEvents\n| summarize DifferentFatalEvents=dcountif(EventType,(DeathsDirect + DeathsIndirect)>0) by State\n| where DifferentFatalEvents > 0\n| order by DifferentFatalEvents",
+        "sourceLength": 3430
+      }
     },
     {
       "name": "hll",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "hll_if",
-      "category": "Aggregate Function"
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "hll() (aggregation function)",
+        "description": "The `hll()` function is a way to estimate the number of unique values in a set of values. It does so by calculating intermediate results for aggregation within the summarize operator for a group of data using the `dcount` function.\n\nRead about the underlying algorithm (*H*yper*L*og*L*og) and the estimation accuracy.",
+        "syntax": "`hll` `(`*expr* [`,` *accuracy*]`)`",
+        "returnInfo": "Returns the intermediate results of distinct count of *expr* across the group.\n\n> [!NOTE]\n> - The results of hll(), hll_if(), and hll_merge() can be stored and later retrieved. For example, you might want to create a daily unique user summary, which can then be used to calculate weekly counts.\n> However, the precise binary representation of these results might change over time. There's no guarantee that these functions produce identical results for identical inputs, and therefore we don't advise relying on them.\n> - Use the hll_merge function to merge the results of multiple `hll()` functions.\n> - Use the dcount_hll function to calculate the number of distinct values from the output of the `hll()` or `hll_merge` functions.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr* | `string` |  *True* | The expression used for the aggregation calculation. |\n| *accuracy* | `int` |   | The value that controls the balance between speed and accuracy. If unspecified, the default value is `1`. For supported values, see Estimation accuracy. |",
+        "example": "StormEvents\n| summarize hll(DamageProperty) by bin(StartTime,10m)",
+        "sourceLength": 4198
+      }
     },
     {
       "name": "hll_merge",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "make_bag",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "make_bag_if",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "make_dictionary",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "make_list",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "make_list_if",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "make_list_with_nulls",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "make_set",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "make_set_if",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "makelist",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "makeset",
-      "category": "Aggregate Function"
+      "category": "KQL function",
+      "documentation": {
+        "title": "hll_merge()",
+        "description": "Merges HLL results. This is the scalar version of the aggregate version `hll_merge()`.\n\nRead about the underlying algorithm (*H*yper*L*og*L*og) and estimation accuracy.\n\n> [!IMPORTANT]\n> The results of hll(), hll_if(), and hll_merge() can be stored and later retrieved. For example, you might want to create a daily unique users summary, which can then be used to calculate weekly counts.\n> However, the precise binary representation of these results can change over time. There's no guarantee that these functions produce identical results for identical inputs, and therefore we don't advise relying on them.",
+        "syntax": "`hll_merge(` *hll*`,` *hll2*`,` [ *hll3*`,` ... ]`)`",
+        "returnInfo": "Returns one HLL value. The value is the result of merging the columns *hll*, *hll2*, ... *hllN*.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*hll*, *hll2*, ... | `string` | *True*|The column names containing HLL values to merge. The function expects between 2-64 arguments.|",
+        "example": "range x from 1 to 10 step 1 \n| extend y = x + 10\n| summarize hll_x = hll(x), hll_y = hll(y)\n| project merged = hll_merge(hll_x, hll_y)\n| project dcount_hll(merged)",
+        "sourceLength": 2729
+      }
     },
     {
       "name": "max",
-      "category": "Aggregate Function"
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "max() (aggregation function)",
+        "description": "Finds the maximum value of the expression in the table.",
+        "syntax": "`max(`*expr*`)`",
+        "returnInfo": "Returns the value in the table that maximizes the specified expression.\n\n> [!TIP]\n> This function gives you the max on its own. If you want to see other columns in addition to the max, use arg_max.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr* | `string` |  *True* | The expression for which the maximum value is determined. |",
+        "example": "StormEvents\n| summarize LatestEvent=max(StartTime)",
+        "sourceLength": 2098
+      }
     },
     {
       "name": "maxif",
-      "category": "Aggregate Function"
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "maxif() (aggregation function)",
+        "description": "Calculates the maximum value of *expr* in records for which *predicate* evaluates to `true`.\n\nSee also - max() function, which returns the maximum value across the group without predicate expression.",
+        "syntax": "`maxif(`*expr*`,`*predicate*`)`",
+        "returnInfo": "Returns the maximum value of *expr* in records for which *predicate* evaluates to `true`.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr* | `string` |  *True* | The expression used for the aggregation calculation. |\n| *predicate* | `string` |  *True* | The expression used to filter rows. |",
+        "example": "StormEvents\n| extend Damage=DamageCrops + DamageProperty, Deaths=DeathsDirect + DeathsIndirect\n| summarize MaxDamageNoCasualties=maxif(Damage, Deaths == 0) by State",
+        "sourceLength": 2692
+      }
     },
     {
       "name": "merge_tdigest",
-      "category": "Aggregate Function"
+      "category": "KQL function",
+      "documentation": {
+        "title": "merge_tdigest()",
+        "description": "Merges `tdigest` results (scalar version of the aggregate version `tdigest_merge()`).\n\nRead more about the underlying algorithm (T-Digest) and the estimated error here.\n\n> The `merge_tdigest()` and `tdigest_merge()` functions are equivalent\n\n> [!IMPORTANT]\n>The results of tdigest() and tdigest_merge() can be stored and later retrieved. For example, you may want to create daily percentiles summary, which can then be used to calculate weekly percentiles.\n> However, the precise binary representation of these results may change over time. There's no guarantee that these functions will produce identical results for identical inputs, and therefore we don't advise relying on them.",
+        "syntax": "`merge_tdigest(`*exprs*`)`",
+        "returnInfo": "The result for merging the columns `*Expr1*`, `*Expr2*`, ... `*ExprN*` to one `tdigest`.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *exprs* | `dynamic` |  *True* | One or more comma-separated column references that have the `tdigest` values to be merged. |",
+        "example": "range x from 1 to 10 step 1 \n| extend y = x + 10\n| summarize tdigestX = tdigest(x), tdigestY = tdigest(y)\n| project merged = merge_tdigest(tdigestX, tdigestY)\n| project percentile_tdigest(merged, 100, typeof(long))",
+        "sourceLength": 2457
+      }
     },
     {
       "name": "min",
-      "category": "Aggregate Function"
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "min() (aggregation function)",
+        "description": "Finds the minimum value of the expression in the table.",
+        "syntax": "`min` `(`*expr*`)`",
+        "returnInfo": "Returns the minimum value of *expr* across the table.\n\n> [!TIP]\n> This gives you the min on its own. If you want to see other columns in addition to the min, use arg_min.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr* | `string` |  *True* | The expression for which the minimum value is determined. |",
+        "example": "StormEvents\n| summarize FirstEvent=min(StartTime)",
+        "sourceLength": 1976
+      }
     },
     {
       "name": "minif",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "passthrough",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "percentile",
-      "category": "Aggregate Function"
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "minif() (aggregation function)",
+        "description": "Returns the minimum of *Expr* in records for which *Predicate* evaluates to `true`.\n\n* Can be used only in context of aggregation inside summarize\n\nSee also - min() function, which returns the minimum value across the group without predicate expression.",
+        "syntax": "`minif` `(`*Expr*`,`*Predicate*`)`",
+        "returnInfo": "The minimum value of *Expr* in records for which *Predicate* evaluates to `true`.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *Expr* | `string` |  *True* | Expression that will be used for aggregation calculation. |\n| *Predicate* | `string` |  *True* | Expression that will be used to filter rows. |",
+        "example": "StormEvents\n| extend Damage=DamageCrops+DamageProperty, Deaths=DeathsDirect+DeathsIndirect\n| summarize MinDamageWithCasualties=minif(Damage,(Deaths >0) and (Damage >0)) by State \n| where MinDamageWithCasualties >0 and isnotnull(MinDamageWithCasualties)",
+        "sourceLength": 2806
+      }
     },
     {
       "name": "percentiles",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "percentiles_array",
-      "category": "Aggregate Function"
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "percentile(), percentiles() (aggregation function)",
+        "description": "The `percentile()` function calculates an estimate for the specified nearest-rank percentile of the population defined by *expr*.\nThe accuracy depends on the density of population in the region of the percentile.\n\n`percentiles()` works similarly to `percentile()`. However, `percentiles()` can calculate multiple percentile values at once, which is more efficient than calculating each percentile value separately.\n\nTo calculate weighted percentiles, see percentilesw().",
+        "syntax": "`percentile(`*expr*`,` *percentile*`)`\n\n`percentiles(`*expr*`,` *percentiles*`)`",
+        "returnInfo": "Instead of returning the values in individual columns, use the `percentiles_array()` function to return the percentiles in a single column of dynamic array type.\n\n### Syntax\n\n`percentiles_array(`*expr*`,` *percentiles*`)`\n\n### Parameters\n\n| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*expr* | `string` |  *True* | The expression to use for aggregation calculation.|\n|*percentiles*| real or dynamic |  *True*| One or more comma-separated percentiles or a dynamic array of percentiles. Each percentile must be a real value.|\n\n### Returns\n\nReturns an estimate for *expr* of the specified percentiles in the group as a single column of dynamic array type.\n\n### Examples\n\n#### Comma-separated percentiles\n\nMultiple percentiles can be obtained as an array in a single dynamic column, instead of in multiple columns as with percentiles().\n\n:::moniker range=\"azure-data-explorer\"\n> [!div class=\"nextstepaction\"]\n> <a href=\"https://dataexplorer.azure.com/clusters/help/databases/SampleIoTData?query=H4sIAAAAAAAAAwspSswrTssvyk1NCU7NK84vKnZJLEnk5apRKC7NzU0syqxKVShILUpOzSvJzEktjk8sKkqs1AhLzClN1VEw1VEwAmJTAx0FcyBtaaqpo5BYlg6R1lRIqlSAmOmXmJsKANY0tLFpAAAA\" target=\"_blank\">Run the query</a>\n::: moniker-end\n\n```kusto\nTransformedSensorsData\n| summarize percentiles_array(Value, 5, 25, 50, 75, 95), avg(Value) by SensorName\n```\n\n**Output**\n\nThe results table displays only the first 10 rows.\n\n|SensorName|percentiles_Value|avg_Value |\n|:--|:--|:--|\n|sensor-82|[\"0.048141473520867069\",\"0.24407515500271132\",\"0.48974511106780577\",\"0.74160998970950343\",\"0.94587903204190071\"]|0.493950914|\n|sensor-130|[\"0.049200214398937764\",\"0.25735850440187535\",\"0.51206374010048239\",\"0.74182335059053839\",\"0.95210342463616771\"]|0.505111463|\n|sensor-56|[\"0.04857779335488676\",\"0.24709868149337144\",\"0.49668762923789589\",\"0.74458470404241883\",\"0.94889104840865857\"]|0.497955018|\n|sensor-24|[\"0.051507199150534679\",\"0.24803904945640423\",\"0.50397070213183581\",\"0.75653888126010793\",\"0.9518782718727431\"]|0.501084379|\n|sensor-47|[\"0.045991246974755672\",\"0.24644331118208851\",\"0.48089197707088743\",\"0.74475142784472248\",\"0.9518322864959039\"]|0.49386228|\n|sensor-135|[\"0.05132897529660399\",\"0.24204987641954018\",\"0.48470113942206461\",\"0.74275730068433621\",\"0.94784079559229406\"]|0.494817619|\n|sensor-74|[\"0.048914714739047828\",\"0.25160926036445724\",\"0.49832498850160978\",\"0.75257887767110776\",\"0.94932261924236094\"]|0.501627252|\n|sensor-173|[\"0.048333149363009836\",\"0.26084250046756496\",\"0.51288012531934613\",\"0.74964772791583412\",\"0.95156058795294\"]|0.505401226|\n|sensor-28|[\"0.048511161184567046\",\"0.2547387968731824\",\"0.50101318228599656\",\"0.75693845702682039\",\"0.95243122486483989\"]|0.502066244|\n|sensor-34|[\"0.049980293859462954\",\"0.25094722564949412\",\"0.50914023067384762\",\"0.75571549713447961\",\"0.95176564809278674\"]|0.504309494|\n|...|...|...|\n\n#### Dynamic array of percentiles\n\nPercentiles for `percentiles_array` can be specified in a dynamic array of integer or floating-point numbers. The array must be constant but doesn't have to be literal.\n\n:::moniker range=\"azure-data-explorer\"\n> [!div class=\"nextstepaction\"]\n> <a href=\"https://dataexplorer.azure.com/clusters/help/databases/SampleIoTData?query=H4sIAAAAAAAAAwspSswrTssvyk1NCU7NK84vKnZJLEnkqlEoLs3NTSzKrEpVKEgtSk7NK8nMSS2OTywqSqzUCEvMKU3VUUipzEvMzUzWiDbVUTACYlMDHQVzIG1pGqupqaOQWJYOUampkFSpADHdLzE3FQAgg+RhcwAAAA==\" target=\"_blank\">Run the query</a>\n::: moniker-end\n\n```kusto\nTransformedSensorsData\n| summarize percentiles_array(Value, dynamic([5, 25, 50, 75, 95])), avg(Value) by SensorName\n```\n\n**Output**\n\nThe results table displays only the first 10 rows.\n\n|SensorName|percentiles_Value|avg_Value |\n|:--|:--|:--|\n|sensor-82|[\"0.048141473520867069\",\"0.24407515500271132\",\"0.48974511106780577\",\"0.74160998970950343\",\"0.94587903204190071\"]|0.493950914|\n|sensor-130|[\"0.049200214398937764\",\"0.25735850440187535\",\"0.51206374010048239\",\"0.74182335059053839\",\"0.95210342463616771\"]|0.505111463|\n|sensor-56|[\"0.04857779335488676\",\"0.24709868149337144\",\"0.49668762923789589\",\"0.74458470404241883\",\"0.94889104840865857\"]|0.497955018|\n|sensor-24|[\"0.051507199150534679\",\"0.24803904945640423\",\"0.50397070213183581\",\"0.75653888126010793\",\"0.9518782718727431\"]|0.501084379|\n|sensor-47|[\"0.045991246974755672\",\"0.24644331118208851\",\"0.48089197707088743\",\"0.74475142784472248\",\"0.9518322864959039\"]|0.49386228|\n|sensor-135|[\"0.05132897529660399\",\"0.24204987641954018\",\"0.48470113942206461\",\"0.74275730068433621\",\"0.94784079559229406\"]|0.494817619|\n|sensor-74|[\"0.048914714739047828\",\"0.25160926036445724\",\"0.49832498850160978\",\"0.75257887767110776\",\"0.94932261924236094\"]|0.501627252|\n|sensor-173|[\"0.048333149363009836\",\"0.26084250046756496\",\"0.51288012531934613\",\"0.74964772791583412\",\"0.95156058795294\"]|0.505401226|\n|sensor-28|[\"0.048511161184567046\",\"0.2547387968731824\",\"0.50101318228599656\",\"0.75693845702682039\",\"0.95243122486483989\"]|0.502066244|\n|sensor-34|[\"0.049980293859462954\",\"0.25094722564949412\",\"0.50914023067384762\",\"0.75571549713447961\",\"0.95176564809278674\"]|0.504309494|\n|...|...|...|\n\n*P*-th percentile (0 < *P* <= 100) of a list of ordered values, sorted in ascending order, is the smallest value in the list. The *P* percent of the data is less or equal to *P*-th percentile value (from Wikipedia article on percentiles).\n\nDefine *0*-th percentiles to be the smallest member of the population.\n\n>[!NOTE]\n> Given the approximating nature of the calculation, the actual returned value may not be a member of the population.\n> Nearest-rank definition means that *P*=50 does not conform to the interpolative definition of the median. When evaluating the significance of this discrepancy for the specific application, the size of the population and an estimation error should be taken into account.\n\nThe percentiles aggregate provides an approximate value using T-Digest.\n\n>[!NOTE]\n>\n> * The bounds on the estimation error vary with the value of the requested percentile. The best accuracy is at both ends of the [0..100] scale. Percentiles 0 and 100 are the exact minimum and maximum values of the distribution. The accuracy gradually decreases towards the middle of the scale. It's worst at the median and is capped at 1%.\n> * Error bounds are observed on the rank, not on the value. Suppose percentile(X, 50) returned a value of Xm. The estimate guarantees that at least 49% and at most 51% of the values of X are less or equal to Xm. There is no theoretical limit on the difference between Xm and the actual median value of X.\n> * The estimation may sometimes result in a precise value but there are no reliable conditions to define when it will be the case.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*expr* | `string` |  *True* | The expression to use for aggregation calculation.|\n|*percentile*| real |  *True*| A constant that specifies the percentile.|\n|*percentiles* | real |  *True* | One or more comma-separated percentiles.|",
+        "example": "",
+        "sourceLength": 11369
+      }
     },
     {
       "name": "percentilesw",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "percentilesw_array",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "percentilew",
-      "category": "Aggregate Function"
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "percentilew(), percentilesw() (aggregation function)",
+        "description": "The `percentilew()` function calculates a weighted estimate for the specified nearest-rank percentile of the population defined by *expr*. `percentilesw()` works similarly to `percentilew()`. However, `percentilesw()` can calculate multiple weighted percentile values at once, which is more efficient than calculating each weighted percentile value separately.\n\nWeighted percentiles calculate percentiles in a dataset by giving each value in the input dataset a weight. In this method, each value is considered to be repeated a number of times equal to its weight, which is then used to calculate the percentile. By giving more importance to certain values, weighted percentiles provide a way to calculate percentiles in a \"weighted\" manner.\n\nTo calculate unweighted percentiles, see percentiles().",
+        "syntax": "`percentilew(`*expr*`,` *weightExpr*`,` *percentile*`)`\n\n`percentilesw(`*expr*`,` *weightExpr*`,` *percentiles*`)`",
+        "returnInfo": "Instead of returning the values in individual columns, use the `percentilesw_array()` function to return the percentiles in a single column of dynamic array type.\n\n### Syntax\n\n`percentilesw_array(`*expr*`,` *weightExpr*`,` *percentiles*`)`\n\n### Parameters\n\n| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*expr* | `string` |  *True* | The expression to use for aggregation calculation.|\n|*percentiles*| real or dynamic |  *True*| One or more comma-separated percentiles or a dynamic array of percentiles. Each percentile must be a real value.|\n|*weightExpr*| `long` | *True*|The weight to give each value.|\n\n### Returns\n\nReturns an estimate for *expr* of the specified percentiles in the group as a single column of dynamic array type.\n\n### Examples\n\nThe examples in this section show how to use the syntax to help you get started.\n\n#### Comma-separated percentiles\n\n:::moniker range=\"azure-data-explorer\"\n> [!div class=\"nextstepaction\"]\n> <a href=\"https://dataexplorer.azure.com/clusters/help/databases/SampleIoTData?query=H4sIAAAAAAAAA1WOQQuCQBCF7/sr3lFhCM2sLLrUtVN0i4hpG0Ja11pXwujHZ8hCzVw+Ho/5xoiHYS9Wd3s+G8EKF/b9fjnayWNTt9YvTG2vhO1QXLf6JkMWQx2g0M+ckCY08JQwDpwRssApYZJAHZfqV6neaNqqYle+BHdxWqwvjTTPEzvHXfRnJYSfCHl/d5YTimJUxB+W4nlIyQAAAA==\" target=\"_blank\">Run the query</a>\n::: moniker-end\n\n```kusto\nlet latencyTable = datatable (ReqCount:long, LatencyBucket:long) \n[ \n    8, 10, \n    6, 20, \n    3, 30, \n    1, 40 \n];\nlatencyTable\n| summarize percentilesw_array(LatencyBucket, ReqCount, 50, 75, 99.9)\n```\n\n**Output**\n\n| percentile_LatencyBucket |\n|:---|:---|:---|\n| [20, 20, 40] |\n\n#### Dynamic array of percentiles\n\n:::moniker range=\"azure-data-explorer\"\n> [!div class=\"nextstepaction\"]\n> <a href=\"https://dataexplorer.azure.com/clusters/help/databases/SampleIoTData?query=H4sIAAAAAAAAA1WOQQuCQBCF7/sr3lFhiMysLLrUtVN0E4lpHUJa11pXwujHZ4hQ8y4fjwffGPEw7MXq7sQXI9iiYN/ny8FRHvu6tX5tanslHIbhrtU3GboQKoNCfytCNKWBF4TZyDEhHjkizKdQ+Ub9KtUbTVtV7MqX4C5Oi/WlkeZ5Zue4C/6shPEnQtFZrkodZEkvWCaENJ2keRh+AIIR/2/UAAAA\" target=\"_blank\">Run the query</a>\n::: moniker-end\n\n```kusto\nlet latencyTable = datatable (ReqCount:long, LatencyBucket:long) \n[ \n    8, 10, \n    6, 20, \n    3, 30, \n    1, 40 \n];\nlatencyTable\n| summarize percentilesw_array(LatencyBucket, ReqCount, dynamic([50, 75, 99.9]))\n```\n\n**Output**\n\n| percentile_LatencyBucket |\n|:---|:---|:---|\n| [20, 20, 40] |",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*expr* | `string` |  *True* | The expression to use for aggregation calculation.|\n|*weightExpr*| `long` | *True*|The weight to give each value.|\n|*percentile*| real |  *True*| A constant that specifies the percentile.|\n|*percentiles* | real |  *True* | One or more comma-separated percentiles.|",
+        "example": "",
+        "sourceLength": 7995
+      }
     },
     {
       "name": "stdev",
-      "category": "Aggregate Function"
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "stdev() (aggregation function)",
+        "description": "Calculates the standard deviation of *expr* across the group, using Bessel's correction for a small dataset that is considered a sample.\n\nFor a large dataset that is representative of the population, use stdevp() (aggregation function).",
+        "syntax": "`stdev(`*expr*`)`",
+        "returnInfo": "Returns the standard deviation value of *expr* across the group.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr* | `string` |  *True* | The expression used for the standard deviation aggregation calculation. |",
+        "example": "range x from 1 to 5 step 1\n| summarize make_list(x), stdev(x)",
+        "sourceLength": 2265
+      }
     },
     {
       "name": "stdevif",
-      "category": "Aggregate Function"
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "stdevif() (aggregation function)",
+        "description": "Calculates the standard deviation of *expr* in records for which *predicate* evaluates to `true`.",
+        "syntax": "`stdevif(`*expr*`,`*predicate*`)`",
+        "returnInfo": "Returns the standard deviation value of *expr* in records for which *predicate* evaluates to `true`.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr* | `string` |  *True* | The expression used for the standards deviation aggregation calculation. |\n| *predicate* | `string` |  *True* | The predicate that has to evaluate to `true` in order for *expr* to be added to the result. |",
+        "example": "range x from 1 to 100 step 1\n| summarize stdevif(x, x % 2 == 0)",
+        "sourceLength": 2024
+      }
     },
     {
       "name": "stdevp",
-      "category": "Aggregate Function"
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "stdevp() (aggregation function)",
+        "description": "Calculates the standard deviation of *expr* across the group, considering the group as a population for a large dataset that is representative of the population.\n\nFor a small dataset that is a sample, use stdev() (aggregation function).",
+        "syntax": "`stdevp(`*expr*`)`",
+        "returnInfo": "Returns the standard deviation value of *expr* across the group.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*expr* | `string` |  *True* | The expression used for the standards deviation aggregation calculation. |",
+        "example": "range x from 1 to 5 step 1\n| summarize make_list(x), stdevp(x)",
+        "sourceLength": 2132
+      }
     },
     {
       "name": "sum",
-      "category": "Aggregate Function"
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "sum() (aggregation function)",
+        "description": "Calculates the sum of *expr* across the group.",
+        "syntax": "`sum(`*expr*`)`",
+        "returnInfo": "Returns the sum value of *expr* across the group.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr*  string |  *True* | The expression used for the aggregation calculation. |",
+        "example": "StormEvents \n| summarize EventCount=count(), TotalDamages = sum(DamageCrops+DamageProperty) by State \n| sort by TotalDamages",
+        "sourceLength": 2245
+      }
     },
     {
       "name": "sumif",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "take_any",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "take_anyif",
-      "category": "Aggregate Function"
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "sumif() (aggregation function)",
+        "description": "Calculates the sum of *expr* in records for which *predicate* evaluates to `true`.\n\nYou can also use the sum() function, which sums rows without predicate expression.",
+        "syntax": "`sumif(`*expr*`,`*predicate*`)`",
+        "returnInfo": "Returns the sum of *expr* for which *predicate* evaluates to `true`.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr* | `string` |  *True* | The expression used for the aggregation calculation. |\n| *predicate* | `string` |  *True* | The expression used to filter rows. If the predicate evaluates to `true`, the row will be included in the result.|",
+        "example": "let T = datatable(name:string, day_of_birth:long)\n[\n   \"John\", 9,\n   \"Paul\", 18,\n   \"George\", 25,\n   \"Ringo\", 7\n];\nT\n| summarize sumif(day_of_birth, strlen(name) > 4)",
+        "sourceLength": 3193
+      }
     },
     {
       "name": "tdigest",
-      "category": "Aggregate Function"
-    },
-    {
-      "name": "tdigest_merge",
-      "category": "Aggregate Function"
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "tdigest() (aggregation function)",
+        "description": "Calculates the intermediate results of `percentiles()` across the group.\n\nFor more information, see the underlying algorithm (T-Digest) and the estimated error.\n\n> [!IMPORTANT]\n> The results of tdigest() and tdigest_merge() can be stored and later retrieved. For example, you may want to create daily percentiles summary, which can then be used to calculate weekly percentiles.\n> However, the precise binary representation of these results may change over time, and is not documented. There's no guarantee that these functions will produce identical results for identical inputs.",
+        "syntax": "`tdigest(`*expr* [`,` *weight*]`)`",
+        "returnInfo": "The Intermediate results of weighted percentiles of `*expr*` across the group.\n\n> [!TIP]\n>\n>- Use the aggregation function tdigest_merge() to merge the output of `tdigest` again across another group.\n>- Use the function percentile_tdigest() to calculate the percentile/percentilew of the `tdigest` results.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr* | `string` |  *True* | The expression used for the aggregation calculation. |\n| *weight* | `string` | | The weights of the values for the aggregation calculation. |",
+        "example": "",
+        "sourceLength": 6437
+      }
     },
     {
       "name": "variance",
-      "category": "Aggregate Function"
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "variance() (aggregation function)",
+        "description": "Calculates the variance of *expr* across the group, considering the group as a sample.\n\nThe following formula is used:\n\n:::image type=\"content\" source=\"media/variance-aggfunction/variance-sample.png\" alt-text=\"Image showing a variance sample formula.\":::",
+        "syntax": "`variance(`*expr*`)`",
+        "returnInfo": "Returns the variance value of *expr* across the group.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*expr* | `real` |  *True* | The expression used for the variance calculation.|",
+        "example": "range x from 1 to 5 step 1\n| summarize make_list(x), variance(x)",
+        "sourceLength": 1910
+      }
     },
     {
       "name": "varianceif",
-      "category": "Aggregate Function"
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "varianceif() (aggregation function)",
+        "description": "Calculates the variance of *expr* in records for which *predicate* evaluates to `true`.",
+        "syntax": "`varianceif(`*expr*`,` *predicate*`)`",
+        "returnInfo": "Returns the variance value of *expr* in records for which *predicate* evaluates to `true`.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*expr* | `string` |  *True* | The expression to use for the variance calculation.|\n|*predicate*| `string` |  *True* | If *predicate* evaluates to `true`, the *expr* calculated value will be added to the variance.|",
+        "example": "range x from 1 to 100 step 1\n| summarize varianceif(x, x%2 == 0)",
+        "sourceLength": 1906
+      }
     },
     {
       "name": "variancep",
-      "category": "Aggregate Function"
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "variancep() (aggregation function)",
+        "description": "Calculates the variance of *expr* across the group, considering the group as a population.\n\nThe following formula is used:\n\n:::image type=\"content\" source=\"media/variancep-aggfunction/variance-population.png\" alt-text=\"Image showing a variance sample formula.\" :::",
+        "syntax": "`variancep(`*expr*`)`",
+        "returnInfo": "Returns the variance value of *expr* across the group.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*expr* | `string` |  *True* | The expression to use for the variance calculation.|",
+        "example": "range x from 1 to 5 step 1\n| summarize make_list(x), variancep(x)",
+        "sourceLength": 1877
+      }
     },
     {
       "name": "variancepif",
-      "category": "Aggregate Function"
+      "category": "Aggregation function",
+      "documentation": {
+        "title": "variancepif() (aggregation function)",
+        "description": "Calculates the variance of *expr* in records for which *predicate* evaluates to `true`.",
+        "syntax": "`variancepif(`*expr*`,` *predicate*`)`",
+        "returnInfo": "Returns the variance value of *expr* in records for which *predicate* evaluates to `true`.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*expr* | `string` |  *True* | The expression to use for the variance calculation.|\n|*predicate*| `string` |  *True* | If *predicate* evaluates to `true`, the *expr* calculated value will be added to the variance.|",
+        "example": "range x from 1 to 100 step 1\n| summarize variancepif(x, x%2 == 0)",
+        "sourceLength": 2047
+      }
+    },
+    {
+      "name": "any",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "anyif",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "arg_max",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "arg_min",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "argmax",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "argmin",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "binary_all_and",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "binary_all_or",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "binary_all_xor",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "cnt",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "count_distinct",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "count_distinctif",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "hll_if",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "make_bag",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "make_bag_if",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "make_dictionary",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "make_list",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "make_list_if",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "make_list_with_nulls",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "make_set",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "make_set_if",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "makelist",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "makeset",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "passthrough",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "percentile",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "percentiles_array",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "percentilesw_array",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "percentilew",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "take_any",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "take_anyif",
+      "category": "Aggregate function"
+    },
+    {
+      "name": "tdigest_merge",
+      "category": "Aggregate function"
     }
   ],
   "lastUpdated": "2025-09-11T13:20:42.137Z"
