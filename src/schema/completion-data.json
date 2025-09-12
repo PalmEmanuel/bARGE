@@ -2228,18 +2228,6 @@
       "category": "KQL Function"
     },
     {
-      "label": "all",
-      "kind": "Function",
-      "insertText": "all()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "any",
-      "kind": "Function",
-      "insertText": "any()",
-      "category": "KQL Function"
-    },
-    {
       "label": "around",
       "kind": "Function",
       "insertText": "around()",
@@ -2255,12 +2243,6 @@
       "label": "array_iff",
       "kind": "Function",
       "insertText": "array_iff()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "array_iif",
-      "kind": "Function",
-      "insertText": "array_iif()",
       "category": "KQL Function"
     },
     {
@@ -2330,21 +2312,9 @@
       "category": "KQL Function"
     },
     {
-      "label": "array_strcat",
-      "kind": "Function",
-      "insertText": "array_strcat()",
-      "category": "KQL Function"
-    },
-    {
       "label": "array_sum",
       "kind": "Function",
       "insertText": "array_sum()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "arraylength",
-      "kind": "Function",
-      "insertText": "arraylength()",
       "category": "KQL Function"
     },
     {
@@ -2390,12 +2360,6 @@
       "category": "KQL Function"
     },
     {
-      "label": "bag_pack",
-      "kind": "Function",
-      "insertText": "bag_pack()",
-      "category": "KQL Function"
-    },
-    {
       "label": "bag_pack_columns",
       "kind": "Function",
       "insertText": "bag_pack_columns()",
@@ -2411,12 +2375,6 @@
       "label": "bag_set_key",
       "kind": "Function",
       "insertText": "bag_set_key()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "bag_zip",
-      "kind": "Function",
-      "insertText": "bag_zip()",
       "category": "KQL Function"
     },
     {
@@ -2438,12 +2396,6 @@
       "category": "KQL Function"
     },
     {
-      "label": "base64_decodestring",
-      "kind": "Function",
-      "insertText": "base64_decodestring()",
-      "category": "KQL Function"
-    },
-    {
       "label": "base64_encode_fromarray",
       "kind": "Function",
       "insertText": "base64_encode_fromarray()",
@@ -2459,12 +2411,6 @@
       "label": "base64_encode_tostring",
       "kind": "Function",
       "insertText": "base64_encode_tostring()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "base64_encodestring",
-      "kind": "Function",
-      "insertText": "base64_encodestring()",
       "category": "KQL Function"
     },
     {
@@ -2582,12 +2528,6 @@
       "category": "KQL Function"
     },
     {
-      "label": "columnifexists",
-      "kind": "Function",
-      "insertText": "columnifexists()",
-      "category": "KQL Function"
-    },
-    {
       "label": "convert_angle",
       "kind": "Function",
       "insertText": "convert_angle()",
@@ -2660,21 +2600,9 @@
       "category": "KQL Function"
     },
     {
-      "label": "current_cursor",
-      "kind": "Function",
-      "insertText": "current_cursor()",
-      "category": "KQL Function"
-    },
-    {
       "label": "current_database",
       "kind": "Function",
       "insertText": "current_database()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "current_node_id",
-      "kind": "Function",
-      "insertText": "current_node_id()",
       "category": "KQL Function"
     },
     {
@@ -2708,21 +2636,9 @@
       "category": "KQL Function"
     },
     {
-      "label": "cursor_current",
-      "kind": "Function",
-      "insertText": "cursor_current()",
-      "category": "KQL Function"
-    },
-    {
       "label": "database",
       "kind": "Function",
       "insertText": "database()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "datepart",
-      "kind": "Function",
-      "insertText": "datepart()",
       "category": "KQL Function"
     },
     {
@@ -2735,12 +2651,6 @@
       "label": "datetime_diff",
       "kind": "Function",
       "insertText": "datetime_diff()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "datetime_list_timezones",
-      "kind": "Function",
-      "insertText": "datetime_list_timezones()",
       "category": "KQL Function"
     },
     {
@@ -2759,24 +2669,6 @@
       "label": "datetime_utc_to_local",
       "kind": "Function",
       "insertText": "datetime_utc_to_local()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "dayofmonth",
-      "kind": "Function",
-      "insertText": "dayofmonth()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "dayofweek",
-      "kind": "Function",
-      "insertText": "dayofweek()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "dayofyear",
-      "kind": "Function",
-      "insertText": "dayofyear()",
       "category": "KQL Function"
     },
     {
@@ -2819,12 +2711,6 @@
       "label": "endofyear",
       "kind": "Function",
       "insertText": "endofyear()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "entity_group",
-      "kind": "Function",
-      "insertText": "entity_group()",
       "category": "KQL Function"
     },
     {
@@ -2876,12 +2762,6 @@
       "category": "KQL Function"
     },
     {
-      "label": "extentid",
-      "kind": "Function",
-      "insertText": "extentid()",
-      "category": "KQL Function"
-    },
-    {
       "label": "external_table",
       "kind": "Function",
       "insertText": "external_table()",
@@ -2903,24 +2783,6 @@
       "label": "extract_json",
       "kind": "Function",
       "insertText": "extract_json()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "extractall",
-      "kind": "Function",
-      "insertText": "extractall()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "extractjson",
-      "kind": "Function",
-      "insertText": "extractjson()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "floor",
-      "kind": "Function",
-      "insertText": "floor()",
       "category": "KQL Function"
     },
     {
@@ -3278,12 +3140,6 @@
       "category": "KQL Function"
     },
     {
-      "label": "getmonth",
-      "kind": "Function",
-      "insertText": "getmonth()",
-      "category": "KQL Function"
-    },
-    {
       "label": "gettype",
       "kind": "Function",
       "insertText": "gettype()",
@@ -3299,18 +3155,6 @@
       "label": "graph",
       "kind": "Function",
       "insertText": "graph()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "gzip_compress_to_base64_string",
-      "kind": "Function",
-      "insertText": "gzip_compress_to_base64_string()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "gzip_decompress_from_base64_string",
-      "kind": "Function",
-      "insertText": "gzip_decompress_from_base64_string()",
       "category": "KQL Function"
     },
     {
@@ -3386,33 +3230,15 @@
       "category": "KQL Function"
     },
     {
-      "label": "hll_isvalid",
-      "kind": "Function",
-      "insertText": "hll_isvalid()",
-      "category": "KQL Function"
-    },
-    {
       "label": "hll_merge",
       "kind": "Function",
       "insertText": "hll_merge()",
       "category": "KQL Function"
     },
     {
-      "label": "hourofday",
-      "kind": "Function",
-      "insertText": "hourofday()",
-      "category": "KQL Function"
-    },
-    {
       "label": "iff",
       "kind": "Function",
       "insertText": "iff()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "iif",
-      "kind": "Function",
-      "insertText": "iif()",
       "category": "KQL Function"
     },
     {
@@ -3431,12 +3257,6 @@
       "label": "ingestion_time",
       "kind": "Function",
       "insertText": "ingestion_time()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "inner_nodes",
-      "kind": "Function",
-      "insertText": "inner_nodes()",
       "category": "KQL Function"
     },
     {
@@ -3506,18 +3326,6 @@
       "category": "KQL Function"
     },
     {
-      "label": "isascii",
-      "kind": "Function",
-      "insertText": "isascii()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "iscolumnexists",
-      "kind": "Function",
-      "insertText": "iscolumnexists()",
-      "category": "KQL Function"
-    },
-    {
       "label": "isempty",
       "kind": "Function",
       "insertText": "isempty()",
@@ -3572,12 +3380,6 @@
       "category": "KQL Function"
     },
     {
-      "label": "labels",
-      "kind": "Function",
-      "insertText": "labels()",
-      "category": "KQL Function"
-    },
-    {
       "label": "log",
       "kind": "Function",
       "insertText": "log()",
@@ -3608,21 +3410,9 @@
       "category": "KQL Function"
     },
     {
-      "label": "make_string",
-      "kind": "Function",
-      "insertText": "make_string()",
-      "category": "KQL Function"
-    },
-    {
       "label": "make_timespan",
       "kind": "Function",
       "insertText": "make_timespan()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "map",
-      "kind": "Function",
-      "insertText": "map()",
       "category": "KQL Function"
     },
     {
@@ -3668,39 +3458,9 @@
       "category": "KQL Function"
     },
     {
-      "label": "node_degree_in",
-      "kind": "Function",
-      "insertText": "node_degree_in()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "node_degree_out",
-      "kind": "Function",
-      "insertText": "node_degree_out()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "node_id",
-      "kind": "Function",
-      "insertText": "node_id()",
-      "category": "KQL Function"
-    },
-    {
       "label": "not",
       "kind": "Function",
       "insertText": "not()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "notempty",
-      "kind": "Function",
-      "insertText": "notempty()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "notnull",
-      "kind": "Function",
-      "insertText": "notnull()",
       "category": "KQL Function"
     },
     {
@@ -3725,12 +3485,6 @@
       "label": "pack_array",
       "kind": "Function",
       "insertText": "pack_array()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "pack_dictionary",
-      "kind": "Function",
-      "insertText": "pack_dictionary()",
       "category": "KQL Function"
     },
     {
@@ -3788,12 +3542,6 @@
       "category": "KQL Function"
     },
     {
-      "label": "parse_urlquery",
-      "kind": "Function",
-      "insertText": "parse_urlquery()",
-      "category": "KQL Function"
-    },
-    {
       "label": "parse_user_agent",
       "kind": "Function",
       "insertText": "parse_user_agent()",
@@ -3812,33 +3560,9 @@
       "category": "KQL Function"
     },
     {
-      "label": "parsejson",
-      "kind": "Function",
-      "insertText": "parsejson()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "parseurl",
-      "kind": "Function",
-      "insertText": "parseurl()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "parseurlquery",
-      "kind": "Function",
-      "insertText": "parseurlquery()",
-      "category": "KQL Function"
-    },
-    {
       "label": "percentile_tdigest",
       "kind": "Function",
       "insertText": "percentile_tdigest()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "percentiles_array_tdigest",
-      "kind": "Function",
-      "insertText": "percentiles_array_tdigest()",
       "category": "KQL Function"
     },
     {
@@ -3926,12 +3650,6 @@
       "category": "KQL Function"
     },
     {
-      "label": "replace",
-      "kind": "Function",
-      "insertText": "replace()",
-      "category": "KQL Function"
-    },
-    {
       "label": "replace_regex",
       "kind": "Function",
       "insertText": "replace_regex()",
@@ -3974,12 +3692,6 @@
       "category": "KQL Function"
     },
     {
-      "label": "row_rank",
-      "kind": "Function",
-      "insertText": "row_rank()",
-      "category": "KQL Function"
-    },
-    {
       "label": "row_rank_dense",
       "kind": "Function",
       "insertText": "row_rank_dense()",
@@ -3995,12 +3707,6 @@
       "label": "row_window_session",
       "kind": "Function",
       "insertText": "row_window_session()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "rowstore_ordinal_range",
-      "kind": "Function",
-      "insertText": "rowstore_ordinal_range()",
       "category": "KQL Function"
     },
     {
@@ -4316,12 +4022,6 @@
       "category": "KQL Function"
     },
     {
-      "label": "set_equals",
-      "kind": "Function",
-      "insertText": "set_equals()",
-      "category": "KQL Function"
-    },
-    {
       "label": "set_has_element",
       "kind": "Function",
       "insertText": "set_has_element()",
@@ -4454,33 +4154,9 @@
       "category": "KQL Function"
     },
     {
-      "label": "tdigest_isvalid",
-      "kind": "Function",
-      "insertText": "tdigest_isvalid()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "tdigest_merge",
-      "kind": "Function",
-      "insertText": "tdigest_merge()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "to_utf8",
-      "kind": "Function",
-      "insertText": "to_utf8()",
-      "category": "KQL Function"
-    },
-    {
       "label": "tobool",
       "kind": "Function",
       "insertText": "tobool()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "toboolean",
-      "kind": "Function",
-      "insertText": "toboolean()",
       "category": "KQL Function"
     },
     {
@@ -4493,18 +4169,6 @@
       "label": "todecimal",
       "kind": "Function",
       "insertText": "todecimal()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "todouble",
-      "kind": "Function",
-      "insertText": "todouble()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "todynamic",
-      "kind": "Function",
-      "insertText": "todynamic()",
       "category": "KQL Function"
     },
     {
@@ -4538,12 +4202,6 @@
       "category": "KQL Function"
     },
     {
-      "label": "toobject",
-      "kind": "Function",
-      "insertText": "toobject()",
-      "category": "KQL Function"
-    },
-    {
       "label": "toreal",
       "kind": "Function",
       "insertText": "toreal()",
@@ -4553,12 +4211,6 @@
       "label": "tostring",
       "kind": "Function",
       "insertText": "tostring()",
-      "category": "KQL Function"
-    },
-    {
-      "label": "totime",
-      "kind": "Function",
-      "insertText": "totime()",
       "category": "KQL Function"
     },
     {
@@ -4664,12 +4316,6 @@
       "category": "KQL Function"
     },
     {
-      "label": "weekofyear",
-      "kind": "Function",
-      "insertText": "weekofyear()",
-      "category": "KQL Function"
-    },
-    {
       "label": "welch_test",
       "kind": "Function",
       "insertText": "welch_test()",
@@ -4679,6 +4325,360 @@
       "label": "zip",
       "kind": "Function",
       "insertText": "zip()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "all",
+      "kind": "Function",
+      "insertText": "all()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "any",
+      "kind": "Function",
+      "insertText": "any()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "array_iif",
+      "kind": "Function",
+      "insertText": "array_iif()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "array_strcat",
+      "kind": "Function",
+      "insertText": "array_strcat()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "arraylength",
+      "kind": "Function",
+      "insertText": "arraylength()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "bag_pack",
+      "kind": "Function",
+      "insertText": "bag_pack()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "bag_zip",
+      "kind": "Function",
+      "insertText": "bag_zip()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "base64_decodestring",
+      "kind": "Function",
+      "insertText": "base64_decodestring()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "base64_encodestring",
+      "kind": "Function",
+      "insertText": "base64_encodestring()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "columnifexists",
+      "kind": "Function",
+      "insertText": "columnifexists()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "current_cursor",
+      "kind": "Function",
+      "insertText": "current_cursor()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "current_node_id",
+      "kind": "Function",
+      "insertText": "current_node_id()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "cursor_current",
+      "kind": "Function",
+      "insertText": "cursor_current()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "datepart",
+      "kind": "Function",
+      "insertText": "datepart()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "datetime_list_timezones",
+      "kind": "Function",
+      "insertText": "datetime_list_timezones()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "dayofmonth",
+      "kind": "Function",
+      "insertText": "dayofmonth()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "dayofweek",
+      "kind": "Function",
+      "insertText": "dayofweek()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "dayofyear",
+      "kind": "Function",
+      "insertText": "dayofyear()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "entity_group",
+      "kind": "Function",
+      "insertText": "entity_group()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "extentid",
+      "kind": "Function",
+      "insertText": "extentid()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "extractall",
+      "kind": "Function",
+      "insertText": "extractall()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "extractjson",
+      "kind": "Function",
+      "insertText": "extractjson()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "floor",
+      "kind": "Function",
+      "insertText": "floor()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "getmonth",
+      "kind": "Function",
+      "insertText": "getmonth()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "gzip_compress_to_base64_string",
+      "kind": "Function",
+      "insertText": "gzip_compress_to_base64_string()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "gzip_decompress_from_base64_string",
+      "kind": "Function",
+      "insertText": "gzip_decompress_from_base64_string()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "hll_isvalid",
+      "kind": "Function",
+      "insertText": "hll_isvalid()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "hourofday",
+      "kind": "Function",
+      "insertText": "hourofday()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "iif",
+      "kind": "Function",
+      "insertText": "iif()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "inner_nodes",
+      "kind": "Function",
+      "insertText": "inner_nodes()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "isascii",
+      "kind": "Function",
+      "insertText": "isascii()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "iscolumnexists",
+      "kind": "Function",
+      "insertText": "iscolumnexists()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "labels",
+      "kind": "Function",
+      "insertText": "labels()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "make_string",
+      "kind": "Function",
+      "insertText": "make_string()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "map",
+      "kind": "Function",
+      "insertText": "map()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "node_degree_in",
+      "kind": "Function",
+      "insertText": "node_degree_in()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "node_degree_out",
+      "kind": "Function",
+      "insertText": "node_degree_out()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "node_id",
+      "kind": "Function",
+      "insertText": "node_id()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "notempty",
+      "kind": "Function",
+      "insertText": "notempty()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "notnull",
+      "kind": "Function",
+      "insertText": "notnull()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "pack_dictionary",
+      "kind": "Function",
+      "insertText": "pack_dictionary()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "parse_urlquery",
+      "kind": "Function",
+      "insertText": "parse_urlquery()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "parsejson",
+      "kind": "Function",
+      "insertText": "parsejson()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "parseurl",
+      "kind": "Function",
+      "insertText": "parseurl()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "parseurlquery",
+      "kind": "Function",
+      "insertText": "parseurlquery()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "percentiles_array_tdigest",
+      "kind": "Function",
+      "insertText": "percentiles_array_tdigest()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "replace",
+      "kind": "Function",
+      "insertText": "replace()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "row_rank",
+      "kind": "Function",
+      "insertText": "row_rank()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "rowstore_ordinal_range",
+      "kind": "Function",
+      "insertText": "rowstore_ordinal_range()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "set_equals",
+      "kind": "Function",
+      "insertText": "set_equals()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "tdigest_isvalid",
+      "kind": "Function",
+      "insertText": "tdigest_isvalid()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "tdigest_merge",
+      "kind": "Function",
+      "insertText": "tdigest_merge()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "to_utf8",
+      "kind": "Function",
+      "insertText": "to_utf8()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "toboolean",
+      "kind": "Function",
+      "insertText": "toboolean()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "todouble",
+      "kind": "Function",
+      "insertText": "todouble()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "todynamic",
+      "kind": "Function",
+      "insertText": "todynamic()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "toobject",
+      "kind": "Function",
+      "insertText": "toobject()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "totime",
+      "kind": "Function",
+      "insertText": "totime()",
+      "category": "KQL Function"
+    },
+    {
+      "label": "weekofyear",
+      "kind": "Function",
+      "insertText": "weekofyear()",
       "category": "KQL Function"
     },
     {

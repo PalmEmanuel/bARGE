@@ -497,7 +497,46 @@ export class KustoLanguageServiceProvider implements
             if (this.schemaData.functions) {
                 const func = this.schemaData.functions.find((fn: any) => fn.name.toLowerCase() === lowerWord);
                 if (func) {
-                    return `**${func.name}()** - ${func.category}`;
+                    // If we have enhanced documentation, use it
+                    if (func.documentation) {
+                        const doc = func.documentation;
+                        let hoverContent = `## Function \`${doc.title}\`\n\n`;
+                        hoverContent += `*${func.category}*\n\n`;
+                        
+                        // Description
+                        if (doc.description) {
+                            hoverContent += `${doc.description}\n\n`;
+                        }
+                        
+                        // Syntax
+                        if (doc.syntax) {
+                            hoverContent += `### Syntax\n\n${doc.syntax}\n\n`;
+                        }
+                        
+                        // Parameters Table
+                        if (doc.parametersTable) {
+                            hoverContent += `### Parameters\n\n${doc.parametersTable}\n\n`;
+                        }
+                        
+                        // Returns
+                        if (doc.returnInfo) {
+                            hoverContent += `### Returns\n\n${doc.returnInfo}\n\n`;
+                        }
+                        
+                        // Example(s)
+                        if (doc.example && doc.example.trim()) {
+                            // Check if there are multiple examples (look for multiple code blocks or line breaks)
+                            const hasMultipleExamples = doc.example.includes('```') || 
+                                                      doc.example.split('\n').filter((line: string) => line.trim()).length > 3;
+                            const exampleLabel = hasMultipleExamples ? "Examples" : "Example";
+                            hoverContent += `### ${exampleLabel}\n\`\`\`kql\n${doc.example}\n\`\`\``;
+                        }
+                        
+                        return hoverContent;
+                    } else {
+                        // Fallback to old format
+                        return `**${func.name}()**`;
+                    }
                 }
             }
             
@@ -505,12 +544,11 @@ export class KustoLanguageServiceProvider implements
             if (this.schemaData.tables) {
                 const table = this.schemaData.tables[lowerWord];
                 if (table) {
-                    let hoverContent = `**Table: \`${table.name}\`**\n\n`;
+                    let hoverContent = `## Table \`${table.name}\`\n\n`;
                     
                     // Add resource types section
                     if (table.name.toLowerCase() === 'resources') {
                         // Special case for main resources table - skip description, use resource types info instead
-                        hoverContent += `**Resource Types:**\n\n`;
                         hoverContent += `Most Azure Resource Manager resource types and properties are here.\n\n`;
                     } else {
                         // Add description if available for non-resources tables
@@ -520,7 +558,7 @@ export class KustoLanguageServiceProvider implements
                         
                         // List specific resource types for specialized tables
                         if (table.resourceTypes && table.resourceTypes.length > 0) {
-                            hoverContent += `**Resource Types:**\n`;
+                            hoverContent += `### Resource Types\n`;
                             const displayTypes = table.resourceTypes.slice(0, 5); // Show first 5
                             displayTypes.forEach((type: string) => {
                                 hoverContent += `- \`${type}\`\n`;
@@ -560,11 +598,11 @@ export class KustoLanguageServiceProvider implements
                         
                         if (selectedExamples.length === 1) {
                             const exampleCode = getExampleCode(selectedExamples[0]);
-                            hoverContent += `**${exampleLabel}:**\n\`\`\`kql\n${exampleCode}\n\`\`\``;
+                            hoverContent += `### ${exampleLabel}\n\`\`\`kql\n${exampleCode}\n\`\`\``;
                         } else if (selectedExamples.length > 1) {
                             const example1Code = getExampleCode(selectedExamples[0]);
                             const example2Code = getExampleCode(selectedExamples[1]);
-                            hoverContent += `**${exampleLabel}:**
+                            hoverContent += `### ${exampleLabel}
 
 \`\`\`kql
 ${example1Code}

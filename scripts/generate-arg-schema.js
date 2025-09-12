@@ -26,6 +26,163 @@ const https = require('https');
 const fs = require('fs').promises;
 const path = require('path');
 
+// Function to clean markdown links and includes  
+function cleanMarkdownLinks(text) {
+    if (!text) return '';
+    return text
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Remove [text](url) links
+        .replace(/>\s*!\s*INCLUDE\s+\[[^\]]+\]/g, '') // Remove > !INCLUDE [name] directives
+        .replace(/!\s*INCLUDE\s+\[[^\]]+\]/g, '') // Remove !INCLUDE [name] directives
+        .replace(/:heavy_check_mark:/g, '*True*') // Replace emoji with italicized True
+        .replace(/\|--/g, '|:--') // Convert table alignment to left-aligned (add colon to start of each column)
+        .replace(/\|---/g, '|:---') // Convert table alignment to left-aligned (3 dashes)
+        .replace(/\|----/g, '|:----') // Convert table alignment to left-aligned (4 dashes)
+        .replace(/\n\s*\n\s*\n/g, '\n\n') // Collapse multiple newlines
+        .trim();
+}
+
+// Focused documentation parser for Microsoft Docs
+function parseMarkdownDoc(content) {
+    const lines = content.split('\n');
+    let title = '';
+    let description = '';
+    let syntax = '';
+    let returnInfo = '';
+    let parametersTable = '';
+    let example = '';
+    
+    let currentSection = '';
+    let descriptionLines = [];
+    let syntaxLines = [];
+    let returnLines = [];
+    let parameterLines = [];
+    let exampleLines = [];
+    let foundIncludeLine = false;
+    
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const trimmedLine = line.trim();
+        
+        // Extract title (first h1)
+        if (!title && trimmedLine.startsWith('# ')) {
+            title = trimmedLine.substring(2).trim();
+            continue;
+        }
+        
+        // Skip until we find the INCLUDE line for description
+        if (!foundIncludeLine && trimmedLine.includes('!INCLUDE')) {
+            foundIncludeLine = true;
+            continue;
+        }
+        
+        // Detect sections by headers (any level #, ##, ###, etc.)
+        if (trimmedLine.startsWith('#')) {
+            const isH2 = trimmedLine.startsWith('## ') && !trimmedLine.startsWith('### ');
+            
+            if (isH2) {
+                const header = trimmedLine.substring(3).toLowerCase();
+                if (header.includes('syntax')) {
+                    currentSection = 'syntax';
+                    syntaxLines = [];
+                } else if (header.includes('parameter') || header.includes('argument')) {
+                    currentSection = 'parameters';
+                    parameterLines = [];
+                } else if (header.includes('return') || header.includes('output')) {
+                    currentSection = 'returns';
+                    returnLines = [];
+                } else if (header.includes('example')) {
+                    currentSection = 'examples';
+                    exampleLines = [];
+                } else if (header.includes('related')) {
+                    // Stop processing at "Related content" section
+                    currentSection = 'stopped';
+                } else {
+                    // Any other section stops description collection
+                    if (currentSection === '') {
+                        currentSection = 'other';
+                    }
+                }
+                
+                // Don't continue here - we want to capture the section header for non-description sections
+                if (currentSection !== 'other' && currentSection !== 'stopped') {
+                    continue;
+                }
+            } else {
+                // Any heading (h1, h3, h4, etc.) ends the current section
+                // This is especially important for examples to stop at "# Related content"
+                if (currentSection === 'examples' || currentSection === 'other') {
+                    // Stop collecting for examples or other sections
+                    currentSection = 'stopped';
+                }
+            }
+        }
+        
+        // Collect content based on current section
+        if (foundIncludeLine && currentSection === '' && !trimmedLine.startsWith('## ')) {
+            // Description: everything after INCLUDE until first ## section
+            descriptionLines.push(line);
+        } else if (currentSection === 'syntax') {
+            syntaxLines.push(line);
+        } else if (currentSection === 'returns') {
+            returnLines.push(line);
+        } else if (currentSection === 'parameters') {
+            parameterLines.push(line);
+        } else if (currentSection === 'examples') {
+            exampleLines.push(line);
+        }
+        // Stop collecting if we hit 'stopped' section
+        if (currentSection === 'stopped') {
+            continue;
+        }
+    }
+    
+    // Process all sections - preserve full content including formatting
+    description = descriptionLines.join('\n').trim();
+    syntax = syntaxLines.join('\n').trim();
+    returnInfo = returnLines.join('\n').trim();
+    parametersTable = parameterLines.join('\n').trim();
+    
+    // For examples, extract only kusto code blocks
+    let processedExample = '';
+    if (exampleLines.length > 0) {
+        const exampleText = exampleLines.join('\n');
+        const lines = exampleText.split('\n');
+        let inKustoBlock = false;
+        let kustoBlocks = [];
+        let currentBlock = [];
+        
+        for (const line of lines) {
+            const trimmed = line.trim();
+            if (trimmed === '```kusto') {
+                inKustoBlock = true;
+                currentBlock = [];
+            } else if (trimmed === '```' && inKustoBlock) {
+                inKustoBlock = false;
+                if (currentBlock.length > 0) {
+                    kustoBlocks.push(currentBlock.join('\n'));
+                }
+                currentBlock = [];
+            } else if (inKustoBlock) {
+                currentBlock.push(line);
+            }
+        }
+        
+        processedExample = kustoBlocks.join('\n\n');
+    }
+    
+    example = processedExample;
+    
+    return {
+        title: cleanMarkdownLinks(title),
+        description: cleanMarkdownLinks(description),
+        syntax: cleanMarkdownLinks(syntax),
+        returnInfo: cleanMarkdownLinks(returnInfo),
+        parametersTable: cleanMarkdownLinks(parametersTable),
+        example: cleanMarkdownLinks(example),
+        sourceLength: content.length
+    };
+}
+
 // Import Kusto Language Service for KQL language elements
 let kustoLanguageService;
 try {
@@ -1124,8 +1281,30 @@ class ARGSchemaGenerator {
             const kustoElements = this.extractKustoLanguageElements();
             this.schema.keywords = kustoElements.keywords.map(name => ({ name, category: 'KQL Keyword' }));
             this.schema.operators = kustoElements.operators.map(name => ({ name, category: 'KQL Operator' }));
-            this.schema.functions = kustoElements.functions.map(name => ({ name, category: 'KQL Function' }));
+            
+            // Extract enhanced documentation for functions
+            console.log('📚 Extracting enhanced function documentation...');
+            const functionsWithDocs = await this.extractMicrosoftDocsDocumentation(kustoElements.functions);
+            
+            // Merge documented functions with basic function list
+            const functionMap = new Map();
+            
+            // Add documented functions first
+            functionsWithDocs.forEach(func => {
+                functionMap.set(func.name, func);
+            });
+            
+            // Add any remaining functions without documentation
+            kustoElements.functions.forEach(name => {
+                if (!functionMap.has(name)) {
+                    functionMap.set(name, { name, category: 'KQL Function' });
+                }
+            });
+            
+            this.schema.functions = Array.from(functionMap.values());
             this.schema.aggregates = kustoElements.aggregates.map(name => ({ name, category: 'Aggregate Function' }));
+            
+            console.log(`✅ Enhanced function documentation: ${functionsWithDocs.length} with docs, ${this.schema.functions.length} total`);
         } catch (error) {
             console.warn('⚠️ Could not extract Kusto language elements:', error.message);
             this.schema.keywords = [];
@@ -1334,6 +1513,90 @@ class ARGSchemaGenerator {
             functions: Array.from(functions).sort(),
             aggregates: Array.from(aggregates).sort()
         };
+    }
+
+    async extractMicrosoftDocsDocumentation(functionNames) {
+        console.log('📚 Extracting documentation from Microsoft Docs...');
+        
+        try {
+            // Get list of documentation files
+            const repoUrl = 'https://api.github.com/repos/MicrosoftDocs/dataexplorer-docs/contents/data-explorer/kusto/query';
+            const fileListResponse = await this.fetchUrl(repoUrl);
+            const files = JSON.parse(fileListResponse).filter(file => 
+                file.name.endsWith('-function.md') || file.name.endsWith('-operator.md')
+            );
+            
+            console.log(`📄 Found ${files.length} documentation files`);
+            
+            // Find functions that have documentation
+            const matchedFunctions = [];
+            functionNames.forEach(funcName => {
+                const searchPatterns = [
+                    `${funcName.toLowerCase()}-function.md`,
+                    `${funcName.toLowerCase().replace(/_/g, '-')}-function.md`
+                ];
+                
+                for (const pattern of searchPatterns) {
+                    const file = files.find(f => f.name === pattern);
+                    if (file) {
+                        matchedFunctions.push({
+                            name: funcName,
+                            file: file
+                        });
+                        break;
+                    }
+                }
+            });
+            
+            console.log(`✅ Found ${matchedFunctions.length} functions with documentation`);
+            console.log(`📥 Extracting documentation for all ${matchedFunctions.length} functions...`);
+            
+            const extractedDocs = [];
+            let successCount = 0;
+            let errorCount = 0;
+            
+            for (let i = 0; i < matchedFunctions.length; i++) {
+                const func = matchedFunctions[i];
+                
+                // Progress indicator every 50 functions
+                if (i % 50 === 0) {
+                    console.log(`📥 Progress: ${i}/${matchedFunctions.length} (${((i / matchedFunctions.length) * 100).toFixed(1)}%)`);
+                }
+                
+                try {
+                    const rawUrl = `https://raw.githubusercontent.com/MicrosoftDocs/dataexplorer-docs/main/data-explorer/kusto/query/${func.file.name}`;
+                    const content = await this.fetchUrl(rawUrl);
+                    
+                    if (content) {
+                        const documentation = parseMarkdownDoc(content);
+                        
+                        extractedDocs.push({
+                            name: func.name,
+                            category: 'KQL Function',
+                            documentation: documentation
+                        });
+                        successCount++;
+                    } else {
+                        console.warn(`⚠️ Empty content for ${func.name}`);
+                        errorCount++;
+                    }
+                    
+                    // Small delay to be respectful to GitHub API
+                    await this.delay(50);
+                    
+                } catch (error) {
+                    console.error(`❌ Error extracting ${func.name}: ${error.message}`);
+                    errorCount++;
+                }
+            }
+            
+            console.log(`📊 Documentation extraction complete: ${successCount} success, ${errorCount} errors`);
+            return extractedDocs;
+            
+        } catch (error) {
+            console.error('❌ Error extracting Microsoft Docs documentation:', error.message);
+            return [];
+        }
     }
 
     async generateTextMateGrammar() {
