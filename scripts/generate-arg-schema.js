@@ -67,6 +67,45 @@ function cleanFunctionTitle(title) {
         .trim();
 }
 
+function filterMicrosoftLearnNotes(text) {
+    if (!text) {
+        return text;
+    }
+    
+    const lines = text.split('\n');
+    const filteredLines = [];
+    let inNoteBlock = false;
+    
+    for (const line of lines) {
+        const trimmed = line.trim();
+        
+        // Check if this line starts a Microsoft Learn note block
+        if (trimmed.startsWith('> [!')) {
+            inNoteBlock = true;
+            continue; // Skip this line
+        }
+        
+        // Check if we're in a note block
+        if (inNoteBlock) {
+            // If the line starts with '>', it's still part of the note block
+            if (trimmed.startsWith('>')) {
+                continue; // Skip this line
+            } else {
+                // No longer in note block
+                inNoteBlock = false;
+                // Fall through to process this line normally
+            }
+        }
+        
+        // Keep the line if we're not in a note block
+        if (!inNoteBlock) {
+            filteredLines.push(line);
+        }
+    }
+    
+    return filteredLines.join('\n').trim();
+}
+
 // Focused documentation parser for Microsoft Docs
 function parseMarkdownDoc(content) {
     const lines = content.split('\n');
@@ -110,7 +149,7 @@ function parseMarkdownDoc(content) {
                 if (header.includes('syntax')) {
                     currentSection = 'syntax';
                     syntaxLines = [];
-                } else if (header.includes('parameter') || header.includes('argument')) {
+                } else if (header.includes('parameter')) {
                     currentSection = 'parameters';
                     parameterLines = [];
                 } else if (header.includes('return') || header.includes('output')) {
@@ -167,6 +206,9 @@ function parseMarkdownDoc(content) {
     syntax = syntaxLines.join('\n').trim();
     returnInfo = returnLines.join('\n').trim();
     parametersTable = parameterLines.join('\n').trim();
+    
+    // Filter out Microsoft Learn note blocks from description
+    description = filterMicrosoftLearnNotes(description);
     
     // For examples, extract only kusto code blocks
     let processedExample = '';
@@ -230,6 +272,7 @@ try {
 } catch (error) {
     console.warn('⚠️ @kusto/language-service-next not available, operators/functions will be empty in TextMate grammar');
     console.warn('Error:', error.message);
+    throw error;
 }
 
 class ARGSchemaGenerator {
@@ -1479,9 +1522,9 @@ class ARGSchemaGenerator {
         if (!nameMatch) {
             return null;
         }
-        
+
         const operatorName = nameMatch[1].replace(/-/g, '_');
-        
+
         // Use the original parseMarkdownDoc function to get structured data
         const parsedDoc = parseMarkdownDoc(content);
         
@@ -1497,7 +1540,7 @@ class ARGSchemaGenerator {
         return {
             name: operatorName,
             type: 'operator',
-            category: 'operator', // Fix: should be 'operator' not 'KQL operator'
+            category: 'operator',
             documentation: {
                 ...parsedDoc,
                 url: microsoftLearnUrl
@@ -1951,12 +1994,45 @@ class ARGSchemaGenerator {
         // Extract KQL language elements from Kusto Language Service
         const kustoElements = this.extractKustoLanguageElements();
         
-        // Access the global Kusto Language API
-        const kustoLanguage = global.Kusto.Language;
+        // Override with our schema classifications for better accuracy
+        const schemaOperatorNames = new Set(this.schema.operators.map(op => op.name.toLowerCase()));
+        const schemaKeywordNames = new Set();
         
-        // Use keywords and operators from Kusto Language Service
-        const keywords = kustoElements.keywords;
-        const operators = kustoElements.operators;
+        // Build schema keywords set
+        for (const keyword of this.schema.keywords) {
+            const keywordName = typeof keyword === 'object' ? keyword.name : keyword;
+            schemaKeywordNames.add(keywordName.toLowerCase());
+        }
+        
+        // Use schema-based classification, fall back to Kusto Language Service
+        const keywords = [];
+        const operators = [];
+        
+        // Add all elements from Kusto Language Service, but classify based on our schema
+        const allKustoElements = new Set([...kustoElements.keywords, ...kustoElements.operators]);
+        
+        for (const element of allKustoElements) {
+            const lowerElement = element.toLowerCase();
+            if (schemaOperatorNames.has(lowerElement)) {
+                operators.push(element);
+            } else if (schemaKeywordNames.has(lowerElement)) {
+                keywords.push(element);
+            } else {
+                // Fallback to original Kusto classification
+                if (kustoElements.operators.includes(element)) {
+                    operators.push(element);
+                } else {
+                    keywords.push(element);
+                }
+            }
+        }
+        
+        // Add any schema operators not found in Kusto elements
+        for (const op of this.schema.operators) {
+            if (!operators.includes(op.name) && !operators.includes(op.name.toLowerCase())) {
+                operators.push(op.name);
+            }
+        }
         
         // Escape regex metacharacters in keywords for safe regex usage
         const escapedKeywords = keywords.map(kw => {
@@ -2083,7 +2159,7 @@ class ARGSchemaGenerator {
                 "ambiguous_keywords_as_keywords": {
                     "patterns": [
                         {
-                            "name": "keyword.control.kql",
+                            "name": "keyword.other.kql",
                             "match": `(?i)\\b(${ambiguousWordsPattern})(?!\\s*\\()`
                         }
                     ]
@@ -2091,7 +2167,7 @@ class ARGSchemaGenerator {
                 "keywords": {
                     "patterns": [
                         {
-                            "name": "keyword.control.kql",
+                            "name": "keyword.other.kql",
                             "match": `(?i)\\b(${pureKeywordsPattern})\\b`
                         }
                     ]
@@ -2099,8 +2175,8 @@ class ARGSchemaGenerator {
                 "operators": {
                     "patterns": [
                         {
-                            "name": "punctuation.operator.kql",
-                            "match": `(${pureOperatorsPattern})`
+                            "name": "keyword.control.kql",
+                            "match": `(?i)\\b(${operatorsPattern})\\b`
                         }
                     ]
                 },

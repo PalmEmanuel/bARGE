@@ -214,7 +214,9 @@ export class KustoLanguageServiceProvider implements
         position: vscode.Position,
         token: vscode.CancellationToken
     ): Promise<vscode.Hover | null> {
-        const wordRange = document.getWordRangeAtPosition(position);
+        // Custom word pattern that includes hyphens for KQL operators like mv-apply
+        const customWordPattern = /[a-zA-Z_][a-zA-Z0-9_-]*/;
+        const wordRange = document.getWordRangeAtPosition(position, customWordPattern);
         if (!wordRange) {
             // Reset hover state when not on a word
             this.resetHoverState();
@@ -1036,8 +1038,6 @@ ${example2Code}
 
         // Add all disposables to context
         context.subscriptions.push(...this.disposables);
-        
-        console.log('Enhanced Kusto Language Service registered for bARGE');
     }
 
     /**
