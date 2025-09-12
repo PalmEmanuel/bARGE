@@ -53,6 +53,15 @@ function extractCategoryFromTitle(title) {
     return 'KQL function'; // Default fallback
 }
 
+// Clean title by removing category information in parentheses
+function cleanFunctionTitle(title) {
+    if (!title) {
+        return title;
+    }
+    // Remove category information like "(aggregation function)" from the end
+    return title.replace(/\s*\([^)]+\)\s*$/, '').trim();
+}
+
 // Focused documentation parser for Microsoft Docs
 function parseMarkdownDoc(content) {
     const lines = content.split('\n');
@@ -184,13 +193,17 @@ function parseMarkdownDoc(content) {
     
     example = processedExample;
     
+    // Extract category from raw title before cleaning
+    const extractedCategory = title ? extractCategoryFromTitle(title) : 'KQL function';
+    
     return {
-        title: cleanMarkdownLinks(title),
+        title: cleanMarkdownLinks(cleanFunctionTitle(title)),
         description: cleanMarkdownLinks(description),
         syntax: cleanMarkdownLinks(syntax),
         returnInfo: cleanMarkdownLinks(returnInfo),
         parametersTable: cleanMarkdownLinks(parametersTable),
         example: cleanMarkdownLinks(example),
+        category: extractedCategory, // Include the extracted category
         sourceLength: content.length
     };
 }
@@ -1601,10 +1614,8 @@ class ARGSchemaGenerator {
                     if (content) {
                         const documentation = parseMarkdownDoc(content);
                         
-                        // Extract category from title if available
-                        const category = documentation.title ? 
-                            extractCategoryFromTitle(documentation.title) : 
-                            'KQL function';
+                        // Use the category extracted during parsing (from raw title)
+                        const category = documentation.category || 'KQL function';
                         
                         extractedDocs.push({
                             name: func.name,

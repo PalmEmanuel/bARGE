@@ -500,7 +500,7 @@ export class KustoLanguageServiceProvider implements
         // If we have enhanced documentation, use it
         if (functionInfo.documentation) {
             const doc = functionInfo.documentation;
-            let hoverContent = `## Function ${doc.title}
+            let hoverContent = `## Function \`${doc.title}\`
 
 `;
             hoverContent += `*${functionInfo.category}*
@@ -595,9 +595,8 @@ ${doc.returnInfo}
                     }
                 }
                 
-                // If no keywords or operators found and no parentheses, still return null
-                // This ensures count without parentheses doesn't show function documentation
-                return null;
+                // Continue to check tables and other items if no keywords/operators found
+                // (Don't return null here - let it fall through to table checking)
             }
             
             // Check functions/aggregates (fallback for general case)
