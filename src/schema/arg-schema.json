@@ -11781,162 +11781,6 @@
         "sourceLength": 4364,
         "url": "https://learn.microsoft.com/en-us/kusto/query/where-operator"
       }
-    },
-    {
-      "name": "!",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "!=",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "!~",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "%",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "(",
-      "category": "KQL Operator"
-    },
-    {
-      "name": ")",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "*",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "+",
-      "category": "KQL Operator"
-    },
-    {
-      "name": ",",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "-",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "--",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "-->",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "-[",
-      "category": "KQL Operator"
-    },
-    {
-      "name": ".",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "..",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "/",
-      "category": "KQL Operator"
-    },
-    {
-      "name": ":",
-      "category": "KQL Operator"
-    },
-    {
-      "name": ";",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "<",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "<--",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "<-[",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "<=",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "<>",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "<|",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "=",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "==",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "=>",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "=~",
-      "category": "KQL Operator"
-    },
-    {
-      "name": ">",
-      "category": "KQL Operator"
-    },
-    {
-      "name": ">=",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "?",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "@",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "[",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "]",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "]-",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "]->",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "{",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "|",
-      "category": "KQL Operator"
-    },
-    {
-      "name": "}",
-      "category": "KQL Operator"
     }
   ],
   "functions": [
@@ -16801,6 +16645,21 @@
       }
     },
     {
+      "name": "tdigest_merge",
+      "category": "Aggregation functions",
+      "documentation": {
+        "title": "tdigest_merge()",
+        "description": "Merges tdigest results across the group.\n\nFor more information about the underlying algorithm (T-Digest) and the estimated error, see estimation error in percentiles.\n\n> The `tdigest_merge()` and `merge_tdigest()` functions are equivalent",
+        "syntax": "`tdigest_merge(`*expr*`)`",
+        "returnInfo": "Returns the merged tdigest values of *expr* across the group.\n\n> [!NOTE]\n>\n> * Use the function percentile_tdigest() to calculate the percentiles from the `tdigest_merge` results.\n> * All tdigests that are included in the same group must be of the same type.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*expr* | `string` |  *True* | The expression used for the aggregation calculation.|",
+        "example": "StormEvents\n| summarize PreAggDamageProperty=tdigest(DamageProperty) by State\n| summarize tdigest_merge(PreAggDamageProperty)",
+        "category": "Aggregation functions",
+        "sourceLength": 4694,
+        "url": "https://learn.microsoft.com/en-us/kusto/query/tdigest-merge-aggregation-function"
+      }
+    },
+    {
       "name": "tobool",
       "category": "KQL function",
       "documentation": {
@@ -17234,9 +17093,7 @@
         "sourceLength": 2369,
         "url": "https://learn.microsoft.com/en-us/kusto/query/zip-function"
       }
-    }
-  ],
-  "aggregates": [
+    },
     {
       "name": "arg_max",
       "category": "Aggregation function",
@@ -17539,17 +17396,17 @@
     },
     {
       "name": "hll_merge",
-      "category": "Aggregation function",
+      "category": "KQL function",
       "documentation": {
         "title": "hll_merge()",
-        "description": "Merges HLL results across the group into a single HLL value.\n\nFor more information, see the underlying algorithm (*H*yper*L*og*L*og) and estimation accuracy.",
-        "syntax": "`hll_merge` `(`*hll*`)`",
-        "returnInfo": "The function returns the merged HLL values of *hll* across the group.\n\n> [!NOTE]\n> - The results of hll(), hll_if(), and hll_merge() can be stored and later retrieved. For example, you might want to create a daily unique user summary, which can then be used to calculate weekly counts.\n> However, the precise binary representation of these results might change over time. There's no guarantee that these functions produce identical results for identical inputs, and therefore we don't advise relying on them.\n> - Use the dcount_hll function to calculate the `dcount` from hll() and hll_merge() aggregation functions.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*hll*| `string` | *True*|The column name containing HLL values to merge.|",
-        "example": "StormEvents\n| summarize hllRes = hll(DamageProperty) by bin(StartTime,10m)\n| summarize hllMerged = hll_merge(hllRes)",
-        "category": "Aggregation function",
-        "sourceLength": 3222,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/hll-merge-aggregation-function"
+        "description": "Merges HLL results. This is the scalar version of the aggregate version `hll_merge()`.\n\nRead about the underlying algorithm (*H*yper*L*og*L*og) and estimation accuracy.",
+        "syntax": "`hll_merge(` *hll*`,` *hll2*`,` [ *hll3*`,` ... ]`)`",
+        "returnInfo": "Returns one HLL value. The value is the result of merging the columns *hll*, *hll2*, ... *hllN*.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*hll*, *hll2*, ... | `string` | *True*|The column names containing HLL values to merge. The function expects between 2-64 arguments.|",
+        "example": "range x from 1 to 10 step 1 \n| extend y = x + 10\n| summarize hll_x = hll(x), hll_y = hll(y)\n| project merged = hll_merge(hll_x, hll_y)\n| project dcount_hll(merged)",
+        "category": "KQL function",
+        "sourceLength": 2729,
+        "url": "https://learn.microsoft.com/en-us/kusto/query/hll-merge-function"
       }
     },
     {
@@ -17685,6 +17542,21 @@
         "category": "Aggregation function",
         "sourceLength": 2692,
         "url": "https://learn.microsoft.com/en-us/kusto/query/maxif-aggregation-function"
+      }
+    },
+    {
+      "name": "merge_tdigest",
+      "category": "KQL function",
+      "documentation": {
+        "title": "merge_tdigest()",
+        "description": "Merges `tdigest` results (scalar version of the aggregate version `tdigest_merge()`).\n\nRead more about the underlying algorithm (T-Digest) and the estimated error here.\n\n> The `merge_tdigest()` and `tdigest_merge()` functions are equivalent",
+        "syntax": "`merge_tdigest(`*exprs*`)`",
+        "returnInfo": "The result for merging the columns `*Expr1*`, `*Expr2*`, ... `*ExprN*` to one `tdigest`.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *exprs* | `dynamic` |  *True* | One or more comma-separated column references that have the `tdigest` values to be merged. |",
+        "example": "range x from 1 to 10 step 1 \n| extend y = x + 10\n| summarize tdigestX = tdigest(x), tdigestY = tdigest(y)\n| project merged = merge_tdigest(tdigestX, tdigestY)\n| project percentile_tdigest(merged, 100, typeof(long))",
+        "category": "KQL function",
+        "sourceLength": 2457,
+        "url": "https://learn.microsoft.com/en-us/kusto/query/merge-tdigest-function"
       }
     },
     {
@@ -17941,6 +17813,298 @@
         "sourceLength": 2047,
         "url": "https://learn.microsoft.com/en-us/kusto/query/variancepif-aggregation-function"
       }
+    },
+    {
+      "name": "all",
+      "category": "Function"
+    },
+    {
+      "name": "any",
+      "category": "Function"
+    },
+    {
+      "name": "array_iif",
+      "category": "Function"
+    },
+    {
+      "name": "array_strcat",
+      "category": "Function"
+    },
+    {
+      "name": "arraylength",
+      "category": "Function"
+    },
+    {
+      "name": "bag_pack",
+      "category": "Function"
+    },
+    {
+      "name": "bag_zip",
+      "category": "Function"
+    },
+    {
+      "name": "base64_decodestring",
+      "category": "Function"
+    },
+    {
+      "name": "base64_encodestring",
+      "category": "Function"
+    },
+    {
+      "name": "columnifexists",
+      "category": "Function"
+    },
+    {
+      "name": "current_cursor",
+      "category": "Function"
+    },
+    {
+      "name": "current_node_id",
+      "category": "Function"
+    },
+    {
+      "name": "cursor_current",
+      "category": "Function"
+    },
+    {
+      "name": "datepart",
+      "category": "Function"
+    },
+    {
+      "name": "datetime_list_timezones",
+      "category": "Function"
+    },
+    {
+      "name": "dayofmonth",
+      "category": "Function"
+    },
+    {
+      "name": "dayofweek",
+      "category": "Function"
+    },
+    {
+      "name": "dayofyear",
+      "category": "Function"
+    },
+    {
+      "name": "entity_group",
+      "category": "Function"
+    },
+    {
+      "name": "extentid",
+      "category": "Function"
+    },
+    {
+      "name": "extractall",
+      "category": "Function"
+    },
+    {
+      "name": "extractjson",
+      "category": "Function"
+    },
+    {
+      "name": "floor",
+      "category": "Function"
+    },
+    {
+      "name": "getmonth",
+      "category": "Function"
+    },
+    {
+      "name": "gzip_compress_to_base64_string",
+      "category": "Function"
+    },
+    {
+      "name": "gzip_decompress_from_base64_string",
+      "category": "Function"
+    },
+    {
+      "name": "hll_isvalid",
+      "category": "Function"
+    },
+    {
+      "name": "hourofday",
+      "category": "Function"
+    },
+    {
+      "name": "iif",
+      "category": "Function"
+    },
+    {
+      "name": "inner_nodes",
+      "category": "Function"
+    },
+    {
+      "name": "isascii",
+      "category": "Function"
+    },
+    {
+      "name": "iscolumnexists",
+      "category": "Function"
+    },
+    {
+      "name": "labels",
+      "category": "Function"
+    },
+    {
+      "name": "make_string",
+      "category": "Function"
+    },
+    {
+      "name": "map",
+      "category": "Function"
+    },
+    {
+      "name": "node_degree_in",
+      "category": "Function"
+    },
+    {
+      "name": "node_degree_out",
+      "category": "Function"
+    },
+    {
+      "name": "node_id",
+      "category": "Function"
+    },
+    {
+      "name": "notempty",
+      "category": "Function"
+    },
+    {
+      "name": "notnull",
+      "category": "Function"
+    },
+    {
+      "name": "pack_dictionary",
+      "category": "Function"
+    },
+    {
+      "name": "parse_urlquery",
+      "category": "Function"
+    },
+    {
+      "name": "parsejson",
+      "category": "Function"
+    },
+    {
+      "name": "parseurl",
+      "category": "Function"
+    },
+    {
+      "name": "parseurlquery",
+      "category": "Function"
+    },
+    {
+      "name": "percentiles_array_tdigest",
+      "category": "Function"
+    },
+    {
+      "name": "replace",
+      "category": "Function"
+    },
+    {
+      "name": "row_rank",
+      "category": "Function"
+    },
+    {
+      "name": "rowstore_ordinal_range",
+      "category": "Function"
+    },
+    {
+      "name": "set_equals",
+      "category": "Function"
+    },
+    {
+      "name": "tdigest_isvalid",
+      "category": "Function"
+    },
+    {
+      "name": "to_utf8",
+      "category": "Function"
+    },
+    {
+      "name": "toboolean",
+      "category": "Function"
+    },
+    {
+      "name": "todouble",
+      "category": "Function"
+    },
+    {
+      "name": "todynamic",
+      "category": "Function"
+    },
+    {
+      "name": "toobject",
+      "category": "Function"
+    },
+    {
+      "name": "totime",
+      "category": "Function"
+    },
+    {
+      "name": "weekofyear",
+      "category": "Function"
+    },
+    {
+      "name": "zlib_compress_to_base64_string",
+      "category": "Function"
+    },
+    {
+      "name": "zlib_decompress_from_base64_string",
+      "category": "Function"
+    },
+    {
+      "name": "any",
+      "category": "Aggregation function"
+    },
+    {
+      "name": "anyif",
+      "category": "Aggregation function"
+    },
+    {
+      "name": "argmax",
+      "category": "Aggregation function"
+    },
+    {
+      "name": "argmin",
+      "category": "Aggregation function"
+    },
+    {
+      "name": "cnt",
+      "category": "Aggregation function"
+    },
+    {
+      "name": "make_dictionary",
+      "category": "Aggregation function"
+    },
+    {
+      "name": "makelist",
+      "category": "Aggregation function"
+    },
+    {
+      "name": "makeset",
+      "category": "Aggregation function"
+    },
+    {
+      "name": "passthrough",
+      "category": "Aggregation function"
+    },
+    {
+      "name": "percentile",
+      "category": "Aggregation function"
+    },
+    {
+      "name": "percentiles_array",
+      "category": "Aggregation function"
+    },
+    {
+      "name": "percentilesw_array",
+      "category": "Aggregation function"
+    },
+    {
+      "name": "percentilew",
+      "category": "Aggregation function"
     }
   ],
   "lastUpdated": "2025-09-11T13:20:42.137Z"

@@ -283,8 +283,7 @@ class ARGSchemaGenerator {
             // resourceTypeProperties: {}, // Detailed properties for each resource type - DISABLED: Creates 100MB+ of data
             keywords: [], // KQL keywords from Kusto Language Service
             operators: [], // KQL operators from Kusto Language Service
-            functions: [], // KQL functions from Kusto Language Service
-            aggregates: [], // KQL aggregate functions from Kusto Language Service
+            functions: [], // KQL functions and aggregates from Kusto Language Service
             lastUpdated: new Date().toISOString()
         };
         this.sampleQueries = [];
@@ -299,7 +298,6 @@ class ARGSchemaGenerator {
         
         // Track functions without documentation
         this.unmatchedFunctions = [];
-        this.unmatchedAggregates = [];
         this.unmatchedKeywords = [];
         this.unmatchedOperators = [];
     }
@@ -422,7 +420,7 @@ class ARGSchemaGenerator {
             const schemaContent = await fs.readFile(schemaPath, 'utf8');
             this.schema = JSON.parse(schemaContent);
             
-            // Ensure keywords, operators, functions, and aggregates arrays exist (they might not in older schema files)
+            // Ensure keywords, operators, and functions arrays exist (they might not in older schema files)
             if (!this.schema.keywords) {
                 this.schema.keywords = [];
             }
@@ -432,17 +430,13 @@ class ARGSchemaGenerator {
             if (!this.schema.functions) {
                 this.schema.functions = [];
             }
-            if (!this.schema.aggregates) {
-                this.schema.aggregates = [];
-            }
             
             console.log(`✅ Loaded existing schema with:`);
             console.log(`   Tables: ${Object.keys(this.schema.tables).length}`);
             console.log(`   Resource Types: ${Object.keys(this.schema.resourceTypes).length}`);
             console.log(`   Keywords: ${this.schema.keywords.length}`);
             console.log(`   Operators: ${this.schema.operators.length}`);
-            console.log(`   Functions: ${this.schema.functions.length}`);
-            console.log(`   Aggregates: ${this.schema.aggregates.length}`);
+            console.log(`   Functions: ${this.schema.functions.length} (includes aggregation functions)`);
             
         } catch (error) {
             console.error('❌ Failed to load existing schema:', error.message);
@@ -458,17 +452,13 @@ class ARGSchemaGenerator {
         console.log(`   Keywords: ${this.schema.keywords?.length || 0}`);
         console.log(`   Operators: ${this.schema.operators?.length || 0}`);
         console.log(`   Functions: ${this.schema.functions?.length || 0}`);
-        console.log(`   Aggregates: ${this.schema.aggregates?.length || 0}`);
         
         // Report documentation coverage
-        if (this.unmatchedFunctions.length > 0 || this.unmatchedAggregates.length > 0 || 
+        if (this.unmatchedFunctions.length > 0 || 
             this.unmatchedKeywords.length > 0 || this.unmatchedOperators.length > 0) {
             console.log('\n📝 Documentation Coverage:');
             if (this.unmatchedFunctions.length > 0) {
                 console.log(`   Unmatched Functions (${this.unmatchedFunctions.length}): ${this.unmatchedFunctions.join(', ')}`);
-            }
-            if (this.unmatchedAggregates.length > 0) {
-                console.log(`   Unmatched Aggregates (${this.unmatchedAggregates.length}): ${this.unmatchedAggregates.join(', ')}`);
             }
             if (this.unmatchedKeywords.length > 0) {
                 console.log(`   Unmatched Keywords (${this.unmatchedKeywords.length}): ${this.unmatchedKeywords.join(', ')}`);
@@ -1385,11 +1375,16 @@ class ARGSchemaGenerator {
             this.schema.keywords = kustoElements.keywords.map(name => ({ name, category: 'KQL Keyword' }));
             this.schema.operators = kustoElements.operators.map(name => ({ name, category: 'KQL Operator' }));
             
-            // Set up basic functions and aggregates first
-            this.schema.functions = kustoElements.functions.map(name => ({ name, category: 'Function' }));
-            this.schema.aggregates = kustoElements.aggregates.map(name => ({ name, category: 'Aggregate' }));
+            // Set up functions and merge aggregates into functions array
+            this.schema.functions = [
+                ...kustoElements.functions.map(name => ({ name, category: 'Function' })),
+                ...kustoElements.aggregates.map(name => ({ name, category: 'Aggregation function' }))
+            ];
             
-            // Extract enhanced documentation for functions and aggregates
+            // Remove the separate aggregates section since they're now merged into functions
+            delete this.schema.aggregates;
+            
+            // Extract enhanced documentation for functions (including aggregates)
             await this.extractMicrosoftDocsDocumentation();
             
         } catch (error) {
@@ -1397,7 +1392,6 @@ class ARGSchemaGenerator {
             this.schema.keywords = [];
             this.schema.operators = [];
             this.schema.functions = [];
-            this.schema.aggregates = [];
         }
 
         // Write complete schema
@@ -1658,14 +1652,17 @@ class ARGSchemaGenerator {
     async processFunctionDocumentation(functionsDocumented, aggregatesDocumented) {
         console.log(`\n🔗 Processing function documentation...`);
         
-        // Match with schema functions and track unmatched
+        // Combine both function and aggregate documentation arrays
+        const allDocumentedFunctions = [...functionsDocumented, ...aggregatesDocumented];
+        
+        // Match with schema functions (including aggregates) and track unmatched
         let matchedFunctions = 0;
-        let matchedAggregates = 0;
         const matchedFunctionsList = [];
-        const matchedAggregatesList = [];
 
+        // Collect unmatched functions to preserve them in schema
+        const unmatchedFunctionsList = [];
         for (const func of this.schema.functions) {
-            const docFunction = functionsDocumented.find(doc => 
+            const docFunction = allDocumentedFunctions.find(doc => 
                 doc.name === func.name || 
                 doc.name === func.name.toLowerCase() ||
                 func.name === doc.name.toLowerCase()
@@ -1677,36 +1674,18 @@ class ARGSchemaGenerator {
                 matchedFunctionsList.push(func);
                 matchedFunctions++;
             } else {
+                // Keep unmatched functions but without documentation
+                unmatchedFunctionsList.push(func);
                 this.unmatchedFunctions.push(func.name);
             }
         }
 
-        for (const agg of this.schema.aggregates) {
-            const docAggregate = aggregatesDocumented.find(doc => 
-                doc.name === agg.name || 
-                doc.name === agg.name.toLowerCase() ||
-                agg.name === doc.name.toLowerCase()
-            );
-            
-            if (docAggregate) {
-                agg.documentation = docAggregate.documentation;
-                agg.category = docAggregate.category;
-                matchedAggregatesList.push(agg);
-                matchedAggregates++;
-            } else {
-                this.unmatchedAggregates.push(agg.name);
-            }
-        }
-
-        // Update schema to only include matched functions and aggregates
-        this.schema.functions = matchedFunctionsList;
-        this.schema.aggregates = matchedAggregatesList;
+        // Update schema to include both matched and unmatched functions
+        this.schema.functions = [...matchedFunctionsList, ...unmatchedFunctionsList];
 
         const totalFunctions = matchedFunctions + this.unmatchedFunctions.length;
-        const totalAggregates = matchedAggregates + this.unmatchedAggregates.length;
 
-        console.log(`  • Functions matched: ${matchedFunctions}/${totalFunctions} (${this.unmatchedFunctions.length} excluded from schema)`);
-        console.log(`  • Aggregates matched: ${matchedAggregates}/${totalAggregates} (${this.unmatchedAggregates.length} excluded from schema)`);
+        console.log(`  • Functions matched: ${matchedFunctions}/${totalFunctions} (includes aggregation functions, ${this.unmatchedFunctions.length} excluded from schema)`);
         
         // Track remaining keywords that don't have documentation
         for (const keyword of this.schema.keywords) {
@@ -1721,10 +1700,6 @@ class ARGSchemaGenerator {
         
         if (this.unmatchedFunctions.length > 0) {
             console.log(`  • Unmatched functions: ${this.unmatchedFunctions.join(', ')}`);
-        }
-        
-        if (this.unmatchedAggregates.length > 0) {
-            console.log(`  • Unmatched aggregates: ${this.unmatchedAggregates.join(', ')}`);
         }
     }
 
@@ -1818,12 +1793,6 @@ class ARGSchemaGenerator {
                 insertText: `${fn.name}()`,
                 category: fn.category
             })),
-            aggregates: this.schema.aggregates.map(agg => ({
-                label: agg.name,
-                kind: 'Function',
-                insertText: `${agg.name}()`,
-                category: agg.category
-            })),
             resourceTypes: Object.keys(this.schema.resourceTypes).map(type => ({
                 label: type,
                 kind: 'Value',
@@ -1893,6 +1862,8 @@ class ARGSchemaGenerator {
         const keywords = new Set();
         const functions = new Set();
         const aggregates = new Set();
+        let filteredKeywords = new Set();
+        let filteredOperators = new Set();
         
         if (!kustoLanguageService) {
             throw new Error('Kusto Language Service not available');
@@ -1965,7 +1936,32 @@ class ARGSchemaGenerator {
                 });
             }
             
-            console.log(`🔧 Extracted ${keywords.size} keywords, ${operators.size} operators, ${functions.size} functions, and ${aggregates.size} aggregates from Kusto Language Service`);
+            // Filter out symbolic keywords and operators (keep only word-based items)
+            filteredKeywords = new Set();
+            filteredOperators = new Set();
+            const isSymbolic = (item) => {
+                // Check if item contains only symbols/punctuation and no letters
+                return /^[^a-zA-Z]*$/.test(item) && /[^\w\s]/.test(item);
+            };
+            
+            for (const keyword of keywords) {
+                if (!isSymbolic(keyword)) {
+                    filteredKeywords.add(keyword);
+                }
+            }
+            
+            for (const operator of operators) {
+                if (!isSymbolic(operator)) {
+                    filteredOperators.add(operator);
+                }
+            }
+            
+            const filteredKeywordCount = keywords.size - filteredKeywords.size;
+            const filteredOperatorCount = operators.size - filteredOperators.size;
+            console.log(`🔧 Extracted ${filteredKeywords.size} keywords, ${filteredOperators.size} operators, ${functions.size} functions, and ${aggregates.size} aggregates from Kusto Language Service`);
+            if (filteredKeywordCount > 0 || filteredOperatorCount > 0) {
+                console.log(`   • Filtered out ${filteredKeywordCount} symbolic keywords and ${filteredOperatorCount} symbolic operators`);
+            }
             
         } catch (error) {
             console.error('❌ Error extracting from Kusto Language Service:', error.message);
@@ -1973,8 +1969,8 @@ class ARGSchemaGenerator {
         }
         
         return {
-            keywords: Array.from(keywords).sort(),
-            operators: Array.from(operators).sort(),
+            keywords: Array.from(filteredKeywords).sort(),
+            operators: Array.from(filteredOperators).sort(),
             functions: Array.from(functions).sort(),
             aggregates: Array.from(aggregates).sort()
         };
@@ -2053,15 +2049,6 @@ class ARGSchemaGenerator {
         const allKeywordsSet = new Set(keywords.map(k => k.toLowerCase()));
         const allOperatorsSet = new Set(operators.map(o => o.toLowerCase()));
         
-        // Find words that can be both functions AND keywords/operators
-        const ambiguousWords = [];
-        allFunctions.forEach(func => {
-            const lowerFunc = func.toLowerCase();
-            if (allKeywordsSet.has(lowerFunc) || allOperatorsSet.has(lowerFunc)) {
-                ambiguousWords.push(func);
-            }
-        });
-        
         // Separate ambiguous functions from pure functions
         const pureKeywords = keywords.filter(kw => !allFunctionsSet.has(kw.toLowerCase()));
         const pureOperators = operators.filter(op => !allFunctionsSet.has(op.toLowerCase()));
@@ -2074,7 +2061,6 @@ class ARGSchemaGenerator {
         const pureKeywordsPattern = pureKeywords.map(kw => kw.replace(/[\\^$.|?*+(){}\[\]]/g, '\\$&')).join('|');
         const pureOperatorsPattern = pureOperators.map(op => op.replace(/[\\^$.|?*+(){}\[\]]/g, '\\$&')).join('|');
         const pureFunctionsPattern = pureFunctions.join('|');
-        const ambiguousWordsPattern = ambiguousWords.join('|');
         
         const tables = Object.keys(this.schema.tables).filter(name => name).join('|');
         
@@ -2154,14 +2140,6 @@ class ARGSchemaGenerator {
                         {
                             "name": "support.function.builtin.kql",
                             "match": `(?i)\\b(${allFunctionsPattern})(?=\\s*\\()`
-                        }
-                    ]
-                },
-                "ambiguous_keywords_as_keywords": {
-                    "patterns": [
-                        {
-                            "name": "keyword.other.kql",
-                            "match": `(?i)\\b(${ambiguousWordsPattern})(?!\\s*\\()`
                         }
                     ]
                 },

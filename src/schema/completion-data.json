@@ -2098,240 +2098,6 @@
       "kind": "Operator",
       "insertText": "where",
       "category": "operator"
-    },
-    {
-      "label": "!",
-      "kind": "Operator",
-      "insertText": "!",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "!=",
-      "kind": "Operator",
-      "insertText": "!=",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "!~",
-      "kind": "Operator",
-      "insertText": "!~",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "%",
-      "kind": "Operator",
-      "insertText": "%",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "(",
-      "kind": "Operator",
-      "insertText": "(",
-      "category": "KQL Operator"
-    },
-    {
-      "label": ")",
-      "kind": "Operator",
-      "insertText": ")",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "*",
-      "kind": "Operator",
-      "insertText": "*",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "+",
-      "kind": "Operator",
-      "insertText": "+",
-      "category": "KQL Operator"
-    },
-    {
-      "label": ",",
-      "kind": "Operator",
-      "insertText": ",",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "-",
-      "kind": "Operator",
-      "insertText": "-",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "--",
-      "kind": "Operator",
-      "insertText": "--",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "-->",
-      "kind": "Operator",
-      "insertText": "-->",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "-[",
-      "kind": "Operator",
-      "insertText": "-[",
-      "category": "KQL Operator"
-    },
-    {
-      "label": ".",
-      "kind": "Operator",
-      "insertText": ".",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "..",
-      "kind": "Operator",
-      "insertText": "..",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "/",
-      "kind": "Operator",
-      "insertText": "/",
-      "category": "KQL Operator"
-    },
-    {
-      "label": ":",
-      "kind": "Operator",
-      "insertText": ":",
-      "category": "KQL Operator"
-    },
-    {
-      "label": ";",
-      "kind": "Operator",
-      "insertText": ";",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "<",
-      "kind": "Operator",
-      "insertText": "<",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "<--",
-      "kind": "Operator",
-      "insertText": "<--",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "<-[",
-      "kind": "Operator",
-      "insertText": "<-[",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "<=",
-      "kind": "Operator",
-      "insertText": "<=",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "<>",
-      "kind": "Operator",
-      "insertText": "<>",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "<|",
-      "kind": "Operator",
-      "insertText": "<|",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "=",
-      "kind": "Operator",
-      "insertText": "=",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "==",
-      "kind": "Operator",
-      "insertText": "==",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "=>",
-      "kind": "Operator",
-      "insertText": "=>",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "=~",
-      "kind": "Operator",
-      "insertText": "=~",
-      "category": "KQL Operator"
-    },
-    {
-      "label": ">",
-      "kind": "Operator",
-      "insertText": ">",
-      "category": "KQL Operator"
-    },
-    {
-      "label": ">=",
-      "kind": "Operator",
-      "insertText": ">=",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "?",
-      "kind": "Operator",
-      "insertText": "?",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "@",
-      "kind": "Operator",
-      "insertText": "@",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "[",
-      "kind": "Operator",
-      "insertText": "[",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "]",
-      "kind": "Operator",
-      "insertText": "]",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "]-",
-      "kind": "Operator",
-      "insertText": "]-",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "]->",
-      "kind": "Operator",
-      "insertText": "]->",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "{",
-      "kind": "Operator",
-      "insertText": "{",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "|",
-      "kind": "Operator",
-      "insertText": "|",
-      "category": "KQL Operator"
-    },
-    {
-      "label": "}",
-      "kind": "Operator",
-      "insertText": "}",
-      "category": "KQL Operator"
     }
   ],
   "functions": [
@@ -4280,6 +4046,12 @@
       "category": "KQL function"
     },
     {
+      "label": "tdigest_merge",
+      "kind": "Function",
+      "insertText": "tdigest_merge()",
+      "category": "Aggregation functions"
+    },
+    {
       "label": "tobool",
       "kind": "Function",
       "insertText": "tobool()",
@@ -4452,9 +4224,7 @@
       "kind": "Function",
       "insertText": "zip()",
       "category": "KQL function"
-    }
-  ],
-  "aggregates": [
+    },
     {
       "label": "arg_max",
       "kind": "Function",
@@ -4579,7 +4349,7 @@
       "label": "hll_merge",
       "kind": "Function",
       "insertText": "hll_merge()",
-      "category": "Aggregation function"
+      "category": "KQL function"
     },
     {
       "label": "make_bag",
@@ -4634,6 +4404,12 @@
       "kind": "Function",
       "insertText": "maxif()",
       "category": "Aggregation function"
+    },
+    {
+      "label": "merge_tdigest",
+      "kind": "Function",
+      "insertText": "merge_tdigest()",
+      "category": "KQL function"
     },
     {
       "label": "min",
@@ -4735,6 +4511,444 @@
       "label": "variancepif",
       "kind": "Function",
       "insertText": "variancepif()",
+      "category": "Aggregation function"
+    },
+    {
+      "label": "all",
+      "kind": "Function",
+      "insertText": "all()",
+      "category": "Function"
+    },
+    {
+      "label": "any",
+      "kind": "Function",
+      "insertText": "any()",
+      "category": "Function"
+    },
+    {
+      "label": "array_iif",
+      "kind": "Function",
+      "insertText": "array_iif()",
+      "category": "Function"
+    },
+    {
+      "label": "array_strcat",
+      "kind": "Function",
+      "insertText": "array_strcat()",
+      "category": "Function"
+    },
+    {
+      "label": "arraylength",
+      "kind": "Function",
+      "insertText": "arraylength()",
+      "category": "Function"
+    },
+    {
+      "label": "bag_pack",
+      "kind": "Function",
+      "insertText": "bag_pack()",
+      "category": "Function"
+    },
+    {
+      "label": "bag_zip",
+      "kind": "Function",
+      "insertText": "bag_zip()",
+      "category": "Function"
+    },
+    {
+      "label": "base64_decodestring",
+      "kind": "Function",
+      "insertText": "base64_decodestring()",
+      "category": "Function"
+    },
+    {
+      "label": "base64_encodestring",
+      "kind": "Function",
+      "insertText": "base64_encodestring()",
+      "category": "Function"
+    },
+    {
+      "label": "columnifexists",
+      "kind": "Function",
+      "insertText": "columnifexists()",
+      "category": "Function"
+    },
+    {
+      "label": "current_cursor",
+      "kind": "Function",
+      "insertText": "current_cursor()",
+      "category": "Function"
+    },
+    {
+      "label": "current_node_id",
+      "kind": "Function",
+      "insertText": "current_node_id()",
+      "category": "Function"
+    },
+    {
+      "label": "cursor_current",
+      "kind": "Function",
+      "insertText": "cursor_current()",
+      "category": "Function"
+    },
+    {
+      "label": "datepart",
+      "kind": "Function",
+      "insertText": "datepart()",
+      "category": "Function"
+    },
+    {
+      "label": "datetime_list_timezones",
+      "kind": "Function",
+      "insertText": "datetime_list_timezones()",
+      "category": "Function"
+    },
+    {
+      "label": "dayofmonth",
+      "kind": "Function",
+      "insertText": "dayofmonth()",
+      "category": "Function"
+    },
+    {
+      "label": "dayofweek",
+      "kind": "Function",
+      "insertText": "dayofweek()",
+      "category": "Function"
+    },
+    {
+      "label": "dayofyear",
+      "kind": "Function",
+      "insertText": "dayofyear()",
+      "category": "Function"
+    },
+    {
+      "label": "entity_group",
+      "kind": "Function",
+      "insertText": "entity_group()",
+      "category": "Function"
+    },
+    {
+      "label": "extentid",
+      "kind": "Function",
+      "insertText": "extentid()",
+      "category": "Function"
+    },
+    {
+      "label": "extractall",
+      "kind": "Function",
+      "insertText": "extractall()",
+      "category": "Function"
+    },
+    {
+      "label": "extractjson",
+      "kind": "Function",
+      "insertText": "extractjson()",
+      "category": "Function"
+    },
+    {
+      "label": "floor",
+      "kind": "Function",
+      "insertText": "floor()",
+      "category": "Function"
+    },
+    {
+      "label": "getmonth",
+      "kind": "Function",
+      "insertText": "getmonth()",
+      "category": "Function"
+    },
+    {
+      "label": "gzip_compress_to_base64_string",
+      "kind": "Function",
+      "insertText": "gzip_compress_to_base64_string()",
+      "category": "Function"
+    },
+    {
+      "label": "gzip_decompress_from_base64_string",
+      "kind": "Function",
+      "insertText": "gzip_decompress_from_base64_string()",
+      "category": "Function"
+    },
+    {
+      "label": "hll_isvalid",
+      "kind": "Function",
+      "insertText": "hll_isvalid()",
+      "category": "Function"
+    },
+    {
+      "label": "hourofday",
+      "kind": "Function",
+      "insertText": "hourofday()",
+      "category": "Function"
+    },
+    {
+      "label": "iif",
+      "kind": "Function",
+      "insertText": "iif()",
+      "category": "Function"
+    },
+    {
+      "label": "inner_nodes",
+      "kind": "Function",
+      "insertText": "inner_nodes()",
+      "category": "Function"
+    },
+    {
+      "label": "isascii",
+      "kind": "Function",
+      "insertText": "isascii()",
+      "category": "Function"
+    },
+    {
+      "label": "iscolumnexists",
+      "kind": "Function",
+      "insertText": "iscolumnexists()",
+      "category": "Function"
+    },
+    {
+      "label": "labels",
+      "kind": "Function",
+      "insertText": "labels()",
+      "category": "Function"
+    },
+    {
+      "label": "make_string",
+      "kind": "Function",
+      "insertText": "make_string()",
+      "category": "Function"
+    },
+    {
+      "label": "map",
+      "kind": "Function",
+      "insertText": "map()",
+      "category": "Function"
+    },
+    {
+      "label": "node_degree_in",
+      "kind": "Function",
+      "insertText": "node_degree_in()",
+      "category": "Function"
+    },
+    {
+      "label": "node_degree_out",
+      "kind": "Function",
+      "insertText": "node_degree_out()",
+      "category": "Function"
+    },
+    {
+      "label": "node_id",
+      "kind": "Function",
+      "insertText": "node_id()",
+      "category": "Function"
+    },
+    {
+      "label": "notempty",
+      "kind": "Function",
+      "insertText": "notempty()",
+      "category": "Function"
+    },
+    {
+      "label": "notnull",
+      "kind": "Function",
+      "insertText": "notnull()",
+      "category": "Function"
+    },
+    {
+      "label": "pack_dictionary",
+      "kind": "Function",
+      "insertText": "pack_dictionary()",
+      "category": "Function"
+    },
+    {
+      "label": "parse_urlquery",
+      "kind": "Function",
+      "insertText": "parse_urlquery()",
+      "category": "Function"
+    },
+    {
+      "label": "parsejson",
+      "kind": "Function",
+      "insertText": "parsejson()",
+      "category": "Function"
+    },
+    {
+      "label": "parseurl",
+      "kind": "Function",
+      "insertText": "parseurl()",
+      "category": "Function"
+    },
+    {
+      "label": "parseurlquery",
+      "kind": "Function",
+      "insertText": "parseurlquery()",
+      "category": "Function"
+    },
+    {
+      "label": "percentiles_array_tdigest",
+      "kind": "Function",
+      "insertText": "percentiles_array_tdigest()",
+      "category": "Function"
+    },
+    {
+      "label": "replace",
+      "kind": "Function",
+      "insertText": "replace()",
+      "category": "Function"
+    },
+    {
+      "label": "row_rank",
+      "kind": "Function",
+      "insertText": "row_rank()",
+      "category": "Function"
+    },
+    {
+      "label": "rowstore_ordinal_range",
+      "kind": "Function",
+      "insertText": "rowstore_ordinal_range()",
+      "category": "Function"
+    },
+    {
+      "label": "set_equals",
+      "kind": "Function",
+      "insertText": "set_equals()",
+      "category": "Function"
+    },
+    {
+      "label": "tdigest_isvalid",
+      "kind": "Function",
+      "insertText": "tdigest_isvalid()",
+      "category": "Function"
+    },
+    {
+      "label": "to_utf8",
+      "kind": "Function",
+      "insertText": "to_utf8()",
+      "category": "Function"
+    },
+    {
+      "label": "toboolean",
+      "kind": "Function",
+      "insertText": "toboolean()",
+      "category": "Function"
+    },
+    {
+      "label": "todouble",
+      "kind": "Function",
+      "insertText": "todouble()",
+      "category": "Function"
+    },
+    {
+      "label": "todynamic",
+      "kind": "Function",
+      "insertText": "todynamic()",
+      "category": "Function"
+    },
+    {
+      "label": "toobject",
+      "kind": "Function",
+      "insertText": "toobject()",
+      "category": "Function"
+    },
+    {
+      "label": "totime",
+      "kind": "Function",
+      "insertText": "totime()",
+      "category": "Function"
+    },
+    {
+      "label": "weekofyear",
+      "kind": "Function",
+      "insertText": "weekofyear()",
+      "category": "Function"
+    },
+    {
+      "label": "zlib_compress_to_base64_string",
+      "kind": "Function",
+      "insertText": "zlib_compress_to_base64_string()",
+      "category": "Function"
+    },
+    {
+      "label": "zlib_decompress_from_base64_string",
+      "kind": "Function",
+      "insertText": "zlib_decompress_from_base64_string()",
+      "category": "Function"
+    },
+    {
+      "label": "any",
+      "kind": "Function",
+      "insertText": "any()",
+      "category": "Aggregation function"
+    },
+    {
+      "label": "anyif",
+      "kind": "Function",
+      "insertText": "anyif()",
+      "category": "Aggregation function"
+    },
+    {
+      "label": "argmax",
+      "kind": "Function",
+      "insertText": "argmax()",
+      "category": "Aggregation function"
+    },
+    {
+      "label": "argmin",
+      "kind": "Function",
+      "insertText": "argmin()",
+      "category": "Aggregation function"
+    },
+    {
+      "label": "cnt",
+      "kind": "Function",
+      "insertText": "cnt()",
+      "category": "Aggregation function"
+    },
+    {
+      "label": "make_dictionary",
+      "kind": "Function",
+      "insertText": "make_dictionary()",
+      "category": "Aggregation function"
+    },
+    {
+      "label": "makelist",
+      "kind": "Function",
+      "insertText": "makelist()",
+      "category": "Aggregation function"
+    },
+    {
+      "label": "makeset",
+      "kind": "Function",
+      "insertText": "makeset()",
+      "category": "Aggregation function"
+    },
+    {
+      "label": "passthrough",
+      "kind": "Function",
+      "insertText": "passthrough()",
+      "category": "Aggregation function"
+    },
+    {
+      "label": "percentile",
+      "kind": "Function",
+      "insertText": "percentile()",
+      "category": "Aggregation function"
+    },
+    {
+      "label": "percentiles_array",
+      "kind": "Function",
+      "insertText": "percentiles_array()",
+      "category": "Aggregation function"
+    },
+    {
+      "label": "percentilesw_array",
+      "kind": "Function",
+      "insertText": "percentilesw_array()",
+      "category": "Aggregation function"
+    },
+    {
+      "label": "percentilew",
+      "kind": "Function",
+      "insertText": "percentilew()",
       "category": "Aggregation function"
     }
   ],

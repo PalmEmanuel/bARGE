@@ -6,12 +6,12 @@ import * as path from 'path';
  * This is a simplified implementation that prepares for future integration
  * with @kusto/language-service-next when properly configured
  */
-export class KustoLanguageServiceProvider implements 
+export class KustoLanguageServiceProvider implements
     vscode.CompletionItemProvider,
     vscode.HoverProvider,
     vscode.SignatureHelpProvider,
     vscode.DocumentFormattingEditProvider {
-    
+
     private disposables: vscode.Disposable[] = [];
     private diagnosticCollection: vscode.DiagnosticCollection;
     private schemaData: any = null;
@@ -32,11 +32,11 @@ export class KustoLanguageServiceProvider implements
     private async loadSchemaData(): Promise<void> {
         try {
             let extensionPath = vscode.extensions.getExtension('palmemanuel.barge-vscode')?.extensionPath;
-            
+
             if (extensionPath) {
                 const schemaPath = path.join(extensionPath, 'src', 'schema', 'arg-schema.json');
                 const completionPath = path.join(extensionPath, 'src', 'schema', 'completion-data.json');
-                
+
                 try {
                     const fs = require('fs');
                     this.schemaData = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
@@ -74,7 +74,7 @@ export class KustoLanguageServiceProvider implements
 
         // Get contextual suggestions based on sophisticated analysis
         const suggestions = this.getContextualSuggestions(linePrefix, currentWord);
-        
+
         return suggestions;
     }
 
@@ -90,34 +90,34 @@ export class KustoLanguageServiceProvider implements
             suggestions.push(...this.filterCompletionItems(this.getARGTables(), lowerCurrentWord));
             suggestions.push(...this.filterCompletionItems(this.getKQLOperators(), lowerCurrentWord));
         }
-        
+
         // After pipe - suggest operators
         else if (this.isAfterPipe(linePrefix)) {
             suggestions.push(...this.filterCompletionItems(this.getKQLOperators(), lowerCurrentWord));
         }
-        
+
         // In function context - suggest functions
         else if (this.isInFunctionContext(linePrefix)) {
             suggestions.push(...this.filterCompletionItems(this.getKQLFunctions(), lowerCurrentWord));
         }
-        
+
         // After 'type ==' or 'type =~' - suggest resource types
         else if (this.isResourceTypeContext(linePrefix)) {
             suggestions.push(...this.filterCompletionItems(this.getResourceTypes(), lowerCurrentWord));
         }
-        
+
         // In project, extend, where, or summarize by context - suggest properties and functions
         else if (this.isPropertyContext(linePrefix)) {
             suggestions.push(...this.getCommonColumns(lowerCurrentWord));
             suggestions.push(...this.filterCompletionItems(this.getKQLFunctions(), lowerCurrentWord));
             suggestions.push(...this.filterCompletionItems(this.getResourceTypes(), lowerCurrentWord));
         }
-        
+
         // Default: suggest common operators and functions
         else {
             suggestions.push(...this.filterCompletionItems(this.getKQLOperators(), lowerCurrentWord));
             suggestions.push(...this.filterCompletionItems(this.getKQLFunctions(), lowerCurrentWord));
-            
+
             // Add common column names
             suggestions.push(...this.getCommonColumns(lowerCurrentWord));
         }
@@ -147,11 +147,11 @@ export class KustoLanguageServiceProvider implements
         if (!filter) {
             return items;
         }
-        
+
         return items.filter(item => {
             const label = typeof item.label === 'string' ? item.label : item.label.label;
             return label.toLowerCase().includes(filter) ||
-                   (item.detail && item.detail.toLowerCase().includes(filter));
+                (item.detail && item.detail.toLowerCase().includes(filter));
         });
     }
 
@@ -174,7 +174,7 @@ export class KustoLanguageServiceProvider implements
 
         const items: vscode.CompletionItem[] = [];
         for (const column of commonColumns) {
-            if (!filter || column.label.toLowerCase().includes(filter) || 
+            if (!filter || column.label.toLowerCase().includes(filter) ||
                 column.detail.toLowerCase().includes(filter)) {
                 const item = new vscode.CompletionItem(column.label, vscode.CompletionItemKind.Property);
                 item.detail = column.detail;
@@ -192,7 +192,7 @@ export class KustoLanguageServiceProvider implements
      */
     private getResourceTypes(): vscode.CompletionItem[] {
         const resourceTypes: vscode.CompletionItem[] = [];
-        
+
         if (this.completionData?.resourceTypes) {
             for (const rt of this.completionData.resourceTypes) {
                 const item = new vscode.CompletionItem(rt.label, vscode.CompletionItemKind.Value);
@@ -202,7 +202,7 @@ export class KustoLanguageServiceProvider implements
                 resourceTypes.push(item);
             }
         }
-        
+
         return resourceTypes;
     }
 
@@ -222,18 +222,18 @@ export class KustoLanguageServiceProvider implements
         }
 
         const word = document.getText(wordRange);
-        
+
         // Reset hover state if we're hovering over a different word
         if (this.currentHoverWord !== word.toLowerCase()) {
             this.resetHoverState();
         }
-        
+
         // Get the line text to check for context (like parentheses)
         const lineText = document.lineAt(position).text;
         const wordStart = wordRange.start.character;
         const wordEnd = wordRange.end.character;
         const textAfterWord = lineText.substring(wordEnd).trim();
-        
+
         const hoverInfo = this.getKQLHoverInfo(word, textAfterWord);
 
         if (hoverInfo) {
@@ -263,7 +263,7 @@ export class KustoLanguageServiceProvider implements
     ): Promise<vscode.SignatureHelp | null> {
         const line = document.lineAt(position).text;
         const beforeCursor = line.substring(0, position.character);
-        
+
         // Find function call pattern
         const functionMatch = beforeCursor.match(/(\w+)\s*\(\s*([^)]*)$/);
         if (!functionMatch) {
@@ -272,17 +272,17 @@ export class KustoLanguageServiceProvider implements
 
         const functionName = functionMatch[1];
         const signature = this.getFunctionSignature(functionName);
-        
+
         if (signature) {
             const signatureHelp = new vscode.SignatureHelp();
             signatureHelp.signatures = [signature];
             signatureHelp.activeSignature = 0;
-            
+
             // Calculate active parameter
             const parameters = functionMatch[2];
             const parameterIndex = (parameters.match(/,/g) || []).length;
             signatureHelp.activeParameter = Math.min(parameterIndex, signature.parameters.length - 1);
-            
+
             return signatureHelp;
         }
 
@@ -299,7 +299,7 @@ export class KustoLanguageServiceProvider implements
     ): Promise<vscode.TextEdit[]> {
         const text = document.getText();
         const formatted = this.formatKQL(text, options);
-        
+
         if (formatted !== text) {
             const fullRange = new vscode.Range(
                 document.positionAt(0),
@@ -307,7 +307,7 @@ export class KustoLanguageServiceProvider implements
             );
             return [vscode.TextEdit.replace(fullRange, formatted)];
         }
-        
+
         return [];
     }
 
@@ -331,12 +331,12 @@ export class KustoLanguageServiceProvider implements
 
     private isPropertyContext(linePrefix: string): boolean {
         return /\b(project|extend|where|summarize\s+by)\s+[a-zA-Z0-9_,.\s]*$/i.test(linePrefix) ||
-               /[,\s]\s*[a-zA-Z0-9_]*$/.test(linePrefix);
+            /[,\s]\s*[a-zA-Z0-9_]*$/.test(linePrefix);
     }
 
     private getKQLOperators(): vscode.CompletionItem[] {
         const operators: vscode.CompletionItem[] = [];
-        
+
         // Use schema data only - include both keywords and operators
         if (this.completionData?.keywords) {
             for (const kw of this.completionData.keywords) {
@@ -348,7 +348,7 @@ export class KustoLanguageServiceProvider implements
                 operators.push(item);
             }
         }
-        
+
         if (this.completionData?.operators) {
             for (const op of this.completionData.operators) {
                 const item = new vscode.CompletionItem(op.label, vscode.CompletionItemKind.Operator);
@@ -359,7 +359,7 @@ export class KustoLanguageServiceProvider implements
                 operators.push(item);
             }
         }
-        
+
         return operators;
     }
 
@@ -368,7 +368,7 @@ export class KustoLanguageServiceProvider implements
      */
     private getKQLFunctions(): vscode.CompletionItem[] {
         const functions: vscode.CompletionItem[] = [];
-        
+
         // Use schema data only - no fallback
         if (this.completionData?.functions) {
             for (const fn of this.completionData.functions) {
@@ -380,7 +380,7 @@ export class KustoLanguageServiceProvider implements
                 functions.push(item);
             }
         }
-        
+
         return functions;
     }
 
@@ -389,7 +389,7 @@ export class KustoLanguageServiceProvider implements
      */
     private getEnhancedProperties(): vscode.CompletionItem[] {
         const properties: vscode.CompletionItem[] = [];
-        
+
         // Use schema data only - no fallback
         if (this.completionData?.properties) {
             for (const prop of this.completionData.properties) {
@@ -403,7 +403,7 @@ export class KustoLanguageServiceProvider implements
                 properties.push(item);
             }
         }
-        
+
         return properties;
     }
 
@@ -412,7 +412,7 @@ export class KustoLanguageServiceProvider implements
      */
     private getARGTables(): vscode.CompletionItem[] {
         const tables: vscode.CompletionItem[] = [];
-        
+
         // Use schema data only - no fallback
         if (this.completionData?.tables) {
             for (const table of this.completionData.tables) {
@@ -424,7 +424,7 @@ export class KustoLanguageServiceProvider implements
                 tables.push(item);
             }
         }
-        
+
         return tables;
     }
 
@@ -439,34 +439,34 @@ export class KustoLanguageServiceProvider implements
         if (!examples || examples.length === 0) {
             return [];
         }
-        
+
         // If we have fewer examples than requested, return all
         if (examples.length <= count) {
             return examples;
         }
-        
+
         const cacheKey = `${tableName}_${count}`;
-        
+
         // If we're already hovering on the same word, return cached examples
         if (this.isHovering && this.currentHoverWord === tableName && this.cachedExamples.has(cacheKey)) {
             return this.cachedExamples.get(cacheKey)!;
         }
-        
+
         // New hover session - generate new random examples
         const selected: any[] = [];
         const availableIndices = [...Array(examples.length).keys()];
-        
+
         for (let i = 0; i < count && availableIndices.length > 0; i++) {
             const randomIndex = Math.floor(Math.random() * availableIndices.length);
             const exampleIndex = availableIndices.splice(randomIndex, 1)[0];
             selected.push(examples[exampleIndex]);
         }
-        
+
         // Cache the selection and update hover state
         this.cachedExamples.set(cacheKey, selected);
         this.isHovering = true;
         this.currentHoverWord = tableName;
-        
+
         return selected;
     }
 
@@ -478,13 +478,126 @@ export class KustoLanguageServiceProvider implements
         return null;
     }
 
-    private getKQLDocumentation(word: string, textAfterWord: string = ''): string | null {
+    private getKQLDocumentation(word: string, textAfterWord: string = '', textBeforeWord: string = ''): string | null {
         const lowerWord = word.toLowerCase();
         const hasParentheses = textAfterWord.startsWith('(');
-        
+        const isAfterPipe = /\|\s*$/.test(textBeforeWord);
+
         // Check schema data first if available
         if (this.schemaData) {
-            // If we detect parentheses, prioritize function matching
+            // If we detect parentheses, prioritize function and aggregate matching
+            if (hasParentheses) {
+                let func = null;
+
+                // Check functions (includes all aggregates now)
+                if (this.schemaData.functions) {
+                    func = this.schemaData.functions.find((fn: any) => fn.name.toLowerCase() === lowerWord);
+                }
+
+                if (func) {
+                    // If we have enhanced documentation, use it
+                    if (func.documentation) {
+                        const doc = func.documentation;
+                        let hoverContent = `## Function \`${doc.title}\`\n\n`;
+                        hoverContent += `*${func.category}*\n\n`;
+
+                        // Description
+                        if (doc.description) {
+                            hoverContent += `${doc.description}\n\n`;
+                        }
+
+                        // Add Microsoft Learn URL if available
+                        if (doc.url) {
+                            hoverContent += `[Details on Microsoft Learn](${doc.url}?wt.mc_id=DT-MVP-5005372)\n\n`;
+                        }
+
+                        // Syntax
+                        if (doc.syntax) {
+                            hoverContent += `## Syntax\n\n${doc.syntax}\n\n`;
+                        }
+
+                        // Parameters Table
+                        if (doc.parametersTable) {
+                            hoverContent += `## Parameters\n\n${doc.parametersTable}\n\n`;
+                        }
+
+                        // Returns
+                        if (doc.returnInfo) {
+                            hoverContent += `## Returns\n\n${doc.returnInfo}\n\n`;
+                        }
+
+                        // Example(s)
+                        if (doc.example && doc.example.trim()) {
+                            // Check if there are multiple examples (look for multiple code blocks or line breaks)
+                            const hasMultipleExamples = doc.example.includes('```') ||
+                                doc.example.split('\n').filter((line: string) => line.trim()).length > 3;
+                            const exampleLabel = hasMultipleExamples ? "Examples" : "Example";
+                            hoverContent += `## ${exampleLabel}\n\`\`\`kql\n${doc.example}\n\`\`\``;
+                        }
+
+                        return hoverContent;
+                    } else {
+                        // Fallback to old format
+                        return `**Function: ${func.name}()** - ${func.category}`;
+                    }
+                }
+            }
+
+            // Check keywords first (where, project, contains, etc.) - only if no parentheses
+            if (!hasParentheses && this.schemaData.keywords) {
+                const keyword = this.schemaData.keywords.find((kw: any) => kw.name.toLowerCase() === lowerWord);
+                if (keyword) {
+                    return `**${keyword.name}** - ${keyword.category}`;
+                }
+            }
+
+            // Check operators - only if no parentheses
+            if (!hasParentheses && this.schemaData.operators) {
+                const operator = this.schemaData.operators.find((op: any) => op.name.toLowerCase() === lowerWord);
+                if (operator) {
+                    // Show operator documentation
+                    if (operator.documentation) {
+                        const doc = operator.documentation;
+                        let hoverContent = `## Operator \`${doc.title}\`\n\n`;
+                        hoverContent += `*${operator.category}*\n\n`;
+
+                        if (doc.description) {
+                            hoverContent += `${doc.description}\n\n`;
+                        }
+
+                        // Add Microsoft Learn URL if available
+                        if (doc.url) {
+                            hoverContent += `[Details on Microsoft Learn](${doc.url}?wt.mc_id=DT-MVP-5005372)\n\n`;
+                        }
+
+                        if (doc.syntax) {
+                            hoverContent += `### Syntax\n\n${doc.syntax}\n\n`;
+                        }
+
+                        if (doc.parametersTable) {
+                            hoverContent += `### Parameters\n\n${doc.parametersTable}\n\n`;
+                        }
+
+                        if (doc.returnInfo) {
+                            hoverContent += `### Returns\n\n${doc.returnInfo}\n\n`;
+                        }
+
+                        if (doc.example && doc.example.trim()) {
+                            const hasMultipleExamples = doc.example.includes('```') ||
+                                doc.example.split('\n').filter((line: string) => line.trim()).length > 3;
+                            const exampleLabel = hasMultipleExamples ? "Examples" : "Example";
+                            hoverContent += `### ${exampleLabel}\n\`\`\`kql\n${doc.example}\n\`\`\``;
+                        }
+
+                        return hoverContent;
+                    } else {
+                        return `**${operator.name}** - ${operator.category}`;
+                    }
+                }
+            }
+
+            // Only check functions if there are parentheses (function call syntax)
+            // This prevents matching functions when the word appears as a keyword or operator
             if (hasParentheses && this.schemaData.functions) {
                 const func = this.schemaData.functions.find((fn: any) => fn.name.toLowerCase() === lowerWord);
                 if (func) {
@@ -493,99 +606,36 @@ export class KustoLanguageServiceProvider implements
                         const doc = func.documentation;
                         let hoverContent = `## Function \`${doc.title}\`\n\n`;
                         hoverContent += `*${func.category}*\n\n`;
-                        
+
                         // Description
                         if (doc.description) {
                             hoverContent += `${doc.description}\n\n`;
                         }
-                        
-                        // Syntax
-                        if (doc.syntax) {
-                            hoverContent += `## Syntax\n\n${doc.syntax}\n\n`;
-                        }
-                        
-                        // Parameters Table
-                        if (doc.parametersTable) {
-                            hoverContent += `## Parameters\n\n${doc.parametersTable}\n\n`;
-                        }
-                        
-                        // Returns
-                        if (doc.returnInfo) {
-                            hoverContent += `## Returns\n\n${doc.returnInfo}\n\n`;
-                        }
-                        
-                        // Example(s)
-                        if (doc.example && doc.example.trim()) {
-                            // Check if there are multiple examples (look for multiple code blocks or line breaks)
-                            const hasMultipleExamples = doc.example.includes('```') || 
-                                                      doc.example.split('\n').filter((line: string) => line.trim()).length > 3;
-                            const exampleLabel = hasMultipleExamples ? "Examples" : "Example";
-                            hoverContent += `## ${exampleLabel}\n\`\`\`kql\n${doc.example}\n\`\`\``;
-                        }
-                        
-                        return hoverContent;
-                    } else {
-                        // Fallback to old format
-                        return `**Function: ${func.name}()** - ${func.category}`;
-                    }
-                }
-            }
-            
-            // Check keywords first (where, project, contains, etc.) - only if no parentheses
-            if (!hasParentheses && this.schemaData.keywords) {
-                const keyword = this.schemaData.keywords.find((kw: any) => kw.name.toLowerCase() === lowerWord);
-                if (keyword) {
-                    return `**${keyword.name}** - ${keyword.category}`;
-                }
-            }
-            
-            // Check operators - only if no parentheses
-            if (!hasParentheses && this.schemaData.operators) {
-                const operator = this.schemaData.operators.find((op: any) => op.name.toLowerCase() === lowerWord);
-                if (operator) {
-                    return `**${operator.name}** - ${operator.category}`;
-                }
-            }
-            
-            // Check functions
-            if (this.schemaData.functions) {
-                const func = this.schemaData.functions.find((fn: any) => fn.name.toLowerCase() === lowerWord);
-                if (func) {
-                    // If we have enhanced documentation, use it
-                    if (func.documentation) {
-                        const doc = func.documentation;
-                        let hoverContent = `## Function \`${doc.title}\`\n\n`;
-                        hoverContent += `*${func.category}*\n\n`;
-                        
-                        // Description
-                        if (doc.description) {
-                            hoverContent += `${doc.description}\n\n`;
-                        }
-                        
+
                         // Syntax
                         if (doc.syntax) {
                             hoverContent += `### Syntax\n\n${doc.syntax}\n\n`;
                         }
-                        
+
                         // Parameters Table
                         if (doc.parametersTable) {
                             hoverContent += `### Parameters\n\n${doc.parametersTable}\n\n`;
                         }
-                        
+
                         // Returns
                         if (doc.returnInfo) {
                             hoverContent += `### Returns\n\n${doc.returnInfo}\n\n`;
                         }
-                        
+
                         // Example(s)
                         if (doc.example && doc.example.trim()) {
                             // Check if there are multiple examples (look for multiple code blocks or line breaks)
-                            const hasMultipleExamples = doc.example.includes('```') || 
-                                                      doc.example.split('\n').filter((line: string) => line.trim()).length > 3;
+                            const hasMultipleExamples = doc.example.includes('```') ||
+                                doc.example.split('\n').filter((line: string) => line.trim()).length > 3;
                             const exampleLabel = hasMultipleExamples ? "Examples" : "Example";
                             hoverContent += `### ${exampleLabel}\n\`\`\`kql\n${doc.example}\n\`\`\``;
                         }
-                        
+
                         return hoverContent;
                     } else {
                         // Fallback to old format
@@ -593,23 +643,29 @@ export class KustoLanguageServiceProvider implements
                     }
                 }
             }
-            
+
             // Check tables
             if (this.schemaData.tables) {
                 const table = this.schemaData.tables[lowerWord];
                 if (table) {
                     let hoverContent = `## Table \`${table.name}\`\n\n`;
-                    
+
                     // Add resource types section
                     if (table.name.toLowerCase() === 'resources') {
                         // Special case for main resources table - skip description, use resource types info instead
+                        hoverContent += `[Details on Microsoft Learn](https://learn.microsoft.com/en-us/azure/governance/resource-graph/concepts/query-language?wt.mc_id=DT-MVP-5005372)\n\n`;
+                        
                         hoverContent += `Most Azure Resource Manager resource types and properties are here.\n\n`;
+
+                        hoverContent += `[Tables and Resources Reference](https://learn.microsoft.com/en-us/azure/governance/resource-graph/reference/supported-tables-resources?wt.mc_id=DT-MVP-5005372)\n\n`;
                     } else {
                         // Add description if available for non-resources tables
                         if (table.description) {
                             hoverContent += `${table.description}\n\n`;
                         }
-                        
+
+                        hoverContent += `[Details on Microsoft Learn](https://learn.microsoft.com/en-us/azure/governance/resource-graph/concepts/query-language?wt.mc_id=DT-MVP-5005372)\n\n`;
+
                         // List specific resource types for specialized tables
                         if (table.resourceTypes && table.resourceTypes.length > 0) {
                             hoverContent += `### Resource Types\n`;
@@ -621,9 +677,11 @@ export class KustoLanguageServiceProvider implements
                                 hoverContent += `- ... and ${table.resourceTypes.length - 5} more\n`;
                             }
                             hoverContent += '\n';
+
+                            hoverContent += `[Tables and Resources Reference](https://learn.microsoft.com/en-us/azure/governance/resource-graph/reference/supported-tables-resources?wt.mc_id=DT-MVP-5005372)\n\n`;
                         }
                     }
-                    
+
                     // Add examples if available
                     if (table.examples && table.examples.length > 0) {
                         // Handle both old string format and new object format for examples
@@ -638,7 +696,7 @@ export class KustoLanguageServiceProvider implements
 
                         // Randomly select up to 2 examples for variety (with caching for stability)
                         const selectedExamples = this.selectRandomExamples(table.name, table.examples, 2);
-                        
+
                         // Sort selected examples by length (shorter first)
                         if (selectedExamples.length > 1) {
                             selectedExamples.sort((a, b) => {
@@ -647,9 +705,9 @@ export class KustoLanguageServiceProvider implements
                                 return aCode.length - bCode.length;
                             });
                         }
-                        
+
                         const exampleLabel = selectedExamples.length === 1 ? "Example" : "Examples";
-                        
+
                         if (selectedExamples.length === 1) {
                             const exampleCode = getExampleCode(selectedExamples[0]);
                             hoverContent += `### ${exampleLabel}\n\`\`\`kql\n${exampleCode}\n\`\`\``;
@@ -669,11 +727,11 @@ ${example2Code}
 \`\`\``;
                         }
                     }
-                    
+
                     return hoverContent;
                 }
             }
-            
+
             // Check resource types
             if (this.schemaData.resourceTypes) {
                 const resourceType = this.schemaData.resourceTypes[lowerWord];
@@ -683,7 +741,7 @@ ${example2Code}
                 }
             }
         }
-        
+
         // No fallback documentation - will be implemented with a better approach
         return null;
     }
@@ -709,17 +767,17 @@ ${example2Code}
         // Basic KQL formatting - can be enhanced later
         const lines = text.split('\n');
         const formatted: string[] = [];
-        
+
         for (let line of lines) {
             line = line.trim();
             if (line === '') {
                 formatted.push('');
                 continue;
             }
-            
+
             // Add proper spacing around pipes
             line = line.replace(/\s*\|\s*/g, '\n| ');
-            
+
             // Handle multiline - split on pipes but keep first line without pipe
             const parts = line.split('\n| ');
             if (parts.length > 1) {
@@ -731,7 +789,7 @@ ${example2Code}
                 formatted.push(line);
             }
         }
-        
+
         return formatted.join('\n');
     }
 
@@ -765,7 +823,7 @@ ${example2Code}
                         line.indexOf(tableName) + tableName.length
                     );
                     const suggestions = this.getSimilarTableNames(tableName);
-                    const message = suggestions.length > 0 
+                    const message = suggestions.length > 0
                         ? `Unknown table '${tableName}'. Did you mean: ${suggestions.join(', ')}?`
                         : `Unknown table '${tableName}'`;
                     diagnostics.push(new vscode.Diagnostic(
@@ -817,54 +875,54 @@ ${example2Code}
 
     private isValidTableName(name: string): boolean {
         const lowerName = name.toLowerCase();
-        
+
         // Check schema data first
         if (this.schemaData?.tables) {
             return !!this.schemaData.tables[lowerName];
         }
-        
+
         // Check completion data
         if (this.completionData?.tables) {
-            return this.completionData.tables.some((table: any) => 
+            return this.completionData.tables.some((table: any) =>
                 table.label.toLowerCase() === lowerName
             );
         }
-        
+
         // No fallback - if schema isn't loaded, return false
         return false;
     }
 
     private isValidOperator(name: string): boolean {
         const lowerName = name.toLowerCase();
-        
+
         // Check both keywords and operators since KQL commands like 'where', 'project' are keywords
         // Check schema data first
         if (this.schemaData?.keywords) {
-            const isKeyword = this.schemaData.keywords.some((kw: any) => 
+            const isKeyword = this.schemaData.keywords.some((kw: any) =>
                 typeof kw === 'string' ? kw.toLowerCase() === lowerName : kw.name?.toLowerCase() === lowerName
             );
             if (isKeyword) {
                 return true;
             }
         }
-        
+
         if (this.schemaData?.operators) {
             const isOperator = this.schemaData.operators.some((op: any) => op.name?.toLowerCase() === lowerName);
             if (isOperator) {
                 return true;
             }
         }
-        
+
         // Check completion data
         if (this.completionData?.operators) {
-            const isInOperators = this.completionData.operators.some((op: any) => 
+            const isInOperators = this.completionData.operators.some((op: any) =>
                 typeof op.label === 'string' ? op.label.toLowerCase() === lowerName : false
             );
             if (isInOperators) {
                 return true;
             }
         }
-        
+
         // No fallback - if schema isn't loaded, return false
         return false;
     }
@@ -872,23 +930,23 @@ ${example2Code}
     private getSimilarTableNames(name: string): string[] {
         const lowerName = name.toLowerCase();
         let tableNames: string[] = [];
-        
+
         // Get table names from schema data only
         if (this.schemaData?.tables) {
             tableNames = Object.keys(this.schemaData.tables);
         } else if (this.completionData?.tables) {
             tableNames = this.completionData.tables.map((table: any) => table.label);
         }
-        
+
         // No fallback - if no schema data, return empty array
         if (tableNames.length === 0) {
             return [];
         }
-        
+
         // Simple similarity check - starts with same letter or contains similar substring
         return tableNames
-            .filter(table => 
-                table.toLowerCase().startsWith(lowerName[0]) || 
+            .filter(table =>
+                table.toLowerCase().startsWith(lowerName[0]) ||
                 this.calculateSimilarity(lowerName, table.toLowerCase()) > 0.6
             )
             .slice(0, 3);
@@ -897,7 +955,7 @@ ${example2Code}
     private getSimilarOperatorNames(name: string): string[] {
         const lowerName = name.toLowerCase();
         let operatorNames: string[] = [];
-        
+
         // Get both keyword and operator names from schema data since KQL commands can be either
         if (this.schemaData?.keywords) {
             operatorNames.push(...this.schemaData.keywords);
@@ -905,20 +963,20 @@ ${example2Code}
         if (this.schemaData?.operators) {
             operatorNames.push(...this.schemaData.operators.map((op: any) => op.name));
         }
-        
+
         // Also check completion data
         if (this.completionData?.operators) {
             operatorNames.push(...this.completionData.operators.map((op: any) => op.label));
         }
-        
+
         // No fallback - if no schema data, return empty array
         if (operatorNames.length === 0) {
             return [];
         }
-        
+
         return operatorNames
-            .filter(op => 
-                op.toLowerCase().startsWith(lowerName[0]) || 
+            .filter(op =>
+                op.toLowerCase().startsWith(lowerName[0]) ||
                 this.calculateSimilarity(lowerName, op.toLowerCase()) > 0.6
             )
             .slice(0, 3);
@@ -955,7 +1013,7 @@ ${example2Code}
      */
     public register(context: vscode.ExtensionContext): void {
         const documentSelector: vscode.DocumentSelector = { scheme: 'file', language: 'kql' };
-        
+
         // Register enhanced providers
         this.disposables.push(
             vscode.languages.registerCompletionItemProvider(
@@ -978,7 +1036,7 @@ ${example2Code}
         };
 
         vscode.workspace.textDocuments.forEach(updateDiagnostics);
-        
+
         this.disposables.push(
             vscode.workspace.onDidOpenTextDocument(updateDiagnostics),
             vscode.workspace.onDidChangeTextDocument(e => updateDiagnostics(e.document)),
@@ -987,7 +1045,7 @@ ${example2Code}
 
         // Add all disposables to context
         context.subscriptions.push(...this.disposables);
-        
+
         console.log('Enhanced Kusto Language Service registered for bARGE');
     }
 
