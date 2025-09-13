@@ -1265,9 +1265,6 @@ class ARGSchemaGenerator {
             JSON.stringify(this.schema, null, 2)
         );
 
-        // Write completion provider data
-        await this.generateCompletionData(outputDir);
-
         // Write TextMate grammar
         await this.generateTextMateGrammar();
 
@@ -1765,44 +1762,6 @@ class ARGSchemaGenerator {
             // Remove extra whitespace and empty lines
             .replace(/\n\s*\n\s*\n/g, '\n\n')
             .trim();
-    }
-
-    async generateCompletionData(outputDir) {
-        const completionData = {
-            tables: Object.keys(this.schema.tables).map(name => ({
-                label: name,
-                kind: 'Table',
-                insertText: name
-            })),
-            keywords: this.schema.keywords.map(kw => ({
-                label: kw.name,
-                kind: 'Keyword',
-                insertText: kw.name,
-                category: kw.category
-            })),
-            operators: this.schema.operators.map(op => ({
-                label: op.name,
-                kind: 'Operator',
-                insertText: op.name,
-                category: op.category
-            })),
-            functions: this.schema.functions.map(fn => ({
-                label: fn.name,
-                kind: 'Function',
-                insertText: `${fn.name}()`,
-                category: fn.category
-            })),
-            resourceTypes: Object.keys(this.schema.resourceTypes).map(type => ({
-                label: type,
-                kind: 'Value',
-                insertText: `'${type}'`
-            }))
-        };
-
-        await fs.writeFile(
-            path.join(outputDir, 'completion-data.json'),
-            JSON.stringify(completionData, null, 2)
-        );
     }
 
     extractKustoLanguageElements() {
