@@ -15,10 +15,14 @@ export class KustoLanguageServiceProvider implements
     private disposables: vscode.Disposable[] = [];
     private diagnosticCollection: vscode.DiagnosticCollection;
     private schemaData: any = null;
-    private completionData: any = null;
     private isHovering: boolean = false;
     private currentHoverWord: string = '';
     private cachedExamples: Map<string, any[]> = new Map();
+
+    // Getter for schema access
+    private get schema(): any {
+        return this.schemaData;
+    }
 
     constructor() {
         this.diagnosticCollection = vscode.languages.createDiagnosticCollection('kusto-enhanced');
@@ -35,24 +39,20 @@ export class KustoLanguageServiceProvider implements
 
             if (extensionPath) {
                 const schemaPath = path.join(extensionPath, 'src', 'schema', 'arg-schema.json');
-                const completionPath = path.join(extensionPath, 'src', 'schema', 'completion-data.json');
 
                 try {
                     const fs = require('fs');
                     this.schemaData = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
-                    this.completionData = JSON.parse(fs.readFileSync(completionPath, 'utf8'));
                     console.log('📋 Loaded ARG schema with:', {
                         tables: Object.keys(this.schemaData.tables || {}).length,
                         resourceTypes: Object.keys(this.schemaData.resourceTypes || {}).length,
                         operators: (this.schemaData.operators || []).length,
-                        functions: (this.schemaData.functions || []).length,
-                        completionTables: (this.completionData.tables || []).length,
-                        completionOperators: (this.completionData.operators || []).length
+                        functions: (this.schemaData.functions || []).length
                     });
                 } catch (error) {
                     console.error('❌ Could not load generated schema data:', error instanceof Error ? error.message : String(error));
                     console.error('Schema files are required for proper functionality. Please run schema generation.');
-                    console.error('Expected files:', schemaPath, completionPath);
+                    console.error('Expected files:', schemaPath);
                 }
             } else {
                 console.error('❌ Extension path not found. Schema data cannot be loaded.');
@@ -130,7 +130,15 @@ export class KustoLanguageServiceProvider implements
      */
     private isStartOfStatement(linePrefix: string): boolean {
         const trimmed = linePrefix.trim();
-        return trimmed === '' || /^\s*\/\//.test(linePrefix);
+        // Empty line or comment
+        if (trimmed === '' || /^\s*\/\//.test(linePrefix)) {
+            return true;
+        }
+        // Single word at start of line (likely a table name being typed)
+        if (/^\s*[a-zA-Z_][a-zA-Z0-9_]*$/.test(linePrefix)) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -193,12 +201,13 @@ export class KustoLanguageServiceProvider implements
     private getResourceTypes(): vscode.CompletionItem[] {
         const resourceTypes: vscode.CompletionItem[] = [];
 
-        if (this.completionData?.resourceTypes) {
-            for (const rt of this.completionData.resourceTypes) {
-                const item = new vscode.CompletionItem(rt.label, vscode.CompletionItemKind.Value);
-                item.detail = rt.detail;
-                item.insertText = `'${rt.label}'`;
-                item.sortText = `5_${rt.label}`;
+        // Use schema data instead of completion data
+        if (this.schema?.resourceTypes) {
+            for (const rt of Object.keys(this.schema.resourceTypes)) {
+                const item = new vscode.CompletionItem(rt, vscode.CompletionItemKind.Value);
+                item.detail = `Resource Type - ${rt}`;
+                item.insertText = `'${rt}'`;
+                item.sortText = `5_${rt}`;
                 resourceTypes.push(item);
             }
         }
@@ -396,7 +405,7 @@ export class KustoLanguageServiceProvider implements
         }
 
         const wordText = lineText.substring(start, end);
-        
+
         // Validate that we have a meaningful word/operator
         if (!wordText || !this.isValidKQLWord(wordText)) {
             return null;
@@ -471,35 +480,44 @@ export class KustoLanguageServiceProvider implements
     private getKQLOperators(): vscode.CompletionItem[] {
         const operators: vscode.CompletionItem[] = [];
 
-        // Use schema data only - include both keywords and operators
-        if (this.completionData?.keywords) {
-            for (const kw of this.completionData.keywords) {
-                const item = new vscode.CompletionItem(kw.label, vscode.CompletionItemKind.Keyword);
-                item.detail = kw.detail || kw.category;
-                item.insertText = kw.insertText || kw.label;
-                if (kw.documentation && kw.documentation.value) {
-                    item.documentation = new vscode.MarkdownString(kw.documentation.value);
+        // Use schema data for keywords
+        if (this.schema?.keywords) {
+            for (const kw of this.schema.keywords) {
+                const item = new vscode.CompletionItem(kw.name, vscode.CompletionItemKind.Keyword);
+                item.detail = `Keyword - ${kw.category}`;
+                item.insertText = kw.name;
+
+                // Use getKQLDocumentation for consistent documentation formatting
+                const documentation = this.getKQLDocumentation(kw.name);
+                if (documentation) {
+                    item.documentation = new vscode.MarkdownString(documentation);
                 } else {
                     item.documentation = new vscode.MarkdownString(kw.category);
                 }
-                item.sortText = kw.sortText || `2_${kw.label}`;
-                item.filterText = kw.filterText || kw.label;
+
+                item.sortText = `2_${kw.name}`;
+                item.filterText = kw.name;
                 operators.push(item);
             }
         }
 
-        if (this.completionData?.operators) {
-            for (const op of this.completionData.operators) {
-                const item = new vscode.CompletionItem(op.label, vscode.CompletionItemKind.Function);
-                item.detail = op.detail || op.category;
-                item.insertText = op.insertText || op.label;
-                if (op.documentation && op.documentation.value) {
-                    item.documentation = new vscode.MarkdownString(op.documentation.value);
+        // Use schema data for operators
+        if (this.schema?.operators) {
+            for (const op of this.schema.operators) {
+                const item = new vscode.CompletionItem(op.name, vscode.CompletionItemKind.Function);
+                item.detail = `Operator - ${op.category}`;
+                item.insertText = op.name;
+
+                // Use getKQLDocumentation for consistent documentation formatting
+                const documentation = this.getKQLDocumentation(op.name);
+                if (documentation) {
+                    item.documentation = new vscode.MarkdownString(documentation);
                 } else {
                     item.documentation = new vscode.MarkdownString(op.category);
                 }
-                item.sortText = op.sortText || `2_${op.label}`;
-                item.filterText = op.filterText || op.label;
+
+                item.sortText = `2_${op.name}`;
+                item.filterText = op.name;
                 operators.push(item);
             }
         }
@@ -513,14 +531,35 @@ export class KustoLanguageServiceProvider implements
     private getKQLFunctions(): vscode.CompletionItem[] {
         const functions: vscode.CompletionItem[] = [];
 
-        // Use schema data only - no fallback
-        if (this.completionData?.functions) {
-            for (const fn of this.completionData.functions) {
-                const item = new vscode.CompletionItem(fn.label, vscode.CompletionItemKind.Function);
-                item.detail = fn.detail;
-                item.insertText = new vscode.SnippetString(fn.insertText);
-                item.documentation = new vscode.MarkdownString(fn.detail);
-                item.sortText = `3_${fn.label}`;
+        // Use schema data instead of completion data
+        if (this.schema?.functions) {
+            for (const fn of this.schema.functions) {
+                const item = new vscode.CompletionItem(fn.name, vscode.CompletionItemKind.Function);
+                item.detail = `Function - ${fn.category}`;
+
+                // Create snippet for function parameters if available
+                if (fn.documentation?.parametersTable) {
+                    // Extract parameter names for snippet (simplified)
+                    const paramMatch = fn.documentation.parametersTable.match(/\| \*([^*]+)\*/g);
+                    if (paramMatch && paramMatch.length > 0) {
+                        const params = paramMatch.map((match: string, index: number) => `\${${index + 1}:${match.replace(/\| \*([^*]+)\*.*/, '$1')}}`).join(', ');
+                        item.insertText = new vscode.SnippetString(`${fn.name}(${params})`);
+                    } else {
+                        item.insertText = new vscode.SnippetString(`${fn.name}($1)`);
+                    }
+                } else {
+                    item.insertText = new vscode.SnippetString(`${fn.name}($1)`);
+                }
+
+                // Format function documentation
+                const documentation = this.getKQLDocumentation(fn.name, '(');
+                if (documentation) {
+                    item.documentation = new vscode.MarkdownString(documentation);
+                } else {
+                    item.documentation = new vscode.MarkdownString(fn.category);
+                }
+
+                item.sortText = `3_${fn.name}`;
                 functions.push(item);
             }
         }
@@ -529,42 +568,31 @@ export class KustoLanguageServiceProvider implements
     }
 
     /**
-     * Get enhanced property completions from schema data
-     */
-    private getEnhancedProperties(): vscode.CompletionItem[] {
-        const properties: vscode.CompletionItem[] = [];
-
-        // Use schema data only - no fallback
-        if (this.completionData?.properties) {
-            for (const prop of this.completionData.properties) {
-                const item = new vscode.CompletionItem(prop.label, vscode.CompletionItemKind.Property);
-                item.detail = prop.detail;
-                item.insertText = prop.insertText;
-                item.documentation = new vscode.MarkdownString(prop.detail);
-                if (prop.resourceType) {
-                    item.filterText = `${prop.label} ${prop.resourceType}`;
-                }
-                properties.push(item);
-            }
-        }
-
-        return properties;
-    }
-
-    /**
      * Get Azure Resource Graph table completions from schema data
      */
     private getARGTables(): vscode.CompletionItem[] {
         const tables: vscode.CompletionItem[] = [];
 
-        // Use schema data only - no fallback
-        if (this.completionData?.tables) {
-            for (const table of this.completionData.tables) {
-                const item = new vscode.CompletionItem(table.label, vscode.CompletionItemKind.Class);
-                item.detail = table.detail;
-                item.insertText = table.insertText;
-                item.documentation = new vscode.MarkdownString(table.detail);
-                item.sortText = `1_${table.label}`;
+        // Use schema data directly - this avoids duplication in completion-data.json
+        if (this.schema?.tables) {
+            for (const [tableName, tableData] of Object.entries(this.schema.tables)) {
+                const item = new vscode.CompletionItem(tableName, vscode.CompletionItemKind.Class);
+
+                // Generate detail from description
+                const data = tableData as any; // Type assertion for schema data
+                const description = data.description || 'Azure Resource Graph table';
+                item.detail = `Table - ${description}`;
+
+                // Add newline, pipe, and space after table name for easier operator chaining
+                item.insertText = new vscode.SnippetString(`${tableName}\n| `);
+
+                // Use getKQLDocumentation for consistent documentation formatting
+                const documentation = this.getKQLDocumentation(tableName);
+                if (documentation) {
+                    item.documentation = new vscode.MarkdownString(documentation);
+                }
+
+                item.sortText = `1_${tableName}`;
                 tables.push(item);
             }
         }
@@ -795,36 +823,28 @@ export class KustoLanguageServiceProvider implements
                     let hoverContent = `## Table \`${table.name}\`\n\n`;
 
                     // Add resource types section
-                    if (table.name.toLowerCase() === 'resources') {
-                        // Special case for main resources table - skip description, use resource types info instead
-                        hoverContent += `[Details on Microsoft Learn](https://learn.microsoft.com/en-us/azure/governance/resource-graph/concepts/query-language?wt.mc_id=DT-MVP-5005372)\n\n`;
-                        
-                        hoverContent += `Most Azure Resource Manager resource types and properties are here.\n\n`;
-
-                        hoverContent += `[Tables and Resources Reference](https://learn.microsoft.com/en-us/azure/governance/resource-graph/reference/supported-tables-resources?wt.mc_id=DT-MVP-5005372)\n\n`;
-                    } else {
-                        // Add description if available for non-resources tables
-                        if (table.description) {
-                            hoverContent += `${table.description}\n\n`;
-                        }
-
-                        hoverContent += `[Details on Microsoft Learn](https://learn.microsoft.com/en-us/azure/governance/resource-graph/concepts/query-language?wt.mc_id=DT-MVP-5005372)\n\n`;
-
-                        // List specific resource types for specialized tables
-                        if (table.resourceTypes && table.resourceTypes.length > 0) {
-                            hoverContent += `### Resource Types\n`;
-                            const displayTypes = table.resourceTypes.slice(0, 5); // Show first 5
-                            displayTypes.forEach((type: string) => {
-                                hoverContent += `- \`${type}\`\n`;
-                            });
-                            if (table.resourceTypes.length > 5) {
-                                hoverContent += `- ... and ${table.resourceTypes.length - 5} more\n`;
-                            }
-                            hoverContent += '\n';
-
-                            hoverContent += `[Tables and Resources Reference](https://learn.microsoft.com/en-us/azure/governance/resource-graph/reference/supported-tables-resources?wt.mc_id=DT-MVP-5005372)\n\n`;
-                        }
+                    // Add description if available for non-resources tables
+                    if (table.description) {
+                        hoverContent += `${table.description}\n\n`;
                     }
+
+                    hoverContent += `[Details on Microsoft Learn](https://learn.microsoft.com/en-us/azure/governance/resource-graph/concepts/query-language?wt.mc_id=DT-MVP-5005372)\n\n`;
+
+                    // List specific resource types for specialized tables
+                    if (table.resourceTypes && table.resourceTypes.length > 0) {
+                        hoverContent += `### Resource Types\n`;
+                        const displayTypes = table.resourceTypes.slice(0, 5); // Show first 5
+                        displayTypes.forEach((type: string) => {
+                            hoverContent += `- \`${type}\`\n`;
+                        });
+                        if (table.resourceTypes.length > 5) {
+                            hoverContent += `- ... and ${table.resourceTypes.length - 5} more\n`;
+                        }
+                        hoverContent += '\n';
+
+                    }
+
+                    hoverContent += `[Tables and Resources Reference](https://learn.microsoft.com/en-us/azure/governance/resource-graph/reference/supported-tables-resources?wt.mc_id=DT-MVP-5005372)\n\n`;
 
                     // Add examples if available
                     if (table.examples && table.examples.length > 0) {
@@ -1025,13 +1045,6 @@ ${example2Code}
             return !!this.schemaData.tables[lowerName];
         }
 
-        // Check completion data
-        if (this.completionData?.tables) {
-            return this.completionData.tables.some((table: any) =>
-                table.label.toLowerCase() === lowerName
-            );
-        }
-
         // No fallback - if schema isn't loaded, return false
         return false;
     }
@@ -1057,16 +1070,6 @@ ${example2Code}
             }
         }
 
-        // Check completion data
-        if (this.completionData?.operators) {
-            const isInOperators = this.completionData.operators.some((op: any) =>
-                typeof op.label === 'string' ? op.label.toLowerCase() === lowerName : false
-            );
-            if (isInOperators) {
-                return true;
-            }
-        }
-
         // No fallback - if schema isn't loaded, return false
         return false;
     }
@@ -1078,8 +1081,8 @@ ${example2Code}
         // Get table names from schema data only
         if (this.schemaData?.tables) {
             tableNames = Object.keys(this.schemaData.tables);
-        } else if (this.completionData?.tables) {
-            tableNames = this.completionData.tables.map((table: any) => table.label);
+        } else {
+            throw new Error('Schema data not loaded');
         }
 
         // No fallback - if no schema data, return empty array
@@ -1106,11 +1109,6 @@ ${example2Code}
         }
         if (this.schemaData?.operators) {
             operatorNames.push(...this.schemaData.operators.map((op: any) => op.name));
-        }
-
-        // Also check completion data
-        if (this.completionData?.operators) {
-            operatorNames.push(...this.completionData.operators.map((op: any) => op.label));
         }
 
         // No fallback - if no schema data, return empty array

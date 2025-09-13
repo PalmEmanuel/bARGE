@@ -26,14 +26,8 @@
           "startsWithTable": true
         },
         {
-          "code": "AdvisorResources\n| where type == 'microsoft.advisor/recommendations'\n| where properties.category == 'HighAvailability'\n| where properties.shortDescription.solution == 'Upgrade to the latest version of the Azure Connected Machine agent'\n| project  id,  JoinId = toupper(properties.resourceMetadata.resourceId),  machineName = tostring(properties.impactedValue),  agentVersion = tostring(properties.extendedProperties.installedVersion),  expectedVersion = tostring(properties.extendedProperties.latestVersion)\n| join kind=leftouter( Resources\n| where type == 'microsoft.hybridcompute/machines'\n| project  machineId = toupper(id),  status = tostring (properties.status) ) on \\$left.JoinId == \\$right.machineId\n| where status != 'Expired'\n| summarize by id, machineName, agentVersion, expectedVersion\n| order by tolower(machineName) asc",
-          "source": "cli",
-          "length": 832,
-          "startsWithTable": true
-        },
-        {
           "code": "AdvisorResources\n| where type == 'microsoft.advisor/recommendations'\n| where properties.category == 'HighAvailability'\n| where properties.shortDescription.solution == 'Upgrade to the latest version of the Azure Connected Machine agent'\n| project  id,  JoinId = toupper(properties.resourceMetadata.resourceId),  machineName = tostring(properties.impactedValue),  agentVersion = tostring(properties.extendedProperties.installedVersion),  expectedVersion = tostring(properties.extendedProperties.latestVersion)\n| join kind=leftouter( Resources\n| where type == 'microsoft.hybridcompute/machines'\n| project  machineId = toupper(id),  status = tostring (properties.status) ) on $left.JoinId == $right.machineId\n| where status != 'Expired'\n| summarize by id, machineName, agentVersion, expectedVersion\n| order by tolower(machineName) asc",
-          "source": "powershell",
+          "source": "cli",
           "length": 830,
           "startsWithTable": true
         }
@@ -457,14 +451,8 @@
           "startsWithTable": true
         },
         {
-          "code": "HealthResources\n| where subscriptionId == 'mySubscriptionId'\n| where type == 'microsoft.resourcehealth/availabilitystatuses'\n| where properties contains 'Microsoft.Compute/virtualMachines'\n| extend VmId = tolower(tostring(properties['targetResourceId']))\n| extend AvailabilityState = tostring(properties['availabilityState'])\n| where AvailabilityState != 'Available'\n| project VmId, todatetime(properties['occurredTime']), AvailabilityState\n| join kind = inner (HealthResources\n| where subscriptionId == 'mySubscriptionId'\n| where type == 'microsoft.resourcehealth/resourceannotations'\n| where properties contains 'Microsoft.Compute/virtualMachines'\n| extend VmId = tolower(tostring(properties['targetResourceId']))) on \\$left.VmId == \\$right.VmId\n| join kind = inner (Resources\n| where subscriptionId == 'mySubscriptionId'\n| where type startswith 'microsoft.workloads/sapvirtualinstances/'\n| where id startswith 'myResourceId'\n| mv-expand d = properties.vmDetails\n| project VmId = tolower(d.virtualMachineId)) on \\$left.VmId1 == \\$right.VmId\n| extend AnnotationName = tostring(properties['annotationName']), ImpactType = tostring(properties['impactType']), Context = tostring(properties['context']), Summary = tostring(properties['summary']), Reason = tostring(properties['reason']), OccurredTime = todatetime(properties['occurredTime'])\n| project VmId, OccurredTime, AvailabilityState, AnnotationName, ImpactType, Context, Summary, Reason\n| project-rename ['Virtual Machine ID'] = VmId, ['Time Since Not Available'] = OccurredTime, ['Availability State'] = AvailabilityState, ['Annotation Name'] = AnnotationName, ['Impact Type'] = ImpactType",
-          "source": "cli",
-          "length": 1644,
-          "startsWithTable": true
-        },
-        {
           "code": "HealthResources\n| where subscriptionId == 'mySubscriptionId'\n| where type == 'microsoft.resourcehealth/availabilitystatuses'\n| where properties contains 'Microsoft.Compute/virtualMachines'\n| extend VmId = tolower(tostring(properties['targetResourceId']))\n| extend AvailabilityState = tostring(properties['availabilityState'])\n| where AvailabilityState != 'Available'\n| project VmId, todatetime(properties['occurredTime']), AvailabilityState\n| join kind = inner (HealthResources\n| where subscriptionId == 'mySubscriptionId'\n| where type == 'microsoft.resourcehealth/resourceannotations'\n| where properties contains 'Microsoft.Compute/virtualMachines'\n| extend VmId = tolower(tostring(properties['targetResourceId']))) on $left.VmId == $right.VmId\n| join kind = inner (Resources\n| where subscriptionId == 'mySubscriptionId'\n| where type startswith 'microsoft.workloads/sapvirtualinstances/'\n| where id startswith 'myResourceId'\n| mv-expand d = properties.vmDetails\n| project VmId = tolower(d.virtualMachineId)) on $left.VmId1 == $right.VmId\n| extend AnnotationName = tostring(properties['annotationName']), ImpactType = tostring(properties['impactType']), Context = tostring(properties['context']), Summary = tostring(properties['summary']), Reason = tostring(properties['reason']), OccurredTime = todatetime(properties['occurredTime'])\n| project VmId, OccurredTime, AvailabilityState, AnnotationName, ImpactType, Context, Summary, Reason\n| project-rename ['Virtual Machine ID'] = VmId, ['Time Since Not Available'] = OccurredTime, ['Availability State'] = AvailabilityState, ['Annotation Name'] = AnnotationName, ['Impact Type'] = ImpactType",
-          "source": "powershell",
+          "source": "cli",
           "length": 1640,
           "startsWithTable": true
         }
@@ -1307,9 +1295,9 @@
           "startsWithTable": true
         },
         {
-          "code": "Resources\n| where type == 'microsoft.hybridcompute/machines'\n| project id, JoinID = toupper(id), ComputerName = tostring(properties.osProfile.computerName), OSName = tostring(properties.osName)\n| join kind=leftouter( Resources\n| where type == 'microsoft.hybridcompute/machines/extensions'\n| project  MachineId = toupper(substring(id, 0, indexof(id, '/extensions'))),  ExtensionName = name ) on \\$left.JoinID == \\$right.MachineId\n| summarize Extensions = make_list(ExtensionName) by id, ComputerName, OSName\n| order by tolower(OSName) asc",
+          "code": "Resources\n| where type == 'microsoft.hybridcompute/machines'\n| project id, JoinID = toupper(id), ComputerName = tostring(properties.osProfile.computerName), OSName = tostring(properties.osName)\n| join kind=leftouter( Resources\n| where type == 'microsoft.hybridcompute/machines/extensions'\n| project  MachineId = toupper(substring(id, 0, indexof(id, '/extensions'))),  ExtensionName = name ) on $left.JoinID == $right.MachineId\n| summarize Extensions = make_list(ExtensionName) by id, ComputerName, OSName\n| order by tolower(OSName) asc",
           "source": "cli",
-          "length": 537,
+          "length": 535,
           "startsWithTable": true
         },
         {
@@ -1319,56 +1307,26 @@
           "startsWithTable": true
         },
         {
-          "code": "Resources\n| where type == 'microsoft.compute/virtualmachines'\n| extend JoinID = toupper(id), OSName = tostring(properties.osProfile.computerName), OSType = tostring(properties.storageProfile.osDisk.osType), VMSize = tostring(properties.hardwareProfile.vmSize)\n| join kind=leftouter( Resources\n| where type == 'microsoft.compute/virtualmachines/extensions'\n| extend VMId = toupper(substring(id, 0, indexof(id, '/extensions'))), ExtensionName = name ) on \\$left.JoinID == \\$right.VMId\n| summarize Extensions = make_list(ExtensionName) by id, OSName, OSType, VMSize\n| order by tolower(OSName) asc",
+          "code": "Resources\n| where type == 'microsoft.compute/virtualmachines'\n| extend JoinID = toupper(id), OSName = tostring(properties.osProfile.computerName), OSType = tostring(properties.storageProfile.osDisk.osType), VMSize = tostring(properties.hardwareProfile.vmSize)\n| join kind=leftouter( Resources\n| where type == 'microsoft.compute/virtualmachines/extensions'\n| extend  VMId = toupper(substring(id, 0, indexof(id, '/extensions'))),  ExtensionName = name ) on $left.JoinID == $right.VMId\n| summarize Extensions = make_list(ExtensionName) by id, OSName, OSType, VMSize\n| order by tolower(OSName) asc",
           "source": "cli",
           "length": 593,
           "startsWithTable": true
         },
         {
-          "code": "Resources\n| where type == 'microsoft.compute/virtualmachines'\n| extend JoinID = toupper(id), OSName = tostring(properties.osProfile.computerName), OSType = tostring(properties.storageProfile.osDisk.osType), VMSize = tostring(properties.hardwareProfile.vmSize)\n| join kind=leftouter( Resources\n| where type == 'microsoft.compute/virtualmachines/extensions'\n| extend  VMId = toupper(substring(id, 0, indexof(id, '/extensions'))),  ExtensionName = name ) on \\$left.JoinID == \\$right.VMId\n| summarize Extensions = make_list(ExtensionName) by id, OSName, OSType, VMSize\n| order by tolower(OSName) asc",
-          "source": "cli",
-          "length": 595,
-          "startsWithTable": true
-        },
-        {
-          "code": "Resources\n| where type =~ 'microsoft.compute/virtualmachines'\n| project resourceGroup, Id = tolower(id), PowerState = tostring( properties.extended.instanceView.powerState.code)\n| join kind=leftouter ( HealthResources\n| where type =~ 'microsoft.resourcehealth/availabilitystatuses'\n| where tostring(properties.targetResourceType) =~ 'microsoft.compute/virtualmachines'\n| project targetResourceId = tolower(tostring(properties.targetResourceId)), AvailabilityState = tostring(properties.availabilityState)) on \\$left.Id == \\$right.targetResourceId\n| project-away targetResourceId\n| where PowerState != 'PowerState/deallocated'",
-          "source": "cli",
-          "length": 625,
-          "startsWithTable": true
-        },
-        {
-          "code": "Resources\n| where type =~ 'microsoft.compute/virtualmachines'\n| project vmId = tolower(id), vmNics = properties.networkProfile.networkInterfaces\n| join (Resources\n| where type =~ 'microsoft.network/networkinterfaces'\n| project nicVMId = tolower(tostring(properties.virtualMachine.id)), allVMNicID = tolower(id), nicIPConfigs = properties.ipConfigurations) on \\$left.vmId == \\$right.nicVMId\n| join ( Resources\n| where type =~ 'microsoft.network/publicipaddresses' and isnotnull(properties.ipConfiguration.id)\n| where sku.name == 'Basic'\n| project pipId = id, pipSku = sku.name, pipAssociatedNicId = tolower(tostring(split(properties.ipConfiguration.id, '/ipConfigurations/')[0]))) on \\$left.allVMNicID == \\$right.pipAssociatedNicId\n| project vmId, pipId, pipSku",
-          "source": "cli",
-          "length": 760,
-          "startsWithTable": true
-        },
-        {
-          "code": "Resources\n| where subscriptionId == 'mySubscriptionId'\n| where type startswith 'microsoft.workloads/sapvirtualinstances/'\n| where id startswith 'myResourceId'\n| mv-expand d = properties.vmDetails\n| project VmId = tolower(d.virtualMachineId)\n| join kind = inner (HealthResources\n| where subscriptionId == 'mySubscriptionId'\n| where type == 'microsoft.resourcehealth/availabilitystatuses'\n| where properties contains 'Microsoft.Compute/virtualMachines'\n| extend VmId = tolower(tostring(properties['targetResourceId']))\n| extend AvailabilityState = tostring(properties['availabilityState'])) on \\$left.VmId == \\$right.VmId\n| project VmId, todatetime(properties['occurredTime']), AvailabilityState\n| project-rename ['Virtual Machine ID'] = VmId, UTCTimeStamp = properties_occurredTime, ['Availability State'] = AvailabilityState",
-          "source": "cli",
-          "length": 824,
-          "startsWithTable": true
-        },
-        {
-          "code": "Resources\n| where type == 'microsoft.hybridcompute/machines'\n| project id, JoinID = toupper(id), ComputerName = tostring(properties.osProfile.computerName), OSName = tostring(properties.osName)\n| join kind=leftouter( Resources\n| where type == 'microsoft.hybridcompute/machines/extensions'\n| project  MachineId = toupper(substring(id, 0, indexof(id, '/extensions'))),  ExtensionName = name ) on $left.JoinID == $right.MachineId\n| summarize Extensions = make_list(ExtensionName) by id, ComputerName, OSName\n| order by tolower(OSName) asc",
-          "source": "powershell",
-          "length": 535,
-          "startsWithTable": true
-        },
-        {
           "code": "Resources\n| where type =~ 'microsoft.compute/virtualmachines'\n| project vmId = tolower(id), vmNics = properties.networkProfile.networkInterfaces\n| join (Resources\n| where type =~ 'microsoft.network/networkinterfaces'\n| project nicVMId = tolower(tostring(properties.virtualMachine.id)), allVMNicID = tolower(id), nicIPConfigs = properties.ipConfigurations) on $left.vmId == $right.nicVMId\n| join ( Resources\n| where type =~ 'microsoft.network/publicipaddresses' and isnotnull(properties.ipConfiguration.id)\n| where sku.name == 'Basic'\n| project pipId = id, pipSku = sku.name, pipAssociatedNicId = tolower(tostring(split(properties.ipConfiguration.id, '/ipConfigurations/')[0]))) on $left.allVMNicID == $right.pipAssociatedNicId\n| project vmId, pipId, pipSku",
-          "source": "powershell",
+          "source": "cli",
           "length": 756,
           "startsWithTable": true
         },
         {
           "code": "Resources\n| where subscriptionId == 'mySubscriptionId'\n| where type startswith 'microsoft.workloads/sapvirtualinstances/'\n| where id startswith 'myResourceId'\n| mv-expand d = properties.vmDetails\n| project VmId = tolower(d.virtualMachineId)\n| join kind = inner (HealthResources\n| where subscriptionId == 'mySubscriptionId'\n| where type == 'microsoft.resourcehealth/availabilitystatuses'\n| where properties contains 'Microsoft.Compute/virtualMachines'\n| extend VmId = tolower(tostring(properties['targetResourceId']))\n| extend AvailabilityState = tostring(properties['availabilityState'])) on $left.VmId == $right.VmId\n| project VmId, todatetime(properties['occurredTime']), AvailabilityState\n| project-rename ['Virtual Machine ID'] = VmId, UTCTimeStamp = properties_occurredTime, ['Availability State'] = AvailabilityState",
-          "source": "powershell",
+          "source": "cli",
           "length": 822,
           "startsWithTable": true
         },
         {
           "code": "Resources\n| where subscriptionId == 'mySubscriptionId'\n| where type startswith 'microsoft.workloads/sapvirtualinstances/'\n| where id startswith 'myResourceId'\n| mv-expand d = properties.vmDetails\n| project VmId = tolower(d.virtualMachineId)\n| join kind = leftouter (HealthResourceChanges\n| where subscriptionId == 'mySubscriptionId'\n| where id !has '/virtualMachineScaleSets/'\n| where id has '/virtualMachines/'\n| extend timestamp = todatetime(properties.changeAttributes.timestamp)\n| extend VmId = tolower(tostring(split(id, '/providers/Microsoft.ResourceHealth/')[0]))\n| where properties has 'properties.availabilityState' or properties has 'properties.annotationName'\n| extend HealthChangeType = iff(properties has 'properties.availabilityState', 'Availability', 'Annotation')\n| extend ChangeType = tostring(properties.changeType)\n| where ChangeType == 'Update' or ChangeType == 'Delete') on $left.VmId == $right.VmId\n| extend Changes = parse_json(tostring(properties.changes))\n| extend AvailabilityStateJson = parse_json(tostring(Changes['properties.availabilityState']))\n| extend AnnotationNameJson = parse_json(tostring(Changes['properties.annotationName']))\n| extend AnnotationSummary = parse_json(tostring(Changes['properties.summary']))\n| extend AnnotationReason = parse_json(tostring(Changes['properties.reason']))\n| extend AnnotationImpactType = parse_json(tostring(Changes['properties.impactType']))\n| extend AnnotationContext = parse_json(tostring(Changes['properties.context']))\n| extend AnnotationCategory = parse_json(tostring(Changes['properties.category']))\n| extend AvailabilityStatePreviousValue = tostring(AvailabilityStateJson.previousValue)\n| extend AvailabilityStateCurrentValue = tostring(AvailabilityStateJson.newValue)\n| extend AnnotationNamePreviousValue = tostring(AnnotationNameJson.previousValue)\n| extend AnnotationNameCurrentValue = tostring(AnnotationNameJson.newValue)\n| extend AnnotationSummaryCurrentValue = tostring(AnnotationSummary.newValue)\n| extend AnnotationReasonCurrentValue = tostring(AnnotationReason.newValue)\n| extend AnnotationImpactTypeCurrentValue = tostring(AnnotationImpactType.newValue)\n| extend AnnotationContextCurrentValue = tostring(AnnotationContext.newValue)\n| extend AnnotationCategoryCurrentValue = tostring(AnnotationCategory.newValue)\n| project id = VmId, timestamp, ChangeType, AvailabilityStateCurrentValue, AnnotationNameCurrentValue, AnnotationSummaryCurrentValue, AnnotationReasonCurrentValue, AnnotationImpactTypeCurrentValue, AnnotationContextCurrentValue, AnnotationCategoryCurrentValue, Changes\n| order by id, timestamp asc\n| project-rename ['Virtual Machine ID'] = id, UTCTimeStamp = timestamp, ['Change Type'] = ChangeType, ['Availability State'] = AvailabilityStateCurrentValue, ['Summary'] = AnnotationSummaryCurrentValue, ['Reason'] = AnnotationReasonCurrentValue, ['Impact Type'] = AnnotationImpactTypeCurrentValue, Category = AnnotationCategoryCurrentValue, Context = AnnotationContextCurrentValue",
-          "source": "powershell",
+          "source": "cli",
           "length": 2978,
           "startsWithTable": true
         }
@@ -1463,12 +1421,6 @@
           "code": "SecurityResources\n| where type == 'microsoft.security/assessments'\n| extend resourceId=id,\nrecommendationId=name,\nrecommendationName=properties.displayName,\nsource=properties.resourceDetails.Source,\nrecommendationState=properties.status.code,\ndescription=properties.metadata.description,\nassessmentType=properties.metadata.assessmentType,\nremediationDescription=properties.metadata.remediationDescription,\npolicyDefinitionId=properties.metadata.policyDefinitionId,\nimplementationEffort=properties.metadata.implementationEffort,\nrecommendationSeverity=properties.metadata.severity,\ncategory=properties.metadata.categories,\nuserImpact=properties.metadata.userImpact,\nthreats=properties.metadata.threats,\nportalLink=properties.links.azurePortal\n| project tenantId, subscriptionId, resourceId, recommendationName, recommendationId, recommendationState, recommendationSeverity, description, remediationDescription, assessmentType, policyDefinitionId, implementationEffort, userImpact, category, threats, source, portalLink",
           "source": "kql",
           "length": 1017,
-          "startsWithTable": true
-        },
-        {
-          "code": "SecurityResources\n| where type == 'microsoft.security/insights/classification'\n| where properties.associatedResource contains '\\$resource_id'\n| project SensitivityInsight = properties.insightProperties.purviewCatalogs[0].sensitivity",
-          "source": "cli",
-          "length": 232,
           "startsWithTable": true
         },
         {

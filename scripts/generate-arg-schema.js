@@ -292,7 +292,6 @@ class ARGSchemaGenerator {
         };
         this.sampleQueries = [];
         this.kustoBaseUrl = 'https://learn.microsoft.com';
-        this.requestDelay = 2000; // Increase delay to 2 seconds to be more respectful of GitHub API
         
         // Retry configuration
         this.maxRetries = 5;
@@ -609,56 +608,6 @@ class ARGSchemaGenerator {
         return tableMatch ? tableMatch[1].toLowerCase() : null;
     }
 
-    extractTableDescription(sectionContent, tableName) {
-        // Look for meaningful descriptions, avoiding common page elements
-        const paragraphs = sectionContent.match(/<p[^>]*>(.*?)<\/p>/gis);
-        
-        if (paragraphs) {
-            for (const paragraphMatch of paragraphs) {
-                const description = paragraphMatch
-                    .replace(/<p[^>]*>/gi, '')  // Remove opening p tag
-                    .replace(/<\/p>/gi, '')     // Remove closing p tag
-                    .replace(/<[^>]*>/g, '')    // Remove all other HTML tags
-                    .replace(/\s+/g, ' ')       // Normalize whitespace
-                    .trim();
-                
-                // Skip common footer/navigation text
-                const skipPatterns = [
-                    /was this page helpful/i,
-                    /did this page help/i,
-                    /feedback/i,
-                    /microsoft\.com/i,
-                    /privacy/i,
-                    /terms of use/i,
-                    /cookie/i,
-                    /trademark/i,
-                    /contribute/i,
-                    /previous versions/i,
-                    /learn\.microsoft\.com/i,
-                    /^https?:\/\//i,
-                    /^\s*$/, // Empty or whitespace only
-                    /^[^a-zA-Z]*$/ // No letters (just symbols/numbers)
-                ];
-                
-                // Check if this description should be skipped
-                const shouldSkip = skipPatterns.some(pattern => pattern.test(description));
-                
-                if (!shouldSkip && description.length > 10 && description.length < 200) {
-                    // Add sample query link to the extracted description
-                    const sampleLink = `https://learn.microsoft.com/en-us/azure/governance/resource-graph/samples/samples-by-category`;
-                    return `${description} [View sample queries](${sampleLink}).`;
-                }
-            }
-        }
-        
-        // Fallback to a more specific description based on the table name
-        if (tableName === 'resources') {
-            return '\nMost Resource Manager resource types and properties are here. [View sample queries](https://learn.microsoft.com/en-us/azure/governance/resource-graph/samples/starter).';
-        }
-        
-        return `For sample queries for this table, see [Resource Graph sample queries for ${tableName}](https://learn.microsoft.com/en-us/azure/governance/resource-graph/samples/samples-by-category).`;
-    }
-
     extractResourceTypes(sectionContent) {
         const resourceTypes = [];
         
@@ -749,18 +698,41 @@ class ARGSchemaGenerator {
             console.log(`📝 Found ${sampleFiles.length} sample files, fetching KQL snippets...`);
             const allCodeSnippets = [];
             
-            for (const file of sampleFiles) {
+            // Process files in parallel batches to avoid overwhelming the GitHub API
+            const batchSize = 10; // Process 10 files at a time
+            const batches = [];
+            
+            for (let i = 0; i < sampleFiles.length; i += batchSize) {
+                batches.push(sampleFiles.slice(i, i + batchSize));
+            }
+            
+            console.log(`🚀 Processing ${sampleFiles.length} files in ${batches.length} parallel batches of ${batchSize}...`);
+            
+            for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+                const batch = batches[batchIndex];
+                console.log(`📦 Processing batch ${batchIndex + 1}/${batches.length} (${batch.length} files)...`);
+                
                 try {
-                    console.log(`📥 Fetching: ${file.name}`);
-                    const markdownContent = await this.fetchUrl(file.download_url);
-                    const snippets = this.parseMarkdownCodeSnippets(markdownContent);
-                    allCodeSnippets.push(...snippets);
-                    console.log(`  ✅ Found ${snippets.length} KQL snippets in ${file.name}`);
+                    // Process all files in this batch in parallel
+                    const batchResults = await Promise.all(batch.map(async (file) => {
+                        try {
+                            console.log(`📥 Fetching: ${file.name}`);
+                            const markdownContent = await this.fetchUrl(file.download_url);
+                            const snippets = this.parseMarkdownCodeSnippets(markdownContent);
+                            console.log(`  ✅ Found ${snippets.length} KQL snippets in ${file.name}`);
+                            return snippets;
+                        } catch (urlError) {
+                            console.warn(`  ⚠️ Could not fetch ${file.name}: ${urlError.message}`);
+                            return [];
+                        }
+                    }));
                     
-                    // Add delay between requests to be respectful
-                    await this.delay(this.requestDelay);
-                } catch (urlError) {
-                    console.warn(`  ⚠️ Could not fetch ${file.name}: ${urlError.message}`);
+                    // Flatten and add all snippets from this batch
+                    for (const snippets of batchResults) {
+                        allCodeSnippets.push(...snippets);
+                    }
+                } catch (batchError) {
+                    console.warn(`⚠️ Error processing batch ${batchIndex + 1}: ${batchError.message}`);
                 }
             }
             
@@ -791,9 +763,6 @@ class ARGSchemaGenerator {
                 console.log(`🔍 Searching in: ${searchPath}`);
                 const files = await this.getGitHubDirectoryContents(searchPath);
                 sampleFiles.push(...files);
-                
-                // Add delay between directory searches
-                await this.delay(this.requestDelay);
             } catch (error) {
                 console.warn(`⚠️ Could not access ${searchPath}: ${error.message}`);
             }
@@ -898,9 +867,7 @@ class ARGSchemaGenerator {
                 .trim();
             
             // Handle special cases and normalize the format
-            if (tableName.toLowerCase() === 'resources') {
-                cleanDescription = '\nThe default table if a table isn\'t defined in the query. Most Resource Manager resource types and properties are here';
-            } else if (cleanDescription.startsWith('Related to ')) {
+            if (cleanDescription.startsWith('Related to ')) {
                 // Keep "Related to" descriptions as-is
                 cleanDescription = cleanDescription;
             } else if (cleanDescription.startsWith('related to ')) {
@@ -1426,9 +1393,6 @@ class ARGSchemaGenerator {
             JSON.stringify(this.schema, null, 2)
         );
 
-        // Write completion provider data
-        await this.generateCompletionData(outputDir);
-
         // Write TextMate grammar
         await this.generateTextMateGrammar();
 
@@ -1920,21 +1884,6 @@ class ARGSchemaGenerator {
             .trim();
     }
 
-    async generateCompletionData(outputDir) {        
-        const completionData = {
-            tables: this.generateTableCompletions(),
-            keywords: this.generateKeywordCompletions(),
-            operators: this.generateOperatorCompletions(),
-            functions: this.generateFunctionCompletions(),
-            resourceTypes: this.generateResourceTypeCompletions(),
-            properties: [] // this.generatePropertyCompletions() // NOTE: Detailed properties disabled to reduce bundle size
-        };
-
-        await fs.writeFile(
-            path.join(outputDir, 'completion-data.json'),
-            JSON.stringify(completionData, null, 2)
-        );
-    }
 
     /**
      * Generate enhanced table completions with descriptions and examples
