@@ -26,10 +26,32 @@ const https = require('https');
 const fs = require('fs').promises;
 const path = require('path');
 
-// Function to clean markdown links and includes  
-function cleanMarkdownLinks(text) {
-    if (!text) return '';
-    return text
+// Function to clean markdown content - removes links, includes, Microsoft Learn callouts, and other formatting
+function cleanMarkdown(text) {
+    if (!text) {
+        return '';
+    }
+    
+    const lines = text.split('\n');
+    const filteredLines = [];
+    
+    // First pass: filter Microsoft Learn callouts
+    for (const line of lines) {
+        const trimmed = line.trim();
+        
+        // Check if this line contains a Microsoft Learn callout (case-insensitive)
+        if (trimmed.match(/^>\s*\[!(NOTE|TIP|WARNING|IMPORTANT|CAUTION)\]/i)) {
+            // Replace the callout with just a blockquote, preserving any content after the marker
+            const cleanedLine = line.replace(/\[!(NOTE|TIP|WARNING|IMPORTANT|CAUTION)\]\s*/i, '').replace(/>\s*>\s*/, '> ');
+            filteredLines.push(cleanedLine);
+        } else {
+            // Keep the line as is
+            filteredLines.push(line);
+        }
+    }
+    
+    // Second pass: clean markdown links and other formatting
+    return filteredLines.join('\n')
         .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Remove [text](url) links
         .replace(/>\s*!\s*INCLUDE\s+\[[^\]]+\]/g, '') // Remove > !INCLUDE [name] directives
         .replace(/!\s*INCLUDE\s+\[[^\]]+\]/g, '') // Remove !INCLUDE [name] directives
@@ -37,6 +59,8 @@ function cleanMarkdownLinks(text) {
         .replace(/\|(-{2,})/g, '|:$1') // Convert table alignment to left-aligned (add colon to start of any column with 2+ dashes)
         // Remove moniker ranges like "::: moniker range="..." ... ::: moniker-end"
         .replace(/::: moniker range="[^"]*"\s*[\s\S]*?::: moniker-end/g, '')
+        // Remove image references like ":::image type="content" source="media/..." alt-text="...":::"
+        .replace(/:::image[^:]*:::/g, '')
         .replace(/\n\s*\n\s*\n/g, '\n\n') // Collapse multiple newlines
         .trim();
 }
@@ -65,45 +89,6 @@ function cleanFunctionTitle(title) {
         .replace(/\s+-\s*\(preview\)$/i, '')
         .replace(/\s*-\s*$/i, '')  // Remove trailing " -" after removing preview
         .trim();
-}
-
-function filterMicrosoftLearnNotes(text) {
-    if (!text) {
-        return text;
-    }
-    
-    const lines = text.split('\n');
-    const filteredLines = [];
-    let inNoteBlock = false;
-    
-    for (const line of lines) {
-        const trimmed = line.trim();
-        
-        // Check if this line starts a Microsoft Learn note block
-        if (trimmed.startsWith('> [!')) {
-            inNoteBlock = true;
-            continue; // Skip this line
-        }
-        
-        // Check if we're in a note block
-        if (inNoteBlock) {
-            // If the line starts with '>', it's still part of the note block
-            if (trimmed.startsWith('>')) {
-                continue; // Skip this line
-            } else {
-                // No longer in note block
-                inNoteBlock = false;
-                // Fall through to process this line normally
-            }
-        }
-        
-        // Keep the line if we're not in a note block
-        if (!inNoteBlock) {
-            filteredLines.push(line);
-        }
-    }
-    
-    return filteredLines.join('\n').trim();
 }
 
 // Focused documentation parser for Microsoft Docs
@@ -207,9 +192,6 @@ function parseMarkdownDoc(content) {
     returnInfo = returnLines.join('\n').trim();
     parametersTable = parameterLines.join('\n').trim();
     
-    // Filter out Microsoft Learn note blocks from description
-    description = filterMicrosoftLearnNotes(description);
-    
     // For examples, extract only kusto code blocks
     let processedExample = '';
     if (exampleLines.length > 0) {
@@ -250,12 +232,12 @@ function parseMarkdownDoc(content) {
     const extractedCategory = extractCategoryFromTitle(cleanedTitle);
     
     return {
-        title: cleanMarkdownLinks(cleanFunctionTitle(cleanedTitle)),
-        description: cleanMarkdownLinks(description),
-        syntax: cleanMarkdownLinks(syntax),
-        returnInfo: cleanMarkdownLinks(returnInfo),
-        parametersTable: cleanMarkdownLinks(parametersTable),
-        example: cleanMarkdownLinks(example),
+        title: cleanMarkdown(cleanFunctionTitle(cleanedTitle)),
+        description: cleanMarkdown(description),
+        syntax: cleanMarkdown(syntax),
+        returnInfo: cleanMarkdown(returnInfo),
+        parametersTable: cleanMarkdown(parametersTable),
+        example: cleanMarkdown(example),
         category: extractedCategory, // Include the extracted category
         sourceLength: content.length
     };
@@ -732,20 +714,34 @@ class ARGSchemaGenerator {
             const sampleFiles = await this.discoverGitHubSampleFiles();
             
             console.log(`📝 Found ${sampleFiles.length} sample files, fetching KQL snippets...`);
+            
+            // Process files in parallel with controlled concurrency to be respectful to GitHub API
+            const batchSize = 10; // Process 10 files at a time
             const allCodeSnippets = [];
             
-            for (const file of sampleFiles) {
-                try {
-                    console.log(`📥 Fetching: ${file.name}`);
-                    const markdownContent = await this.fetchUrl(file.download_url);
-                    const snippets = this.parseMarkdownCodeSnippets(markdownContent);
-                    allCodeSnippets.push(...snippets);
-                    console.log(`  ✅ Found ${snippets.length} KQL snippets in ${file.name}`);
-                    
-                    // Add delay between requests to be respectful
+            for (let i = 0; i < sampleFiles.length; i += batchSize) {
+                const batch = sampleFiles.slice(i, i + batchSize);
+                console.log(`📥 Processing batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(sampleFiles.length / batchSize)} (${batch.length} files)`);
+                
+                const batchPromises = batch.map(async (file) => {
+                    try {
+                        console.log(`  📥 Fetching: ${file.name}`);
+                        const markdownContent = await this.fetchUrl(file.download_url);
+                        const snippets = this.parseMarkdownCodeSnippets(markdownContent);
+                        console.log(`    ✅ Found ${snippets.length} KQL snippets in ${file.name}`);
+                        return snippets;
+                    } catch (urlError) {
+                        console.warn(`    ⚠️ Could not fetch ${file.name}: ${urlError.message}`);
+                        return [];
+                    }
+                });
+                
+                const batchResults = await Promise.all(batchPromises);
+                batchResults.forEach(snippets => allCodeSnippets.push(...snippets));
+                
+                // Add delay between batches to be respectful to GitHub API
+                if (i + batchSize < sampleFiles.length) {
                     await this.delay(this.requestDelay);
-                } catch (urlError) {
-                    console.warn(`  ⚠️ Could not fetch ${file.name}: ${urlError.message}`);
                 }
             }
             
@@ -1878,7 +1874,7 @@ class ARGSchemaGenerator {
             .trim();
     }
 
-    cleanMarkdownLinks(content) {
+    cleanMarkdown(content) {
         if (!content) {
             return '';
         }
@@ -2803,7 +2799,8 @@ Examples:
             }
         }).catch(console.error);
     } else {
-        throw new Error('API-based generation requires a valid bearer token. Use --help for usage details.');
+        console.log('📖 Full generation from documentation (no bearer token provided)...');
+        generator.generateExamplesOnly().catch(console.error);
     }
 }
 
