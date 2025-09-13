@@ -106,7 +106,7 @@ export class KustoLanguageServiceProvider implements
             // Find the current table context to filter resource types
             const tableContext = this.findCurrentTableContext(document, position);
             const insideQuotes = this.isInsideQuotes(linePrefix);
-            suggestions.push(...this.filterCompletionItems(this.getResourceTypes(tableContext || undefined, insideQuotes), lowerCurrentWord));
+            suggestions.push(...this.filterCompletionItems(this.getResourceTypes(tableContext || undefined, insideQuotes, document, position), lowerCurrentWord));
         }
 
         // In project, extend, where, or summarize by context - suggest properties and functions
@@ -116,7 +116,7 @@ export class KustoLanguageServiceProvider implements
             // Also provide table-aware resource type suggestions in property context
             const tableContext = this.findCurrentTableContext(document, position);
             const insideQuotes = this.isInsideQuotes(linePrefix);
-            suggestions.push(...this.filterCompletionItems(this.getResourceTypes(tableContext || undefined, insideQuotes), lowerCurrentWord));
+            suggestions.push(...this.filterCompletionItems(this.getResourceTypes(tableContext || undefined, insideQuotes, document, position), lowerCurrentWord));
         }
 
         // Default: suggest common operators and functions
@@ -164,6 +164,76 @@ export class KustoLanguageServiceProvider implements
         
         // If odd number of quotes, we're inside quotes
         return (singleQuotes % 2 === 1) || (doubleQuotes % 2 === 1);
+    }
+
+    /**
+     * Calculate the replacement range for resource type completions
+     */
+    private getResourceTypeReplacementRange(document: vscode.TextDocument, position: vscode.Position, insideQuotes: boolean): vscode.Range | undefined {
+        const line = document.lineAt(position).text;
+        const linePrefix = line.substring(0, position.character);
+        
+        // Find the start of the current resource type being typed
+        let startPos = position.character;
+        
+        if (insideQuotes) {
+            // We're inside quotes, find the start of the quoted string content
+            // Look backwards for the opening quote
+            for (let i = position.character - 1; i >= 0; i--) {
+                const char = line[i];
+                if (char === '"' || char === "'") {
+                    startPos = i + 1; // Start after the quote
+                    break;
+                }
+            }
+        } else {
+            // We're not inside quotes, find the start of the word
+            // Look backwards for non-word characters
+            for (let i = position.character - 1; i >= 0; i--) {
+                const char = line[i];
+                if (!/[a-zA-Z0-9./]/.test(char)) {
+                    startPos = i + 1;
+                    break;
+                }
+                if (i === 0) {
+                    startPos = 0;
+                }
+            }
+        }
+        
+        // Find the end of the current word/quoted content
+        let endPos = position.character;
+        if (insideQuotes) {
+            // Look forward for the closing quote
+            for (let i = position.character; i < line.length; i++) {
+                const char = line[i];
+                if (char === '"' || char === "'") {
+                    endPos = i; // End before the quote
+                    break;
+                }
+            }
+        } else {
+            // Look forward for non-word characters
+            for (let i = position.character; i < line.length; i++) {
+                const char = line[i];
+                if (!/[a-zA-Z0-9./]/.test(char)) {
+                    endPos = i;
+                    break;
+                }
+                if (i === line.length - 1) {
+                    endPos = line.length;
+                }
+            }
+        }
+        
+        if (startPos < endPos) {
+            return new vscode.Range(
+                new vscode.Position(position.line, startPos),
+                new vscode.Position(position.line, endPos)
+            );
+        }
+        
+        return undefined;
     }
 
     /**
@@ -283,8 +353,10 @@ export class KustoLanguageServiceProvider implements
      * Get resource type completions from schema data
      * @param tableContext Optional table name to filter resource types for that specific table
      * @param insideQuotes Whether we're already inside quotes (to avoid double-quoting)
+     * @param document The document being edited (optional, for range calculation)
+     * @param position The current position (optional, for range calculation)
      */
-    private getResourceTypes(tableContext?: string, insideQuotes: boolean = false): vscode.CompletionItem[] {
+    private getResourceTypes(tableContext?: string, insideQuotes: boolean = false, document?: vscode.TextDocument, position?: vscode.Position): vscode.CompletionItem[] {
         const resourceTypes: vscode.CompletionItem[] = [];
 
         if (this.schema?.resourceTypes) {
@@ -298,6 +370,15 @@ export class KustoLanguageServiceProvider implements
                         item.detail = `Resource Type - ${resourceType} (${data.tables.join(', ')} table${data.tables.length > 1 ? 's' : ''})`;
                         // Only add quotes if we're not already inside them
                         item.insertText = insideQuotes ? resourceType : `'${resourceType}'`;
+                        
+                        // Calculate replacement range for proper completion
+                        if (document && position) {
+                            const range = this.getResourceTypeReplacementRange(document, position, insideQuotes);
+                            if (range) {
+                                item.range = range;
+                            }
+                        }
+                        
                         item.sortText = `5_${resourceType}`;
                         resourceTypes.push(item);
                     }
@@ -310,6 +391,15 @@ export class KustoLanguageServiceProvider implements
                     item.detail = `Resource Type - ${resourceType}${data.tables ? ` (${data.tables.join(', ')} table${data.tables.length > 1 ? 's' : ''})` : ''}`;
                     // Only add quotes if we're not already inside them
                     item.insertText = insideQuotes ? resourceType : `'${resourceType}'`;
+                    
+                    // Calculate replacement range for proper completion
+                    if (document && position) {
+                        const range = this.getResourceTypeReplacementRange(document, position, insideQuotes);
+                        if (range) {
+                            item.range = range;
+                        }
+                    }
+                    
                     item.sortText = `5_${resourceType}`;
                     resourceTypes.push(item);
                 }
