@@ -9969,10 +9969,6 @@
       "category": "KQL Keyword"
     },
     {
-      "name": "limit",
-      "category": "KQL Keyword"
-    },
-    {
       "name": "linechart",
       "category": "KQL Keyword"
     },
@@ -11514,6 +11510,20 @@
         "example": "StormEvents\n| where InjuriesDirect > 0\n| summarize by State, EventType\n\nStormEvents\n| where State == \"HAWAII\" and EventType == \"Heavy Rain\"\n| project Duration = EndTime - StartTime\n| summarize Min = min(Duration), Max = max(Duration)\n\nStormEvents\n| summarize TypesOfStorms=dcount(EventType) by State\n| sort by TypesOfStorms\n\nStormEvents\n| project EventType, Duration = EndTime - StartTime\n| where Duration > 1d\n| summarize EventCount=count() by EventType, Length=bin(Duration, 1d)\n| sort by Length\n\ndatatable(x:long)[]\n| summarize any_x=take_any(x), arg_max_x=arg_max(x, *), arg_min_x=arg_min(x, *), avg(x), buildschema(todynamic(tostring(x))), max(x), min(x), percentile(x, 55), hll(x) ,stdev(x), sum(x), sumif(x, x > 0), tdigest(x), variance(x)\n\ndatatable(x:long)[]\n| summarize  count(x), countif(x > 0) , dcount(x), dcountif(x, x > 0)\n\ndatatable(x:long)[]\n| summarize  make_set(x), make_list(x)\n\nrange x from 1 to 4 step 1\n| extend y = iff(x == 1, real(null), real(5))\n| summarize sum(y), avg(y)\n\nrange x from 1 to 2 step 1\n| extend y = iff(x == 1, real(null), real(5))\n| summarize count(y)\n\nrange x from 1 to 2 step 1\n| extend y = iff(x == 1, real(null), real(5))\n| summarize make_set(y), make_set(y)",
         "sourceLength": 11456,
         "url": "https://learn.microsoft.com/en-us/kusto/query/summarize-operator"
+      }
+    },
+    {
+      "name": "limit",
+      "category": "operator",
+      "documentation": {
+        "title": "take",
+        "description": "Return up to the specified number of rows.\n\nThere is no guarantee which records are returned, unless\nthe source data is sorted. If the data is sorted, then the top values will be returned.\n\n> The `take` and `limit` operators are equivalent",
+        "syntax": "`take` *NumberOfRows*",
+        "returnInfo": "",
+        "parametersTable": "|Name|Type|Required|Description|\n|:--|:--|:--|:--|\n|*NumberOfRows*| `int` | *True*|The number of rows to return.|",
+        "example": "StormEvents | take 5",
+        "sourceLength": 2550,
+        "url": "https://learn.microsoft.com/en-us/kusto/query/take-operator"
       }
     },
     {

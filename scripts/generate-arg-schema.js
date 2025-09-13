@@ -1566,6 +1566,14 @@ class ARGSchemaGenerator {
                 );
             }
             
+            // Special case: "take" documentation should also match "limit" keyword
+            if (docOperator.name.toLowerCase() === 'take') {
+                docOperatorVariations.push(
+                    'limit',
+                    'limit'
+                );
+            }
+            
             // Track which items receive documentation from this doc (allow multiple matches)
             let documentationApplied = false;
             
