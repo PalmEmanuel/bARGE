@@ -275,12 +275,12 @@ export class KustoLanguageServiceProvider implements
         if (this.schema?.resourceTypes) {
             // If we have a table context, filter resource types to only those supported by the table
             if (tableContext) {
-                // Use API-based resource types: filter by table property
+                // Use API-based resource types: filter by tables array property
                 for (const [resourceType, resourceData] of Object.entries(this.schema.resourceTypes)) {
                     const data = resourceData as any;
-                    if (data.table && data.table.toLowerCase() === tableContext.toLowerCase()) {
+                    if (data.tables && data.tables.includes(tableContext.toLowerCase())) {
                         const item = new vscode.CompletionItem(resourceType, vscode.CompletionItemKind.Value);
-                        item.detail = `Resource Type - ${resourceType} (${data.table} table)`;
+                        item.detail = `Resource Type - ${resourceType} (${data.tables.join(', ')} table${data.tables.length > 1 ? 's' : ''})`;
                         item.insertText = `'${resourceType}'`;
                         item.sortText = `5_${resourceType}`;
                         resourceTypes.push(item);
@@ -291,7 +291,7 @@ export class KustoLanguageServiceProvider implements
                 for (const [resourceType, resourceData] of Object.entries(this.schema.resourceTypes)) {
                     const data = resourceData as any;
                     const item = new vscode.CompletionItem(resourceType, vscode.CompletionItemKind.Value);
-                    item.detail = `Resource Type - ${resourceType}${data.table ? ` (${data.table} table)` : ''}`;
+                    item.detail = `Resource Type - ${resourceType}${data.tables ? ` (${data.tables.join(', ')} table${data.tables.length > 1 ? 's' : ''})` : ''}`;
                     item.insertText = `'${resourceType}'`;
                     item.sortText = `5_${resourceType}`;
                     resourceTypes.push(item);
@@ -1025,7 +1025,8 @@ ${example2Code}
                 const resourceType = this.schemaData.resourceTypes[lowerWord];
                 if (resourceType) {
                     const properties = resourceType.properties ? `\n\nProperties:\n${resourceType.properties.slice(0, 10).map((prop: string) => `• ${prop}`).join('\n')}${resourceType.properties.length > 10 ? '\n• ...' : ''}` : '';
-                    return `**${resourceType.name}** - Azure Resource Type\n\nTable: ${resourceType.table}${properties}`;
+                    const tablesText = resourceType.tables ? resourceType.tables.join(', ') : 'Unknown';
+                    return `**${resourceType.name}** - Azure Resource Type\n\nTable${resourceType.tables && resourceType.tables.length > 1 ? 's' : ''}: ${tablesText}${properties}`;
                 }
             }
         }
