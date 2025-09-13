@@ -26,12 +26,32 @@ const https = require('https');
 const fs = require('fs').promises;
 const path = require('path');
 
-// Function to clean markdown links and includes  
-function cleanMarkdownLinks(text) {
+// Function to clean markdown content - removes links, includes, Microsoft Learn callouts, and other formatting
+function cleanMarkdown(text) {
     if (!text) {
         return '';
     }
-    return text
+    
+    const lines = text.split('\n');
+    const filteredLines = [];
+    
+    // First pass: filter Microsoft Learn callouts
+    for (const line of lines) {
+        const trimmed = line.trim();
+        
+        // Check if this line contains a Microsoft Learn callout
+        if (trimmed.match(/^>\s*\[!(NOTE|TIP|WARNING|IMPORTANT|CAUTION)\]/)) {
+            // Replace the callout with just a blockquote
+            const cleanedLine = line.replace(/\[!(NOTE|TIP|WARNING|IMPORTANT|CAUTION)\]/, '').replace(/>\s*>\s*/, '> ');
+            filteredLines.push(cleanedLine);
+        } else {
+            // Keep the line as is
+            filteredLines.push(line);
+        }
+    }
+    
+    // Second pass: clean markdown links and other formatting
+    return filteredLines.join('\n')
         .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Remove [text](url) links
         .replace(/>\s*!\s*INCLUDE\s+\[[^\]]+\]/g, '') // Remove > !INCLUDE [name] directives
         .replace(/!\s*INCLUDE\s+\[[^\]]+\]/g, '') // Remove !INCLUDE [name] directives
@@ -69,45 +89,6 @@ function cleanFunctionTitle(title) {
         .replace(/\s+-\s*\(preview\)$/i, '')
         .replace(/\s*-\s*$/i, '')  // Remove trailing " -" after removing preview
         .trim();
-}
-
-function filterMicrosoftLearnNotes(text) {
-    if (!text) {
-        return text;
-    }
-    
-    const lines = text.split('\n');
-    const filteredLines = [];
-    let inNoteBlock = false;
-    
-    for (const line of lines) {
-        const trimmed = line.trim();
-        
-        // Check if this line starts a Microsoft Learn note block
-        if (trimmed.startsWith('> [!')) {
-            inNoteBlock = true;
-            continue; // Skip this line
-        }
-        
-        // Check if we're in a note block
-        if (inNoteBlock) {
-            // If the line starts with '>', it's still part of the note block
-            if (trimmed.startsWith('>')) {
-                continue; // Skip this line
-            } else {
-                // No longer in note block
-                inNoteBlock = false;
-                // Fall through to process this line normally
-            }
-        }
-        
-        // Keep the line if we're not in a note block
-        if (!inNoteBlock) {
-            filteredLines.push(line);
-        }
-    }
-    
-    return filteredLines.join('\n').trim();
 }
 
 // Focused documentation parser for Microsoft Docs
@@ -211,9 +192,6 @@ function parseMarkdownDoc(content) {
     returnInfo = returnLines.join('\n').trim();
     parametersTable = parameterLines.join('\n').trim();
     
-    // Filter out Microsoft Learn note blocks from description
-    description = filterMicrosoftLearnNotes(description);
-    
     // For examples, extract only kusto code blocks
     let processedExample = '';
     if (exampleLines.length > 0) {
@@ -254,12 +232,12 @@ function parseMarkdownDoc(content) {
     const extractedCategory = extractCategoryFromTitle(cleanedTitle);
     
     return {
-        title: cleanMarkdownLinks(cleanFunctionTitle(cleanedTitle)),
-        description: cleanMarkdownLinks(description),
-        syntax: cleanMarkdownLinks(syntax),
-        returnInfo: cleanMarkdownLinks(returnInfo),
-        parametersTable: cleanMarkdownLinks(parametersTable),
-        example: cleanMarkdownLinks(example),
+        title: cleanMarkdown(cleanFunctionTitle(cleanedTitle)),
+        description: cleanMarkdown(description),
+        syntax: cleanMarkdown(syntax),
+        returnInfo: cleanMarkdown(returnInfo),
+        parametersTable: cleanMarkdown(parametersTable),
+        example: cleanMarkdown(example),
         category: extractedCategory, // Include the extracted category
         sourceLength: content.length
     };
@@ -1867,31 +1845,6 @@ class ARGSchemaGenerator {
             .replace(/\s*-\s*$/i, '')  // Remove trailing " -" after removing preview
             .trim();
     }
-
-    cleanMarkdownLinks(content) {
-        if (!content) {
-            return '';
-        }
-        
-        return content
-            // Remove moniker ranges
-            .replace(/:::moniker\s+range="[^"]*":::\s*/g, '')
-            .replace(/:::moniker-end:::\s*/g, '')
-            
-            // Convert markdown links to plain text, preserving the link text
-            .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-            
-            // Remove reference-style links
-            .replace(/\[([^\]]+)\]\[[^\]]*\]/g, '$1')
-            
-            // Clean up table alignment (dynamic replacement for any number of dashes)
-            .replace(/^\|[\s\-:]*\|$/gm, '')
-            
-            // Remove extra whitespace and empty lines
-            .replace(/\n\s*\n\s*\n/g, '\n\n')
-            .trim();
-    }
-
 
     /**
      * Generate enhanced table completions with descriptions and examples
