@@ -269,31 +269,6 @@
       "label": "tagsresources",
       "kind": "Table",
       "insertText": "tagsresources"
-    },
-    {
-      "label": "insightresources",
-      "kind": "Table",
-      "insertText": "insightresources"
-    },
-    {
-      "label": "managedserviceresources",
-      "kind": "Table",
-      "insertText": "managedserviceresources"
-    },
-    {
-      "label": "mirgateresources",
-      "kind": "Table",
-      "insertText": "mirgateresources"
-    },
-    {
-      "label": "sportresources",
-      "kind": "Table",
-      "insertText": "sportresources"
-    },
-    {
-      "label": "tagresources",
-      "kind": "Table",
-      "insertText": "tagresources"
     }
   ],
   "keywords": [
@@ -5406,6 +5381,16 @@
       "insertText": "'microsoft.offazure/hypervsites/machines/inventoryinsights/pendingupdates'"
     },
     {
+      "label": "microsoft.offazure/hypervsites/machines/inventoryinsights/software",
+      "kind": "Value",
+      "insertText": "'microsoft.offazure/hypervsites/machines/inventoryinsights/software'"
+    },
+    {
+      "label": "microsoft.offazure/hypervsites/machines/inventoryinsights/vulnerabilities",
+      "kind": "Value",
+      "insertText": "'microsoft.offazure/hypervsites/machines/inventoryinsights/vulnerabilities'"
+    },
+    {
       "label": "microsoft.offazure/serversites/machines/inventoryinsights",
       "kind": "Value",
       "insertText": "'microsoft.offazure/serversites/machines/inventoryinsights'"
@@ -6749,6 +6734,11 @@
       "label": "microsoft.appconfiguration/configurationstores",
       "kind": "Value",
       "insertText": "'microsoft.appconfiguration/configurationstores'"
+    },
+    {
+      "label": "microsoft.applicationmigration/codescansites",
+      "kind": "Value",
+      "insertText": "'microsoft.applicationmigration/codescansites'"
     },
     {
       "label": "microsoft.applicationmigration/discoveryhubs",
@@ -13064,12 +13054,6 @@
       "label": "microsoft.resources/tagnamespaces/tags",
       "kind": "Value",
       "insertText": "'microsoft.resources/tagnamespaces/tags'"
-    },
-    {
-      "label": "aka.ms/yourcaliforniaprivacychoices",
-      "kind": "Value",
-      "insertText": "'aka.ms/yourcaliforniaprivacychoices'"
     }
-  ],
-  "properties": []
+  ]
 }

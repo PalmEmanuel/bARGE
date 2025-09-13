@@ -73,7 +73,7 @@ export class KustoLanguageServiceProvider implements
         const currentWord = this.getCurrentWord(linePrefix);
 
         // Get contextual suggestions based on sophisticated analysis
-        const suggestions = this.getContextualSuggestions(linePrefix, currentWord);
+        const suggestions = this.getContextualSuggestions(document, position, linePrefix, currentWord);
 
         return suggestions;
     }
@@ -81,7 +81,7 @@ export class KustoLanguageServiceProvider implements
     /**
      * Get contextual completion suggestions based on sophisticated KQL syntax analysis
      */
-    private getContextualSuggestions(linePrefix: string, currentWord: string): vscode.CompletionItem[] {
+    private getContextualSuggestions(document: vscode.TextDocument, position: vscode.Position, linePrefix: string, currentWord: string): vscode.CompletionItem[] {
         const suggestions: vscode.CompletionItem[] = [];
         const lowerCurrentWord = currentWord.toLowerCase();
 
@@ -103,14 +103,18 @@ export class KustoLanguageServiceProvider implements
 
         // After 'type ==' or 'type =~' - suggest resource types
         else if (this.isResourceTypeContext(linePrefix)) {
-            suggestions.push(...this.filterCompletionItems(this.getResourceTypes(), lowerCurrentWord));
+            // Find the current table context to filter resource types
+            const tableContext = this.findCurrentTableContext(document, position);
+            suggestions.push(...this.filterCompletionItems(this.getResourceTypes(tableContext || undefined), lowerCurrentWord));
         }
 
         // In project, extend, where, or summarize by context - suggest properties and functions
         else if (this.isPropertyContext(linePrefix)) {
             suggestions.push(...this.getCommonColumns(lowerCurrentWord));
             suggestions.push(...this.filterCompletionItems(this.getKQLFunctions(), lowerCurrentWord));
-            suggestions.push(...this.filterCompletionItems(this.getResourceTypes(), lowerCurrentWord));
+            // Also provide table-aware resource type suggestions in property context
+            const tableContext = this.findCurrentTableContext(document, position);
+            suggestions.push(...this.filterCompletionItems(this.getResourceTypes(tableContext || undefined), lowerCurrentWord));
         }
 
         // Default: suggest common operators and functions
@@ -146,6 +150,72 @@ export class KustoLanguageServiceProvider implements
      */
     private isResourceTypeContext(linePrefix: string): boolean {
         return /\btype\s*(==|=~)\s*['"]*[a-zA-Z0-9./]*$/i.test(linePrefix);
+    }
+
+    /**
+     * Find the current table context by parsing backwards through the KQL query
+     * @param document The VS Code document
+     * @param position The current cursor position
+     * @returns The table name if found, null otherwise
+     */
+    private findCurrentTableContext(document: vscode.TextDocument, position: vscode.Position): string | null {
+        // Get all text from the beginning of the document up to the current position
+        const textRange = new vscode.Range(new vscode.Position(0, 0), position);
+        const queryText = document.getText(textRange);
+
+        // Split into lines and reverse to search backwards
+        const lines = queryText.split('\n').reverse();
+
+        // Track if we're in a joined context (need to find the most recent table before current position)
+        let foundPipe = false;
+        
+        for (const line of lines) {
+            const trimmedLine = line.trim();
+            
+            // Skip empty lines and comments
+            if (!trimmedLine || trimmedLine.startsWith('//')) {
+                continue;
+            }
+
+            // If we encounter a pipe, we're no longer looking at the start of a statement
+            if (trimmedLine.includes('|') && !trimmedLine.startsWith('|')) {
+                // This line contains a pipe but doesn't start with one
+                // This could be a table name followed by a pipe
+                const beforePipe = trimmedLine.substring(0, trimmedLine.indexOf('|')).trim();
+                if (beforePipe && this.isValidTableName(beforePipe)) {
+                    return beforePipe.toLowerCase();
+                }
+                foundPipe = true;
+                continue;
+            }
+            
+            // If the line starts with a pipe, we're in the middle of an operator chain
+            if (trimmedLine.startsWith('|')) {
+                foundPipe = true;
+                continue;
+            }
+
+            // Look for table name at the start of the line
+            // Table names are typically at the beginning of a statement (not after a pipe)
+            const tableMatch = trimmedLine.match(/^([a-zA-Z][a-zA-Z0-9]*)/);
+            if (tableMatch) {
+                const potentialTable = tableMatch[1];
+                if (this.isValidTableName(potentialTable)) {
+                    return potentialTable.toLowerCase();
+                }
+            }
+
+            // Look for join patterns: join kind=... (TABLE | ...)
+            const joinMatch = trimmedLine.match(/join\s+(?:kind\s*=\s*\w+\s+)?\(\s*([a-zA-Z][a-zA-Z0-9]*)/i);
+            if (joinMatch) {
+                const joinedTable = joinMatch[1];
+                if (this.isValidTableName(joinedTable)) {
+                    return joinedTable.toLowerCase();
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -197,18 +267,35 @@ export class KustoLanguageServiceProvider implements
 
     /**
      * Get resource type completions from schema data
+     * @param tableContext Optional table name to filter resource types for that specific table
      */
-    private getResourceTypes(): vscode.CompletionItem[] {
+    private getResourceTypes(tableContext?: string): vscode.CompletionItem[] {
         const resourceTypes: vscode.CompletionItem[] = [];
 
-        // Use schema data instead of completion data
         if (this.schema?.resourceTypes) {
-            for (const rt of Object.keys(this.schema.resourceTypes)) {
-                const item = new vscode.CompletionItem(rt, vscode.CompletionItemKind.Value);
-                item.detail = `Resource Type - ${rt}`;
-                item.insertText = `'${rt}'`;
-                item.sortText = `5_${rt}`;
-                resourceTypes.push(item);
+            // If we have a table context, filter resource types to only those supported by the table
+            if (tableContext) {
+                // Use API-based resource types: filter by table property
+                for (const [resourceType, resourceData] of Object.entries(this.schema.resourceTypes)) {
+                    const data = resourceData as any;
+                    if (data.table && data.table.toLowerCase() === tableContext.toLowerCase()) {
+                        const item = new vscode.CompletionItem(resourceType, vscode.CompletionItemKind.Value);
+                        item.detail = `Resource Type - ${resourceType} (${data.table} table)`;
+                        item.insertText = `'${resourceType}'`;
+                        item.sortText = `5_${resourceType}`;
+                        resourceTypes.push(item);
+                    }
+                }
+            } else {
+                // No table context - return all resource types (original behavior)
+                for (const [resourceType, resourceData] of Object.entries(this.schema.resourceTypes)) {
+                    const data = resourceData as any;
+                    const item = new vscode.CompletionItem(resourceType, vscode.CompletionItemKind.Value);
+                    item.detail = `Resource Type - ${resourceType}${data.table ? ` (${data.table} table)` : ''}`;
+                    item.insertText = `'${resourceType}'`;
+                    item.sortText = `5_${resourceType}`;
+                    resourceTypes.push(item);
+                }
             }
         }
 
@@ -861,17 +948,24 @@ export class KustoLanguageServiceProvider implements
                     hoverContent += `[Details on Microsoft Learn](https://learn.microsoft.com/en-us/azure/governance/resource-graph/concepts/query-language?wt.mc_id=DT-MVP-5005372)\n\n`;
 
                     // List specific resource types for specialized tables
-                    if (table.resourceTypes && table.resourceTypes.length > 0) {
-                        hoverContent += `### Resource Types\n`;
-                        const displayTypes = table.resourceTypes.slice(0, 5); // Show first 5
-                        displayTypes.forEach((type: string) => {
-                            hoverContent += `- \`${type}\`\n`;
-                        });
-                        if (table.resourceTypes.length > 5) {
-                            hoverContent += `- ... and ${table.resourceTypes.length - 5} more\n`;
+                    // Find resource types from the top-level resourceTypes section that belong to this table
+                    if (this.schemaData?.resourceTypes) {
+                        const tableResourceTypes = Object.values(this.schemaData.resourceTypes)
+                            .filter((rt: any) => rt.tables && rt.tables.includes(table.name.toLowerCase()))
+                            .map((rt: any) => rt.name || rt.type) // Handle both 'name' and 'type' properties
+                            .filter((name: string) => name !== undefined); // Filter out undefined values
+                        
+                        if (tableResourceTypes.length > 0) {
+                            hoverContent += `### Resource Types\n`;
+                            const displayTypes = tableResourceTypes.slice(0, 5); // Show first 5
+                            displayTypes.forEach((type: string) => {
+                                hoverContent += `- \`${type}\`\n`;
+                            });
+                            if (tableResourceTypes.length > 5) {
+                                hoverContent += `- ... and ${tableResourceTypes.length - 5} more\n`;
+                            }
+                            hoverContent += '\n';
                         }
-                        hoverContent += '\n';
-
                     }
 
                     hoverContent += `[Tables and Resources Reference](https://learn.microsoft.com/en-us/azure/governance/resource-graph/reference/supported-tables-resources?wt.mc_id=DT-MVP-5005372)\n\n`;
