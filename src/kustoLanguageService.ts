@@ -475,21 +475,31 @@ export class KustoLanguageServiceProvider implements
         if (this.completionData?.keywords) {
             for (const kw of this.completionData.keywords) {
                 const item = new vscode.CompletionItem(kw.label, vscode.CompletionItemKind.Keyword);
-                item.detail = kw.category;
-                item.insertText = kw.label;
-                item.documentation = new vscode.MarkdownString(kw.category);
-                item.sortText = `2_${kw.label}`;
+                item.detail = kw.detail || kw.category;
+                item.insertText = kw.insertText || kw.label;
+                if (kw.documentation && kw.documentation.value) {
+                    item.documentation = new vscode.MarkdownString(kw.documentation.value);
+                } else {
+                    item.documentation = new vscode.MarkdownString(kw.category);
+                }
+                item.sortText = kw.sortText || `2_${kw.label}`;
+                item.filterText = kw.filterText || kw.label;
                 operators.push(item);
             }
         }
 
         if (this.completionData?.operators) {
             for (const op of this.completionData.operators) {
-                const item = new vscode.CompletionItem(op.label, vscode.CompletionItemKind.Operator);
-                item.detail = op.category;
-                item.insertText = op.label;
-                item.documentation = new vscode.MarkdownString(op.category);
-                item.sortText = `2_${op.label}`;
+                const item = new vscode.CompletionItem(op.label, vscode.CompletionItemKind.Function);
+                item.detail = op.detail || op.category;
+                item.insertText = op.insertText || op.label;
+                if (op.documentation && op.documentation.value) {
+                    item.documentation = new vscode.MarkdownString(op.documentation.value);
+                } else {
+                    item.documentation = new vscode.MarkdownString(op.category);
+                }
+                item.sortText = op.sortText || `2_${op.label}`;
+                item.filterText = op.filterText || op.label;
                 operators.push(item);
             }
         }

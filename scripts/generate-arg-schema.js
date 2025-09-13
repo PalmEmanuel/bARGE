@@ -28,7 +28,9 @@ const path = require('path');
 
 // Function to clean markdown links and includes  
 function cleanMarkdownLinks(text) {
-    if (!text) return '';
+    if (!text) {
+        return '';
+    }
     return text
         .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Remove [text](url) links
         .replace(/>\s*!\s*INCLUDE\s+\[[^\]]+\]/g, '') // Remove > !INCLUDE [name] directives
@@ -37,6 +39,8 @@ function cleanMarkdownLinks(text) {
         .replace(/\|(-{2,})/g, '|:$1') // Convert table alignment to left-aligned (add colon to start of any column with 2+ dashes)
         // Remove moniker ranges like "::: moniker range="..." ... ::: moniker-end"
         .replace(/::: moniker range="[^"]*"\s*[\s\S]*?::: moniker-end/g, '')
+        // Remove image references like ":::image type="content" source="media/..." alt-text="...":::"
+        .replace(/:::image[^:]*:::/g, '')
         .replace(/\n\s*\n\s*\n/g, '\n\n') // Collapse multiple newlines
         .trim();
 }
@@ -513,11 +517,22 @@ class ARGSchemaGenerator {
             
             // Step 2: Extract KQL syntax elements from Kusto Language Service
             console.log('\n⚙️ Step 2: Extracting KQL syntax elements...');
-            await this.extractKustoLanguageElements();
+            const kustoElements = this.extractKustoLanguageElements();
+            this.schema.keywords = kustoElements.keywords.map(name => ({ name, category: 'KQL Keyword' }));
+            this.schema.operators = kustoElements.operators.map(name => ({ name, category: 'KQL Operator' }));
             
-            // Step 3: Generate schema files with updated syntax
+            // Set up functions and merge aggregates into functions array
+            this.schema.functions = [
+                ...kustoElements.functions.map(name => ({ name, category: 'Function' })),
+                ...kustoElements.aggregates.map(name => ({ name, category: 'Aggregation function' }))
+            ];
+            
+            // Remove the separate aggregates section since they're now merged into functions
+            delete this.schema.aggregates;
+            
+            // Step 3: Generate schema files with updated syntax and documentation
             console.log('\n💾 Step 3: Writing updated schema files...');
-            await this.writeSchemaFiles();
+            await this.writeSchemaFiles(true); // Skip Kusto extraction since we just did it
             
             console.log('\n✅ Syntax refresh complete!');
             this.printSummary();
@@ -935,7 +950,11 @@ class ARGSchemaGenerator {
             const cliCode = match[1];
             const kqlMatch = cliCode.match(/az\s+graph\s+query\s+(?:-q|--query)\s+"([^"]+)"/s);
             if (kqlMatch) {
-                const kqlCode = kqlMatch[1].trim();
+                let kqlCode = kqlMatch[1].trim();
+                // For CLI examples, remove shell escaping of dollar signs
+                // Handle both single and double backslash escaping
+                kqlCode = kqlCode.replace(/\\\\(\$)/g, '$1');  // Handle \\$ → $
+                kqlCode = kqlCode.replace(/\\(\$)/g, '$1');     // Handle \$ → $
                 const cleanCode = this.cleanCodeSnippet(kqlCode);
                 
                 if (cleanCode && this.isKQLQuery(cleanCode)) {
@@ -1360,7 +1379,7 @@ class ARGSchemaGenerator {
         return !shouldExclude;
     }
 
-    async writeSchemaFiles() {
+    async writeSchemaFiles(skipKustoExtraction = false) {
         const outputDir = path.join(__dirname, '..', 'src', 'schema');
         
         try {
@@ -1370,28 +1389,35 @@ class ARGSchemaGenerator {
         }
 
         // Extract KQL language elements from Kusto Language Service before writing
+        // Skip this if already done by the calling method
+        if (!skipKustoExtraction) {
+            try {
+                const kustoElements = this.extractKustoLanguageElements();
+                this.schema.keywords = kustoElements.keywords.map(name => ({ name, category: 'KQL Keyword' }));
+                this.schema.operators = kustoElements.operators.map(name => ({ name, category: 'KQL Operator' }));
+                
+                // Set up functions and merge aggregates into functions array
+                this.schema.functions = [
+                    ...kustoElements.functions.map(name => ({ name, category: 'Function' })),
+                    ...kustoElements.aggregates.map(name => ({ name, category: 'Aggregation function' }))
+                ];
+                
+                // Remove the separate aggregates section since they're now merged into functions
+                delete this.schema.aggregates;
+                
+            } catch (error) {
+                console.warn('⚠️ Could not extract Kusto language elements:', error.message);
+                this.schema.keywords = [];
+                this.schema.operators = [];
+                this.schema.functions = [];
+            }
+        }
+
+        // Extract enhanced documentation for functions (including aggregates)
         try {
-            const kustoElements = this.extractKustoLanguageElements();
-            this.schema.keywords = kustoElements.keywords.map(name => ({ name, category: 'KQL Keyword' }));
-            this.schema.operators = kustoElements.operators.map(name => ({ name, category: 'KQL Operator' }));
-            
-            // Set up functions and merge aggregates into functions array
-            this.schema.functions = [
-                ...kustoElements.functions.map(name => ({ name, category: 'Function' })),
-                ...kustoElements.aggregates.map(name => ({ name, category: 'Aggregation function' }))
-            ];
-            
-            // Remove the separate aggregates section since they're now merged into functions
-            delete this.schema.aggregates;
-            
-            // Extract enhanced documentation for functions (including aggregates)
             await this.extractMicrosoftDocsDocumentation();
-            
         } catch (error) {
-            console.warn('⚠️ Could not extract Kusto language elements:', error.message);
-            this.schema.keywords = [];
-            this.schema.operators = [];
-            this.schema.functions = [];
+            console.warn('⚠️ Could not extract Microsoft Docs documentation:', error.message);
         }
 
         // Write complete schema
@@ -1631,9 +1657,12 @@ class ARGSchemaGenerator {
                 // If keyword starts with "!", create "not-" version
                 if (keywordName.toLowerCase().startsWith('!')) {
                     const notDashVersion = 'not-' + keywordName.substring(1);
+                    const notUnderscoreVersion = 'not_' + keywordName.substring(1);
                     keywordVariations.push(
                         notDashVersion,
-                        notDashVersion.toLowerCase()
+                        notDashVersion.toLowerCase(),
+                        notUnderscoreVersion,
+                        notUnderscoreVersion.toLowerCase()
                     );
                 }
                 
@@ -1643,9 +1672,12 @@ class ARGSchemaGenerator {
                     !keywordName.toLowerCase().startsWith('not_')) {
                     // Insert dash after "not": notcontains -> not-contains
                     const notDashVersion = 'not-' + keywordName.substring(3);
+                    const notUnderscoreVersion = 'not_' + keywordName.substring(3);
                     keywordVariations.push(
                         notDashVersion,
-                        notDashVersion.toLowerCase()
+                        notDashVersion.toLowerCase(),
+                        notUnderscoreVersion,
+                        notUnderscoreVersion.toLowerCase()
                     );
                 }
                 
@@ -1672,23 +1704,9 @@ class ARGSchemaGenerator {
             for (const matchedKeyword of foundInKeywords) {
                 const keywordName = typeof matchedKeyword === 'object' ? matchedKeyword.name : matchedKeyword;
                 
-                // Check if this keyword is actually an operator 
-                const isOperator = keywordName.startsWith('!') || 
-                                 keywordName.includes('between') ||
-                                 keywordName.includes('contains') ||
-                                 keywordName.includes('endswith') ||
-                                 keywordName.includes('startswith') ||
-                                 keywordName.includes('equals') ||
-                                 keywordName.includes('has') ||
-                                 keywordName.includes('in') ||
-                                 keywordName.includes('matches') ||
-                                 // KQL operators that are commonly in keywords section
-                                 ['render', 'search', 'summarize', 'extend', 'project', 'where', 
-                                  'take', 'limit', 'order', 'sort', 'union', 'evaluate', 'top',
-                                  'join', 'distinct', 'count', 'parse', 'sample', 'fork', 
-                                  'facet', 'materialize', 'serialize', 'mv-apply', 'mv-expand',
-                                  'make-series', 'make-graph', 'reduce', 'scan', 'range',
-                                  'datatable', 'externaldata', 'getschema', 'lookup', 'consume'].includes(keywordName);
+                // Check if this keyword is actually an operator by checking if we have documentation for it as an operator
+                // This is much more reliable than hardcoded lists
+                const isOperator = docOperator.type === 'operator' || docOperator.category === 'operator';
                 
                 if (isOperator) {
                     // This is an operator misplaced in keywords - migrate it to operators
@@ -1902,36 +1920,13 @@ class ARGSchemaGenerator {
             .trim();
     }
 
-    async generateCompletionData(outputDir) {
+    async generateCompletionData(outputDir) {        
         const completionData = {
-            tables: Object.keys(this.schema.tables).map(name => ({
-                label: name,
-                kind: 'Table',
-                insertText: name
-            })),
-            keywords: this.schema.keywords.map(kw => ({
-                label: kw.name,
-                kind: 'Keyword',
-                insertText: kw.name,
-                category: kw.category
-            })),
-            operators: this.schema.operators.map(op => ({
-                label: op.name,
-                kind: 'Operator',
-                insertText: op.name,
-                category: op.category
-            })),
-            functions: this.schema.functions.map(fn => ({
-                label: fn.name,
-                kind: 'Function',
-                insertText: `${fn.name}()`,
-                category: fn.category
-            })),
-            resourceTypes: Object.keys(this.schema.resourceTypes).map(type => ({
-                label: type,
-                kind: 'Value',
-                insertText: `'${type}'`
-            })),
+            tables: this.generateTableCompletions(),
+            keywords: this.generateKeywordCompletions(),
+            operators: this.generateOperatorCompletions(),
+            functions: this.generateFunctionCompletions(),
+            resourceTypes: this.generateResourceTypeCompletions(),
             properties: [] // this.generatePropertyCompletions() // NOTE: Detailed properties disabled to reduce bundle size
         };
 
@@ -1939,6 +1934,272 @@ class ARGSchemaGenerator {
             path.join(outputDir, 'completion-data.json'),
             JSON.stringify(completionData, null, 2)
         );
+    }
+
+    /**
+     * Generate enhanced table completions with descriptions and examples
+     */
+    generateTableCompletions() {
+        return Object.keys(this.schema.tables).map(name => {
+            const table = this.schema.tables[name];
+            const completion = {
+                label: name,
+                kind: 'Table',
+                insertText: name,
+                detail: `Table - ${table.description || 'Azure Resource Graph table'}`,
+                sortText: `1_${name}` // Tables get higher priority
+            };
+
+            // Add documentation if available
+            if (table.description || table.resourceTypes?.length || table.examples?.length) {
+                const docs = [];
+                
+                if (table.description) {
+                    docs.push(table.description);
+                }
+                
+                if (table.resourceTypes?.length) {
+                    docs.push(`**Resource Types:**\n${table.resourceTypes.slice(0, 5).map(rt => `- ${rt}`).join('\n')}${table.resourceTypes.length > 5 ? `\n- ... and ${table.resourceTypes.length - 5} more` : ''}`);
+                }
+                
+                if (table.examples?.length) {
+                    const example = table.examples[0];
+                    if (example.code && example.code.length < 200) {
+                        docs.push(`**Example:**\n\`\`\`kql\n${example.code}\n\`\`\``);
+                    } else if (example.code) {
+                        docs.push(`**Example:**\n\`\`\`kql\n${example.code.substring(0, 150)}...\n\`\`\``);
+                    }
+                }
+                
+                if (docs.length > 0) {
+                    completion.documentation = {
+                        kind: 'markdown',
+                        value: docs.join('\n\n')
+                    };
+                }
+            }
+
+            return completion;
+        });
+    }
+
+    /**
+     * Generate enhanced keyword completions
+     */
+    generateKeywordCompletions() {
+        return this.schema.keywords.map(kw => ({
+            label: kw.name,
+            kind: 'Keyword',
+            insertText: kw.name,
+            detail: `Keyword - ${kw.category || 'KQL keyword'}`,
+            sortText: `2_${kw.name}`, // Lower priority than tables
+            filterText: kw.name,
+            documentation: kw.documentation ? {
+                kind: 'markdown',
+                value: kw.documentation.description || `${kw.category} keyword`
+            } : undefined
+        }));
+    }
+
+    /**
+     * Generate enhanced operator completions
+     */
+    generateOperatorCompletions() {
+        return this.schema.operators.map(op => ({
+            label: op.name,
+            kind: 'Operator',
+            insertText: op.name,
+            detail: `Operator - ${op.category || 'KQL operator'}`,
+            sortText: `3_${op.name}`, // Lower priority than keywords
+            filterText: op.name,
+            documentation: op.documentation ? {
+                kind: 'markdown',
+                value: this.formatOperatorDocumentation(op.documentation)
+            } : undefined
+        }));
+    }
+
+    /**
+     * Generate enhanced function completions with parameter placeholders
+     */
+    generateFunctionCompletions() {
+        return this.schema.functions.map(fn => {
+            const completion = {
+                label: fn.name,
+                kind: 'Function',
+                detail: `Function - ${fn.category || 'KQL function'}`,
+                sortText: this.getFunctionSortText(fn),
+                filterText: fn.name
+            };
+
+            // Generate smart insertText with parameter placeholders
+            completion.insertText = this.generateFunctionInsertText(fn);
+
+            // Add rich documentation if available
+            if (fn.documentation) {
+                completion.documentation = {
+                    kind: 'markdown',
+                    value: this.formatFunctionDocumentation(fn.documentation)
+                };
+                
+                // Update detail with function signature if available
+                if (fn.documentation.syntax) {
+                    completion.detail = `Function - ${fn.documentation.syntax}`;
+                }
+            }
+
+            return completion;
+        });
+    }
+
+    /**
+     * Generate enhanced resource type completions
+     */
+    generateResourceTypeCompletions() {
+        return Object.keys(this.schema.resourceTypes).map(type => ({
+            label: type,
+            kind: 'Value',
+            insertText: `'${type}'`,
+            detail: `Resource Type - ${type.split('/')[0]}`,
+            sortText: `4_${type}`, // Lowest priority
+            filterText: type.replace(/[/.]/g, ' '), // Allow searching by parts
+            documentation: {
+                kind: 'markdown',
+                value: `Azure resource type: \`${type}\``
+            }
+        }));
+    }
+
+    /**
+     * Generate function insertText with parameter placeholders
+     */
+    generateFunctionInsertText(fn) {
+        if (!fn.documentation?.parametersTable) {
+            return `${fn.name}($1)$0`; // Simple placeholder if no parameter info
+        }
+
+        // Parse parameters from table
+        const params = this.parseParametersFromTable(fn.documentation.parametersTable);
+        
+        if (params.length === 0) {
+            return `${fn.name}()$0`;
+        }
+
+        // Generate snippet with parameter placeholders
+        const paramPlaceholders = params.map((param, index) => {
+            const placeholder = `\${${index + 1}:${param.name}}`;
+            return param.required ? placeholder : `\${${index + 1}:${param.name}?}`;
+        }).join(', ');
+
+        return `${fn.name}(${paramPlaceholders})$0`;
+    }
+
+    /**
+     * Parse parameters from documentation table
+     */
+    parseParametersFromTable(parametersTable) {
+        if (!parametersTable) {
+            return [];
+        }
+
+        const params = [];
+        const lines = parametersTable.split('\n');
+        
+        for (const line of lines) {
+            const match = line.match(/\|\s*([^|]+)\s*\|\s*([^|]+)\s*\|\s*([^|]+)\s*\|\s*([^|]+)\s*\|/);
+            if (match && !match[1].trim().toLowerCase().includes('name')) {
+                const name = match[1].trim().replace(/[*`]/g, '');
+                const type = match[2].trim();
+                const required = match[3].trim().toLowerCase().includes('true');
+                
+                if (name && name !== '--') {
+                    params.push({ name, type, required });
+                }
+            }
+        }
+        
+        return params;
+    }
+
+    /**
+     * Generate sort text for functions based on category and usage patterns
+     */
+    getFunctionSortText(fn) {
+        // Prioritize commonly used functions
+        const commonFunctions = ['count', 'where', 'project', 'summarize', 'extend', 'limit', 'take', 'sort', 'order', 'join'];
+        
+        if (commonFunctions.includes(fn.name)) {
+            return `2_${fn.name}`; // High priority, same as keywords
+        }
+        
+        // Categorize by function type
+        const categoryPriority = {
+            'Aggregation function': '3_',
+            'Scalar function': '4_',
+            'Tabular function': '3_',
+            'Window function': '4_'
+        };
+        
+        const prefix = categoryPriority[fn.category] || '5_';
+        return `${prefix}${fn.name}`;
+    }
+
+    /**
+     * Format function documentation for display
+     */
+    formatFunctionDocumentation(doc) {
+        const parts = [];
+        
+        if (doc.description) {
+            parts.push(doc.description);
+        }
+        
+        if (doc.syntax) {
+            parts.push(`**Syntax:**\n\`\`\`kql\n${doc.syntax}\n\`\`\``);
+        }
+        
+        if (doc.parametersTable) {
+            parts.push(`**Parameters:**\n${doc.parametersTable}`);
+        }
+        
+        if (doc.returnInfo) {
+            parts.push(`**Returns:** ${doc.returnInfo}`);
+        }
+        
+        if (doc.example) {
+            parts.push(`**Example:**\n\`\`\`kql\n${doc.example}\n\`\`\``);
+        }
+        
+        if (doc.url) {
+            parts.push(`[📖 More info](${doc.url})`);
+        }
+        
+        return parts.join('\n\n');
+    }
+
+    /**
+     * Format operator documentation for display
+     */
+    formatOperatorDocumentation(doc) {
+        const parts = [];
+        
+        if (doc.description) {
+            parts.push(doc.description);
+        }
+        
+        if (doc.syntax) {
+            parts.push(`**Syntax:**\n\`\`\`kql\n${doc.syntax}\n\`\`\``);
+        }
+        
+        if (doc.example) {
+            parts.push(`**Example:**\n\`\`\`kql\n${doc.example}\n\`\`\``);
+        }
+        
+        if (doc.url) {
+            parts.push(`[📖 More info](${doc.url})`);
+        }
+        
+        return parts.join('\n\n');
     }
 
     /**
@@ -2251,6 +2512,7 @@ class ARGSchemaGenerator {
                 { "include": "#functions" },
                 { "include": "#tables" },
                 { "include": "#properties" },
+                { "include": "#join_references" },
                 { "include": "#columns" },
                 { "include": "#strings" },
                 { "include": "#numbers" }
@@ -2306,6 +2568,14 @@ class ARGSchemaGenerator {
                         {
                             "name": "support.class.table.kql",
                             "match": `(?i)\\b(${tables})\\b`
+                        }
+                    ]
+                },
+                "join_references": {
+                    "patterns": [
+                        {
+                            "name": "variable.other.join-reference.kql",
+                            "match": "(?i)\\$?(left|right)\\b"
                         }
                     ]
                 },

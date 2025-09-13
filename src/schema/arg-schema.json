@@ -9613,31 +9613,7 @@
   },
   "keywords": [
     {
-      "name": "!contains_cs",
-      "category": "KQL Keyword"
-    },
-    {
-      "name": "!endswith_cs",
-      "category": "KQL Keyword"
-    },
-    {
-      "name": "!has_cs",
-      "category": "KQL Keyword"
-    },
-    {
-      "name": "!hasprefix_cs",
-      "category": "KQL Keyword"
-    },
-    {
-      "name": "!hassuffix_cs",
-      "category": "KQL Keyword"
-    },
-    {
       "name": "!in~",
-      "category": "KQL Keyword"
-    },
-    {
-      "name": "!startswith_cs",
       "category": "KQL Keyword"
     },
     {
@@ -9711,21 +9687,6 @@
     {
       "name": "areachart",
       "category": "KQL Keyword"
-    },
-    {
-      "name": "as",
-      "category": "KQL Keyword",
-      "documentation": {
-        "title": "as",
-        "description": "Binds a name to the operator's input tabular expression. This operator allows the query to reference the value of the tabular expression multiple times without breaking the query and binding a name through the let statement.\n\nTo optimize multiple uses of the `as` operator within a single query, see Named expressions.",
-        "syntax": "*T* `|` `as` [`hint.materialized` `=` *Materialized*] *Name*",
-        "returnInfo": "",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*T*| `string` |  *True* | The tabular expression to rename.|\n| *Name*| `string` |  *True* | The temporary name for the tabular expression.|\n| *`hint.materialized`*| `bool` |  | If *Materialized* is set to `true`, the value of the tabular expression output is wrapped by a materialize() function call. Otherwise, the value is recalculated on every reference.|\n\n> [!NOTE]\n>\n> * The name given by `as` is used in the `withsource=` column of union, the `source_` column of find, and the `$table` column of search.\n> * The tabular expression named using the operator in a join's outer tabular input (`$left`) can also be used in the join's tabular inner input (`$right`).",
-        "example": "range x from 1 to 5 step 1 \n| as T1 \n| union withsource=TableName (range x from 1 to 5 step 1 | as T2)\n\nunion withsource=TableName (range x from 1 to 5 step 1 | as T1), (range x from 1 to 5 step 1 | as T2)\n\nMyLogTable  \n| where type == \"Event\"\n| as T\n| where Name == \"Start\"\n| join (\n    T\n    | where Name == \"Stop\"\n) on ActivityId",
-        "category": "KQL function",
-        "sourceLength": 3500,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/as-operator"
-      }
     },
     {
       "name": "asc",
@@ -9928,66 +9889,6 @@
       "category": "KQL Keyword"
     },
     {
-      "name": "graph-mark-components",
-      "category": "KQL Keyword",
-      "documentation": {
-        "title": "graph-mark-components",
-        "description": "The `graph-mark-components` operator finds all connected components of a graph and marks each node with a component identifier.",
-        "syntax": "*G* `|` `graph-mark-components` [`kind` `=` *Kind*] [`with_component_id` `=` *ComponentId*]",
-        "returnInfo": "The `graph-mark-components` operator returns a *graph* result, where each node has a component identifier in the *ComponentId* property. The identifier is a zero-based consecutive index of the components. Each component index is chosen arbitrarily and might not be consistent across runs.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *G* | string |  *True* | The graph source. |\n| *Kind* | string |  | The connected component kind, either `weak` (default) or `strong`. A weak component is a set of nodes connected by a path, ignoring the direction of edges. A strong component is a set of nodes connected in both directions, considering the edges' directions. |\n| *ComponentId* | string |  | The property name that denotes the component identifier. The default property name is `ComponentId`. |",
-        "example": "let ChildOf = datatable(child:string, parent:string) \n[ \n  \"Alice\", \"Bob\",  \n  \"Carol\", \"Alice\",  \n  \"Carol\", \"Dave\",  \n  \"Greg\", \"Alice\",  \n  \"Greg\", \"Dave\",  \n  \"Howard\", \"Alice\",  \n  \"Howard\", \"Dave\",  \n  \"Eve\", \"Frank\",  \n  \"Frank\", \"Mallory\",\n  \"Eve\", \"Kirk\",\n]; \nChildOf \n| make-graph child --> parent with_node_id=name\n| graph-mark-components with_component_id = family\n| graph-to-table nodes\n\nlet ChildOf = datatable(child:string, parent:string) \n[ \n  \"Alice\", \"Bob\",  \n  \"Carol\", \"Alice\",  \n  \"Carol\", \"Dave\",  \n  \"Greg\", \"Alice\",  \n  \"Greg\", \"Dave\",  \n  \"Howard\", \"Alice\",  \n  \"Howard\", \"Dave\",  \n  \"Eve\", \"Frank\",  \n  \"Frank\", \"Mallory\",\n  \"Eve\", \"Kirk\",\n]; \nChildOf \n| make-graph child --> parent with_node_id=name\n| graph-mark-components with_component_id = family\n| graph-match (descendant)-[childOf*1..5]->(ancestor)\n  project name = ancestor.name, lineage = map(childOf, child), family = ancestor.family\n| summarize (generations, name) = arg_max(array_length(lineage),name) by family",
-        "category": "Preview",
-        "sourceLength": 4832,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/graph-mark-components-operator"
-      }
-    },
-    {
-      "name": "graph-match",
-      "category": "KQL Keyword",
-      "documentation": {
-        "title": "graph-match",
-        "description": "The `graph-match` operator searches for all occurrences of a graph pattern in an input graph source.",
-        "syntax": "*G* `|` `graph-match` [`cycles` `=` *CyclesOption*]  *Pattern* [`where` *Constraints*] `project` [*ColumnName* `=`] *Expression* [`,` ...]",
-        "returnInfo": "The `graph-match` operator returns a tabular result, where each record corresponds to a match of the pattern in the graph.  \nThe returned columns are defined in the operator's `project` clause using properties of edges and/or nodes defined in the pattern. Properties and functions of properties of variable length edges are returned as a dynamic array, each value in the array corresponds to an occurrence of the variable length edge.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *G* | `string` |  *True* | The input graph source. |\n| *Pattern* | `string` |  *True* | One or more comma delimited sequences of graph node elements connected by graph edge elements using graph notations. See Graph pattern notation. |\n| *Constraints* | `string` |  | A Boolean expression composed of properties of named variables in the *Pattern*. Each graph element (node/edge) has a set of properties that were attached to it during the graph construction. The constraints define which elements (nodes and edges) are matched by the pattern. A property is referenced by the variable name followed by a dot (`.`) and the property name. |\n| *Expression* | `string` | *True* | The `project` clause converts each pattern to a row in a tabular result. The project expressions must be scalar and reference properties of named variables defined in the *Pattern*. A property is referenced by the variable name followed by a dot (`.`) and the attribute name. |\n| *CyclesOption* | `string` |  | Controls whether cycles are matched in the *Pattern*, allowed values: `all`, `none`, `unique_edges`. If `all` is specified, then all cycles are matched, if `none` is specified cycles aren't matched, if `unique_edges` (default) is specified, cycles are matched but only if the cycles don't include the same edge more than once. |\n\n### Graph pattern notation\n\nThe following table shows the supported graph notation:\n  \n|Element|Named variable|Anonymous|\n|:---|:---|:---|\n|Node|`(`*n*`)`|`()`|\n|Directed edge: left to right|`-[`*e*`]->`|`-->`|\n|Directed edge: right to left|`<-[`*e*`]-`|`<--`|\n|Any direction edge|`-[`*e*`]-`|`--`|\n|Variable length edge|`-[`*e*`*3..5]-`|`-[*3..5]-`|\n\n### Variable length edge\n\nA variable length edge allows a specific pattern to be repeated multiple times within defined limits. This type of edge is denoted by an asterisk (`*`), followed by the minimum and maximum occurrence values in the format *min*`..`*max*. Both the minimum and maximum values must be integer scalars. Any sequence of edges falling within this occurrence range can match the variable edge of the pattern, if all the edges in the sequence satisfy the constraints outlined in the `where` clause.\n\n### Multiple sequences\n\nMultiple comma delimited sequences are used to express nonlinear patterns. To describe the connection between different sequences, they have to share one or more variable name of a node. For example, to represent a star pattern with node *n* at the center connected to nodes *a*,*b*,*c*, and *d*, the following pattern could be used:\n\n`(`*a*`)--(`*n*`)--(`*b*`)`,`(`*c*`)--(`*n*`)--(`*d*`)`\n\nOnly single connected component patterns are supported.",
-        "example": "let employees = datatable(name:string, age:long) \n[ \n  \"Alice\", 32,  \n  \"Bob\", 31,  \n  \"Eve\", 27,  \n  \"Joe\", 29,  \n  \"Chris\", 45, \n  \"Alex\", 35,\n  \"Ben\", 23,\n  \"Richard\", 39,\n]; \nlet reports = datatable(employee:string, manager:string) \n[ \n  \"Bob\", \"Alice\",  \n  \"Chris\", \"Alice\",  \n  \"Eve\", \"Bob\",\n  \"Ben\", \"Chris\",\n  \"Joe\", \"Alice\", \n  \"Richard\", \"Bob\"\n]; \nreports \n| make-graph employee --> manager with employees on name \n| graph-match (alice)<-[reports*1..5]-(employee)\n  where alice.name == \"Alice\" and employee.age < 30\n  project employee = employee.name, age = employee.age, reportingPath = map(reports, manager)\n\nlet Entities = datatable(name:string, type:string, age:long) \n[ \n  \"Alice\", \"Person\", 23,  \n  \"Bob\", \"Person\", 31,  \n  \"Eve\", \"Person\", 17,  \n  \"Mallory\", \"Person\", 29,  \n  \"Apollo\", \"System\", 99 \n]; \nlet Actions = datatable(source:string, destination:string, action_type:string) \n[ \n  \"Alice\", \"Bob\", \"communicatesWith\",  \n  \"Alice\", \"Apollo\", \"trusts\",  \n  \"Bob\", \"Apollo\", \"hasPermission\",  \n  \"Eve\", \"Alice\", \"attacks\",  \n  \"Mallory\", \"Alice\", \"attacks\",  \n  \"Mallory\", \"Bob\", \"attacks\"  \n]; \nActions \n| make-graph source --> destination with Entities on name \n| graph-match (mallory)-[attacks]->(compromised)-[hasPermission]->(apollo) \n  where mallory.name == \"Mallory\" and apollo.name == \"Apollo\" and attacks.action_type == \"attacks\" and hasPermission.action_type == \"hasPermission\" \n  project Attacker = mallory.name, Compromised = compromised.name, System = apollo.name\n\nlet Entities = datatable(name:string, type:string, age:long) \n[ \n  \"Alice\", \"Person\", 23,  \n  \"Bob\", \"Person\", 31,  \n  \"Eve\", \"Person\", 17,  \n  \"Mallory\", \"Person\", 29,  \n  \"Apollo\", \"System\", 99 \n]; \nlet Actions = datatable(source:string, destination:string, action_type:string) \n[ \n  \"Alice\", \"Bob\", \"communicatesWith\",  \n  \"Alice\", \"Apollo\", \"trusts\",  \n  \"Bob\", \"Apollo\", \"hasPermission\",  \n  \"Eve\", \"Alice\", \"attacks\",  \n  \"Mallory\", \"Alice\", \"attacks\",  \n  \"Mallory\", \"Bob\", \"attacks\"  \n]; \nActions \n| make-graph source --> destination with Entities on name \n| graph-match (mallory)-[attacks]->(compromised)-[hasPermission]->(apollo), (compromised)-[communicates]-(alice) \n  where mallory.name == \"Mallory\" and apollo.name == \"Apollo\" and attacks.action_type == \"attacks\" and hasPermission.action_type == \"hasPermission\" and alice.name == \"Alice\"\n  project Attacker = mallory.name, Compromised = compromised.name, System = apollo.name",
-        "category": "KQL function",
-        "sourceLength": 10522,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/graph-match-operator"
-      }
-    },
-    {
-      "name": "graph-shortest-paths",
-      "category": "KQL Keyword",
-      "documentation": {
-        "title": "graph-shortest-paths",
-        "description": "The `graph-shortest-paths` operator finds the shortest paths between a set of source nodes and a set of target nodes in a graph and returns a table with the results.",
-        "syntax": "*G* `|` `graph-shortest-paths` [`output` `=` *OutputOption*] *Pattern* `where` *Predicate* `project` [*ColumnName* `=`] *Expression* [`,` ...]",
-        "returnInfo": "The `graph-shortest-paths` operator returns a tabular result, where each record corresponds to a path found in the graph. The returned columns are defined in the operator's `project` clause using properties of nodes and edges defined in the pattern. Properties and functions of properties of variable length edges, are returned as a dynamic array. Each value in the array corresponds to an occurrence of the variable length edge.",
-        "parametersTable": "| Name | Type | Required |Description |\n|:---------------|:-------------|:----------|:-----------------------------|\n| *G* | string | *True* | The graph source, typically the output from a `make-graph` operation.                                                 |\n| *Pattern* | string | *True* | A path pattern that describes the path to find. Patterns must include at least one variable length edge and can't contain multiple sequences. |\n| *Predicate* | expression | | A boolean expression that consists of properties of named variables in the pattern and constants. |\n| *Expression* | expression | *True* | A scalar expression that defines the output row for each found path, using constants and references to properties of named variables in the pattern. |\n| *OutputOption*| string | | Specifies the search output as `any` (default) or `all`. Output is specified as `any` for a single shortest path per source/target pair and `all` for all shortest paths of equal minimum length. |\n\n### Path pattern notation\n\nThe following table shows the supported path pattern notations.\n\n| Element                  | Named variable | Anonymous element |\n|:--------------------------|:----------------|:-----------|\n| Node                     | `(`*n*`)`      | `()`      |\n| Directed edge from left to right | `-[`*e*`]->` | `-->`     |\n| Directed edge from right to left | `<-[`*e*`]-` | `<--`     |\n| Any direction edge       | `-[`*e*`]-`    | `--`      |\n| Variable length edge     | `-[`*e*`*3..5]-` | `-[*3..5]-` |\n\n#### Variable length edge\n\nA variable length edge allows a specific pattern to repeat multiple times within defined limits. An asterisk (`*`) denotes this type of edge, followed by the minimum and maximum occurrence values in the format *min*`..`*max*. These values must be integer scalars. Any sequence of edges within this range can match the variable edge of the pattern, provided all the edges in the sequence meet the `where` clause constraints.",
-        "example": "let connections = datatable(from_station:string, to_station:string, line:string) \n[ \n  \"Central\", \"North\", \"red\",\n  \"North\", \"Central\", \"red\", \n  \"Central\", \"South\",  \"red\", \n  \"South\", \"Central\",  \"red\", \n  \"South\", \"South-West\", \"red\", \n  \"South-West\", \"South\", \"red\", \n  \"South-West\", \"West\", \"red\", \n  \"West\", \"South-West\", \"red\", \n  \"Central\", \"East\", \"blue\", \n  \"East\", \"Central\", \"blue\", \n  \"Central\", \"West\", \"blue\",\n  \"West\", \"Central\", \"blue\",\n]; \nconnections \n| make-graph from_station --> to_station with_node_id=station\n| graph-shortest-paths (start)-[connections*1..5]->(destination)\n  where start.station == \"South-West\" and destination.station == \"North\"\n  project from = start.station, path = map(connections, to_station), line = map(connections, line), to = destination.station\n\nlet connections = datatable(from_station:string, to_station:string, line:string) \n[ \n  \"Central\", \"North\", \"red\",\n  \"North\", \"Central\", \"red\", \n  \"Central\", \"South\",  \"red\", \n  \"South\", \"Central\",  \"red\", \n  \"South\", \"South-West\", \"red\", \n  \"South-West\", \"South\", \"red\", \n  \"South-West\", \"West\", \"red\", \n  \"West\", \"South-West\", \"red\", \n  \"Central\", \"East\", \"blue\", \n  \"East\", \"Central\", \"blue\", \n  \"Central\", \"West\", \"blue\",\n  \"West\", \"Central\", \"blue\",\n]; \nconnections \n| make-graph from_station --> to_station with_node_id=station\n| graph-shortest-paths output=all (start)-[connections*1..5]->(destination)\n  where start.station == \"South-West\" and destination.station == \"North\"\n  project from = start.station, path = map(connections, to_station), line = map(connections, line), to = destination.station",
-        "category": "Preview",
-        "sourceLength": 8009,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/graph-shortest-paths-operator"
-      }
-    },
-    {
-      "name": "graph-to-table",
-      "category": "KQL Keyword",
-      "documentation": {
-        "title": "graph-to-table",
-        "description": "The `graph-to-table` operator exports nodes or edges from a graph to tables.",
-        "syntax": "### Nodes\n\n*G* `|` `graph-to-table` `nodes` [ `with_node_id=`*ColumnName* ]\n\n### Edges\n\n*G* `|` `graph-to-table` `edges` [ `with_source_id=`*ColumnName* ] [ `with_target_id=`*ColumnName* ] [ `as` *TableName* ]\n\n### Nodes and edges\n\n*G* `|` `graph-to-table` `nodes` `as` *NodesTableName* [ `with_node_id=`*ColumnName* ]`,` `edges` `as` *EdgesTableName* [ `with_source_id=`*ColumnName* ] [ `with_target_id=`*ColumnName* ]",
-        "returnInfo": "### Nodes\n\nThe `graph-to-table` operator returns a tabular result, in which each row corresponds to a node in the source graph. The returned columns are the node's properties. When `with_node_id` is provided, the node hash column is of `long` type.\n\n### Edges\n\nThe `graph-to-table` operator returns a tabular result, in which each row corresponds to an edge in the source graph. The returned columns are the node's properties. When `with_source_id` or `with_target_id` are provided, the node hash column is of `long` type.\n\n### Nodes and edges\n\nThe `graph-to-table` operator returns two tabular results, matching the previous descriptions.",
-        "parametersTable": "|Name|Type|Required | Description |\n|:---|:---|:---|:---|\n|*G*| `string` | *True*|The input graph source.|\n|*NodesTableName*| `string` ||The name of the exported nodes table.|\n|*EdgesTableName*| `string` ||The name of the exported edges table.|\n|*ColumnName*| `string` ||Export the node hash ID, source node hash ID, or target node hash ID with the given column name.|",
-        "example": "let nodes = datatable(name:string, type:string, age:long) \n[ \n\t\"Alice\", \"Person\", 23,  \n\t\"Bob\", \"Person\", 31,  \n\t\"Eve\", \"Person\", 17,  \n\t\"Mallory\", \"Person\", 29,  \n\t\"Trent\", \"System\", 99 \n]; \nlet edges = datatable(source:string, destination:string, edge_type:string) \n[ \n\t\"Alice\", \"Bob\", \"communicatesWith\",  \n\t\"Alice\", \"Trent\", \"trusts\",  \n\t\"Bob\", \"Trent\", \"hasPermission\",  \n\t\"Eve\", \"Alice\", \"attacks\",  \n\t\"Mallory\", \"Alice\", \"attacks\",  \n\t\"Mallory\", \"Bob\", \"attacks\"  \n]; \nedges \n| make-graph source --> destination with nodes on name\n| graph-to-table edges with_source_id=SourceId with_target_id=TargetId",
-        "category": "KQL function",
-        "sourceLength": 7711,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/graph-to-table-operator"
-      }
-    },
-    {
       "name": "graph-where-edges",
       "category": "KQL Keyword"
     },
@@ -10128,21 +10029,6 @@
       "category": "KQL Keyword"
     },
     {
-      "name": "macro-expand",
-      "category": "KQL Keyword",
-      "documentation": {
-        "title": "macro-expand",
-        "description": "The `macro-expand` operator simplifies running a subquery on a set of entities, such as clusters, databases, or tables, and then combining the results into a single output.\n\nThe operator is useful when you have data spread across multiple clusters, databases, or tables. For example, when data is held in the same global region as its source, you can use the `macro-expand` operator in a single query across data in distinct locations, instead of running separate queries for each entity and combining the results manually.\n\nThe set of entities you want to query is called an *entity group*. The entity group can be stored for reuse in a database or defined directly in your query text. For more information about stored entity groups, see Entity groups.\n\nThe `macro-expand` operator runs the subquery separately for each entity in the group and then combines all the results into a single output. The subquery can include nested `macro-expand` operators. However, the identifier for the inner `macro-expand` must be different from the identifier for the outer `macro-expand` to clearly distinguish between the scope and references of each one.",
-        "syntax": "`macro-expand` [`kind` `=` *Kind*] [`isfuzzy` `=` *IsFuzzy*] *EntityGroup* `as` *EntityIdentifier*  `(`*Subquery*`)`\n\n`macro-expand` [`kind` `=` *Kind*] [`isfuzzy` `=` *IsFuzzy*] `entity_group` `[`*EntityReference* [`,` ...]  `as` *EntityIdentifier*  `(`*Subquery*`)``]`\n\n`macro-expand` *EntityIdentifier* `in` *EntityGroupIdentifier* `(`*Subquery*`)`\n\n> [!NOTE]\n> The operation of the `macro-expand` operator can be modified by setting the `best_effort` request property to `true`, either by using a `set statement` or through client request properties. When this property is set to `true`, the `macro-expand` operator ignores fuzzy resolution and connectivity failures, to execute any of the subexpressions being unioned and issues a warning in the query status results.\n\n### Variations\n\nThere are several ways to specify the entity group used by the `macro-expand` operator:\n\n- **Inline:** All elements are explicitly defined in the text of the operator invocation itself. For an example, see Calculate errors.\n\n- **Via `let` statement:** The entity group is specified in the query using a `let` statement outside the `macro-expand` operator using the syntax:\n\n    `let` *EntityGroupIdentifier* `=` `entity_group` `[`*EntityReference* [`,` ...]`]`\n\n   For an example, see Calculate SKU errors using `let` statement.\n\n- **Using a stored entity group:** The query uses an entity group stored in the database in scope rather than defined in the query.\n\n   For an example, see Extend table with contextual scalar functions.",
-        "returnInfo": "",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *Kind* | `string` | | Either `inner` or `outer` (default). When `kind` is set to `inner`, the results only include columns common to all the accessed scoped entities. If set to `outer`, the result includes all the columns that occur in any of the inputs. Cells not defined by an input row are set to `null`. |\n| *IsFuzzy* |  |  | When set to `true`, it only considers entity sources that currently exist and are accessible. If at least one entity is found, the query runs, and any missing entities generate warnings in the query status results. If no entities are found, the query can't resolve any specified entities and returns an error. The default is `false`. |\n| *EntityGroup* |  |  *True* | A set of one or more entities that *EntityIdentifier* expands into when a query is run. The entity group can be a stored entity group or a defined group. It denotes one or more entities of the same type that *EntityIdentifier* expands to. |\n| *EntityIdentifier* | `string` |  *True* |  An identifier that serves as a placeholder for an entity in the subquery, and which is expanded into the actual entity when the query is run. Entities that aren't explicitly scoped in *EntityIdentifier* are assumed to be part of the current in scope database. Any specific identifiers included in the query override the default assumption. |\n|*EntityReference*| `string` | |An entity included in the entity group. One or more *EntityReference* is required if an *EntityGroup* isn't specified. |\n| *Subquery* | `string` |  *True* | A single tabular expression that doesn’t take input data directly. It might include references to entities through an *EntityIdentifier*, and use expressions such as let statements, stored functions, or other elements from the database in scope. *Subquery* can be preceded by one or more `let` statements. It can also reference Subquery contextual functions.|\n\n> [!NOTE]\n> A query can only reference entity groups defined in the query text or in the current database. Entity groups in other databases or clusters can't be referenced directly or indirectly.\n\n### Subquery contextual scalars\n\nThe `macro-expand` subquery can reference two specialized scalar values as if they're part of the entity being referenced:\n\n* `$current_database` - Returns the database name of the entity reference (a `string`).\n* `$current_cluster_endpoint` - Returns the URL of the cluster of the entity reference (a `string`).\n\n> [!NOTE]\n> These values can only be used when they are scoped by the *EntityReference*.\n> For example, if *EntityReference* is a database and the `macro-expand` is using `DB` to reference the database,\n> use `DB.$current_cluster_endpoint` to retrieve the URL of the cluster which hosts the database.",
-        "example": "",
-        "category": "KQL function",
-        "sourceLength": 11537,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/macro-expand-operator"
-      }
-    },
-    {
       "name": "matches regex",
       "category": "KQL Keyword"
     },
@@ -10235,51 +10121,6 @@
       "category": "KQL Keyword"
     },
     {
-      "name": "parse-kv",
-      "category": "KQL Keyword",
-      "documentation": {
-        "title": "parse-kv",
-        "description": "Extracts structured information from a string expression and represents the information in a key/value form.\n\nThe following extraction modes are supported:\n\n* **Specified delimiter**: Extraction based on specified delimiters that dictate how keys/values and pairs are separated from each other.\n* **Non-specified delimiter**: Extraction with no need to specify delimiters. Any nonalphanumeric character is considered a delimiter.\n* **Regex**: Extraction based on regular expressions.",
-        "syntax": "### Specified delimiter\n\n*T* `|` `parse-kv` *Expression* `as` `(` *KeysList* `)` `with` `(` `pair_delimiter` `=` *PairDelimiter* `,` `kv_delimiter` `=` *KvDelimiter*  [`,` `quote` `=` *QuoteChars* ... [`,` `escape` `=` *EscapeChar* ...]] [`,` `greedy` `=` `true`] `)`\n\n### Nonspecified delimiter\n\n*T* `|` `parse-kv` *Expression* `as` `(` *KeysList* `)` `with` `(` [`quote` `=` *QuoteChars* ... [`,` `escape` `=` *EscapeChar* ...]] `)`\n\n### Regex\n\n*T* `|` `parse-kv` *Expression* `as` `(` *KeysList* `)` `with` `(` `regex` `=` *RegexPattern*`)` `)`",
-        "returnInfo": "The original input tabular expression *T*, extended with columns per specified keys to extract.\n\n> [!NOTE]\n>\n> * If a key doesn't appear in a record, the corresponding column value is either `null` or an empty string, depending on the column type.\n> * Only keys that are listed in the operator are extracted.\n> * The first appearance of a key is extracted, and subsequent values are ignored.\n> * When you extract keys and values, leading and trailing white spaces are ignored.",
-        "parametersTable": "|Name|Type|Required|Description|\n|:--|:--|:--|:--|\n|*Expression*| `string` | *True*|The expression from which to extract key values.|\n|*KeysList*| `string` | *True*|A comma-separated list of key names and their value data types. The order of the keys doesn't have to match the order in which they appear in the text.|\n|*PairDelimiter*| `string` ||A delimiter that separates key value pairs from each other.|\n|*KvDelimiter*| `string` ||A delimiter that separates keys from values.|\n|*QuoteChars*| `string` ||A one- or two-character string literal representing opening and closing quotes that key name or the extracted value may be wrapped with. The parameter can be repeated to specify a separate set of opening/closing quotes.|\n|*EscapeChar*| `string` ||A one-character string literal describing a character that may be used for escaping special characters in a quoted value. The parameter can be repeated if multiple escape characters are used.|\n|*RegexPattern*| `string` ||A regular expression containing two capturing groups exactly. The first group represents the key name, and the second group represents the key value.|",
-        "example": "",
-        "category": "KQL function",
-        "sourceLength": 12292,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/parse-kv-operator"
-      }
-    },
-    {
-      "name": "parse-where",
-      "category": "KQL Keyword",
-      "documentation": {
-        "title": "parse-where",
-        "description": "Evaluates a string expression, and parses its value into one or more calculated columns. The result is only the successfully parsed strings.\n\n`parse-where` parses the strings in the same way as parse, and filters out strings that were not parsed successfully.\n\nSee parse operator, which produces nulls for unsuccessfully parsed strings.",
-        "syntax": "*T* `| parse-where` [`kind=`*kind* [`flags=` *regexFlags*]] *expression* `with` `*` (*stringConstant* *columnName* [`:` *columnType*]) `*`...",
-        "returnInfo": "The input table, which is extended according to the list of columns that are provided to the operator.\n\n> [!NOTE]\n> Only successfully parsed strings will be in the output. Strings that don't match the pattern will be filtered out.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *T* | `string` |  *True* | The tabular input to parse.|\n| *kind* | `string` |  *True* | One of the supported kind values. The default value is `simple`.|\n| *regexFlags* | `string` | |If *kind* is `regex`, then you can specify regex flags to be used like `U` for ungreedy, `m` for multi-line mode, `s` for match new line `\\n`, and `i` for case-insensitive. More flags can be found in Flags.|\n| *expression* | `string` |  *True* | An expression that evaluates to a string.|\n| *stringConstant* | `string` |  *True* | A string constant for which to search and parse.|\n| *columnName* | `string` |  *True* | The name of a column to assign a value to, extracted from the string expression. |\n| *columnType* | `string` | | The scalar value that indicates the type to convert the value to. The default is the `string`.|\n\n>[!NOTE]\n>\n> * Use project if you also want to drop or rename some columns.\n> * Use `*` in the pattern to skip junk values. This value can't be used after `string` column.\n> * The parse pattern may start with *ColumnName*, in addition to *StringConstant*.\n> * If the parsed *expression* isn't of type `string`, it will be converted to type `string`.\n\n### Supported kind values\n\n|Text|Description|\n|:--|:--|\n| `simple` | This is the default value. *stringConstant* is a regular string value and the match is strict. All string delimiters should appear in the parsed string, and all extended columns must match the required types.|\n| `regex` | *stringConstant* may be a regular expression and the match is strict. All string delimiters, which can be a regex for this mode, should appear in the parsed string, and all extended columns must match the required types.|\n\n### Regex mode\n\nIn regex mode, parse will translate the pattern to a regex and use regular expressions in order to do the matching using numbered captured groups that are handled internally. For example:\n\n```kusto\nparse-where kind=regex Col with * <regex1> var1:string <regex2> var2:long\n```\n\nThe regex that will be generated by the parse internally is `.*?<regex1>(.*?)<regex2>(\\-\\d+)`.\n\n* `*` was translated to `.*?`.\n* `string` was translated to `.*?`.\n* `long` was translated to `\\-\\d+`.",
-        "example": "",
-        "category": "KQL function",
-        "sourceLength": 14499,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/parse-where-operator"
-      }
-    },
-    {
-      "name": "partition",
-      "category": "KQL Keyword",
-      "documentation": {
-        "title": "partition",
-        "description": "The partition operator partitions the records of its input table into multiple subtables according to values in a key column. The operator runs a subquery on each subtable, and produces a single output table that is the union of the results of all subqueries.\n\nThe partition operator is useful when you need to perform a subquery only on a subset of rows that belong to the same partition key, and not a query of the whole dataset. These subqueries could include aggregate functions, window functions, top *N* and others.\n\nThe partition operator supports several strategies of subquery operation:\n\n* Native - use with an implicit data source with thousands of key partition values.\n* Shuffle - use with an implicit source with millions of key partition values.\n* Legacy - use with an implicit or explicit source for 64 or less key partition values.",
-        "syntax": "*T* `|` `partition` [ `hint.strategy=`*Strategy* ] [ *Hints* ] `by` *Column* `(` *TransformationSubQuery* `)`\n\n*T* `|` `partition` [ `hint.strategy=legacy` ] [ *Hints* ] `by` *Column* `{` *SubQueryWithSource* `}`",
-        "returnInfo": "The operator returns a union of the results of the individual subqueries.\n\nThe partition operator supports several strategies of subquery operation: native, shuffle, and legacy.\n\n> [!NOTE]\n> The distinction between the `native` and `shuffle` strategies allows the caller to indicate the cardinality and execution strategy of the subquery. This choice may affect how long the subquery takes to complete but doesn't change the end result.\n\n### Native strategy\n\nThis strategy should be applied when the number of distinct values of the partition key isn't large, roughly in the thousands.\n\nThe subquery must be a tabular transformation that doesn't specify a tabular source. The source is implicit and is assigned according to the subtable partitions. Only certain supported operators can be used in the subquery. There's no restriction on the number of partitions.\n\nTo use this strategy, specify `hint.strategy=native`.\n\n### Shuffle strategy\n\nThis strategy should be applied when the number of distinct values of the partition key is large, in the millions.\n\nThe subquery must be a tabular transformation that doesn't specify a tabular source. The source is implicit and is assigned according to the subtable partitions. Only certain supported operators can be used in the subquery. There's no restriction on the number of partitions.\n\nTo use this strategy, specify `hint.strategy=shuffle`. For more information about shuffle strategy and performance, see shuffle query.\n\n### Supported operators for the native and shuffle strategies\n\nThe following list of operators can be used in subqueries with the native or shuffle strategies:\n\n* count\n* distinct\n* extend\n* make-series (partially supported, see note)\n* mv-apply\n* mv-expand\n* parse\n* parse-where\n* project\n* project-away\n* project-keep\n* project-rename\n* project-reorder\n* reduce\n* sample\n* sample-distinct\n* scan\n* search\n* serialize\n* sort\n* summarize\n* take\n* top\n* top-hitters\n* top-nested\n* where\n\n> [!NOTE]\n> * Operators that reference a table source other than the subtable partitions aren't compatible with the `native` and `shuffle` strategies. For example, join, union, externaldata, and evaluate (plugins). For such scenarios, resort to the legacy strategy.\n> * The fork operator isn't supported for any strategy type, as the subquery must return a single tabular result.\n> * The make-series operator is only partially supported within the `partition by` operator. It is supported only when both the `from` and `to` parameters are specified.\n\n### Legacy strategy\n\nFor historical reasons, the `legacy` strategy is the default strategy. However, we recommend favoring the native or shuffle strategies, as the `legacy` approach is limited to 64 partitions and is less efficient.\n\nIn some scenarios, the `legacy` strategy might be necessary due to its support for including a tabular source in the subquery. In such cases, the subquery can only reference the key column, *Column*, from the input tabular source, *T*. To reference the column, use the syntax `toscalar(`*Column*`)`.\n\nIf the subquery is a tabular transformation without a tabular source, the source is implicit and is based on the subtable partitions.\n\nTo use this strategy, specify `hint.strategy=legacy` or omit any other strategy indication.\n\n> [!NOTE]\n> An error occurs if the partition column, *Column*, contains more than 64 distinct values.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *T* | `string` |  *True* | The input tabular source.|\n| *Strategy* | `string` | | The value `legacy`, `shuffle`, or `native`. This hint defines the execution strategy of the partition operator.</br></br> If no strategy is specified, the `legacy` strategy is used. For more information, see Strategies. | \n| *Column*| `string` |  *True* | The name of a column in *T* whose values determine how to partition the input tabular source.|\n| *TransformationSubQuery*| `string` |  *True* | A tabular transformation expression. The source is implicitly the subtables produced by partitioning the records of *T*. Each subtable is homogenous on the value of *Column*.</br></br> The expression must provide only one tabular result and shouldn't have other types of statements, such as `let` statements.|\n| *SubQueryWithSource*| `string` |  *True* | A tabular expression that includes its own tabular source, such as a table reference. This syntax is only supported with the legacy strategy. The subquery can only reference the key column, *Column*, from *T*. To reference the column, use the syntax `toscalar(`*Column*`)`.</br></br> The expression must provide only one tabular result and shouldn't have other types of statements, such as `let` statements.|\n| *Hints*| `string` | | Zero or more space-separated parameters in the form of: *HintName* `=` *Value* that control the behavior of the operator. See the supported hints per strategy type.|\n\n### Supported hints\n\n|Hint name|Type|Strategy|Description|\n|:--|:--|:--|:--|\n|`hint.shufflekey`| `string` | shuffle | The partition key used to run the partition operator with the `shuffle` strategy. |\n|`hint.materialized`| `bool` | legacy | If set to `true`, materializes the source of the `partition` operator. The default value is `false`. |\n|`hint.concurrency`| `int` | legacy | Determines how many partitions to run in parallel. The default value is `16`.|\n|`hint.spread`| `int` | legacy | Determines how to distribute the partitions among cluster nodes. The default value is `1`.</br></br> For example, if there are *N* partitions and the spread hint is set to *P*, then the *N* partitions are processed by *P* different cluster nodes equally, in parallel/sequentially depending on the concurrency hint.|",
-        "example": "",
-        "category": "KQL function",
-        "sourceLength": 13199,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/partition-operator"
-      }
-    },
-    {
       "name": "partitioned-by",
       "category": "KQL Keyword"
     },
@@ -10302,81 +10143,6 @@
     {
       "name": "plotly",
       "category": "KQL Keyword"
-    },
-    {
-      "name": "project-away",
-      "category": "KQL Keyword",
-      "documentation": {
-        "title": "project-away",
-        "description": "Select what columns from the input table to exclude from the output table.",
-        "syntax": "*T* `| project-away` *ColumnNameOrPattern* [`,` ...]",
-        "returnInfo": "A table with columns that weren't named as arguments. Contains same number of rows as the input table.\n\n> [!TIP]\n> You can `project-away` any columns that are present in the original table or that were computed as part of the query.\n\n> [!NOTE]\n> The order of the columns in the result is determined by their original order in the table. Only the columns that were specified as arguments are dropped. The other columns are included in the result.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *T* | `string` |  *True* | The tabular input from which to remove columns. |\n| *ColumnNameOrPattern* | `string` |  *True* | One or more column names or column wildcard-patterns to be removed from the output.|",
-        "example": "PopulationData\n| project-away Population",
-        "category": "KQL function",
-        "sourceLength": 5181,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/project-away-operator"
-      }
-    },
-    {
-      "name": "project-by-names",
-      "category": "KQL Keyword",
-      "documentation": {
-        "title": "project-by-names",
-        "description": "Select and reorder a subset of columns from the input table by their names, dynamic arrays, or name patterns.",
-        "syntax": "*T* `| project-by-names` *ColumnSpecifier* [`,` ...]",
-        "returnInfo": "A table containing only the columns specified in the *ColumnSpecifier* parameter, in the specified order. All unspecified columns are excluded from the result.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *T* | `string` |  *True* | The tabular input from which to remove columns. |\n| *ColumnSpecifier* | `string` |  *True* | The name of the column, dynamic array of column names, or column wildcard pattern to keep and reorder.|\n\n> [!NOTE]\n> * Columns in the result are ordered based on the sequence in which they're specified or matched.\n> * Column names that don't match any existing column are safely ignored.\n> * Wildcard characters (*) can be used to match multiple columns by name pattern.\n> * ColumnSpecifier can include the result of a column_names_of(Table) expression, which returns a dynamic array of column names from the specified table.\n> * Subqueries or scalar expressions like toscalar() aren't supported in the *ColumnSpecifier* parameter.\n> * For related functionality:\n>   * Use `project-away` to exclude specific columns from the result.\n>   * Use `project-keep` to retain columns without changing their order.\n>   * Use `project-rename` to rename columns.",
-        "example": "",
-        "category": "KQL function",
-        "sourceLength": 7634,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/project-by-names-operator"
-      }
-    },
-    {
-      "name": "project-keep",
-      "category": "KQL Keyword",
-      "documentation": {
-        "title": "project-keep",
-        "description": "Select what columns from the input to keep in the output. Only the columns that are specified as arguments will be shown in the result. The other columns are excluded.",
-        "syntax": "*T* `| project-keep` *ColumnNameOrPattern* [`,` ...]",
-        "returnInfo": "A table with columns that were named as arguments. Contains same number of rows as the input table.\n\n> [!TIP]\n> You can `project-keep` any columns that are present in the original table or that were computed as part of the query.\n\n> [!NOTE]\n> The order of the columns in the result is determined by their original order in the table. Only the columns that were specified as arguments are kept. The other columns are excluded from the result.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *T* | `string` |  *True* | The tabular input from which to keep columns.|\n| *ColumnNameOrPattern* | `string` |  *True* | One or more column names or column wildcard-patterns to be kept in the output.|",
-        "example": "ConferenceSessions\n| project-keep session*",
-        "category": "KQL function",
-        "sourceLength": 3565,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/project-keep-operator"
-      }
-    },
-    {
-      "name": "project-rename",
-      "category": "KQL Keyword",
-      "documentation": {
-        "title": "project-rename",
-        "description": "Renames columns in the output table.",
-        "syntax": "*T* `| project-rename` *NewColumnName* = *ExistingColumnName* [`,` ...]",
-        "returnInfo": "A table that has the columns in the same order as in an existing table, with columns renamed.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *T* | `string` |  *True* | The input tabular data.|\n| *NewColumnName* | `string` |  *True* | The new column name.|\n| *ExistingColumnName* | `string` |  *True* | The name of the existing column to rename.|",
-        "example": "print a='alpha', b='bravo', c='charlie'\n| project-rename new_a=a, new_b=b, new_c=c",
-        "category": "KQL function",
-        "sourceLength": 1857,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/project-rename-operator"
-      }
-    },
-    {
-      "name": "project-reorder",
-      "category": "KQL Keyword",
-      "documentation": {
-        "title": "project-reorder",
-        "description": "Reorders columns in the output table.",
-        "syntax": "*T* `| project-reorder` *ColumnNameOrPattern* [`asc` | `desc` | `granny-asc` | `granny-desc`] [`,` ...]",
-        "returnInfo": "A table that contains columns in the order specified by the operator arguments. `project-reorder` doesn't rename or remove columns from the table, therefore, all columns that existed in the source table, appear in the result table.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *T* | `string` |  *True* | The input tabular data.|\n| *ColumnNameOrPattern* | `string` |  *True* | The name of the column or column wildcard pattern by which to order the columns. |\n| `asc`, `desc`, `granny-asc`, `granny-desc` | `string` | | Indicates how to order the columns when a wildcard pattern is used. `asc` or `desc` orders columns by column name in ascending or descending manner, respectively. `granny-asc` or `granny-desc` orders by ascending or descending, respectively, while secondarily sorting by the next numeric value. For example, `a20` comes before `a100` when `granny-asc` is specified.|\n\n> [!NOTE]\n>\n> * If no explicit ordering is specified, the order is determined by the matching columns as they appear in the source table.\n> * In ambiguous *ColumnNameOrPattern* matching, the column appears in the first position matching the pattern.\n> * Specifying columns for the `project-reorder` is optional. Columns that aren't specified explicitly appear as the last columns of the output table.\n> * To remove columns, use `project-away`.\n> * To choose which columns to keep, use `project-keep`.\n> * To rename columns, use `project-rename`.",
-        "example": "",
-        "category": "KQL function",
-        "sourceLength": 3654,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/project-reorder-operator"
-      }
     },
     {
       "name": "project-smart",
@@ -10535,36 +10301,6 @@
       "category": "KQL Keyword"
     },
     {
-      "name": "top-hitters",
-      "category": "KQL Keyword",
-      "documentation": {
-        "title": "top-hitters",
-        "description": "Returns an approximation for the most popular distinct values, or the values\nwith the largest sum, in the input.",
-        "syntax": "*T* `|` `top-hitters` *NumberOfValues* `of` *ValueExpression* [ `by` *SummingExpression* ]",
-        "returnInfo": "",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *T* | `string` |  *True* | The input tabular expression.|\n| *NumberOfValues* | int, long, or real |  *True* | The number of distinct values of *ValueExpression*.|\n| *ValueExpression* | `string` |  *True* | An expression over the input table *T* whose distinct values are returned.|\n| *SummingExpression* | `string` | | If specified, a numeric expression over the input table *T* whose sum per distinct value of *ValueExpression* establishes which values to emit. If not specified, the count of each distinct value of *ValueExpression*  is used instead.|\n\n> [!NOTE]\n> * When you include *SummingExpression* in the syntax, the query is equivalent to:\n> \n>   `T | summarize S = sum(SummingExpression) by ValueExpression | top NumberOfValues by S desc`\n>\n> * When you don't include *SummingExpression* in the syntax, the query is equivalent to:\n> \n>   `T | summarize C = count() by ValueExpression | top NumberOfValues by C desc`",
-        "example": "",
-        "category": "KQL function",
-        "sourceLength": 4499,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/top-hitters-operator"
-      }
-    },
-    {
-      "name": "top-nested",
-      "category": "KQL Keyword",
-      "documentation": {
-        "title": "top-nested",
-        "description": "The `top-nested` operator performs hierarchical aggregation and value selection.\n\nImagine you have a table with sales information like regions, salespeople, and amounts sold. The `top-nested` operator can help you answer complex questions, such as \"What are the top five regions by sales, and who are the top three salespeople in each of those regions?\"\n\nThe source data is partitioned based on the criteria set in the first `top-nested` clause, such as region. Next, the operator picks the top records in each partition using an aggregation, such as adding sales amounts. Each subsequent `top-nested` clause refines the partitions created by the previous clause, creating a hierarchy of more precise groups.\n\nThe result is a table with two columns per clause. One column holds the partitioning values, such as region, while the other column holds the outcomes of the aggregation calculation, like the sum of sales.",
-        "syntax": "*T* `|` `top-nested` [ *N* ] `of` *Expr* [`with` `others` `=` *ConstExpr*] `by` *Aggregation* [`asc` | `desc`] [`,`  \n&emsp;&emsp;`top-nested` ... ]",
-        "returnInfo": "A table with two columns for each clause. One column contains unique values computed using *Expr*, and the other column shows the results obtained from the *Aggregation* calculation.\n\n### Using the `with` `others` clause\n\nUsing the `top-nested` operator with `with` `others` adds the ability to see your top content contextualized in a wider data set. Evaluating your data in this way is valuable when rendering the data visually.\n\n### Include data from other columns\n\nOnly columns specified as a `top-nested` clause *Expr* are displayed in the output table.\n\nTo include all values of a column at a specific level:\n\n1. Don't specify the value of *N*.\n1. Use the column name as the value of *Expr*.\n1. Use `Ignore=max(1)` as the value of *Aggregation*.\n1. Remove the unnecessary `Ignore` column with project-away.\n\nFor an example, see Most recent events per state with other column data.\n\nThe number of records can grow exponentially with the number of `top-nested` clauses, and record growth is even faster if the *N* parameter is not specified. This operator can consume a considerable amount of resources.\n\nIf the aggregation distribution is irregular, limit the number of distinct values to return by specifying *N*. Then, use the `with` `others` `=` *ConstExpr* clause to get a sense of the weight of all other cases.",
-        "parametersTable": "|Name|Type|Required|Description|\n|:--|:--|:--|:--|\n|*T*| `string` | *True*|The input tabular expression.|\n|*N*| `int` ||The number of top values to be returned for this hierarchy level. If omitted, all distinct values are returned.|\n|*Expr*| `string` | *True*|An expression over the input record indicating which value to return for this hierarchy level. Typically, it refers to a column from *T* or involves a calculation like bin() on a column. Optionally, set an output column name as *Name* `=` *Expr*.|\n|*ConstExpr*| `string` ||If specified, for each hierarchy level, one record is added with the value that is the aggregation over all records that didn't make it to the top.|\n|*Aggregation*| `string` ||The aggregation function applied to records with the same *Expr* value. The result determines the top records. See Supported aggregation functions. Optionally, set an output column name as *Name* `=` *Aggregation*.|\n\n### Supported aggregation functions\n\nThe following aggregation functions are supported:\n\n* sum()\n* count()\n* max()\n* min()\n* dcount()\n* avg()\n* percentile()\n* percentilew()\n\n> [!NOTE]\n> Any algebraic combination of the aggregations is also supported.",
-        "example": "",
-        "category": "KQL function",
-        "sourceLength": 12004,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/top-nested-operator"
-      }
-    },
-    {
       "name": "toscalar",
       "category": "KQL Keyword"
     },
@@ -10666,6 +10402,20 @@
     }
   ],
   "operators": [
+    {
+      "name": "as",
+      "category": "operator",
+      "documentation": {
+        "title": "as",
+        "description": "Binds a name to the operator's input tabular expression. This operator allows the query to reference the value of the tabular expression multiple times without breaking the query and binding a name through the let statement.\n\nTo optimize multiple uses of the `as` operator within a single query, see Named expressions.",
+        "syntax": "*T* `|` `as` [`hint.materialized` `=` *Materialized*] *Name*",
+        "returnInfo": "",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*T*| `string` |  *True* | The tabular expression to rename.|\n| *Name*| `string` |  *True* | The temporary name for the tabular expression.|\n| *`hint.materialized`*| `bool` |  | If *Materialized* is set to `true`, the value of the tabular expression output is wrapped by a materialize() function call. Otherwise, the value is recalculated on every reference.|\n\n> [!NOTE]\n>\n> * The name given by `as` is used in the `withsource=` column of union, the `source_` column of find, and the `$table` column of search.\n> * The tabular expression named using the operator in a join's outer tabular input (`$left`) can also be used in the join's tabular inner input (`$right`).",
+        "example": "range x from 1 to 5 step 1 \n| as T1 \n| union withsource=TableName (range x from 1 to 5 step 1 | as T2)\n\nunion withsource=TableName (range x from 1 to 5 step 1 | as T1), (range x from 1 to 5 step 1 | as T2)\n\nMyLogTable  \n| where type == \"Event\"\n| as T\n| where Name == \"Start\"\n| join (\n    T\n    | where Name == \"Stop\"\n) on ActivityId",
+        "sourceLength": 3500,
+        "url": "https://learn.microsoft.com/en-us/kusto/query/as-operator"
+      }
+    },
     {
       "name": "between",
       "category": "operator",
@@ -10919,6 +10669,62 @@
       }
     },
     {
+      "name": "graph-mark-components",
+      "category": "operator",
+      "documentation": {
+        "title": "graph-mark-components",
+        "description": "The `graph-mark-components` operator finds all connected components of a graph and marks each node with a component identifier.",
+        "syntax": "*G* `|` `graph-mark-components` [`kind` `=` *Kind*] [`with_component_id` `=` *ComponentId*]",
+        "returnInfo": "The `graph-mark-components` operator returns a *graph* result, where each node has a component identifier in the *ComponentId* property. The identifier is a zero-based consecutive index of the components. Each component index is chosen arbitrarily and might not be consistent across runs.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *G* | string |  *True* | The graph source. |\n| *Kind* | string |  | The connected component kind, either `weak` (default) or `strong`. A weak component is a set of nodes connected by a path, ignoring the direction of edges. A strong component is a set of nodes connected in both directions, considering the edges' directions. |\n| *ComponentId* | string |  | The property name that denotes the component identifier. The default property name is `ComponentId`. |",
+        "example": "let ChildOf = datatable(child:string, parent:string) \n[ \n  \"Alice\", \"Bob\",  \n  \"Carol\", \"Alice\",  \n  \"Carol\", \"Dave\",  \n  \"Greg\", \"Alice\",  \n  \"Greg\", \"Dave\",  \n  \"Howard\", \"Alice\",  \n  \"Howard\", \"Dave\",  \n  \"Eve\", \"Frank\",  \n  \"Frank\", \"Mallory\",\n  \"Eve\", \"Kirk\",\n]; \nChildOf \n| make-graph child --> parent with_node_id=name\n| graph-mark-components with_component_id = family\n| graph-to-table nodes\n\nlet ChildOf = datatable(child:string, parent:string) \n[ \n  \"Alice\", \"Bob\",  \n  \"Carol\", \"Alice\",  \n  \"Carol\", \"Dave\",  \n  \"Greg\", \"Alice\",  \n  \"Greg\", \"Dave\",  \n  \"Howard\", \"Alice\",  \n  \"Howard\", \"Dave\",  \n  \"Eve\", \"Frank\",  \n  \"Frank\", \"Mallory\",\n  \"Eve\", \"Kirk\",\n]; \nChildOf \n| make-graph child --> parent with_node_id=name\n| graph-mark-components with_component_id = family\n| graph-match (descendant)-[childOf*1..5]->(ancestor)\n  project name = ancestor.name, lineage = map(childOf, child), family = ancestor.family\n| summarize (generations, name) = arg_max(array_length(lineage),name) by family",
+        "sourceLength": 4832,
+        "url": "https://learn.microsoft.com/en-us/kusto/query/graph-mark-components-operator"
+      }
+    },
+    {
+      "name": "graph-match",
+      "category": "operator",
+      "documentation": {
+        "title": "graph-match",
+        "description": "The `graph-match` operator searches for all occurrences of a graph pattern in an input graph source.",
+        "syntax": "*G* `|` `graph-match` [`cycles` `=` *CyclesOption*]  *Pattern* [`where` *Constraints*] `project` [*ColumnName* `=`] *Expression* [`,` ...]",
+        "returnInfo": "The `graph-match` operator returns a tabular result, where each record corresponds to a match of the pattern in the graph.  \nThe returned columns are defined in the operator's `project` clause using properties of edges and/or nodes defined in the pattern. Properties and functions of properties of variable length edges are returned as a dynamic array, each value in the array corresponds to an occurrence of the variable length edge.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *G* | `string` |  *True* | The input graph source. |\n| *Pattern* | `string` |  *True* | One or more comma delimited sequences of graph node elements connected by graph edge elements using graph notations. See Graph pattern notation. |\n| *Constraints* | `string` |  | A Boolean expression composed of properties of named variables in the *Pattern*. Each graph element (node/edge) has a set of properties that were attached to it during the graph construction. The constraints define which elements (nodes and edges) are matched by the pattern. A property is referenced by the variable name followed by a dot (`.`) and the property name. |\n| *Expression* | `string` | *True* | The `project` clause converts each pattern to a row in a tabular result. The project expressions must be scalar and reference properties of named variables defined in the *Pattern*. A property is referenced by the variable name followed by a dot (`.`) and the attribute name. |\n| *CyclesOption* | `string` |  | Controls whether cycles are matched in the *Pattern*, allowed values: `all`, `none`, `unique_edges`. If `all` is specified, then all cycles are matched, if `none` is specified cycles aren't matched, if `unique_edges` (default) is specified, cycles are matched but only if the cycles don't include the same edge more than once. |\n\n### Graph pattern notation\n\nThe following table shows the supported graph notation:\n  \n|Element|Named variable|Anonymous|\n|:---|:---|:---|\n|Node|`(`*n*`)`|`()`|\n|Directed edge: left to right|`-[`*e*`]->`|`-->`|\n|Directed edge: right to left|`<-[`*e*`]-`|`<--`|\n|Any direction edge|`-[`*e*`]-`|`--`|\n|Variable length edge|`-[`*e*`*3..5]-`|`-[*3..5]-`|\n\n### Variable length edge\n\nA variable length edge allows a specific pattern to be repeated multiple times within defined limits. This type of edge is denoted by an asterisk (`*`), followed by the minimum and maximum occurrence values in the format *min*`..`*max*. Both the minimum and maximum values must be integer scalars. Any sequence of edges falling within this occurrence range can match the variable edge of the pattern, if all the edges in the sequence satisfy the constraints outlined in the `where` clause.\n\n### Multiple sequences\n\nMultiple comma delimited sequences are used to express nonlinear patterns. To describe the connection between different sequences, they have to share one or more variable name of a node. For example, to represent a star pattern with node *n* at the center connected to nodes *a*,*b*,*c*, and *d*, the following pattern could be used:\n\n`(`*a*`)--(`*n*`)--(`*b*`)`,`(`*c*`)--(`*n*`)--(`*d*`)`\n\nOnly single connected component patterns are supported.",
+        "example": "let employees = datatable(name:string, age:long) \n[ \n  \"Alice\", 32,  \n  \"Bob\", 31,  \n  \"Eve\", 27,  \n  \"Joe\", 29,  \n  \"Chris\", 45, \n  \"Alex\", 35,\n  \"Ben\", 23,\n  \"Richard\", 39,\n]; \nlet reports = datatable(employee:string, manager:string) \n[ \n  \"Bob\", \"Alice\",  \n  \"Chris\", \"Alice\",  \n  \"Eve\", \"Bob\",\n  \"Ben\", \"Chris\",\n  \"Joe\", \"Alice\", \n  \"Richard\", \"Bob\"\n]; \nreports \n| make-graph employee --> manager with employees on name \n| graph-match (alice)<-[reports*1..5]-(employee)\n  where alice.name == \"Alice\" and employee.age < 30\n  project employee = employee.name, age = employee.age, reportingPath = map(reports, manager)\n\nlet Entities = datatable(name:string, type:string, age:long) \n[ \n  \"Alice\", \"Person\", 23,  \n  \"Bob\", \"Person\", 31,  \n  \"Eve\", \"Person\", 17,  \n  \"Mallory\", \"Person\", 29,  \n  \"Apollo\", \"System\", 99 \n]; \nlet Actions = datatable(source:string, destination:string, action_type:string) \n[ \n  \"Alice\", \"Bob\", \"communicatesWith\",  \n  \"Alice\", \"Apollo\", \"trusts\",  \n  \"Bob\", \"Apollo\", \"hasPermission\",  \n  \"Eve\", \"Alice\", \"attacks\",  \n  \"Mallory\", \"Alice\", \"attacks\",  \n  \"Mallory\", \"Bob\", \"attacks\"  \n]; \nActions \n| make-graph source --> destination with Entities on name \n| graph-match (mallory)-[attacks]->(compromised)-[hasPermission]->(apollo) \n  where mallory.name == \"Mallory\" and apollo.name == \"Apollo\" and attacks.action_type == \"attacks\" and hasPermission.action_type == \"hasPermission\" \n  project Attacker = mallory.name, Compromised = compromised.name, System = apollo.name\n\nlet Entities = datatable(name:string, type:string, age:long) \n[ \n  \"Alice\", \"Person\", 23,  \n  \"Bob\", \"Person\", 31,  \n  \"Eve\", \"Person\", 17,  \n  \"Mallory\", \"Person\", 29,  \n  \"Apollo\", \"System\", 99 \n]; \nlet Actions = datatable(source:string, destination:string, action_type:string) \n[ \n  \"Alice\", \"Bob\", \"communicatesWith\",  \n  \"Alice\", \"Apollo\", \"trusts\",  \n  \"Bob\", \"Apollo\", \"hasPermission\",  \n  \"Eve\", \"Alice\", \"attacks\",  \n  \"Mallory\", \"Alice\", \"attacks\",  \n  \"Mallory\", \"Bob\", \"attacks\"  \n]; \nActions \n| make-graph source --> destination with Entities on name \n| graph-match (mallory)-[attacks]->(compromised)-[hasPermission]->(apollo), (compromised)-[communicates]-(alice) \n  where mallory.name == \"Mallory\" and apollo.name == \"Apollo\" and attacks.action_type == \"attacks\" and hasPermission.action_type == \"hasPermission\" and alice.name == \"Alice\"\n  project Attacker = mallory.name, Compromised = compromised.name, System = apollo.name",
+        "sourceLength": 10522,
+        "url": "https://learn.microsoft.com/en-us/kusto/query/graph-match-operator"
+      }
+    },
+    {
+      "name": "graph-shortest-paths",
+      "category": "operator",
+      "documentation": {
+        "title": "graph-shortest-paths",
+        "description": "The `graph-shortest-paths` operator finds the shortest paths between a set of source nodes and a set of target nodes in a graph and returns a table with the results.",
+        "syntax": "*G* `|` `graph-shortest-paths` [`output` `=` *OutputOption*] *Pattern* `where` *Predicate* `project` [*ColumnName* `=`] *Expression* [`,` ...]",
+        "returnInfo": "The `graph-shortest-paths` operator returns a tabular result, where each record corresponds to a path found in the graph. The returned columns are defined in the operator's `project` clause using properties of nodes and edges defined in the pattern. Properties and functions of properties of variable length edges, are returned as a dynamic array. Each value in the array corresponds to an occurrence of the variable length edge.",
+        "parametersTable": "| Name | Type | Required |Description |\n|:---------------|:-------------|:----------|:-----------------------------|\n| *G* | string | *True* | The graph source, typically the output from a `make-graph` operation.                                                 |\n| *Pattern* | string | *True* | A path pattern that describes the path to find. Patterns must include at least one variable length edge and can't contain multiple sequences. |\n| *Predicate* | expression | | A boolean expression that consists of properties of named variables in the pattern and constants. |\n| *Expression* | expression | *True* | A scalar expression that defines the output row for each found path, using constants and references to properties of named variables in the pattern. |\n| *OutputOption*| string | | Specifies the search output as `any` (default) or `all`. Output is specified as `any` for a single shortest path per source/target pair and `all` for all shortest paths of equal minimum length. |\n\n### Path pattern notation\n\nThe following table shows the supported path pattern notations.\n\n| Element                  | Named variable | Anonymous element |\n|:--------------------------|:----------------|:-----------|\n| Node                     | `(`*n*`)`      | `()`      |\n| Directed edge from left to right | `-[`*e*`]->` | `-->`     |\n| Directed edge from right to left | `<-[`*e*`]-` | `<--`     |\n| Any direction edge       | `-[`*e*`]-`    | `--`      |\n| Variable length edge     | `-[`*e*`*3..5]-` | `-[*3..5]-` |\n\n#### Variable length edge\n\nA variable length edge allows a specific pattern to repeat multiple times within defined limits. An asterisk (`*`) denotes this type of edge, followed by the minimum and maximum occurrence values in the format *min*`..`*max*. These values must be integer scalars. Any sequence of edges within this range can match the variable edge of the pattern, provided all the edges in the sequence meet the `where` clause constraints.",
+        "example": "let connections = datatable(from_station:string, to_station:string, line:string) \n[ \n  \"Central\", \"North\", \"red\",\n  \"North\", \"Central\", \"red\", \n  \"Central\", \"South\",  \"red\", \n  \"South\", \"Central\",  \"red\", \n  \"South\", \"South-West\", \"red\", \n  \"South-West\", \"South\", \"red\", \n  \"South-West\", \"West\", \"red\", \n  \"West\", \"South-West\", \"red\", \n  \"Central\", \"East\", \"blue\", \n  \"East\", \"Central\", \"blue\", \n  \"Central\", \"West\", \"blue\",\n  \"West\", \"Central\", \"blue\",\n]; \nconnections \n| make-graph from_station --> to_station with_node_id=station\n| graph-shortest-paths (start)-[connections*1..5]->(destination)\n  where start.station == \"South-West\" and destination.station == \"North\"\n  project from = start.station, path = map(connections, to_station), line = map(connections, line), to = destination.station\n\nlet connections = datatable(from_station:string, to_station:string, line:string) \n[ \n  \"Central\", \"North\", \"red\",\n  \"North\", \"Central\", \"red\", \n  \"Central\", \"South\",  \"red\", \n  \"South\", \"Central\",  \"red\", \n  \"South\", \"South-West\", \"red\", \n  \"South-West\", \"South\", \"red\", \n  \"South-West\", \"West\", \"red\", \n  \"West\", \"South-West\", \"red\", \n  \"Central\", \"East\", \"blue\", \n  \"East\", \"Central\", \"blue\", \n  \"Central\", \"West\", \"blue\",\n  \"West\", \"Central\", \"blue\",\n]; \nconnections \n| make-graph from_station --> to_station with_node_id=station\n| graph-shortest-paths output=all (start)-[connections*1..5]->(destination)\n  where start.station == \"South-West\" and destination.station == \"North\"\n  project from = start.station, path = map(connections, to_station), line = map(connections, line), to = destination.station",
+        "sourceLength": 8009,
+        "url": "https://learn.microsoft.com/en-us/kusto/query/graph-shortest-paths-operator"
+      }
+    },
+    {
+      "name": "graph-to-table",
+      "category": "operator",
+      "documentation": {
+        "title": "graph-to-table",
+        "description": "The `graph-to-table` operator exports nodes or edges from a graph to tables.",
+        "syntax": "### Nodes\n\n*G* `|` `graph-to-table` `nodes` [ `with_node_id=`*ColumnName* ]\n\n### Edges\n\n*G* `|` `graph-to-table` `edges` [ `with_source_id=`*ColumnName* ] [ `with_target_id=`*ColumnName* ] [ `as` *TableName* ]\n\n### Nodes and edges\n\n*G* `|` `graph-to-table` `nodes` `as` *NodesTableName* [ `with_node_id=`*ColumnName* ]`,` `edges` `as` *EdgesTableName* [ `with_source_id=`*ColumnName* ] [ `with_target_id=`*ColumnName* ]",
+        "returnInfo": "### Nodes\n\nThe `graph-to-table` operator returns a tabular result, in which each row corresponds to a node in the source graph. The returned columns are the node's properties. When `with_node_id` is provided, the node hash column is of `long` type.\n\n### Edges\n\nThe `graph-to-table` operator returns a tabular result, in which each row corresponds to an edge in the source graph. The returned columns are the node's properties. When `with_source_id` or `with_target_id` are provided, the node hash column is of `long` type.\n\n### Nodes and edges\n\nThe `graph-to-table` operator returns two tabular results, matching the previous descriptions.",
+        "parametersTable": "|Name|Type|Required | Description |\n|:---|:---|:---|:---|\n|*G*| `string` | *True*|The input graph source.|\n|*NodesTableName*| `string` ||The name of the exported nodes table.|\n|*EdgesTableName*| `string` ||The name of the exported edges table.|\n|*ColumnName*| `string` ||Export the node hash ID, source node hash ID, or target node hash ID with the given column name.|",
+        "example": "let nodes = datatable(name:string, type:string, age:long) \n[ \n\t\"Alice\", \"Person\", 23,  \n\t\"Bob\", \"Person\", 31,  \n\t\"Eve\", \"Person\", 17,  \n\t\"Mallory\", \"Person\", 29,  \n\t\"Trent\", \"System\", 99 \n]; \nlet edges = datatable(source:string, destination:string, edge_type:string) \n[ \n\t\"Alice\", \"Bob\", \"communicatesWith\",  \n\t\"Alice\", \"Trent\", \"trusts\",  \n\t\"Bob\", \"Trent\", \"hasPermission\",  \n\t\"Eve\", \"Alice\", \"attacks\",  \n\t\"Mallory\", \"Alice\", \"attacks\",  \n\t\"Mallory\", \"Bob\", \"attacks\"  \n]; \nedges \n| make-graph source --> destination with nodes on name\n| graph-to-table edges with_source_id=SourceId with_target_id=TargetId",
+        "sourceLength": 7711,
+        "url": "https://learn.microsoft.com/en-us/kusto/query/graph-to-table-operator"
+      }
+    },
+    {
       "name": "has_all",
       "category": "operator",
       "documentation": {
@@ -11077,9 +10883,9 @@
       "category": "operator",
       "documentation": {
         "title": "join",
-        "description": "Merge the rows of two tables to form a new table by matching values of the specified columns from each table.\n\nKusto Query Language (KQL) offers many kinds of joins that each affect the schema and rows in the resultant table in different ways. For example, if you use an `inner` join, the table has the same columns as the left table, plus the columns from the right table. For best performance, if one table is always smaller than the other, use it as the left side of the `join` operator.\n\nThe following image provides a visual representation of the operation performed by each join. The color of the shading represents the columns returned, and the areas shaded represent the rows returned.\n\n:::image type=\"content\" source=\"media/joinoperator/join-kinds.png\" alt-text=\"Diagram showing query join kinds.\":::",
+        "description": "Merge the rows of two tables to form a new table by matching values of the specified columns from each table.\n\nKusto Query Language (KQL) offers many kinds of joins that each affect the schema and rows in the resultant table in different ways. For example, if you use an `inner` join, the table has the same columns as the left table, plus the columns from the right table. For best performance, if one table is always smaller than the other, use it as the left side of the `join` operator.\n\nThe following image provides a visual representation of the operation performed by each join. The color of the shading represents the columns returned, and the areas shaded represent the rows returned.",
         "syntax": "*LeftTable* `|` `join` [ `kind` `=` *JoinFlavor* ] [ *Hints* ] `(`*RightTable*`)` `on` *Conditions*",
-        "returnInfo": "The return schema and rows depend on the join flavor. The join flavor is specified with the *kind* keyword. The following table shows the supported join flavors. To see examples for a specific join flavor, select the link in the **Join flavor** column.\n\n| Join flavor | Returns | Illustration |\n| --- | --- | --- |\n| innerunique (default) | Inner join with left side deduplication<br />**Schema**: All columns from both tables, including the matching keys<br />**Rows**: All deduplicated rows from the left table that match rows from the right table | :::image type=\"icon\" source=\"media/joinoperator/join-innerunique.png\" border=\"false\"::: |\n| inner | Standard inner join<br />**Schema**: All columns from both tables, including the matching keys<br />**Rows**: Only matching rows from both tables | :::image type=\"icon\" source=\"media/joinoperator/join-inner.png\" border=\"false\"::: |\n| leftouter | Left outer join<br />**Schema**: All columns from both tables, including the matching keys<br />**Rows**: All records from the left table and only matching rows from the right table | :::image type=\"icon\" source=\"media/joinoperator/join-leftouter.png\" border=\"false\"::: |\n| rightouter | Right outer join<br />**Schema**: All columns from both tables, including the matching keys<br />**Rows**: All records from the right table and only matching rows from the left table | :::image type=\"icon\" source=\"media/joinoperator/join-rightouter.png\" border=\"false\"::: |\n| fullouter | Full outer join<br />**Schema**: All columns from both tables, including the matching keys<br />**Rows**: All records from both tables with unmatched cells populated with null | :::image type=\"icon\" source=\"media/joinoperator/join-fullouter.png\" border=\"false\"::: |\n| leftsemi | Left semi join<br />**Schema**: All columns from the left table<br />**Rows**: All records from the left table that match records from the right table | :::image type=\"icon\" source=\"media/joinoperator/join-leftsemi.png\" border=\"false\"::: |\n| `leftanti`, `anti`, `leftantisemi` | Left anti join and semi variant<br />**Schema**: All columns from the left table<br />**Rows**: All records from the left table that don't match records from the right table | :::image type=\"icon\" source=\"media/joinoperator/join-leftanti.png\" border=\"false\"::: |\n| rightsemi | Right semi join<br />**Schema**: All columns from the right table<br />**Rows**: All records from the right table that match records from the left table | :::image type=\"icon\" source=\"media/joinoperator/join-rightsemi.png\" border=\"false\"::: |\n| `rightanti`, `rightantisemi` | Right anti join and semi variant<br />**Schema**: All columns from the right table<br />**Rows**: All records from the right table that don't match records from the left table | :::image type=\"icon\" source=\"media/joinoperator/join-rightanti.png\" border=\"false\"::: |\n\n### Cross-join\n\nKQL doesn't provide a cross-join flavor. However, you can achieve a cross-join effect by using a placeholder key approach.\n\nIn the following example, a placeholder key is added to both tables and then used for the inner join operation, effectively achieving a cross-join-like behavior:\n\n`X | extend placeholder=1 | join kind=inner (Y | extend placeholder=1) on placeholder`",
+        "returnInfo": "The return schema and rows depend on the join flavor. The join flavor is specified with the *kind* keyword. The following table shows the supported join flavors. To see examples for a specific join flavor, select the link in the **Join flavor** column.\n\n| Join flavor | Returns | Illustration |\n| --- | --- | --- |\n| innerunique (default) | Inner join with left side deduplication<br />**Schema**: All columns from both tables, including the matching keys<br />**Rows**: All deduplicated rows from the left table that match rows from the right table |  |\n| inner | Standard inner join<br />**Schema**: All columns from both tables, including the matching keys<br />**Rows**: Only matching rows from both tables |  |\n| leftouter | Left outer join<br />**Schema**: All columns from both tables, including the matching keys<br />**Rows**: All records from the left table and only matching rows from the right table |  |\n| rightouter | Right outer join<br />**Schema**: All columns from both tables, including the matching keys<br />**Rows**: All records from the right table and only matching rows from the left table |  |\n| fullouter | Full outer join<br />**Schema**: All columns from both tables, including the matching keys<br />**Rows**: All records from both tables with unmatched cells populated with null |  |\n| leftsemi | Left semi join<br />**Schema**: All columns from the left table<br />**Rows**: All records from the left table that match records from the right table |  |\n| `leftanti`, `anti`, `leftantisemi` | Left anti join and semi variant<br />**Schema**: All columns from the left table<br />**Rows**: All records from the left table that don't match records from the right table |  |\n| rightsemi | Right semi join<br />**Schema**: All columns from the right table<br />**Rows**: All records from the right table that match records from the left table |  |\n| `rightanti`, `rightantisemi` | Right anti join and semi variant<br />**Schema**: All columns from the right table<br />**Rows**: All records from the right table that don't match records from the left table |  |\n\n### Cross-join\n\nKQL doesn't provide a cross-join flavor. However, you can achieve a cross-join effect by using a placeholder key approach.\n\nIn the following example, a placeholder key is added to both tables and then used for the inner join operation, effectively achieving a cross-join-like behavior:\n\n`X | extend placeholder=1 | join kind=inner (Y | extend placeholder=1) on placeholder`",
         "parametersTable": "|Name|Type|Required|Description|\n|:--|:--|:--|:--|\n|*LeftTable*| `string` | *True*|The left table or tabular expression, sometimes called the outer table, whose rows are to be merged. Denoted as `$left`.|\n|*JoinFlavor*| `string` ||The type of join to perform: `innerunique`, `inner`, `leftouter`, `rightouter`, `fullouter`, `leftanti`, `rightanti`, `leftsemi`, `rightsemi`. The default is `innerunique`. For more information about join flavors, see Returns.|\n|*Hints*| `string` ||Zero or more space-separated join hints in the form of *Name* `=` *Value* that control the behavior of the row-match operation and execution plan. For more information, see Hints.\n|*RightTable*| `string` | *True*|The right table or tabular expression, sometimes called the inner table, whose rows are to be merged. Denoted as `$right`.|\n|*Conditions*| `string` | *True*|Determines how rows from *LeftTable* are matched with rows from *RightTable*. If the columns you want to match have the same name in both tables, use the syntax `ON` *ColumnName*. Otherwise, use the syntax `ON $left.`*LeftColumn* `==` `$right.`*RightColumn*. To specify multiple conditions, you can either use the \"and\" keyword or separate them with commas. If you use commas, the conditions are evaluated using the \"and\" logical operator.|\n\n> [!TIP]\n> For best performance, if one table is always smaller than the other, use it as the left side of the join.\n\n### Hints\n\n> [!NOTE]\n> The join hints don't change the semantic of `join` but may affect performance.",
         "example": "",
         "sourceLength": 8288,
@@ -11098,6 +10904,20 @@
         "example": "let FactTable=datatable(Row:string,Personal:string,Family:string) [\n  \"1\", \"Rowan\",   \"Murphy\",\n  \"2\", \"Ellis\",   \"Turner\",\n  \"3\", \"Ellis\",   \"Turner\",\n  \"4\", \"Maya\",  \"Robinson\",\n  \"5\", \"Quinn\",    \"Campbell\"\n];\nlet DimTable=datatable(Personal:string,Family:string,Alias:string) [\n  \"Rowan\",  \"Murphy\",   \"rowanm\",\n  \"Ellis\",  \"Turner\", \"ellist\",\n  \"Maya\", \"Robinson\", \"mayar\",\n  \"Quinn\",   \"Campbell\",    \"quinnc\"\n];\nFactTable\n| lookup kind=leftouter DimTable on Personal, Family",
         "sourceLength": 6233,
         "url": "https://learn.microsoft.com/en-us/kusto/query/lookup-operator"
+      }
+    },
+    {
+      "name": "macro-expand",
+      "category": "operator",
+      "documentation": {
+        "title": "macro-expand",
+        "description": "The `macro-expand` operator simplifies running a subquery on a set of entities, such as clusters, databases, or tables, and then combining the results into a single output.\n\nThe operator is useful when you have data spread across multiple clusters, databases, or tables. For example, when data is held in the same global region as its source, you can use the `macro-expand` operator in a single query across data in distinct locations, instead of running separate queries for each entity and combining the results manually.\n\nThe set of entities you want to query is called an *entity group*. The entity group can be stored for reuse in a database or defined directly in your query text. For more information about stored entity groups, see Entity groups.\n\nThe `macro-expand` operator runs the subquery separately for each entity in the group and then combines all the results into a single output. The subquery can include nested `macro-expand` operators. However, the identifier for the inner `macro-expand` must be different from the identifier for the outer `macro-expand` to clearly distinguish between the scope and references of each one.",
+        "syntax": "`macro-expand` [`kind` `=` *Kind*] [`isfuzzy` `=` *IsFuzzy*] *EntityGroup* `as` *EntityIdentifier*  `(`*Subquery*`)`\n\n`macro-expand` [`kind` `=` *Kind*] [`isfuzzy` `=` *IsFuzzy*] `entity_group` `[`*EntityReference* [`,` ...]  `as` *EntityIdentifier*  `(`*Subquery*`)``]`\n\n`macro-expand` *EntityIdentifier* `in` *EntityGroupIdentifier* `(`*Subquery*`)`\n\n> [!NOTE]\n> The operation of the `macro-expand` operator can be modified by setting the `best_effort` request property to `true`, either by using a `set statement` or through client request properties. When this property is set to `true`, the `macro-expand` operator ignores fuzzy resolution and connectivity failures, to execute any of the subexpressions being unioned and issues a warning in the query status results.\n\n### Variations\n\nThere are several ways to specify the entity group used by the `macro-expand` operator:\n\n- **Inline:** All elements are explicitly defined in the text of the operator invocation itself. For an example, see Calculate errors.\n\n- **Via `let` statement:** The entity group is specified in the query using a `let` statement outside the `macro-expand` operator using the syntax:\n\n    `let` *EntityGroupIdentifier* `=` `entity_group` `[`*EntityReference* [`,` ...]`]`\n\n   For an example, see Calculate SKU errors using `let` statement.\n\n- **Using a stored entity group:** The query uses an entity group stored in the database in scope rather than defined in the query.\n\n   For an example, see Extend table with contextual scalar functions.",
+        "returnInfo": "",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *Kind* | `string` | | Either `inner` or `outer` (default). When `kind` is set to `inner`, the results only include columns common to all the accessed scoped entities. If set to `outer`, the result includes all the columns that occur in any of the inputs. Cells not defined by an input row are set to `null`. |\n| *IsFuzzy* |  |  | When set to `true`, it only considers entity sources that currently exist and are accessible. If at least one entity is found, the query runs, and any missing entities generate warnings in the query status results. If no entities are found, the query can't resolve any specified entities and returns an error. The default is `false`. |\n| *EntityGroup* |  |  *True* | A set of one or more entities that *EntityIdentifier* expands into when a query is run. The entity group can be a stored entity group or a defined group. It denotes one or more entities of the same type that *EntityIdentifier* expands to. |\n| *EntityIdentifier* | `string` |  *True* |  An identifier that serves as a placeholder for an entity in the subquery, and which is expanded into the actual entity when the query is run. Entities that aren't explicitly scoped in *EntityIdentifier* are assumed to be part of the current in scope database. Any specific identifiers included in the query override the default assumption. |\n|*EntityReference*| `string` | |An entity included in the entity group. One or more *EntityReference* is required if an *EntityGroup* isn't specified. |\n| *Subquery* | `string` |  *True* | A single tabular expression that doesn’t take input data directly. It might include references to entities through an *EntityIdentifier*, and use expressions such as let statements, stored functions, or other elements from the database in scope. *Subquery* can be preceded by one or more `let` statements. It can also reference Subquery contextual functions.|\n\n> [!NOTE]\n> A query can only reference entity groups defined in the query text or in the current database. Entity groups in other databases or clusters can't be referenced directly or indirectly.\n\n### Subquery contextual scalars\n\nThe `macro-expand` subquery can reference two specialized scalar values as if they're part of the entity being referenced:\n\n* `$current_database` - Returns the database name of the entity reference (a `string`).\n* `$current_cluster_endpoint` - Returns the URL of the cluster of the entity reference (a `string`).\n\n> [!NOTE]\n> These values can only be used when they are scoped by the *EntityReference*.\n> For example, if *EntityReference* is a database and the `macro-expand` is using `DB` to reference the database,\n> use `DB.$current_cluster_endpoint` to retrieve the URL of the cluster which hosts the database.",
+        "example": "",
+        "sourceLength": 11537,
+        "url": "https://learn.microsoft.com/en-us/kusto/query/macro-expand-operator"
       }
     },
     {
@@ -11185,7 +11005,7 @@
       }
     },
     {
-      "name": "not_contains_cs",
+      "name": "!contains_cs",
       "category": "operator",
       "documentation": {
         "title": "!contains_cs",
@@ -11227,7 +11047,7 @@
       }
     },
     {
-      "name": "not_endswith_cs",
+      "name": "!endswith_cs",
       "category": "operator",
       "documentation": {
         "title": "!endswith_cs",
@@ -11283,7 +11103,7 @@
       }
     },
     {
-      "name": "not_has_cs",
+      "name": "!has_cs",
       "category": "operator",
       "documentation": {
         "title": "!has_cs",
@@ -11311,7 +11131,7 @@
       }
     },
     {
-      "name": "not_hasprefix_cs",
+      "name": "!hasprefix_cs",
       "category": "operator",
       "documentation": {
         "title": "!hasprefix_cs",
@@ -11339,7 +11159,7 @@
       }
     },
     {
-      "name": "not_hassuffix_cs",
+      "name": "!hassuffix_cs",
       "category": "operator",
       "documentation": {
         "title": "!hassuffix_cs",
@@ -11395,7 +11215,7 @@
       }
     },
     {
-      "name": "not_startswith_cs",
+      "name": "!startswith_cs",
       "category": "operator",
       "documentation": {
         "title": "!startswith_cs operators",
@@ -11423,6 +11243,20 @@
       }
     },
     {
+      "name": "parse-kv",
+      "category": "operator",
+      "documentation": {
+        "title": "parse-kv",
+        "description": "Extracts structured information from a string expression and represents the information in a key/value form.\n\nThe following extraction modes are supported:\n\n* **Specified delimiter**: Extraction based on specified delimiters that dictate how keys/values and pairs are separated from each other.\n* **Non-specified delimiter**: Extraction with no need to specify delimiters. Any nonalphanumeric character is considered a delimiter.\n* **Regex**: Extraction based on regular expressions.",
+        "syntax": "### Specified delimiter\n\n*T* `|` `parse-kv` *Expression* `as` `(` *KeysList* `)` `with` `(` `pair_delimiter` `=` *PairDelimiter* `,` `kv_delimiter` `=` *KvDelimiter*  [`,` `quote` `=` *QuoteChars* ... [`,` `escape` `=` *EscapeChar* ...]] [`,` `greedy` `=` `true`] `)`\n\n### Nonspecified delimiter\n\n*T* `|` `parse-kv` *Expression* `as` `(` *KeysList* `)` `with` `(` [`quote` `=` *QuoteChars* ... [`,` `escape` `=` *EscapeChar* ...]] `)`\n\n### Regex\n\n*T* `|` `parse-kv` *Expression* `as` `(` *KeysList* `)` `with` `(` `regex` `=` *RegexPattern*`)` `)`",
+        "returnInfo": "The original input tabular expression *T*, extended with columns per specified keys to extract.\n\n> [!NOTE]\n>\n> * If a key doesn't appear in a record, the corresponding column value is either `null` or an empty string, depending on the column type.\n> * Only keys that are listed in the operator are extracted.\n> * The first appearance of a key is extracted, and subsequent values are ignored.\n> * When you extract keys and values, leading and trailing white spaces are ignored.",
+        "parametersTable": "|Name|Type|Required|Description|\n|:--|:--|:--|:--|\n|*Expression*| `string` | *True*|The expression from which to extract key values.|\n|*KeysList*| `string` | *True*|A comma-separated list of key names and their value data types. The order of the keys doesn't have to match the order in which they appear in the text.|\n|*PairDelimiter*| `string` ||A delimiter that separates key value pairs from each other.|\n|*KvDelimiter*| `string` ||A delimiter that separates keys from values.|\n|*QuoteChars*| `string` ||A one- or two-character string literal representing opening and closing quotes that key name or the extracted value may be wrapped with. The parameter can be repeated to specify a separate set of opening/closing quotes.|\n|*EscapeChar*| `string` ||A one-character string literal describing a character that may be used for escaping special characters in a quoted value. The parameter can be repeated if multiple escape characters are used.|\n|*RegexPattern*| `string` ||A regular expression containing two capturing groups exactly. The first group represents the key name, and the second group represents the key value.|",
+        "example": "",
+        "sourceLength": 12292,
+        "url": "https://learn.microsoft.com/en-us/kusto/query/parse-kv-operator"
+      }
+    },
+    {
       "name": "parse",
       "category": "operator",
       "documentation": {
@@ -11434,6 +11268,34 @@
         "example": "",
         "sourceLength": 23570,
         "url": "https://learn.microsoft.com/en-us/kusto/query/parse-operator"
+      }
+    },
+    {
+      "name": "parse-where",
+      "category": "operator",
+      "documentation": {
+        "title": "parse-where",
+        "description": "Evaluates a string expression, and parses its value into one or more calculated columns. The result is only the successfully parsed strings.\n\n`parse-where` parses the strings in the same way as parse, and filters out strings that were not parsed successfully.\n\nSee parse operator, which produces nulls for unsuccessfully parsed strings.",
+        "syntax": "*T* `| parse-where` [`kind=`*kind* [`flags=` *regexFlags*]] *expression* `with` `*` (*stringConstant* *columnName* [`:` *columnType*]) `*`...",
+        "returnInfo": "The input table, which is extended according to the list of columns that are provided to the operator.\n\n> [!NOTE]\n> Only successfully parsed strings will be in the output. Strings that don't match the pattern will be filtered out.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *T* | `string` |  *True* | The tabular input to parse.|\n| *kind* | `string` |  *True* | One of the supported kind values. The default value is `simple`.|\n| *regexFlags* | `string` | |If *kind* is `regex`, then you can specify regex flags to be used like `U` for ungreedy, `m` for multi-line mode, `s` for match new line `\\n`, and `i` for case-insensitive. More flags can be found in Flags.|\n| *expression* | `string` |  *True* | An expression that evaluates to a string.|\n| *stringConstant* | `string` |  *True* | A string constant for which to search and parse.|\n| *columnName* | `string` |  *True* | The name of a column to assign a value to, extracted from the string expression. |\n| *columnType* | `string` | | The scalar value that indicates the type to convert the value to. The default is the `string`.|\n\n>[!NOTE]\n>\n> * Use project if you also want to drop or rename some columns.\n> * Use `*` in the pattern to skip junk values. This value can't be used after `string` column.\n> * The parse pattern may start with *ColumnName*, in addition to *StringConstant*.\n> * If the parsed *expression* isn't of type `string`, it will be converted to type `string`.\n\n### Supported kind values\n\n|Text|Description|\n|:--|:--|\n| `simple` | This is the default value. *stringConstant* is a regular string value and the match is strict. All string delimiters should appear in the parsed string, and all extended columns must match the required types.|\n| `regex` | *stringConstant* may be a regular expression and the match is strict. All string delimiters, which can be a regex for this mode, should appear in the parsed string, and all extended columns must match the required types.|\n\n### Regex mode\n\nIn regex mode, parse will translate the pattern to a regex and use regular expressions in order to do the matching using numbered captured groups that are handled internally. For example:\n\n```kusto\nparse-where kind=regex Col with * <regex1> var1:string <regex2> var2:long\n```\n\nThe regex that will be generated by the parse internally is `.*?<regex1>(.*?)<regex2>(\\-\\d+)`.\n\n* `*` was translated to `.*?`.\n* `string` was translated to `.*?`.\n* `long` was translated to `\\-\\d+`.",
+        "example": "",
+        "sourceLength": 14499,
+        "url": "https://learn.microsoft.com/en-us/kusto/query/parse-where-operator"
+      }
+    },
+    {
+      "name": "partition",
+      "category": "operator",
+      "documentation": {
+        "title": "partition",
+        "description": "The partition operator partitions the records of its input table into multiple subtables according to values in a key column. The operator runs a subquery on each subtable, and produces a single output table that is the union of the results of all subqueries.\n\nThe partition operator is useful when you need to perform a subquery only on a subset of rows that belong to the same partition key, and not a query of the whole dataset. These subqueries could include aggregate functions, window functions, top *N* and others.\n\nThe partition operator supports several strategies of subquery operation:\n\n* Native - use with an implicit data source with thousands of key partition values.\n* Shuffle - use with an implicit source with millions of key partition values.\n* Legacy - use with an implicit or explicit source for 64 or less key partition values.",
+        "syntax": "*T* `|` `partition` [ `hint.strategy=`*Strategy* ] [ *Hints* ] `by` *Column* `(` *TransformationSubQuery* `)`\n\n*T* `|` `partition` [ `hint.strategy=legacy` ] [ *Hints* ] `by` *Column* `{` *SubQueryWithSource* `}`",
+        "returnInfo": "The operator returns a union of the results of the individual subqueries.\n\nThe partition operator supports several strategies of subquery operation: native, shuffle, and legacy.\n\n> [!NOTE]\n> The distinction between the `native` and `shuffle` strategies allows the caller to indicate the cardinality and execution strategy of the subquery. This choice may affect how long the subquery takes to complete but doesn't change the end result.\n\n### Native strategy\n\nThis strategy should be applied when the number of distinct values of the partition key isn't large, roughly in the thousands.\n\nThe subquery must be a tabular transformation that doesn't specify a tabular source. The source is implicit and is assigned according to the subtable partitions. Only certain supported operators can be used in the subquery. There's no restriction on the number of partitions.\n\nTo use this strategy, specify `hint.strategy=native`.\n\n### Shuffle strategy\n\nThis strategy should be applied when the number of distinct values of the partition key is large, in the millions.\n\nThe subquery must be a tabular transformation that doesn't specify a tabular source. The source is implicit and is assigned according to the subtable partitions. Only certain supported operators can be used in the subquery. There's no restriction on the number of partitions.\n\nTo use this strategy, specify `hint.strategy=shuffle`. For more information about shuffle strategy and performance, see shuffle query.\n\n### Supported operators for the native and shuffle strategies\n\nThe following list of operators can be used in subqueries with the native or shuffle strategies:\n\n* count\n* distinct\n* extend\n* make-series (partially supported, see note)\n* mv-apply\n* mv-expand\n* parse\n* parse-where\n* project\n* project-away\n* project-keep\n* project-rename\n* project-reorder\n* reduce\n* sample\n* sample-distinct\n* scan\n* search\n* serialize\n* sort\n* summarize\n* take\n* top\n* top-hitters\n* top-nested\n* where\n\n> [!NOTE]\n> * Operators that reference a table source other than the subtable partitions aren't compatible with the `native` and `shuffle` strategies. For example, join, union, externaldata, and evaluate (plugins). For such scenarios, resort to the legacy strategy.\n> * The fork operator isn't supported for any strategy type, as the subquery must return a single tabular result.\n> * The make-series operator is only partially supported within the `partition by` operator. It is supported only when both the `from` and `to` parameters are specified.\n\n### Legacy strategy\n\nFor historical reasons, the `legacy` strategy is the default strategy. However, we recommend favoring the native or shuffle strategies, as the `legacy` approach is limited to 64 partitions and is less efficient.\n\nIn some scenarios, the `legacy` strategy might be necessary due to its support for including a tabular source in the subquery. In such cases, the subquery can only reference the key column, *Column*, from the input tabular source, *T*. To reference the column, use the syntax `toscalar(`*Column*`)`.\n\nIf the subquery is a tabular transformation without a tabular source, the source is implicit and is based on the subtable partitions.\n\nTo use this strategy, specify `hint.strategy=legacy` or omit any other strategy indication.\n\n> [!NOTE]\n> An error occurs if the partition column, *Column*, contains more than 64 distinct values.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *T* | `string` |  *True* | The input tabular source.|\n| *Strategy* | `string` | | The value `legacy`, `shuffle`, or `native`. This hint defines the execution strategy of the partition operator.</br></br> If no strategy is specified, the `legacy` strategy is used. For more information, see Strategies. | \n| *Column*| `string` |  *True* | The name of a column in *T* whose values determine how to partition the input tabular source.|\n| *TransformationSubQuery*| `string` |  *True* | A tabular transformation expression. The source is implicitly the subtables produced by partitioning the records of *T*. Each subtable is homogenous on the value of *Column*.</br></br> The expression must provide only one tabular result and shouldn't have other types of statements, such as `let` statements.|\n| *SubQueryWithSource*| `string` |  *True* | A tabular expression that includes its own tabular source, such as a table reference. This syntax is only supported with the legacy strategy. The subquery can only reference the key column, *Column*, from *T*. To reference the column, use the syntax `toscalar(`*Column*`)`.</br></br> The expression must provide only one tabular result and shouldn't have other types of statements, such as `let` statements.|\n| *Hints*| `string` | | Zero or more space-separated parameters in the form of: *HintName* `=` *Value* that control the behavior of the operator. See the supported hints per strategy type.|\n\n### Supported hints\n\n|Hint name|Type|Strategy|Description|\n|:--|:--|:--|:--|\n|`hint.shufflekey`| `string` | shuffle | The partition key used to run the partition operator with the `shuffle` strategy. |\n|`hint.materialized`| `bool` | legacy | If set to `true`, materializes the source of the `partition` operator. The default value is `false`. |\n|`hint.concurrency`| `int` | legacy | Determines how many partitions to run in parallel. The default value is `16`.|\n|`hint.spread`| `int` | legacy | Determines how to distribute the partitions among cluster nodes. The default value is `1`.</br></br> For example, if there are *N* partitions and the spread hint is set to *P*, then the *N* partitions are processed by *P* different cluster nodes equally, in parallel/sequentially depending on the concurrency hint.|",
+        "example": "",
+        "sourceLength": 13199,
+        "url": "https://learn.microsoft.com/en-us/kusto/query/partition-operator"
       }
     },
     {
@@ -11451,6 +11313,48 @@
       }
     },
     {
+      "name": "project-away",
+      "category": "operator",
+      "documentation": {
+        "title": "project-away",
+        "description": "Select what columns from the input table to exclude from the output table.",
+        "syntax": "*T* `| project-away` *ColumnNameOrPattern* [`,` ...]",
+        "returnInfo": "A table with columns that weren't named as arguments. Contains same number of rows as the input table.\n\n> [!TIP]\n> You can `project-away` any columns that are present in the original table or that were computed as part of the query.\n\n> [!NOTE]\n> The order of the columns in the result is determined by their original order in the table. Only the columns that were specified as arguments are dropped. The other columns are included in the result.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *T* | `string` |  *True* | The tabular input from which to remove columns. |\n| *ColumnNameOrPattern* | `string` |  *True* | One or more column names or column wildcard-patterns to be removed from the output.|",
+        "example": "PopulationData\n| project-away Population",
+        "sourceLength": 5181,
+        "url": "https://learn.microsoft.com/en-us/kusto/query/project-away-operator"
+      }
+    },
+    {
+      "name": "project-by-names",
+      "category": "operator",
+      "documentation": {
+        "title": "project-by-names",
+        "description": "Select and reorder a subset of columns from the input table by their names, dynamic arrays, or name patterns.",
+        "syntax": "*T* `| project-by-names` *ColumnSpecifier* [`,` ...]",
+        "returnInfo": "A table containing only the columns specified in the *ColumnSpecifier* parameter, in the specified order. All unspecified columns are excluded from the result.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *T* | `string` |  *True* | The tabular input from which to remove columns. |\n| *ColumnSpecifier* | `string` |  *True* | The name of the column, dynamic array of column names, or column wildcard pattern to keep and reorder.|\n\n> [!NOTE]\n> * Columns in the result are ordered based on the sequence in which they're specified or matched.\n> * Column names that don't match any existing column are safely ignored.\n> * Wildcard characters (*) can be used to match multiple columns by name pattern.\n> * ColumnSpecifier can include the result of a column_names_of(Table) expression, which returns a dynamic array of column names from the specified table.\n> * Subqueries or scalar expressions like toscalar() aren't supported in the *ColumnSpecifier* parameter.\n> * For related functionality:\n>   * Use `project-away` to exclude specific columns from the result.\n>   * Use `project-keep` to retain columns without changing their order.\n>   * Use `project-rename` to rename columns.",
+        "example": "",
+        "sourceLength": 7634,
+        "url": "https://learn.microsoft.com/en-us/kusto/query/project-by-names-operator"
+      }
+    },
+    {
+      "name": "project-keep",
+      "category": "operator",
+      "documentation": {
+        "title": "project-keep",
+        "description": "Select what columns from the input to keep in the output. Only the columns that are specified as arguments will be shown in the result. The other columns are excluded.",
+        "syntax": "*T* `| project-keep` *ColumnNameOrPattern* [`,` ...]",
+        "returnInfo": "A table with columns that were named as arguments. Contains same number of rows as the input table.\n\n> [!TIP]\n> You can `project-keep` any columns that are present in the original table or that were computed as part of the query.\n\n> [!NOTE]\n> The order of the columns in the result is determined by their original order in the table. Only the columns that were specified as arguments are kept. The other columns are excluded from the result.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *T* | `string` |  *True* | The tabular input from which to keep columns.|\n| *ColumnNameOrPattern* | `string` |  *True* | One or more column names or column wildcard-patterns to be kept in the output.|",
+        "example": "ConferenceSessions\n| project-keep session*",
+        "sourceLength": 3565,
+        "url": "https://learn.microsoft.com/en-us/kusto/query/project-keep-operator"
+      }
+    },
+    {
       "name": "project",
       "category": "operator",
       "documentation": {
@@ -11462,6 +11366,34 @@
         "example": "",
         "sourceLength": 4318,
         "url": "https://learn.microsoft.com/en-us/kusto/query/project-operator"
+      }
+    },
+    {
+      "name": "project-rename",
+      "category": "operator",
+      "documentation": {
+        "title": "project-rename",
+        "description": "Renames columns in the output table.",
+        "syntax": "*T* `| project-rename` *NewColumnName* = *ExistingColumnName* [`,` ...]",
+        "returnInfo": "A table that has the columns in the same order as in an existing table, with columns renamed.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *T* | `string` |  *True* | The input tabular data.|\n| *NewColumnName* | `string` |  *True* | The new column name.|\n| *ExistingColumnName* | `string` |  *True* | The name of the existing column to rename.|",
+        "example": "print a='alpha', b='bravo', c='charlie'\n| project-rename new_a=a, new_b=b, new_c=c",
+        "sourceLength": 1857,
+        "url": "https://learn.microsoft.com/en-us/kusto/query/project-rename-operator"
+      }
+    },
+    {
+      "name": "project-reorder",
+      "category": "operator",
+      "documentation": {
+        "title": "project-reorder",
+        "description": "Reorders columns in the output table.",
+        "syntax": "*T* `| project-reorder` *ColumnNameOrPattern* [`asc` | `desc` | `granny-asc` | `granny-desc`] [`,` ...]",
+        "returnInfo": "A table that contains columns in the order specified by the operator arguments. `project-reorder` doesn't rename or remove columns from the table, therefore, all columns that existed in the source table, appear in the result table.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *T* | `string` |  *True* | The input tabular data.|\n| *ColumnNameOrPattern* | `string` |  *True* | The name of the column or column wildcard pattern by which to order the columns. |\n| `asc`, `desc`, `granny-asc`, `granny-desc` | `string` | | Indicates how to order the columns when a wildcard pattern is used. `asc` or `desc` orders columns by column name in ascending or descending manner, respectively. `granny-asc` or `granny-desc` orders by ascending or descending, respectively, while secondarily sorting by the next numeric value. For example, `a20` comes before `a100` when `granny-asc` is specified.|\n\n> [!NOTE]\n>\n> * If no explicit ordering is specified, the order is determined by the matching columns as they appear in the source table.\n> * In ambiguous *ColumnNameOrPattern* matching, the column appears in the first position matching the pattern.\n> * Specifying columns for the `project-reorder` is optional. Columns that aren't specified explicitly appear as the last columns of the output table.\n> * To remove columns, use `project-away`.\n> * To choose which columns to keep, use `project-keep`.\n> * To rename columns, use `project-rename`.",
+        "example": "",
+        "sourceLength": 3654,
+        "url": "https://learn.microsoft.com/en-us/kusto/query/project-reorder-operator"
       }
     },
     {
@@ -11644,6 +11576,34 @@
         "example": "StormEvents | take 5",
         "sourceLength": 2550,
         "url": "https://learn.microsoft.com/en-us/kusto/query/take-operator"
+      }
+    },
+    {
+      "name": "top-hitters",
+      "category": "operator",
+      "documentation": {
+        "title": "top-hitters",
+        "description": "Returns an approximation for the most popular distinct values, or the values\nwith the largest sum, in the input.",
+        "syntax": "*T* `|` `top-hitters` *NumberOfValues* `of` *ValueExpression* [ `by` *SummingExpression* ]",
+        "returnInfo": "",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *T* | `string` |  *True* | The input tabular expression.|\n| *NumberOfValues* | int, long, or real |  *True* | The number of distinct values of *ValueExpression*.|\n| *ValueExpression* | `string` |  *True* | An expression over the input table *T* whose distinct values are returned.|\n| *SummingExpression* | `string` | | If specified, a numeric expression over the input table *T* whose sum per distinct value of *ValueExpression* establishes which values to emit. If not specified, the count of each distinct value of *ValueExpression*  is used instead.|\n\n> [!NOTE]\n> * When you include *SummingExpression* in the syntax, the query is equivalent to:\n> \n>   `T | summarize S = sum(SummingExpression) by ValueExpression | top NumberOfValues by S desc`\n>\n> * When you don't include *SummingExpression* in the syntax, the query is equivalent to:\n> \n>   `T | summarize C = count() by ValueExpression | top NumberOfValues by C desc`",
+        "example": "",
+        "sourceLength": 4499,
+        "url": "https://learn.microsoft.com/en-us/kusto/query/top-hitters-operator"
+      }
+    },
+    {
+      "name": "top-nested",
+      "category": "operator",
+      "documentation": {
+        "title": "top-nested",
+        "description": "The `top-nested` operator performs hierarchical aggregation and value selection.\n\nImagine you have a table with sales information like regions, salespeople, and amounts sold. The `top-nested` operator can help you answer complex questions, such as \"What are the top five regions by sales, and who are the top three salespeople in each of those regions?\"\n\nThe source data is partitioned based on the criteria set in the first `top-nested` clause, such as region. Next, the operator picks the top records in each partition using an aggregation, such as adding sales amounts. Each subsequent `top-nested` clause refines the partitions created by the previous clause, creating a hierarchy of more precise groups.\n\nThe result is a table with two columns per clause. One column holds the partitioning values, such as region, while the other column holds the outcomes of the aggregation calculation, like the sum of sales.",
+        "syntax": "*T* `|` `top-nested` [ *N* ] `of` *Expr* [`with` `others` `=` *ConstExpr*] `by` *Aggregation* [`asc` | `desc`] [`,`  \n&emsp;&emsp;`top-nested` ... ]",
+        "returnInfo": "A table with two columns for each clause. One column contains unique values computed using *Expr*, and the other column shows the results obtained from the *Aggregation* calculation.\n\n### Using the `with` `others` clause\n\nUsing the `top-nested` operator with `with` `others` adds the ability to see your top content contextualized in a wider data set. Evaluating your data in this way is valuable when rendering the data visually.\n\n### Include data from other columns\n\nOnly columns specified as a `top-nested` clause *Expr* are displayed in the output table.\n\nTo include all values of a column at a specific level:\n\n1. Don't specify the value of *N*.\n1. Use the column name as the value of *Expr*.\n1. Use `Ignore=max(1)` as the value of *Aggregation*.\n1. Remove the unnecessary `Ignore` column with project-away.\n\nFor an example, see Most recent events per state with other column data.\n\nThe number of records can grow exponentially with the number of `top-nested` clauses, and record growth is even faster if the *N* parameter is not specified. This operator can consume a considerable amount of resources.\n\nIf the aggregation distribution is irregular, limit the number of distinct values to return by specifying *N*. Then, use the `with` `others` `=` *ConstExpr* clause to get a sense of the weight of all other cases.",
+        "parametersTable": "|Name|Type|Required|Description|\n|:--|:--|:--|:--|\n|*T*| `string` | *True*|The input tabular expression.|\n|*N*| `int` ||The number of top values to be returned for this hierarchy level. If omitted, all distinct values are returned.|\n|*Expr*| `string` | *True*|An expression over the input record indicating which value to return for this hierarchy level. Typically, it refers to a column from *T* or involves a calculation like bin() on a column. Optionally, set an output column name as *Name* `=` *Expr*.|\n|*ConstExpr*| `string` ||If specified, for each hierarchy level, one record is added with the value that is the aggregation over all records that didn't make it to the top.|\n|*Aggregation*| `string` ||The aggregation function applied to records with the same *Expr* value. The result determines the top records. See Supported aggregation functions. Optionally, set an output column name as *Name* `=` *Aggregation*.|\n\n### Supported aggregation functions\n\nThe following aggregation functions are supported:\n\n* sum()\n* count()\n* max()\n* min()\n* dcount()\n* avg()\n* percentile()\n* percentilew()\n\n> [!NOTE]\n> Any algebraic combination of the aggregations is also supported.",
+        "example": "",
+        "sourceLength": 12004,
+        "url": "https://learn.microsoft.com/en-us/kusto/query/top-nested-operator"
       }
     },
     {
@@ -17185,7 +17145,7 @@
       "category": "Aggregation function",
       "documentation": {
         "title": "covariance()",
-        "description": "Calculates the sample covariance of two random variables *expr1* and *expr2*.\n\nThe following formula is used:\n\n:::image type=\"content\" source=\"media/covariance-aggfunction/covariance-sample.png\" alt-text=\"Image showing a covariance sample formula.\":::",
+        "description": "Calculates the sample covariance of two random variables *expr1* and *expr2*.\n\nThe following formula is used:",
         "syntax": "`covariance(`*expr1* `,` *expr2 `)`",
         "returnInfo": "Returns the covariance value of *expr1* and *expr2*.",
         "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*expr1* | `real` |  *True* | First random variable expression.|\n|*expr2* | `real` |  *True* | Second random variable expression.|",
@@ -17200,7 +17160,7 @@
       "category": "Aggregation function",
       "documentation": {
         "title": "covarianceif()",
-        "description": "Calculates the sample covariance of two random variables *expr1* and *expr2* in records for which *predicate* evaluates to `true`.\n\nThe following formula is used:\n\n:::image type=\"content\" source=\"media/covariance-aggfunction/covariance-sample.png\" alt-text=\"Equation showing a covariance sample formula.\":::",
+        "description": "Calculates the sample covariance of two random variables *expr1* and *expr2* in records for which *predicate* evaluates to `true`.\n\nThe following formula is used:",
         "syntax": "`covarianceif(`*expr1* `,` *expr2 `,` *predicate*`)`",
         "returnInfo": "Returns the covariance value of *expr1* and *expr2* in records for which *predicate* evaluates to `true`.",
         "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*expr1* | `real` |  *True* | First random variable expression.|\n|*expr2* | `real` |  *True* | Second random variable expression.|\n|*predicate*| `string` |  *True* | If *predicate* evaluates to `true`, values of *expr1* and *expr2* will be added to the covariance.|",
@@ -17215,7 +17175,7 @@
       "category": "Aggregation function",
       "documentation": {
         "title": "covariancep()",
-        "description": "Calculates the population covariance of two random variables *expr1* and *expr2*.\n\nThe following formula is used:\n\n:::image type=\"content\" source=\"media/covariancep-aggfunction/covariance-population.png\" alt-text=\"Image showing a covariance population formula.\" :::",
+        "description": "Calculates the population covariance of two random variables *expr1* and *expr2*.\n\nThe following formula is used:",
         "syntax": "`covariancep(`*expr1* `,` *expr2* `)`",
         "returnInfo": "Returns the covariance value of *expr1* and *expr2*.",
         "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*expr1* | `real` |  *True* | First random variable expression.|\n|*expr2* | `real` |  *True* | Second random variable expression.|",
@@ -17230,7 +17190,7 @@
       "category": "Aggregation function",
       "documentation": {
         "title": "covariancepif()",
-        "description": "Calculates the sample covariance of two random variables *expr1* and *expr2* in records for which *predicate* evaluates to `true`.\n\nThe following formula is used:\n\n:::image type=\"content\" source=\"media/covariancep-aggfunction/covariance-population.png\" alt-text=\"Equation showing a covariance population formula.\":::",
+        "description": "Calculates the sample covariance of two random variables *expr1* and *expr2* in records for which *predicate* evaluates to `true`.\n\nThe following formula is used:",
         "syntax": "`covariancepif(`*expr1* `,` *expr2 `,` *predicate*`)`",
         "returnInfo": "Returns the covariance value of *expr1* and *expr2* in records for which *predicate* evaluates to `true`.",
         "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*expr1* | `real` |  *True* | First random variable expression.|\n|*expr2* | `real` |  *True* | Second random variable expression.|\n|*predicate*| `string` |  *True* | If *predicate* evaluates to `true`, values of *expr1* and *expr2* will be added to the covariance.|",
@@ -17665,7 +17625,7 @@
       "category": "Aggregation function",
       "documentation": {
         "title": "variance()",
-        "description": "Calculates the variance of *expr* across the group, considering the group as a sample.\n\nThe following formula is used:\n\n:::image type=\"content\" source=\"media/variance-aggfunction/variance-sample.png\" alt-text=\"Image showing a variance sample formula.\":::",
+        "description": "Calculates the variance of *expr* across the group, considering the group as a sample.\n\nThe following formula is used:",
         "syntax": "`variance(`*expr*`)`",
         "returnInfo": "Returns the variance value of *expr* across the group.",
         "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*expr* | `real` |  *True* | The expression used for the variance calculation.|",
@@ -17695,7 +17655,7 @@
       "category": "Aggregation function",
       "documentation": {
         "title": "variancep()",
-        "description": "Calculates the variance of *expr* across the group, considering the group as a population.\n\nThe following formula is used:\n\n:::image type=\"content\" source=\"media/variancep-aggfunction/variance-population.png\" alt-text=\"Image showing a variance sample formula.\" :::",
+        "description": "Calculates the variance of *expr* across the group, considering the group as a population.\n\nThe following formula is used:",
         "syntax": "`variancep(`*expr*`)`",
         "returnInfo": "Returns the variance value of *expr* across the group.",
         "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*expr* | `string` |  *True* | The expression to use for the variance calculation.|",
