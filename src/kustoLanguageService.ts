@@ -105,7 +105,8 @@ export class KustoLanguageServiceProvider implements
         else if (this.isResourceTypeContext(linePrefix)) {
             // Find the current table context to filter resource types
             const tableContext = this.findCurrentTableContext(document, position);
-            suggestions.push(...this.filterCompletionItems(this.getResourceTypes(tableContext || undefined), lowerCurrentWord));
+            const insideQuotes = this.isInsideQuotes(linePrefix);
+            suggestions.push(...this.filterCompletionItems(this.getResourceTypes(tableContext || undefined, insideQuotes), lowerCurrentWord));
         }
 
         // In project, extend, where, or summarize by context - suggest properties and functions
@@ -114,7 +115,8 @@ export class KustoLanguageServiceProvider implements
             suggestions.push(...this.filterCompletionItems(this.getKQLFunctions(), lowerCurrentWord));
             // Also provide table-aware resource type suggestions in property context
             const tableContext = this.findCurrentTableContext(document, position);
-            suggestions.push(...this.filterCompletionItems(this.getResourceTypes(tableContext || undefined), lowerCurrentWord));
+            const insideQuotes = this.isInsideQuotes(linePrefix);
+            suggestions.push(...this.filterCompletionItems(this.getResourceTypes(tableContext || undefined, insideQuotes), lowerCurrentWord));
         }
 
         // Default: suggest common operators and functions
@@ -150,6 +152,18 @@ export class KustoLanguageServiceProvider implements
      */
     private isResourceTypeContext(linePrefix: string): boolean {
         return /\btype\s*(==|=~)\s*['"]*[a-zA-Z0-9./]*$/i.test(linePrefix);
+    }
+
+    /**
+     * Check if the current position is inside quotes
+     */
+    private isInsideQuotes(linePrefix: string): boolean {
+        // Count quotes to determine if we're inside them
+        const singleQuotes = (linePrefix.match(/'/g) || []).length;
+        const doubleQuotes = (linePrefix.match(/"/g) || []).length;
+        
+        // If odd number of quotes, we're inside quotes
+        return (singleQuotes % 2 === 1) || (doubleQuotes % 2 === 1);
     }
 
     /**
@@ -268,8 +282,9 @@ export class KustoLanguageServiceProvider implements
     /**
      * Get resource type completions from schema data
      * @param tableContext Optional table name to filter resource types for that specific table
+     * @param insideQuotes Whether we're already inside quotes (to avoid double-quoting)
      */
-    private getResourceTypes(tableContext?: string): vscode.CompletionItem[] {
+    private getResourceTypes(tableContext?: string, insideQuotes: boolean = false): vscode.CompletionItem[] {
         const resourceTypes: vscode.CompletionItem[] = [];
 
         if (this.schema?.resourceTypes) {
@@ -281,7 +296,8 @@ export class KustoLanguageServiceProvider implements
                     if (data.tables && data.tables.includes(tableContext.toLowerCase())) {
                         const item = new vscode.CompletionItem(resourceType, vscode.CompletionItemKind.Value);
                         item.detail = `Resource Type - ${resourceType} (${data.tables.join(', ')} table${data.tables.length > 1 ? 's' : ''})`;
-                        item.insertText = `'${resourceType}'`;
+                        // Only add quotes if we're not already inside them
+                        item.insertText = insideQuotes ? resourceType : `'${resourceType}'`;
                         item.sortText = `5_${resourceType}`;
                         resourceTypes.push(item);
                     }
@@ -292,7 +308,8 @@ export class KustoLanguageServiceProvider implements
                     const data = resourceData as any;
                     const item = new vscode.CompletionItem(resourceType, vscode.CompletionItemKind.Value);
                     item.detail = `Resource Type - ${resourceType}${data.tables ? ` (${data.tables.join(', ')} table${data.tables.length > 1 ? 's' : ''})` : ''}`;
-                    item.insertText = `'${resourceType}'`;
+                    // Only add quotes if we're not already inside them
+                    item.insertText = insideQuotes ? resourceType : `'${resourceType}'`;
                     item.sortText = `5_${resourceType}`;
                     resourceTypes.push(item);
                 }
