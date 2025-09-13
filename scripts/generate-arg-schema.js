@@ -1547,11 +1547,10 @@ class ARGSchemaGenerator {
         
         let matchedOperators = 0;
         const matchedOperatorsList = [];
-        const migratedFromKeywords = [];
         const documentedOperatorNames = operatorsDocumented.map(op => op.name.toLowerCase());
 
         for (const docOperator of operatorsDocumented) {
-            // Create variations for better matching (handle hyphens/underscores)
+            // Create variations for better matching (handle hyphens/underscores and not-/! mappings)
             const docOperatorVariations = [
                 docOperator.name,
                 docOperator.name.toLowerCase(),
@@ -1561,8 +1560,27 @@ class ARGSchemaGenerator {
                 docOperator.name.replace(/-/g, '_').toLowerCase()
             ];
             
+            // Add "not-" to "!" mapping - if doc name starts with "not-", also try with "!"
+            if (docOperator.name.toLowerCase().startsWith('not-')) {
+                const exclamationVersion = '!' + docOperator.name.substring(4); // Remove "not-" and add "!"
+                docOperatorVariations.push(
+                    exclamationVersion,
+                    exclamationVersion.toLowerCase()
+                );
+                
+                // Also try "notcontains" style (remove hyphen)
+                const notVersion = 'not' + docOperator.name.substring(4); // Remove "not-" and add "not"
+                docOperatorVariations.push(
+                    notVersion,
+                    notVersion.toLowerCase()
+                );
+            }
+            
+            // Track which items receive documentation from this doc (allow multiple matches)
+            let documentationApplied = false;
+            
             // Check if this operator exists in our current operators list
-            let foundInOperators = this.schema.operators.find(op => {
+            let foundInOperators = this.schema.operators.filter(op => {
                 const opVariations = [
                     op.name,
                     op.name.toLowerCase(),
@@ -1571,11 +1589,34 @@ class ARGSchemaGenerator {
                     op.name.replace(/-/g, '_'),
                     op.name.replace(/-/g, '_').toLowerCase()
                 ];
+                
+                // Create temporary variations for matching:
+                // If operator starts with "!", create "not-" version
+                if (op.name.toLowerCase().startsWith('!')) {
+                    const notDashVersion = 'not-' + op.name.substring(1);
+                    opVariations.push(
+                        notDashVersion,
+                        notDashVersion.toLowerCase()
+                    );
+                }
+                
+                // If operator starts with "not" but not "not-" or "not_", create "not-" version
+                if (op.name.toLowerCase().startsWith('not') && 
+                    !op.name.toLowerCase().startsWith('not-') && 
+                    !op.name.toLowerCase().startsWith('not_')) {
+                    // Insert dash after "not": notcontains -> not-contains
+                    const notDashVersion = 'not-' + op.name.substring(3);
+                    opVariations.push(
+                        notDashVersion,
+                        notDashVersion.toLowerCase()
+                    );
+                }
+                
                 return docOperatorVariations.some(docVar => opVariations.includes(docVar));
             });
 
-            // Check if this operator exists in our keywords list (needs migration)
-            let foundInKeywords = this.schema.keywords.find(kw => {
+            // Check if this operator exists in our keywords list (that could also receive documentation)
+            let foundInKeywords = this.schema.keywords.filter(kw => {
                 const keywordName = typeof kw === 'object' ? kw.name : kw;
                 const keywordVariations = [
                     keywordName,
@@ -1585,35 +1626,131 @@ class ARGSchemaGenerator {
                     keywordName.replace(/-/g, '_'),
                     keywordName.replace(/-/g, '_').toLowerCase()
                 ];
+                
+                // Create temporary variations for matching:
+                // If keyword starts with "!", create "not-" version
+                if (keywordName.toLowerCase().startsWith('!')) {
+                    const notDashVersion = 'not-' + keywordName.substring(1);
+                    keywordVariations.push(
+                        notDashVersion,
+                        notDashVersion.toLowerCase()
+                    );
+                }
+                
+                // If keyword starts with "not" but not "not-" or "not_", create "not-" version
+                if (keywordName.toLowerCase().startsWith('not') && 
+                    !keywordName.toLowerCase().startsWith('not-') && 
+                    !keywordName.toLowerCase().startsWith('not_')) {
+                    // Insert dash after "not": notcontains -> not-contains
+                    const notDashVersion = 'not-' + keywordName.substring(3);
+                    keywordVariations.push(
+                        notDashVersion,
+                        notDashVersion.toLowerCase()
+                    );
+                }
+                
                 return docOperatorVariations.some(docVar => keywordVariations.includes(docVar));
             });
 
-            if (foundInOperators) {
+            // Apply documentation to all matching operators
+            for (const matchedOperator of foundInOperators) {
                 // Update existing operator with documentation
-                foundInOperators.documentation = docOperator.documentation;
-                foundInOperators.category = 'operator'; // Fix: always use 'operator'
-                matchedOperatorsList.push(foundInOperators);
-                matchedOperators++;
-            } else if (foundInKeywords) {
-                // Migrate keyword to operator
-                const keywordName = typeof foundInKeywords === 'object' ? foundInKeywords.name : foundInKeywords;
-                const newOperator = {
-                    name: keywordName, // Use the original keyword name format
-                    category: 'operator', // Fix: always use 'operator'
-                    documentation: docOperator.documentation
-                };
-                matchedOperatorsList.push(newOperator);
-                matchedOperators++;
-                migratedFromKeywords.push(keywordName);
+                const cleanedDocumentation = { ...docOperator.documentation };
+                // Remove the inner category from documentation to avoid conflicts  
+                if (cleanedDocumentation.category) {
+                    delete cleanedDocumentation.category;
+                }
                 
-                // Remove from keywords list
-                this.schema.keywords = this.schema.keywords.filter(kw => kw !== foundInKeywords);
+                matchedOperator.documentation = cleanedDocumentation;
+                matchedOperator.category = 'operator'; // Fix: always use 'operator'
+                matchedOperatorsList.push(matchedOperator);
+                documentationApplied = true;
+            }
+            
+            // Apply documentation to matching keywords 
+            // For operators found in keywords: migrate them to operators section with documentation
+            for (const matchedKeyword of foundInKeywords) {
+                const keywordName = typeof matchedKeyword === 'object' ? matchedKeyword.name : matchedKeyword;
+                
+                // Check if this keyword is actually an operator 
+                const isOperator = keywordName.startsWith('!') || 
+                                 keywordName.includes('between') ||
+                                 keywordName.includes('contains') ||
+                                 keywordName.includes('endswith') ||
+                                 keywordName.includes('startswith') ||
+                                 keywordName.includes('equals') ||
+                                 keywordName.includes('has') ||
+                                 keywordName.includes('in') ||
+                                 keywordName.includes('matches') ||
+                                 // KQL operators that are commonly in keywords section
+                                 ['render', 'search', 'summarize', 'extend', 'project', 'where', 
+                                  'take', 'limit', 'order', 'sort', 'union', 'evaluate', 'top',
+                                  'join', 'distinct', 'count', 'parse', 'sample', 'fork', 
+                                  'facet', 'materialize', 'serialize', 'mv-apply', 'mv-expand',
+                                  'make-series', 'make-graph', 'reduce', 'scan', 'range',
+                                  'datatable', 'externaldata', 'getschema', 'lookup', 'consume'].includes(keywordName);
+                
+                if (isOperator) {
+                    // This is an operator misplaced in keywords - migrate it to operators
+                    const newOperator = {
+                        name: keywordName,
+                        category: 'operator',
+                        documentation: { ...docOperator.documentation }
+                    };
+                    
+                    // Remove the inner category from documentation to avoid conflicts
+                    if (newOperator.documentation && newOperator.documentation.category) {
+                        delete newOperator.documentation.category;
+                    }
+                    
+                    // Add to operators list
+                    matchedOperatorsList.push(newOperator);
+                    
+                    // Remove from keywords
+                    this.schema.keywords = this.schema.keywords.filter(kw => {
+                        const kwName = typeof kw === 'object' ? kw.name : kw;
+                        return kwName !== keywordName;
+                    });
+                    
+                    documentationApplied = true;
+                } else {
+                    // This is actually a keyword, just add documentation
+                    const keywordInSchema = this.schema.keywords.find(kw => {
+                        const kwName = typeof kw === 'object' ? kw.name : kw;
+                        return kwName === keywordName;
+                    });
+                    
+                    if (keywordInSchema) {
+                        // Convert keyword to object if it's a string and add documentation
+                        if (typeof keywordInSchema === 'string') {
+                            const keywordIndex = this.schema.keywords.indexOf(keywordInSchema);
+                            this.schema.keywords[keywordIndex] = {
+                                name: keywordInSchema,
+                                category: 'KQL Keyword',
+                                documentation: docOperator.documentation
+                            };
+                        } else {
+                            keywordInSchema.documentation = docOperator.documentation;
+                        }
+                        documentationApplied = true;
+                    }
+                }
+            }
+            
+            if (documentationApplied) {
+                matchedOperators++;
             } else {
                 // This is a new operator not in our lists
+                const cleanedDocumentation = { ...docOperator.documentation };
+                // Remove the inner category from documentation to avoid conflicts
+                if (cleanedDocumentation.category) {
+                    delete cleanedDocumentation.category;
+                }
+                
                 const newOperator = {
                     name: docOperator.name,
                     category: 'operator', // Fix: always use 'operator'
-                    documentation: docOperator.documentation
+                    documentation: cleanedDocumentation
                 };
                 matchedOperatorsList.push(newOperator);
                 matchedOperators++;
@@ -1641,9 +1778,6 @@ class ARGSchemaGenerator {
         this.schema.operators = matchedOperatorsList;
 
         console.log(`  • Operators documented: ${matchedOperators}`);
-        if (migratedFromKeywords.length > 0) {
-            console.log(`  • Migrated from keywords: ${migratedFromKeywords.join(', ')}`);
-        }
         if (this.unmatchedOperators.length > 0) {
             console.log(`  • Unmatched operators: ${this.unmatchedOperators.join(', ')}`);
         }
@@ -2039,8 +2173,8 @@ class ARGSchemaGenerator {
         
         // Escape regex metacharacters in operators for safe regex usage
         const escapedOperators = operators.map(op => {
-            // Escape regex special characters: \ ^ $ . | ? * + ( ) [ ] { }
-            return op.replace(/[\\^$.|?*+(){}\[\]]/g, '\\$&');
+            // Escape regex special characters: \ ^ $ . | ? * + ( ) [ ] { } !
+            return op.replace(/[\\^$.|?*+(){}\[\]!]/g, '\\$&');
         });
         const operatorsPattern = escapedOperators.join('|');
         
@@ -2057,6 +2191,7 @@ class ARGSchemaGenerator {
             return !allKeywordsSet.has(lowerFunc) && !allOperatorsSet.has(lowerFunc);
         });
         
+        // Use pureFunctions for all function patterns to avoid conflicts with operators
         const allFunctionsPattern = allFunctions.join('|');
         const pureKeywordsPattern = pureKeywords.map(kw => kw.replace(/[\\^$.|?*+(){}\[\]]/g, '\\$&')).join('|');
         const pureOperatorsPattern = pureOperators.map(op => op.replace(/[\\^$.|?*+(){}\[\]]/g, '\\$&')).join('|');
@@ -2111,7 +2246,6 @@ class ARGSchemaGenerator {
             "patterns": [
                 { "include": "#comments" },
                 { "include": "#function_calls" },
-                { "include": "#ambiguous_keywords_as_keywords" },
                 { "include": "#keywords" },
                 { "include": "#operators" },
                 { "include": "#functions" },
@@ -2155,7 +2289,7 @@ class ARGSchemaGenerator {
                     "patterns": [
                         {
                             "name": "keyword.control.kql",
-                            "match": `(?i)\\b(${operatorsPattern})\\b`
+                            "match": `(?i)(?<!\\w)(${operatorsPattern})(?!\\w)`
                         }
                     ]
                 },

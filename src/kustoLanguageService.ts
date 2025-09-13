@@ -214,14 +214,16 @@ export class KustoLanguageServiceProvider implements
         position: vscode.Position,
         token: vscode.CancellationToken
     ): Promise<vscode.Hover | null> {
-        const wordRange = document.getWordRangeAtPosition(position);
-        if (!wordRange) {
+        // Use enhanced word range detection to handle operators like !contains, mv-apply
+        const enhancedWordInfo = this.getEnhancedWordRange(document, position);
+        if (!enhancedWordInfo) {
             // Reset hover state when not on a word
             this.resetHoverState();
             return null;
         }
 
-        const word = document.getText(wordRange);
+        const word = enhancedWordInfo.text;
+        const wordRange = enhancedWordInfo.range;
 
         // Reset hover state if we're hovering over a different word
         if (this.currentHoverWord !== word.toLowerCase()) {
@@ -311,7 +313,139 @@ export class KustoLanguageServiceProvider implements
         return [];
     }
 
+    /**
+     * Enhanced word range detection that handles KQL operators with special characters
+     * Supports patterns like:
+     * - !contains, !has, !startswith (exclamation prefix)
+     * - mv-apply, mv-expand (hyphen separator)
+     * - project-away, project-keep (hyphen separator)
+     */
+    private getEnhancedWordRange(document: vscode.TextDocument, position: vscode.Position): { range: vscode.Range; text: string } | null {
+        const line = document.lineAt(position);
+        const lineText = line.text;
+        const charIndex = position.character;
+
+        // If cursor is beyond line length, return null
+        if (charIndex > lineText.length) {
+            return null;
+        }
+
+        // Find the start and end of the word/operator
+        let start = charIndex;
+        let end = charIndex;
+
+        // If cursor is on a special character, adjust start position
+        const currentChar = charIndex < lineText.length ? lineText[charIndex] : '';
+        if (currentChar === '!' && charIndex < lineText.length - 1 && this.isValidWordChar(lineText[charIndex + 1])) {
+            // Cursor is on ! and next char is a valid word char, so we're at the start of !contains or similar
+            // Don't adjust start, let the backward loop handle it
+        } else if (!this.isValidWordChar(currentChar) && currentChar !== '!' && currentChar !== '-') {
+            // If cursor is not on a word character, try to find the nearest word
+            // Move backward first to see if we're just after a word
+            if (charIndex > 0 && (this.isValidWordChar(lineText[charIndex - 1]) || lineText[charIndex - 1] === '!' || lineText[charIndex - 1] === '-')) {
+                start = charIndex - 1;
+                end = charIndex - 1;
+            } else {
+                return null;
+            }
+        }
+
+        // Move backward to find the start of the word/operator
+        while (start > 0) {
+            const char = lineText[start - 1];
+            if (this.isValidWordChar(char)) {
+                start--;
+            } else if (char === '!') {
+                // Special case: include ! prefix for operators like !contains, !has
+                start--;
+                break;
+            } else if (char === '-' && start > 0) {
+                // Check if this might be part of a compound operator like mv-apply
+                const prevChar = lineText[start - 2];
+                if (prevChar && this.isValidWordChar(prevChar)) {
+                    start--;
+                } else {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+
+        // Move forward to find the end of the word/operator
+        while (end < lineText.length) {
+            const char = lineText[end];
+            if (this.isValidWordChar(char)) {
+                end++;
+            } else if (char === '-' && end < lineText.length - 1) {
+                // Check if this might be part of a compound operator like mv-apply
+                const nextChar = lineText[end + 1];
+                if (nextChar && this.isValidWordChar(nextChar)) {
+                    end++;
+                } else {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+
+        // If we didn't find a valid word, return null
+        if (start >= end) {
+            return null;
+        }
+
+        const wordText = lineText.substring(start, end);
+        
+        // Validate that we have a meaningful word/operator
+        if (!wordText || !this.isValidKQLWord(wordText)) {
+            return null;
+        }
+
+        const range = new vscode.Range(
+            new vscode.Position(position.line, start),
+            new vscode.Position(position.line, end)
+        );
+
+        return { range, text: wordText };
+    }
+
+    /**
+     * Check if a character is valid for KQL words (letters, numbers, underscore)
+     */
+    private isValidWordChar(char: string): boolean {
+        return /[a-zA-Z0-9_]/.test(char);
+    }
+
+    /**
+     * Validate that a word is a potential KQL word/operator
+     */
+    private isValidKQLWord(word: string): boolean {
+        // Must contain at least one letter
+        if (!/[a-zA-Z]/.test(word)) {
+            return false;
+        }
+
+        // Valid patterns:
+        // - Regular words: project, where, contains
+        // - Exclamation operators: !contains, !has
+        // - Hyphenated operators: mv-apply, project-away
+        return /^(!?[a-zA-Z][a-zA-Z0-9_]*(-[a-zA-Z][a-zA-Z0-9_]*)*)$/.test(word);
+    }
+
+    /**
+     * Enhanced getCurrentWord that handles KQL operators with special characters
+     * like !contains, mv-apply, project-away
+     */
     private getCurrentWord(linePrefix: string): string {
+        // Enhanced pattern to match KQL words/operators with special characters
+        // Matches patterns like: word, !word, word-word, !word-word
+        const enhancedWordMatch = linePrefix.match(/(!?[a-zA-Z_][a-zA-Z0-9_]*(-[a-zA-Z_][a-zA-Z0-9_]*)*)$/);
+        if (enhancedWordMatch) {
+            return enhancedWordMatch[0];
+        }
+
+        // Fallback to original pattern for simple words
         const wordMatch = linePrefix.match(/[a-zA-Z_][a-zA-Z0-9_]*$/);
         return wordMatch ? wordMatch[0] : '';
     }
