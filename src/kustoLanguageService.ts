@@ -394,6 +394,10 @@ export class KustoLanguageServiceProvider implements
                 } else {
                     break;
                 }
+            } else if (char === '~') {
+                // Include ~ suffix for operators like contains~, in~
+                end++;
+                break; // ~ is always at the end, so we can break after including it
             } else {
                 break;
             }
@@ -439,7 +443,9 @@ export class KustoLanguageServiceProvider implements
         // - Regular words: project, where, contains
         // - Exclamation operators: !contains, !has
         // - Hyphenated operators: mv-apply, project-away
-        return /^(!?[a-zA-Z][a-zA-Z0-9_]*(-[a-zA-Z][a-zA-Z0-9_]*)*)$/.test(word);
+        // - Case-insensitive operators: contains~, in~
+        // - Combined: !contains~, !in~
+        return /^(!?[a-zA-Z][a-zA-Z0-9_]*(-[a-zA-Z][a-zA-Z0-9_]*)*~?)$/.test(word);
     }
 
     /**
@@ -448,8 +454,8 @@ export class KustoLanguageServiceProvider implements
      */
     private getCurrentWord(linePrefix: string): string {
         // Enhanced pattern to match KQL words/operators with special characters
-        // Matches patterns like: word, !word, word-word, !word-word
-        const enhancedWordMatch = linePrefix.match(/(!?[a-zA-Z_][a-zA-Z0-9_]*(-[a-zA-Z_][a-zA-Z0-9_]*)*)$/);
+        // Matches patterns like: word, !word, word-word, !word-word, word~, !word~, !word-word~
+        const enhancedWordMatch = linePrefix.match(/(!?[a-zA-Z_][a-zA-Z0-9_]*(-[a-zA-Z_][a-zA-Z0-9_]*)*~?)$/);
         if (enhancedWordMatch) {
             return enhancedWordMatch[0];
         }
@@ -651,9 +657,26 @@ export class KustoLanguageServiceProvider implements
     }
 
     private getKQLDocumentation(word: string, textAfterWord: string = '', textBeforeWord: string = ''): string | null {
-        const lowerWord = word.toLowerCase();
+        let lowerWord = word.toLowerCase();
         const hasParentheses = textAfterWord.startsWith('(');
         const isAfterPipe = /\|\s*$/.test(textBeforeWord);
+
+        // Handle operator variants with ! prefix and ~ suffix
+        let baseOperatorName = lowerWord;
+        let isNegated = false;
+        let isCaseInsensitive = false;
+
+        // Check for ! prefix (negation)
+        if (lowerWord.startsWith('!')) {
+            isNegated = true;
+            baseOperatorName = lowerWord.substring(1);
+        }
+
+        // Check for ~ suffix (case-insensitive)
+        if (baseOperatorName.endsWith('~')) {
+            isCaseInsensitive = true;
+            baseOperatorName = baseOperatorName.substring(0, baseOperatorName.length - 1);
+        }
 
         // Check schema data first if available
         if (this.schemaData) {
@@ -717,20 +740,27 @@ export class KustoLanguageServiceProvider implements
 
             // Check keywords first (where, project, contains, etc.) - only if no parentheses
             if (!hasParentheses && this.schemaData.keywords) {
-                const keyword = this.schemaData.keywords.find((kw: any) => kw.name.toLowerCase() === lowerWord);
+                const keyword = this.schemaData.keywords.find((kw: any) => kw.name.toLowerCase() === baseOperatorName);
                 if (keyword) {
                     return `**${keyword.name}** - ${keyword.category}`;
                 }
             }
 
-            // Check operators - only if no parentheses
-            if (!hasParentheses && this.schemaData.operators) {
-                const operator = this.schemaData.operators.find((op: any) => op.name.toLowerCase() === lowerWord);
+            // Check operators - operators don't use parentheses in their syntax
+            if (this.schemaData.operators) {
+                // First try exact match (for operators like in~, !in~ that exist exactly in schema)
+                let operator = this.schemaData.operators.find((op: any) => op.name.toLowerCase() === lowerWord);
+                
+                // If not found, try base operator (for operators like contains~ that don't exist exactly)
+                if (!operator) {
+                    operator = this.schemaData.operators.find((op: any) => op.name.toLowerCase() === baseOperatorName);
+                }
+                
                 if (operator) {
                     // Show operator documentation
                     if (operator.documentation) {
                         const doc = operator.documentation;
-                        let hoverContent = `## Operator \`${doc.title}\`\n\n`;
+                        let hoverContent = `## Operator \`${word}\`\n\n`;
                         hoverContent += `*${operator.category}*\n\n`;
 
                         if (doc.description) {
