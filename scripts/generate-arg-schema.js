@@ -4,27 +4,27 @@
  * Azure Resource Graph Schema Generator
  * 
  * Dynamically parses Resource Graph API and Microsoft Learn documentation to generate info for bARGE
- * Sources:
- * - @kusto/language-service-next - Get KQL keywords, operators, functions, aggregates
- * - Resource Graph API - Get all available tables and resource types
- * - https://learn.microsoft.com/en-us/azure/governance/resource-graph/concepts/query-language - Find information about resource tables
- * - https://learn.microsoft.com/en-us/azure/governance/resource-graph/samples/samples-by-category - Get sample queries for all tables
- * 
- * Usage:
- *   node generate-arg-schema.js                     # Full generation from documentation
- *   node generate-arg-schema.js <bearer-token>      # Full generation using Azure API
- *   node generate-arg-schema.js --examples-only     # Only refresh examples (faster)
- *   node generate-arg-schema.js -e                  # Short form for examples-only
- *   node generate-arg-schema.js --resources-only    # Only refresh resource tables and types
- *   node generate-arg-schema.js -r                  # Short form for resources-only  
- *   node generate-arg-schema.js --syntax-only       # Only refresh KQL syntax (operators, functions, aggregates)
- *   node generate-arg-schema.js -s                  # Short form for syntax-only
- *   node generate-arg-schema.js --help              # Show help
  */
 
 const https = require('https');
 const fs = require('fs').promises;
 const path = require('path');
+
+const isNotARG = (item) => {
+    // Filter out items not available in Azure Resource Graph
+    // Should not start with _ or number
+    // Should not start with geo*
+    // Should not contain .
+    // Should not start with 'with_', 'hll_', 'punycode', 'rank_'
+    return item.startsWith('_') ||
+        /^\d/.test(item) ||
+        /^geo/i.test(item) ||
+        item.includes('.') ||
+        /^with_/i.test(item) ||
+        /^hll_/i.test(item) ||
+        /^punycode/i.test(item) ||
+        /^rank_/i.test(item);
+};
 
 // Function to clean markdown content - removes links, includes, Microsoft Learn callouts, and other formatting
 function cleanMarkdown(text) {
@@ -74,7 +74,7 @@ function extractCategoryFromTitle(title) {
         // Apply sentence casing: first letter uppercase, rest lowercase
         return category.charAt(0).toUpperCase() + category.slice(1).toLowerCase();
     }
-    return 'KQL function'; // Default fallback
+    return 'Function'; // Default fallback
 }
 
 // Clean title by removing category information in parentheses
@@ -92,7 +92,7 @@ function cleanFunctionTitle(title) {
 }
 
 // Focused documentation parser for Microsoft Docs
-function parseMarkdownDoc(content) {
+function parseMarkdownContent(content) {
     const lines = content.split('\n');
     let title = '';
     let description = '';
@@ -250,9 +250,7 @@ try {
     require('@kusto/language-service-next/bridge.min.js');
     // Then load the Kusto Language Service (minified version)
     kustoLanguageService = require('@kusto/language-service-next/Kusto.Language.Bridge.min.js');
-    console.log('✅ Kusto Language Service loaded successfully');
 } catch (error) {
-    console.warn('⚠️ @kusto/language-service-next not available, operators/functions will be empty in TextMate grammar');
     console.warn('Error:', error.message);
     throw error;
 }
@@ -269,7 +267,7 @@ class ARGSchemaGenerator {
         };
         this.sampleQueries = [];
         this.kustoBaseUrl = 'https://learn.microsoft.com';
-        this.requestDelay = 2000; // Increase delay to 2 seconds to be more respectful of GitHub API
+        this.requestDelay = 500; // Increase delay to 500ms to be more respectful of GitHub API
 
         // Retry configuration
         this.maxRetries = 5;
@@ -284,17 +282,8 @@ class ARGSchemaGenerator {
     }
 
     async fetchUrl(url, attempt = 1) {
-        const isRetry = attempt > 1;
-        console.log(`📥 ${isRetry ? `Retry ${attempt}/${this.maxRetries}: ` : ''}Fetching: ${url}`);
-
         try {
-            const data = await this.makeHttpRequest(url);
-            if (!isRetry) {
-                console.log(`✅ Fetched ${data.length} characters from ${url.substring(0, 100)}${url.length > 100 ? '...' : ''}`);
-            } else {
-                console.log(`✅ Retry successful: ${data.length} characters from ${url.substring(0, 100)}${url.length > 100 ? '...' : ''}`);
-            }
-            return data;
+            return await this.makeHttpRequest(url);
         } catch (error) {
             if (attempt < this.maxRetries) {
                 const delay = Math.min(this.baseRetryDelay * Math.pow(2, attempt - 1), this.maxRetryDelay);
@@ -302,8 +291,7 @@ class ARGSchemaGenerator {
                 await this.delay(delay);
                 return this.fetchUrl(url, attempt + 1);
             } else {
-                console.warn(`❌ Final attempt failed for ${url}: ${error.message}`);
-                return ''; // Return empty string after all retries exhausted
+                throw new Error(`❌ Final attempt failed for ${url}: ${error.message}`);
             }
         }
     }
@@ -366,33 +354,7 @@ class ARGSchemaGenerator {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    async generateExamplesOnly() {
-        console.log('📚 Examples-only mode: Loading existing schema and refreshing examples...');
-
-        try {
-            // Step 1: Load existing schema
-            console.log('\n📂 Step 1: Loading existing schema files...');
-            await this.loadExistingSchema();
-
-            // Step 2: Fetch and match sample queries to tables
-            console.log('\n📚 Step 2: Fetching sample queries...');
-            await this.fetchAndMatchSampleQueries();
-
-            // Step 3: Generate schema files with updated examples
-            console.log('\n💾 Step 3: Writing updated schema files...');
-            await this.writeSchemaFiles();
-
-            console.log('\n✅ Examples refresh complete!');
-            this.printSummary();
-
-        } catch (error) {
-            console.error('❌ Error refreshing examples:', error);
-            throw error;
-        }
-    }
-
     async loadExistingSchema() {
-        const fs = require('fs').promises;
         const outputDir = path.join(__dirname, '..', 'src', 'schema');
         const schemaPath = path.join(outputDir, 'arg-schema.json');
 
@@ -420,9 +382,8 @@ class ARGSchemaGenerator {
             console.log(`   Functions: ${this.schema.functions.length} (includes aggregation functions)`);
 
         } catch (error) {
-            console.error('❌ Failed to load existing schema:', error.message);
+            console.warn('❌ Failed to load existing schema:', error.message);
             console.log('💡 Hint: Run the full generation first to create the schema files');
-            throw error;
         }
     }
 
@@ -450,168 +411,6 @@ class ARGSchemaGenerator {
         }
     }
 
-    async generateResourcesOnly() {
-        console.log('🗂️ Resources-only mode: Loading existing schema and refreshing resource tables/types...');
-
-        try {
-            // Step 1: Load existing schema
-            console.log('\n📂 Step 1: Loading existing schema files...');
-            await this.loadExistingSchema();
-
-            // Step 2: Fetch and parse tables and resource types
-            console.log('\n🗂️ Step 2: Fetching resource tables and types...');
-            const htmlContent = await this.fetchUrl('https://learn.microsoft.com/en-us/azure/governance/resource-graph/reference/supported-tables-resources');
-            await this.parseTables(htmlContent);
-
-            // Step 2.5: Fetch table descriptions
-            console.log('\n📋 Step 2.5: Fetching table descriptions...');
-            await this.fetchTableDescriptions();
-
-            // Step 2.7: Fetch and match sample queries to tables
-            console.log('\n📚 Step 2.7: Fetching sample queries...');
-            await this.fetchAndMatchSampleQueries();
-
-            // Step 3: Generate schema files with updated resources
-            console.log('\n💾 Step 3: Writing updated schema files...');
-            await this.writeSchemaFiles();
-
-            console.log('\n✅ Resources refresh complete!');
-            this.printSummary();
-
-        } catch (error) {
-            console.error('❌ Error refreshing resources:', error);
-            throw error;
-        }
-    }
-
-    async generateSyntaxOnly() {
-        console.log('⚙️ Syntax-only mode: Loading existing schema and refreshing KQL syntax elements...');
-
-        try {
-            // Step 1: Load existing schema
-            console.log('\n📂 Step 1: Loading existing schema files...');
-            await this.loadExistingSchema();
-
-            // Step 2: Extract KQL syntax elements from Kusto Language Service
-            console.log('\n⚙️ Step 2: Extracting KQL syntax elements...');
-            await this.extractKustoLanguageElements();
-
-            // Step 3: Generate schema files with updated syntax
-            console.log('\n💾 Step 3: Writing updated schema files...');
-            await this.writeSchemaFiles();
-
-            console.log('\n✅ Syntax refresh complete!');
-            this.printSummary();
-
-        } catch (error) {
-            console.error('❌ Error refreshing syntax:', error);
-            throw error;
-        }
-    }
-
-    async parseTables(htmlContent) {
-        console.log('📋 Dynamically extracting ARG tables...');
-
-        // Extract all table sections dynamically
-        // Look for headers that contain "resources" (case-insensitive)
-        const tableHeaderRegex = /<h2[^>]*>(.*?resources.*?)<\/h2>(.*?)(?=<h2|$)/gis;
-        let match;
-        let tableCount = 0;
-
-        while ((match = tableHeaderRegex.exec(htmlContent)) !== null) {
-            const headerText = match[1].trim();
-            const sectionContent = match[2];
-
-            // Extract clean table name from header
-            const tableName = this.extractTableName(headerText);
-
-            if (tableName && this.isValidTableName(tableName)) {
-                console.log(`  🔍 Found table: ${tableName}`);
-
-                // Preserve existing examples if table already exists
-                const existingTable = this.schema.tables[tableName];
-                const existingExamples = existingTable ? existingTable.examples || [] : [];
-                const existingDescription = existingTable ? existingTable.description : undefined;
-
-                const tableSchema = {
-                    name: tableName,
-                    examples: existingExamples
-                };
-
-                // Preserve existing description if it exists and we're not overwriting it
-                if (existingDescription) {
-                    tableSchema.description = existingDescription;
-                }
-
-                this.schema.tables[tableName] = tableSchema;
-
-                tableCount++;
-                console.log(`    ✅ ${tableName}: table extracted`);
-            }
-        }
-
-        console.log(`📋 Extracted ${tableCount} tables dynamically`);
-    }
-
-    extractTableName(headerText) {
-        // Remove HTML tags and extract the clean table name
-        const cleanHeader = headerText.replace(/<[^>]*>/g, '').trim();
-
-        // Look for words ending in "resources" or just "resources"
-        const tableMatch = cleanHeader.match(/\b(\w*resources?)\b/i);
-        return tableMatch ? tableMatch[1].toLowerCase() : null;
-    }
-
-    extractTableDescription(sectionContent, tableName) {
-        // Look for meaningful descriptions, avoiding common page elements
-        const paragraphs = sectionContent.match(/<p[^>]*>(.*?)<\/p>/gis);
-
-        if (paragraphs) {
-            for (const paragraphMatch of paragraphs) {
-                const description = paragraphMatch
-                    .replace(/<p[^>]*>/gi, '')  // Remove opening p tag
-                    .replace(/<\/p>/gi, '')     // Remove closing p tag
-                    .replace(/<[^>]*>/g, '')    // Remove all other HTML tags
-                    .replace(/\s+/g, ' ')       // Normalize whitespace
-                    .trim();
-
-                // Skip common footer/navigation text
-                const skipPatterns = [
-                    /was this page helpful/i,
-                    /did this page help/i,
-                    /feedback/i,
-                    /microsoft\.com/i,
-                    /privacy/i,
-                    /terms of use/i,
-                    /cookie/i,
-                    /trademark/i,
-                    /contribute/i,
-                    /previous versions/i,
-                    /learn\.microsoft\.com/i,
-                    /^https?:\/\//i,
-                    /^\s*$/, // Empty or whitespace only
-                    /^[^a-zA-Z]*$/ // No letters (just symbols/numbers)
-                ];
-
-                // Check if this description should be skipped
-                const shouldSkip = skipPatterns.some(pattern => pattern.test(description));
-
-                if (!shouldSkip && description.length > 10 && description.length < 200) {
-                    // Add sample query link to the extracted description
-                    const sampleLink = `https://learn.microsoft.com/en-us/azure/governance/resource-graph/samples/samples-by-category?wt.mc_id=DT-MVP-5005372`;
-                    return `${description} [View sample queries](${sampleLink}).`;
-                }
-            }
-        }
-
-        // Fallback to a more specific description based on the table name
-        if (tableName === 'resources') {
-            return '\nMost Resource Manager resource types and properties are here. [View sample queries](https://learn.microsoft.com/en-us/azure/governance/resource-graph/samples/starter?wt.mc_id=DT-MVP-5005372).';
-        }
-
-        return `For sample queries for this table, see [Resource Graph sample queries for ${tableName}](https://learn.microsoft.com/en-us/azure/governance/resource-graph/samples/samples-by-category?wt.mc_id=DT-MVP-5005372).`;
-    }
-
     async fetchAndMatchSampleQueries() {
         console.log('📚 Fetching sample queries from Microsoft documentation...');
 
@@ -632,14 +431,11 @@ class ARGSchemaGenerator {
 
                 const batchPromises = batch.map(async (file) => {
                     try {
-                        console.log(`  📥 Fetching: ${file.name}`);
                         const markdownContent = await this.fetchUrl(file.download_url);
                         const snippets = this.parseMarkdownCodeSnippets(markdownContent);
-                        console.log(`    ✅ Found ${snippets.length} KQL snippets in ${file.name}`);
                         return snippets;
                     } catch (urlError) {
-                        throw new Error(`    ⚠️ Could not fetch ${file.name}: ${urlError.message}`);
-                        return [];
+                        throw new Error(`⚠️ Could not fetch ${file.name}: ${urlError.message}`);
                     }
                 });
 
@@ -653,7 +449,6 @@ class ARGSchemaGenerator {
             }
 
             console.log(`📝 Total ${allCodeSnippets.length} KQL snippets found from all sample files`);
-            console.log('🔗 Matching code snippets to tables...');
             this.matchSnippetsToTables(allCodeSnippets);
 
         } catch (error) {
@@ -738,7 +533,6 @@ class ARGSchemaGenerator {
             const fileInfo = JSON.parse(response);
 
             if (fileInfo.download_url) {
-                console.log(`📥 Fetching: query-language.md`);
                 const markdownContent = await this.fetchUrl(fileInfo.download_url);
 
                 // Parse the table descriptions from the markdown
@@ -750,7 +544,6 @@ class ARGSchemaGenerator {
                     const lowerTableName = tableName.toLowerCase();
                     if (this.schema.tables[lowerTableName]) {
                         this.schema.tables[lowerTableName].description = description;
-                        console.log(`  ✅ Added description for ${tableName}: ${description.substring(0, 50)}...`);
                     }
                 }
 
@@ -810,7 +603,6 @@ class ARGSchemaGenerator {
     }
 
     parseMarkdownCodeSnippets(markdownContent) {
-        console.log('🔍 Extracting KQL code snippets from markdown...');
         const allExamples = [];
 
         // Collect all examples with their source type - single pass through content
@@ -907,18 +699,14 @@ class ARGSchemaGenerator {
                         source: example.source,
                         length: example.code.length
                     });
-                    console.log(`  ✅ Found KQL from ${sourceType} (${example.code.length} chars): ${example.code.substring(0, 50)}...`);
                 }
             }
         }
-
-        console.log(`📝 Extracted ${codeSnippets.length} unique KQL code snippets from markdown (${allExamples.length} total found)`);
 
         return codeSnippets;
     }
 
     parseCodeSnippets(htmlContent) {
-        console.log('🔍 Extracting KQL code snippets...');
         const codeSnippets = [];
 
         // Look for code blocks in various formats used by Microsoft Learn
@@ -1161,14 +949,13 @@ class ARGSchemaGenerator {
             }
         });
 
-        console.log(`🔗 Total examples matched: ${totalMatches}`);
+        console.log(`🔗 Total examples matched: ${totalMatches}/${codeSnippets.length}`);
     }
 
     snippetStartsWithTable(snippet, tableName) {
         // Check if the snippet starts with the table name (case-insensitive)
         // This is the highest priority match
         const trimmedSnippet = snippet.trim();
-        const lowerSnippet = trimmedSnippet.toLowerCase();
         const lowerTableName = tableName.toLowerCase();
 
         // Escape regex metacharacters in table name
@@ -1240,19 +1027,15 @@ class ARGSchemaGenerator {
         // Extract KQL language elements from Kusto Language Service before writing
         try {
             const kustoElements = this.extractKustoLanguageElements();
-            this.schema.keywords = kustoElements.keywords.map(name => ({ name, category: 'KQL Keyword' }));
-            this.schema.operators = kustoElements.operators.map(name => ({ name, category: 'KQL Operator' }));
-
-            // Set up functions and merge aggregates into functions array
+            this.schema.keywords = kustoElements.keywords.map(name => ({ name, category: 'Keyword' }));
+            this.schema.operators = kustoElements.operators.map(name => ({ name, category: 'Operator' }));
             this.schema.functions = [
+                // Set up functions and merge aggregates into functions array
                 ...kustoElements.functions.map(name => ({ name, category: 'Function' })),
-                ...kustoElements.aggregates.map(name => ({ name, category: 'Aggregation function' }))
+                ...kustoElements.aggregates.map(name => ({ name, category: 'Aggregation Function' }))
             ];
 
-            // Remove the separate aggregates section since they're now merged into functions
-            delete this.schema.aggregates;
-
-            // Extract enhanced documentation for functions (including aggregates)
+            // Extract enhanced documentation from Microsoft Learn files on GitHub
             await this.extractMicrosoftDocsDocumentation();
 
         } catch (error) {
@@ -1279,44 +1062,28 @@ class ARGSchemaGenerator {
             const allFiles = await this.fetchGitHubDirectoryContents(kqlDocsUrl);
 
             // Filter function files
-            const functionFiles = allFiles.filter(file =>
+            const matchingFiles = allFiles.filter(file =>
                 file.name.endsWith('-function.md') ||
                 file.name.endsWith('-aggregate-function.md') ||
-                file.name.endsWith('-aggregation-function.md')
-            );
-
-            // Filter operator files
-            const operatorFiles = allFiles.filter(file =>
+                file.name.endsWith('-aggregation-function.md') ||
                 file.name.endsWith('-operator.md')
             );
 
-            console.log(`📄 Found ${functionFiles.length} function documentation files`);
-            console.log(`📄 Found ${operatorFiles.length} operator documentation files`);
+            console.log(`📄 Found ${matchingFiles.length} matching documentation files`);
 
-            // Process functions and aggregates in parallel
-            const functionResults = await Promise.all(functionFiles.map(async (file) => {
+            // Process functions and operators in parallel
+            const syntaxResults = await Promise.all(matchingFiles.map(async (file) => {
                 const fileContent = await this.fetchGitHubFileContent(file.download_url);
-                const functionDoc = this.parseMarkdownDoc(fileContent, file.name);
+                const doc = this.parseMarkdownDoc(fileContent, file.name);
 
-                return { file: file.name, doc: functionDoc };
+                return { file: file.name, doc: doc };
             }));
 
-            // Process operators in parallel
-            const operatorResults = await Promise.all(operatorFiles.map(async (file) => {
-                const fileContent = await this.fetchGitHubFileContent(file.download_url);
-                const operatorDoc = this.parseOperatorMarkdownDoc(fileContent, file.name);
+            const functionsDocumented = syntaxResults.filter(result => result.doc && result.doc.category === 'function').map(result => result.doc);
+            const aggregatesDocumented = syntaxResults.filter(result => result.doc && result.doc.category === 'aggregate').map(result => result.doc);
+            const operatorsDocumented = syntaxResults.filter(result => result.doc && result.doc.category === 'operator').map(result => result.doc);
 
-                return { file: file.name, doc: operatorDoc };
-            }));
-
-            // Separate functions from aggregates (only include successfully parsed ones)
-            const functionsDocumented = functionResults.filter(result => result.doc && result.doc.type === 'function').map(result => result.doc);
-            const aggregatesDocumented = functionResults.filter(result => result.doc && result.doc.type === 'aggregate').map(result => result.doc);
-
-            // Get documented operators (only include successfully parsed ones)
-            const operatorsDocumented = operatorResults.filter(result => result.doc).map(result => result.doc);
-
-            console.log(`\n� Documentation extraction results:`);
+            console.log(`\n🔍 Documentation extraction results:`);
             console.log(`  • Functions documented: ${functionsDocumented.length}`);
             console.log(`  • Aggregates documented: ${aggregatesDocumented.length}`);
             console.log(`  • Operators documented: ${operatorsDocumented.length}`);
@@ -1326,6 +1093,16 @@ class ARGSchemaGenerator {
 
             // Then process functions and aggregates
             await this.processFunctionDocumentation(functionsDocumented, aggregatesDocumented);
+
+            // Move keywords back from operators list if they couldn't be matched to docs
+            this.schema.keywords = this.schema.operators.filter(op => {
+                const opName = typeof op === 'object' ? op.name : op;
+                return op.category === 'Keyword' && !isNotARG(opName);
+            });
+            // Filter out keywords from operators that have been moved back to keywords list
+            this.schema.operators = this.schema.operators.filter(op => {
+                return op.category !== 'Keyword';
+            });
 
         } catch (error) {
             console.error('❌ Error extracting Microsoft Docs documentation:', error.message);
@@ -1343,60 +1120,44 @@ class ARGSchemaGenerator {
 
     parseMarkdownDoc(content, filename) {
         // Extract function name from filename
-        const nameMatch = filename.match(/^(.+?)(?:-(function|aggregate-function|aggregation-function))\.md$/);
-        if (!nameMatch) {
-            return null;
+        let nameMatch = filename.match(/^(.+?)(?:-(function|aggregate-function|aggregation-function))\.md$/);
+
+        let category = null;
+        if (nameMatch) {
+            // Determine category from filename
+            const isAggregate = filename.includes('aggregate') || filename.includes('aggregation');
+            category = isAggregate ? 'aggregate' : 'function';
+        }
+        else {
+            nameMatch = filename.match(/^(.+?)-operator\.md$/);
+
+            if (nameMatch) {
+                category = 'operator';
+            }
         }
 
-        const functionName = nameMatch[1].replace(/-/g, '_');
+        if (!nameMatch) {
+            return null; // Not a recognized function or operator file
+        }
 
-        // Determine type from filename
-        const isAggregate = filename.includes('aggregate') || filename.includes('aggregation');
-        const type = isAggregate ? 'aggregate' : 'function';
+        const name = nameMatch[1];
 
         // Use the original parseMarkdownDoc function to get structured data
-        const parsedDoc = parseMarkdownDoc(content);
+        const parsedDoc = parseMarkdownContent(content);
 
         // Add Microsoft Learn URL
         const urlSlug = filename.replace(/\.md$/, '');
         const microsoftLearnUrl = `https://learn.microsoft.com/en-us/kusto/query/${urlSlug}`;
-
-        return {
-            name: functionName,
-            type: type,
-            category: parsedDoc.category || (isAggregate ? 'KQL aggregate function' : 'KQL function'),
-            documentation: {
-                ...parsedDoc,
-                url: microsoftLearnUrl
-            }
-        };
-    }
-
-    parseOperatorMarkdownDoc(content, filename) {
-        // Extract operator name from filename
-        const nameMatch = filename.match(/^(.+?)-operator\.md$/);
-        if (!nameMatch) {
-            return null;
-        }
-
-        const operatorName = nameMatch[1].replace(/-/g, '_');
-
-        // Use the original parseMarkdownDoc function to get structured data
-        const parsedDoc = parseMarkdownDoc(content);
 
         // Trim " operator" from the title for cleaner display
         if (parsedDoc.title && parsedDoc.title.toLowerCase().endsWith(' operator')) {
             parsedDoc.title = parsedDoc.title.slice(0, -9).trim(); // Remove " operator" (9 characters)
         }
 
-        // Add Microsoft Learn URL
-        const urlSlug = filename.replace(/\.md$/, '');
-        const microsoftLearnUrl = `https://learn.microsoft.com/en-us/kusto/query/${urlSlug}`;
-
+        // Return structured doc for syntax word (function or operator)
         return {
-            name: operatorName,
-            type: 'operator',
-            category: 'operator',
+            name: name,
+            category: category,
             documentation: {
                 ...parsedDoc,
                 url: microsoftLearnUrl
@@ -1442,161 +1203,75 @@ class ARGSchemaGenerator {
             let documentationApplied = false;
 
             // Check if this operator exists in our current operators list
-            let foundInOperators = this.schema.operators.filter(op => {
-                const opVariations = [
-                    op.name,
-                    op.name.toLowerCase(),
-                    op.name.replace(/_/g, '-'),
-                    op.name.replace(/_/g, '-').toLowerCase(),
-                    op.name.replace(/-/g, '_'),
-                    op.name.replace(/-/g, '_').toLowerCase()
+            let foundInKeywordsOrOperators = [...this.schema.operators, ...this.schema.keywords].filter(word => {
+                let name = word.name;
+                let realName = name;
+
+                // Special handling for 'in' and 'in~' operators in docs
+                // 'in' is 'in-cs', '!in' is 'not-in-cs'
+                // 'in~' is 'in', '!in~' is 'not-in'
+                if (name.match(/^!?in$/)) { // If name is in or !in, treat as in-cs for matching
+                    name = `${name}-cs`;
+                } else if (name.match(/^!?in~$/)) { // If name is in~ or !in~, treat as in for matching
+                    name = name.replace('~', '');
+                }
+
+                const wordVariations = [
+                    name,
+                    name.toLowerCase(),
+                    name.replace(/_/g, '-'),
+                    name.replace(/_/g, '-').toLowerCase(),
+                    name.replace(/-/g, '_'),
+                    name.replace(/-/g, '_').toLowerCase()
                 ];
 
                 // Create temporary variations for matching:
-                // If operator starts with "!", create "not-" version
-                if (op.name.toLowerCase().startsWith('!')) {
-                    const notDashVersion = 'not-' + op.name.substring(1);
-                    opVariations.push(
+                // If word starts with "!", create "not-" version
+                if (name.toLowerCase().startsWith('!')) {
+                    const notDashVersion = 'not-' + name.substring(1);
+                    wordVariations.push(
                         notDashVersion,
                         notDashVersion.toLowerCase()
                     );
                 }
 
-                // If operator starts with "not" but not "not-" or "not_", create "not-" version
-                if (op.name.toLowerCase().startsWith('not') &&
-                    !op.name.toLowerCase().startsWith('not-') &&
-                    !op.name.toLowerCase().startsWith('not_')) {
+                // If word starts with "not" but not "not-" or "not_", create "not-" version
+                if (name.toLowerCase().startsWith('not') &&
+                    !name.toLowerCase().startsWith('not-') &&
+                    !name.toLowerCase().startsWith('not_')) {
                     // Insert dash after "not": notcontains -> not-contains
-                    const notDashVersion = 'not-' + op.name.substring(3);
-                    opVariations.push(
+                    const notDashVersion = 'not-' + name.substring(3);
+                    wordVariations.push(
                         notDashVersion,
                         notDashVersion.toLowerCase()
                     );
                 }
 
-                return docOperatorVariations.some(docVar => opVariations.includes(docVar));
-            });
+                // Restore original name after possible matching additions
+                name = realName;
 
-            // Check if this operator exists in our keywords list (that could also receive documentation)
-            let foundInKeywords = this.schema.keywords.filter(kw => {
-                const keywordName = typeof kw === 'object' ? kw.name : kw;
-                const keywordVariations = [
-                    keywordName,
-                    keywordName.toLowerCase(),
-                    keywordName.replace(/_/g, '-'),
-                    keywordName.replace(/_/g, '-').toLowerCase(),
-                    keywordName.replace(/-/g, '_'),
-                    keywordName.replace(/-/g, '_').toLowerCase()
-                ];
-
-                // Create temporary variations for matching:
-                // If keyword starts with "!", create "not-" version
-                if (keywordName.toLowerCase().startsWith('!')) {
-                    const notDashVersion = 'not-' + keywordName.substring(1);
-                    keywordVariations.push(
-                        notDashVersion,
-                        notDashVersion.toLowerCase()
-                    );
+                if (name.toLowerCase() === 'limit') {
+                    // Special case: "limit" keyword in KQL is actually "take" operator
+                    wordVariations.push('take');
                 }
 
-                // If keyword starts with "not" but not "not-" or "not_", create "not-" version
-                if (keywordName.toLowerCase().startsWith('not') &&
-                    !keywordName.toLowerCase().startsWith('not-') &&
-                    !keywordName.toLowerCase().startsWith('not_')) {
-                    // Insert dash after "not": notcontains -> not-contains
-                    const notDashVersion = 'not-' + keywordName.substring(3);
-                    keywordVariations.push(
-                        notDashVersion,
-                        notDashVersion.toLowerCase()
-                    );
-                }
-
-                return docOperatorVariations.some(docVar => keywordVariations.includes(docVar));
+                return docOperatorVariations.some(docVar => wordVariations.includes(docVar));
             });
 
             // Apply documentation to all matching operators
-            for (const matchedOperator of foundInOperators) {
+            for (const matchedWord of foundInKeywordsOrOperators) {
                 // Update existing operator with documentation
                 const cleanedDocumentation = { ...docOperator.documentation };
+
                 // Remove the inner category from documentation to avoid conflicts  
                 if (cleanedDocumentation.category) {
                     delete cleanedDocumentation.category;
                 }
 
-                matchedOperator.documentation = cleanedDocumentation;
-                matchedOperator.category = 'operator'; // Fix: always use 'operator'
-                matchedOperatorsList.push(matchedOperator);
+                matchedWord.documentation = cleanedDocumentation;
+                matchedWord.category = 'Operator';
+                matchedOperatorsList.push(matchedWord);
                 documentationApplied = true;
-            }
-
-            // Apply documentation to matching keywords 
-            // For operators found in keywords: migrate them to operators section with documentation
-            for (const matchedKeyword of foundInKeywords) {
-                const keywordName = typeof matchedKeyword === 'object' ? matchedKeyword.name : matchedKeyword;
-
-                // Check if this keyword is actually an operator 
-                const isOperator = keywordName.startsWith('!') ||
-                    keywordName.includes('between') ||
-                    keywordName.includes('contains') ||
-                    keywordName.includes('endswith') ||
-                    keywordName.includes('startswith') ||
-                    keywordName.includes('equals') ||
-                    keywordName.includes('has') ||
-                    keywordName.includes('in') ||
-                    keywordName.includes('matches') ||
-                    // KQL operators that are commonly in keywords section
-                    ['render', 'search', 'summarize', 'extend', 'project', 'where',
-                        'take', 'limit', 'order', 'sort', 'union', 'evaluate', 'top',
-                        'join', 'distinct', 'count', 'parse', 'sample', 'fork',
-                        'facet', 'materialize', 'serialize', 'mv-apply', 'mv-expand',
-                        'make-series', 'make-graph', 'reduce', 'scan', 'range',
-                        'datatable', 'externaldata', 'getschema', 'lookup', 'consume'].includes(keywordName);
-
-                if (isOperator) {
-                    // This is an operator misplaced in keywords - migrate it to operators
-                    const newOperator = {
-                        name: keywordName,
-                        category: 'operator',
-                        documentation: { ...docOperator.documentation }
-                    };
-
-                    // Remove the inner category from documentation to avoid conflicts
-                    if (newOperator.documentation && newOperator.documentation.category) {
-                        delete newOperator.documentation.category;
-                    }
-
-                    // Add to operators list
-                    matchedOperatorsList.push(newOperator);
-
-                    // Remove from keywords
-                    this.schema.keywords = this.schema.keywords.filter(kw => {
-                        const kwName = typeof kw === 'object' ? kw.name : kw;
-                        return kwName !== keywordName;
-                    });
-
-                    documentationApplied = true;
-                } else {
-                    // This is actually a keyword, just add documentation
-                    const keywordInSchema = this.schema.keywords.find(kw => {
-                        const kwName = typeof kw === 'object' ? kw.name : kw;
-                        return kwName === keywordName;
-                    });
-
-                    if (keywordInSchema) {
-                        // Convert keyword to object if it's a string and add documentation
-                        if (typeof keywordInSchema === 'string') {
-                            const keywordIndex = this.schema.keywords.indexOf(keywordInSchema);
-                            this.schema.keywords[keywordIndex] = {
-                                name: keywordInSchema,
-                                category: 'KQL Keyword',
-                                documentation: docOperator.documentation
-                            };
-                        } else {
-                            keywordInSchema.documentation = docOperator.documentation;
-                        }
-                        documentationApplied = true;
-                    }
-                }
             }
 
             if (documentationApplied) {
@@ -1604,6 +1279,7 @@ class ARGSchemaGenerator {
             } else {
                 // This is a new operator not in our lists
                 const cleanedDocumentation = { ...docOperator.documentation };
+
                 // Remove the inner category from documentation to avoid conflicts
                 if (cleanedDocumentation.category) {
                     delete cleanedDocumentation.category;
@@ -1611,7 +1287,7 @@ class ARGSchemaGenerator {
 
                 const newOperator = {
                     name: docOperator.name,
-                    category: 'operator', // Fix: always use 'operator'
+                    category: 'operator',
                     documentation: cleanedDocumentation
                 };
                 matchedOperatorsList.push(newOperator);
@@ -1620,7 +1296,7 @@ class ARGSchemaGenerator {
         }
 
         // Add existing operators that didn't get documentation and track unmatched
-        for (const op of this.schema.operators) {
+        for (const op of [...this.schema.operators, ...this.schema.keywords]) {
             const matchedOp = matchedOperatorsList.find(matched => matched.name === op.name);
             if (!matchedOp) {
                 // Check if this operator has documentation available
@@ -1641,12 +1317,12 @@ class ARGSchemaGenerator {
 
         console.log(`  • Operators documented: ${matchedOperators}`);
         if (this.unmatchedOperators.length > 0) {
-            console.log(`  • Unmatched operators: ${this.unmatchedOperators.join(', ')}`);
+            console.log(`  • Unmatched operators (${this.unmatchedOperators.length}): ${this.unmatchedOperators.join(', ')}`);
         }
     }
 
     async processFunctionDocumentation(functionsDocumented, aggregatesDocumented) {
-        console.log(`\n🔗 Processing function documentation...`);
+        console.log(`🔗 Processing function documentation...`);
 
         // Combine both function and aggregate documentation arrays
         const allDocumentedFunctions = [...functionsDocumented, ...aggregatesDocumented];
@@ -1658,15 +1334,24 @@ class ARGSchemaGenerator {
         // Collect unmatched functions to preserve them in schema
         const unmatchedFunctionsList = [];
         for (const func of this.schema.functions) {
-            const docFunction = allDocumentedFunctions.find(doc =>
-                doc.name === func.name ||
-                doc.name === func.name.toLowerCase() ||
-                func.name === doc.name.toLowerCase()
-            );
+            const wordVariations = [
+                func.name,
+                func.name.toLowerCase(),
+                func.name.replace(/_/g, '-'),
+                func.name.replace(/_/g, '-').toLowerCase(),
+                func.name.replace(/-/g, '_'),
+                func.name.replace(/-/g, '_').toLowerCase()
+            ];
+            // Find the corresponding documented function
+            const docFunction = allDocumentedFunctions.find(docFunc => {
+                return wordVariations.includes(docFunc.name);
+            });
 
             if (docFunction) {
                 func.documentation = docFunction.documentation;
-                func.category = docFunction.category;
+                func.category = docFunction.documentation.category;
+                // Remove the inner category from documentation
+                delete docFunction.documentation.category;
                 matchedFunctionsList.push(func);
                 matchedFunctions++;
             } else {
@@ -1677,11 +1362,11 @@ class ARGSchemaGenerator {
         }
 
         // Update schema to include both matched and unmatched functions
-        this.schema.functions = [...matchedFunctionsList, ...unmatchedFunctionsList];
+        this.schema.functions = [...matchedFunctionsList];
 
         const totalFunctions = matchedFunctions + this.unmatchedFunctions.length;
 
-        console.log(`  • Functions matched: ${matchedFunctions}/${totalFunctions} (includes aggregation functions, ${this.unmatchedFunctions.length} excluded from schema)`);
+        console.log(`  • Functions matched: ${matchedFunctions}/${totalFunctions} (${this.unmatchedFunctions.length} excluded from schema)`);
 
         // Track remaining keywords that don't have documentation
         for (const keyword of this.schema.keywords) {
@@ -1773,15 +1458,13 @@ class ARGSchemaGenerator {
         const aggregates = new Set();
         let filteredKeywords = new Set();
         let filteredOperators = new Set();
+        let removedFunctions = new Set();
 
         if (!kustoLanguageService) {
             throw new Error('Kusto Language Service not available');
         }
 
         try {
-            // Initialize Bridge.NET framework first
-            require('@kusto/language-service-next/bridge.min.js');
-
             // Access the global Kusto Language API
             const kustoLanguage = global.Kusto.Language;
 
@@ -1821,14 +1504,23 @@ class ARGSchemaGenerator {
                 }
             }
 
+            // Filter out symbolic keywords and operators (keep only word-based items)
+            filteredKeywords = new Set();
+            filteredOperators = new Set();
+            const isSymbolic = (item) => {
+                // Check if item contains only symbols/punctuation and no letters
+                return /^[^a-zA-Z]*$/.test(item) && /[^\w\s]/.test(item);
+            };
+
             // Extract functions from Kusto.Language.Functions.All
             if (kustoLanguage.Functions && kustoLanguage.Functions.All) {
                 const functionList = kustoLanguage.Functions.All;
                 functionList.forEach(fn => {
                     const name = fn.name || fn.Name;
-                    if (name && !name.startsWith('__')) {
-                        // Exclude internal double underscore functions not available in ARG
+                    if (name && !isNotARG(name)) {
                         functions.add(name);
+                    } else if (name) {
+                        removedFunctions.add(name);
                     }
                 });
             }
@@ -1838,38 +1530,31 @@ class ARGSchemaGenerator {
                 const aggregateList = kustoLanguage.Aggregates.All;
                 aggregateList.forEach(agg => {
                     const name = agg.name || agg.Name;
-                    if (name && !name.startsWith('__')) {
-                        // Exclude internal double underscore aggregates not available in ARG
+                    if (name && !isNotARG(name)) {
                         aggregates.add(name);
+                    } else if (name) {
+                        removedFunctions.add(name);
                     }
                 });
             }
 
-            // Filter out symbolic keywords and operators (keep only word-based items)
-            filteredKeywords = new Set();
-            filteredOperators = new Set();
-            const isSymbolic = (item) => {
-                // Check if item contains only symbols/punctuation and no letters
-                return /^[^a-zA-Z]*$/.test(item) && /[^\w\s]/.test(item);
-            };
-
             for (const keyword of keywords) {
-                if (!isSymbolic(keyword)) {
+                if (!isNotARG(keyword)) {
                     filteredKeywords.add(keyword);
                 }
             }
 
             for (const operator of operators) {
-                if (!isSymbolic(operator)) {
+                if (!isSymbolic(operator) && !isNotARG(operator)) {
                     filteredOperators.add(operator);
                 }
             }
 
-            const filteredKeywordCount = keywords.size - filteredKeywords.size;
-            const filteredOperatorCount = operators.size - filteredOperators.size;
+            const removedKeywords = keywords.size - filteredKeywords.size;
+            const removedOperators = operators.size - filteredOperators.size;
             console.log(`🔧 Extracted ${filteredKeywords.size} keywords, ${filteredOperators.size} operators, ${functions.size} functions, and ${aggregates.size} aggregates from Kusto Language Service`);
-            if (filteredKeywordCount > 0 || filteredOperatorCount > 0) {
-                console.log(`   • Filtered out ${filteredKeywordCount} symbolic keywords and ${filteredOperatorCount} symbolic operators`);
+            if (removedKeywords > 0 || removedOperators > 0) {
+                console.log(`   • Filtered out ${removedKeywords} symbolic keywords and ${removedOperators} symbolic operators`);
             }
 
         } catch (error) {
@@ -1896,48 +1581,9 @@ class ARGSchemaGenerator {
 
         console.log('🎨 Generating dynamic TextMate grammar...');
 
-        // Extract KQL language elements from Kusto Language Service
-        const kustoElements = this.extractKustoLanguageElements();
-
-        // Override with our schema classifications for better accuracy
-        const schemaOperatorNames = new Set(this.schema.operators.map(op => op.name.toLowerCase()));
-        const schemaKeywordNames = new Set();
-
-        // Build schema keywords set
-        for (const keyword of this.schema.keywords) {
-            const keywordName = typeof keyword === 'object' ? keyword.name : keyword;
-            schemaKeywordNames.add(keywordName.toLowerCase());
-        }
-
-        // Use schema-based classification, fall back to Kusto Language Service
-        const keywords = [];
-        const operators = [];
-
-        // Add all elements from Kusto Language Service, but classify based on our schema
-        const allKustoElements = new Set([...kustoElements.keywords, ...kustoElements.operators]);
-
-        for (const element of allKustoElements) {
-            const lowerElement = element.toLowerCase();
-            if (schemaOperatorNames.has(lowerElement)) {
-                operators.push(element);
-            } else if (schemaKeywordNames.has(lowerElement)) {
-                keywords.push(element);
-            } else {
-                // Fallback to original Kusto classification
-                if (kustoElements.operators.includes(element)) {
-                    operators.push(element);
-                } else {
-                    keywords.push(element);
-                }
-            }
-        }
-
-        // Add any schema operators not found in Kusto elements
-        for (const op of this.schema.operators) {
-            if (!operators.includes(op.name) && !operators.includes(op.name.toLowerCase())) {
-                operators.push(op.name);
-            }
-        }
+        const functions = this.schema.functions.map(f => f.name ? f.name : f);
+        const keywords = this.schema.keywords.map(k => k.name ? k.name : k);
+        const operators = this.schema.operators.map(o => o.name ? o.name : o);
 
         // Escape regex metacharacters in keywords for safe regex usage
         const escapedKeywords = keywords.map(kw => {
@@ -1953,29 +1599,25 @@ class ARGSchemaGenerator {
         });
         const operatorsPattern = escapedOperators.join('|');
 
-        const allFunctions = [...kustoElements.functions, ...kustoElements.aggregates];
-        const allFunctionsSet = new Set(allFunctions.map(f => f.toLowerCase()));
+        const allFunctionsSet = new Set(functions.map(f => f.toLowerCase()));
         const allKeywordsSet = new Set(keywords.map(k => k.toLowerCase()));
         const allOperatorsSet = new Set(operators.map(o => o.toLowerCase()));
 
         // Separate ambiguous functions from pure functions
         const pureKeywords = keywords.filter(kw => !allFunctionsSet.has(kw.toLowerCase()));
         const pureOperators = operators.filter(op => !allFunctionsSet.has(op.toLowerCase()));
-        const pureFunctions = allFunctions.filter(func => {
+        const pureFunctions = functions.filter(func => {
             const lowerFunc = func.toLowerCase();
             return !allKeywordsSet.has(lowerFunc) && !allOperatorsSet.has(lowerFunc);
         });
 
         // Use pureFunctions for all function patterns to avoid conflicts with operators
-        const allFunctionsPattern = allFunctions.join('|');
+        const allFunctionsPattern = functions.join('|');
         const pureKeywordsPattern = pureKeywords.map(kw => kw.replace(/[\\^$.|?*+(){}\[\]]/g, '\\$&')).join('|');
         const pureOperatorsPattern = pureOperators.map(op => op.replace(/[\\^$.|?*+(){}\[\]]/g, '\\$&')).join('|');
         const pureFunctionsPattern = pureFunctions.join('|');
 
         const tables = Object.keys(this.schema.tables).filter(name => name).join('|');
-
-        // Extract common properties from schema data only
-        const allProperties = new Set();
 
         const textMateGrammar = {
             "name": "Azure Resource Graph KQL",
@@ -2027,7 +1669,7 @@ class ARGSchemaGenerator {
                     "patterns": [
                         {
                             "name": "keyword.control.kql",
-                            "match": `(?i)(?<!\\w)(${operatorsPattern})(?!\\w)`
+                            "match": `(?i)(?<!\\w)(${operatorsPattern})(?!\\w?~)`
                         }
                     ]
                 },
@@ -2145,12 +1787,10 @@ class ARGSchemaGenerator {
         );
 
         console.log(`🎨 Dynamic TextMate grammar written with:`);
-        console.log(`   - ${kustoElements.keywords.length} keywords`);
-        console.log(`   - ${kustoElements.operators.length} operators`);
-        console.log(`   - ${kustoElements.functions.length} functions`);
-        console.log(`   - ${kustoElements.aggregates.length} aggregates`);
+        console.log(`   - ${keywords.length} keywords`);
+        console.log(`   - ${operators.length} operators`);
+        console.log(`   - ${functions.length} functions`);
         console.log(`   - ${Object.keys(this.schema.tables).length} tables`);
-        console.log(`   - ${allProperties.size} properties`);
     }
 
     /**
@@ -2219,20 +1859,18 @@ class ARGSchemaGenerator {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
-                'Accept-Language': 'en',
-                'Authorization': `Bearer ${bearerToken}`,
-                'x-ms-client-request-id': this.generateGuid(),
-                'x-ms-command-name': 'bARGE.SchemaGenerator',
-                'User-Agent': 'bARGE-SchemaGenerator/1.0'
+                'Authorization': `Bearer ${bearerToken}`
             }
         };
 
         try {
             const responseData = await this.makeHttpsRequest(requestOptions);
             const schemaData = JSON.parse(responseData);
+            if (schemaData.error) {
+                throw new Error(`API error: ${schemaData.error.message}`);
+            }
 
             console.log(`✅ Successfully retrieved ${Object.keys(schemaData).length} table categories`);
-            console.log(`📋 Tables found: ${Object.keys(schemaData).join(', ')}`);
 
             return schemaData;
         } catch (error) {
@@ -2335,9 +1973,6 @@ if (require.main === module) {
 
     // Parse command line arguments
     const args = process.argv.slice(2);
-    const examplesOnly = args.includes('--examples-only') || args.includes('-e');
-    const resourcesOnly = args.includes('--resources-only') || args.includes('-r');
-    const syntaxOnly = args.includes('--syntax-only') || args.includes('-s');
     const showHelp = args.includes('--help') || args.includes('-h');
     const bearerToken = args.find(arg => !arg.startsWith('--') && !arg.startsWith('-'));
 
@@ -2346,37 +1981,14 @@ if (require.main === module) {
 Azure Resource Graph Schema Generator
 
 Usage:
-  node generate-arg-schema.js                     # Full generation from documentation
   node generate-arg-schema.js <bearer-token>      # Full generation using Azure API
-  node generate-arg-schema.js --examples-only     # Only refresh examples (faster)
-  node generate-arg-schema.js -e                  # Short form for examples-only
-  node generate-arg-schema.js --resources-only    # Only refresh resource tables and types
-  node generate-arg-schema.js -r                  # Short form for resources-only  
-  node generate-arg-schema.js --syntax-only       # Only refresh KQL syntax (operators, functions, aggregates)
-  node generate-arg-schema.js -s                  # Short form for syntax-only
-  node generate-arg-schema.js --help              # Show this help
 
 Options:
-  --examples-only, -e    Load existing schema and only refresh examples
-  --resources-only, -r   Load existing schema and only refresh resource tables/types
-  --syntax-only, -s      Load existing schema and only refresh KQL syntax elements
   --help, -h            Show this help message
 
 Examples:
-  node generate-arg-schema.js --examples-only
-  node generate-arg-schema.js --resources-only
-  node generate-arg-schema.js --syntax-only
   node generate-arg-schema.js eyJ0eXAiOiJKV1QiLCJhbGc...
         `);
-    } else if (examplesOnly) {
-        console.log('📚 Examples-only mode: Loading existing schema and refreshing examples...');
-        generator.generateExamplesOnly().catch(console.error);
-    } else if (resourcesOnly) {
-        console.log('🗂️ Resources-only mode: Loading existing schema and refreshing resource tables/types...');
-        generator.generateResourcesOnly().catch(console.error);
-    } else if (syntaxOnly) {
-        console.log('⚙️ Syntax-only mode: Loading existing schema and refreshing KQL syntax elements...');
-        generator.generateSyntaxOnly().catch(console.error);
     } else if (bearerToken && bearerToken.startsWith('Bearer ')) {
         console.log('🔑 Using provided bearer token for API-based generation...');
         generator.generateSchemaFromAPI(bearerToken.substring(7)).then(success => {
@@ -2392,8 +2004,7 @@ Examples:
             }
         }).catch(console.error);
     } else {
-        console.log('📖 Full generation from documentation (no bearer token provided)...');
-        generator.generateExamplesOnly().catch(console.error);
+        console.log('⚠️ No bearer token provided, generating documentation only...');
     }
 }
 

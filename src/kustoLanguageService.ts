@@ -684,7 +684,7 @@ export class KustoLanguageServiceProvider implements
         if (this.schema?.keywords) {
             for (const kw of this.schema.keywords) {
                 const item = new vscode.CompletionItem(kw.name, vscode.CompletionItemKind.Keyword);
-                item.detail = `Keyword - ${kw.category}`;
+                item.detail = `${kw.category}`;
                 item.insertText = kw.name;
 
                 // Use getKQLDocumentation for consistent documentation formatting
@@ -705,7 +705,7 @@ export class KustoLanguageServiceProvider implements
         if (this.schema?.operators) {
             for (const op of this.schema.operators) {
                 const item = new vscode.CompletionItem(op.name, vscode.CompletionItemKind.Function);
-                item.detail = `Operator - ${op.category}`;
+                item.detail = `${op.category}`;
                 item.insertText = op.name;
 
                 // Use getKQLDocumentation for consistent documentation formatting
@@ -735,7 +735,7 @@ export class KustoLanguageServiceProvider implements
         if (this.schema?.functions) {
             for (const fn of this.schema.functions) {
                 const item = new vscode.CompletionItem(fn.name, vscode.CompletionItemKind.Function);
-                item.detail = `Function - ${fn.category}`;
+                item.detail = `${fn.category}`;
 
                 // Create snippet for function parameters if available
                 if (fn.documentation?.parametersTable) {
