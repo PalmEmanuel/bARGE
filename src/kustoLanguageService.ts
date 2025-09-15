@@ -480,7 +480,7 @@ export class KustoLanguageServiceProvider implements
         const lineText = document.lineAt(position).text;
         const wordStart = wordRange.start.character;
         const wordEnd = wordRange.end.character;
-        const textAfterWord = lineText.substring(wordEnd).trim();
+        const textAfterWord = lineText.substring(wordEnd);
 
         const hoverInfo = this.getKQLHoverInfo(word, textAfterWord);
 
@@ -918,7 +918,8 @@ export class KustoLanguageServiceProvider implements
 
     private getKQLDocumentation(word: string, textAfterWord: string = '', textBeforeWord: string = ''): string | null {
         let lowerWord = word.toLowerCase();
-        const hasParentheses = textAfterWord.startsWith('(');
+        // Only consider it a function call if parentheses are immediately after the word (no space)
+        const hasImmediateParentheses = textAfterWord.startsWith('(');
         const isAfterPipe = /\|\s*$/.test(textBeforeWord);
 
         // Handle operator variants with ! prefix and ~ suffix
@@ -940,8 +941,17 @@ export class KustoLanguageServiceProvider implements
 
         // Check schema data first if available
         if (this.schemaData) {
-            // If we detect parentheses, prioritize function and aggregate matching
-            if (hasParentheses) {
+            // First check keywords (where, project, contains, and, or, etc.) regardless of parentheses
+            // Keywords should always be checked first as they're fundamental language constructs
+            if (this.schemaData.keywords) {
+                const keyword = this.schemaData.keywords.find((kw: any) => kw.name.toLowerCase() === baseOperatorName);
+                if (keyword) {
+                    return `**${keyword.name}** - ${keyword.category}`;
+                }
+            }
+
+            // If we detect immediate parentheses, prioritize function and aggregate matching
+            if (hasImmediateParentheses) {
                 let func = null;
 
                 // Check functions (includes all aggregates now)
@@ -998,14 +1008,6 @@ export class KustoLanguageServiceProvider implements
                 }
             }
 
-            // Check keywords first (where, project, contains, etc.) - only if no parentheses
-            if (!hasParentheses && this.schemaData.keywords) {
-                const keyword = this.schemaData.keywords.find((kw: any) => kw.name.toLowerCase() === baseOperatorName);
-                if (keyword) {
-                    return `**${keyword.name}** - ${keyword.category}`;
-                }
-            }
-
             // Check operators - operators don't use parentheses in their syntax
             if (this.schemaData.operators) {
                 // First try exact match (for operators like in~, !in~ that exist exactly in schema)
@@ -1058,9 +1060,9 @@ export class KustoLanguageServiceProvider implements
                 }
             }
 
-            // Only check functions if there are parentheses (function call syntax)
+            // Only check functions if there are immediate parentheses (function call syntax)
             // This prevents matching functions when the word appears as a keyword or operator
-            if (hasParentheses && this.schemaData.functions) {
+            if (hasImmediateParentheses && this.schemaData.functions) {
                 const func = this.schemaData.functions.find((fn: any) => fn.name.toLowerCase() === lowerWord);
                 if (func) {
                     // If we have enhanced documentation, use it
@@ -1296,40 +1298,40 @@ ${example2Code}
                 }
             }
 
-            // Check for potential operator typos using schema data
-            const operatorMatches = line.match(/\|\s*([a-zA-Z]+)/);
-            if (operatorMatches) {
-                const operator = operatorMatches[1];
-                if (!this.isValidOperator(operator)) {
-                    const range = new vscode.Range(
-                        i,
-                        line.indexOf(operator),
-                        i,
-                        line.indexOf(operator) + operator.length
-                    );
-                    const suggestions = this.getSimilarOperatorNames(operator);
-                    const message = suggestions.length > 0
-                        ? `Unknown operator '${operator}'. Did you mean: ${suggestions.join(', ')}?`
-                        : `Unknown operator '${operator}'`;
-                    diagnostics.push(new vscode.Diagnostic(
-                        range,
-                        message,
-                        vscode.DiagnosticSeverity.Warning
-                    ));
-                }
-            }
+            // // Check for potential operator typos using schema data
+            // const operatorMatches = line.match(/\|\s*([a-zA-Z]+)/);
+            // if (operatorMatches) {
+            //     const operator = operatorMatches[1];
+            //     if (!this.isValidOperator(operator)) {
+            //         const range = new vscode.Range(
+            //             i,
+            //             line.indexOf(operator),
+            //             i,
+            //             line.indexOf(operator) + operator.length
+            //         );
+            //         const suggestions = this.getSimilarOperatorNames(operator);
+            //         const message = suggestions.length > 0
+            //             ? `Unknown operator '${operator}'. Did you mean: ${suggestions.join(', ')}?`
+            //             : `Unknown operator '${operator}'`;
+            //         diagnostics.push(new vscode.Diagnostic(
+            //             range,
+            //             message,
+            //             vscode.DiagnosticSeverity.Warning
+            //         ));
+            //     }
+            // }
 
-            // Basic syntax checking
-            if (line.includes('|') && !line.match(/^\s*\|/)) {
-                // Line contains pipe but doesn't start with pipe - might be malformed
-                const pipeIndex = line.indexOf('|');
-                const range = new vscode.Range(i, pipeIndex, i, pipeIndex + 1);
-                diagnostics.push(new vscode.Diagnostic(
-                    range,
-                    'Consider starting operator lines with |',
-                    vscode.DiagnosticSeverity.Information
-                ));
-            }
+            // // Basic syntax checking
+            // if (line.includes('|') && !line.match(/^\s*\|/)) {
+            //     // Line contains pipe but doesn't start with pipe - might be malformed
+            //     const pipeIndex = line.indexOf('|');
+            //     const range = new vscode.Range(i, pipeIndex, i, pipeIndex + 1);
+            //     diagnostics.push(new vscode.Diagnostic(
+            //         range,
+            //         'Consider starting operator lines with |',
+            //         vscode.DiagnosticSeverity.Information
+            //     ));
+            // }
         }
 
         this.diagnosticCollection.set(document.uri, diagnostics);
@@ -1403,7 +1405,7 @@ ${example2Code}
 
         // Get both keyword and operator names from schema data since KQL commands can be either
         if (this.schemaData?.keywords) {
-            operatorNames.push(...this.schemaData.keywords);
+            operatorNames.push(...this.schemaData.keywords.map((kw: any) => kw.name));
         }
         if (this.schemaData?.operators) {
             operatorNames.push(...this.schemaData.operators.map((op: any) => op.name));

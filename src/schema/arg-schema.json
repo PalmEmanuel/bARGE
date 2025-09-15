@@ -15902,6 +15902,7 @@
     },
     {
       "name": "iif",
+      "category": "Function",
       "documentation": {
         "title": "iff()",
         "description": "Returns the *:::no-loc text=\"then\":::* value when the *:::no-loc text=\"if\":::* condition evaluates to `true`, otherwise it returns the *:::no-loc text=\"else\":::* value.\n\n> The `iff()` and `iif()` functions are equivalent.",
@@ -18533,6 +18534,7 @@
     },
     {
       "name": "merge_tdigest",
+      "category": "Function",
       "documentation": {
         "title": "merge_tdigest()",
         "description": "Merges `tdigest` results (scalar version of the aggregate version `tdigest_merge()`).\n\nRead more about the underlying algorithm (T-Digest) and the estimated error here.\n\n> The `merge_tdigest()` and `tdigest_merge()` functions are equivalent\n\n> \n>The results of tdigest() and tdigest_merge() can be stored and later retrieved. For example, you may want to create daily percentiles summary, which can then be used to calculate weekly percentiles.\n> However, the precise binary representation of these results may change over time. There's no guarantee that these functions will produce identical results for identical inputs, and therefore we don't advise relying on them.",
@@ -18714,6 +18716,7 @@
     },
     {
       "name": "tdigest_merge",
+      "category": "Function",
       "documentation": {
         "title": "tdigest_merge()",
         "description": "Merges tdigest results across the group.\n\nFor more information about the underlying algorithm (T-Digest) and the estimated error, see estimation error in percentiles.\n\n> The `tdigest_merge()` and `merge_tdigest()` functions are equivalent\n\n> \n>The results of tdigest() and tdigest_merge() can be stored and later retrieved. For example, you may want to create daily percentiles summary, which can then be used to calculate weekly percentiles.\n> However, the precise binary representation of these results may change over time. There's no guarantee that these functions will produce identical results for identical inputs, and therefore we don't advise relying on them.",
@@ -18782,5 +18785,5 @@
       }
     }
   ],
-  "lastUpdated": "2025-09-15T11:37:05.079Z"
+  "lastUpdated": "2025-09-15T12:02:48.812Z"
 }
