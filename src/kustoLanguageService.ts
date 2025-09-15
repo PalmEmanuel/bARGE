@@ -363,7 +363,7 @@ export class KustoLanguageServiceProvider implements
     }
 
     /**
-     * Get 'by' completion after 'order' operator
+     * Get 'by' completion after 'order' or 'sort' operator
      */
     private getOrderByCompletion(filter: string): vscode.CompletionItem[] {
         const items: vscode.CompletionItem[] = [];
