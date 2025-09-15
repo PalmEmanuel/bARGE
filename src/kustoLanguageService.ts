@@ -1395,13 +1395,13 @@ ${example2Code}
                 this,
                 '.', '|', ' ', '=', "'", '"', '(', ','
             ),
-            vscode.languages.registerHoverProvider(documentSelector, this),
-            vscode.languages.registerSignatureHelpProvider(
-                documentSelector,
-                this,
-                '(', ','
-            ),
-            vscode.languages.registerDocumentFormattingEditProvider(documentSelector, this)
+            vscode.languages.registerHoverProvider(documentSelector, this)
+            // vscode.languages.registerSignatureHelpProvider(
+            //     documentSelector,
+            //     this,
+            //     '(', ','
+            // ),
+            // vscode.languages.registerDocumentFormattingEditProvider(documentSelector, this)
         );
 
         // Set up diagnostics
