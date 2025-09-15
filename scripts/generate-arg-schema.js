@@ -1669,7 +1669,7 @@ class ARGSchemaGenerator {
                     "patterns": [
                         {
                             "name": "keyword.control.kql",
-                            "match": `(?i)(?<!\\w)(${operatorsPattern})(?!\\w?~)`
+                            "match": `(?i)(!?)\\b(${operatorsPattern})\\b(~?)`
                         }
                     ]
                 },
