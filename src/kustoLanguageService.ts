@@ -505,6 +505,8 @@ export class KustoLanguageServiceProvider implements
                     if (joinKind.rowsInfo) {
                         documentation.appendMarkdown(`**Rows**: ${joinKind.rowsInfo}\n\n`);
                     }
+
+                    documentation.appendMarkdown(`[Details on Microsoft Learn](https://learn.microsoft.com/en-us/kusto/query/join-operator?wt.mc_id=DT-MVP-5005372)`);
                     
                     item.documentation = documentation;
                     
@@ -1152,6 +1154,8 @@ export class KustoLanguageServiceProvider implements
                     if (joinKind.rowsInfo) {
                         hoverContent += `### Rows\n\n${joinKind.rowsInfo}\n\n`;
                     }
+
+                    hoverContent += `[Details on Microsoft Learn](https://learn.microsoft.com/en-us/kusto/query/join-operator?wt.mc_id=DT-MVP-5005372)`;
                     
                     return hoverContent;
                 }
