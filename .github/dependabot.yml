@@ -8,7 +8,7 @@ updates:
       day: "saturday"
       time: "09:00"
     commit-message:
-      prefix: "dev: Bump "
+      prefix: "deps: "
     labels:
       - "dependencies"
 
@@ -20,6 +20,6 @@ updates:
       day: "saturday"
       time: "09:00"
     commit-message:
-      prefix: "dev: Bump "
+      prefix: "deps: "
     labels:
       - "dependencies"
