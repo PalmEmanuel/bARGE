@@ -2150,7 +2150,7 @@ Examples:
             }
         }).catch(console.error);
     } else {
-        console.log('⚠️ No bearer token provided, generating documentation only...');
+        console.log('⚠️ No bearer token provided!');
     }
 }
 
