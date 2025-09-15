@@ -1,0 +1,183 @@
+{
+  "name": "Azure Resource Graph KQL",
+  "scopeName": "source.kql.arg",
+  "fileTypes": [
+    "kql"
+  ],
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#function_calls"
+    },
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#operators"
+    },
+    {
+      "include": "#functions"
+    },
+    {
+      "include": "#tables"
+    },
+    {
+      "include": "#properties"
+    },
+    {
+      "include": "#numbers"
+    },
+    {
+      "include": "#columns"
+    },
+    {
+      "include": "#strings"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.kql",
+          "match": "//.*$"
+        },
+        {
+          "name": "comment.block.kql",
+          "begin": "/\\*",
+          "end": "\\*/"
+        }
+      ]
+    },
+    "function_calls": {
+      "patterns": [
+        {
+          "name": "support.function.builtin.kql",
+          "match": "(?i)\\b(abs|acos|ago|around|array_concat|array_iff|array_index_of|array_length|array_reverse|array_rotate_left|array_rotate_right|array_shift_left|array_shift_right|array_slice|array_sort_asc|array_sort_desc|array_split|array_sum|asin|assert|atan|atan2|base64_decode_toarray|base64_decode_toguid|base64_decode_tostring|base64_encode_fromarray|base64_encode_fromguid|base64_encode_tostring|beta_cdf|beta_inv|beta_pdf|bin|binary_and|binary_not|binary_or|binary_shift_left|binary_shift_right|binary_xor|bitset_count_ones|case|ceiling|cluster|coalesce|column_ifexists|column_names_of|convert_angle|convert_energy|convert_force|convert_length|convert_mass|convert_speed|convert_temperature|convert_volume|cos|cot|countof|current_cluster_endpoint|current_database|current_principal|current_principal_details|current_principal_is_member_of|cursor_after|cursor_before_or_at|datetime_add|datetime_diff|datetime_local_to_utc|datetime_part|datetime_utc_to_local|dcount_hll|degrees|dynamic_to_json|endofday|endofmonth|endofweek|endofyear|erf|erfc|estimate_data_size|exp|exp10|exp2|extent_id|extent_tags|extract|extract_all|extract_json|floor|format_bytes|format_datetime|format_ipv4|format_ipv4_mask|format_timespan|gamma|gettype|getyear|graph|has_any_index|has_any_ipv4|has_any_ipv4_prefix|has_ipv4|has_ipv4_prefix|hash|hash_combine|hash_many|hash_md5|hash_sha1|hash_sha256|hash_xxhash64|iff|iif|indexof|indexof_regex|ingestion_time|ipv4_compare|ipv4_is_in_any_range|ipv4_is_in_range|ipv4_is_match|ipv4_is_private|ipv4_netmask_suffix|ipv4_range_to_cidr_list|ipv6_compare|ipv6_is_in_any_range|ipv6_is_in_range|ipv6_is_match|isempty|isfinite|isinf|isnan|isnotempty|isutf8|jaccard_index|make_datetime|make_timespan|max_of|merge_tdigest|min_of|monthofyear|new_guid|next|not|now|parse_command_line|parse_csv|parse_ipv4|parse_ipv4_mask|parse_ipv6|parse_ipv6_mask|parse_json|parse_path|parse_url|parse_user_agent|parse_version|parse_xml|percentile_tdigest|percentrank_tdigest|pi|pow|prev|radians|rand|range|regex_quote|repeat|replace_regex|replace_string|replace_strings|reverse|round|row_cumsum|row_number|row_rank_dense|row_rank_min|row_window_session|series_abs|series_acos|series_add|series_asin|series_atan|series_ceiling|series_cos|series_cosine_similarity|series_decompose|series_decompose_anomalies|series_decompose_forecast|series_divide|series_dot_product|series_equals|series_exp|series_fft|series_fill_backward|series_fill_const|series_fill_forward|series_fill_linear|series_fir|series_fit_2lines|series_fit_2lines_dynamic|series_fit_line|series_fit_line_dynamic|series_fit_poly|series_floor|series_greater|series_greater_equals|series_ifft|series_iir|series_less|series_less_equals|series_magnitude|series_multiply|series_not_equals|series_outliers|series_pearson_correlation|series_periods_detect|series_periods_validate|series_pow|series_product|series_seasonal|series_sign|series_sin|series_stats|series_stats_dynamic|series_subtract|series_sum|series_tan|sign|sin|split|sqrt|startofday|startofmonth|startofweek|startofyear|stored_query_result|strcat|strcat_array|strcat_delim|strcmp|string_size|strlen|strrep|substring|tan|tdigest_merge|tobool|todatetime|todecimal|toguid|tohex|toint|tolong|tolower|toreal|tostring|totimespan|toupper|translate|treepath|trim|trim_end|trim_start|unicode_codepoints_from_string|unicode_codepoints_to_string|unixtime_microseconds_todatetime|unixtime_milliseconds_todatetime|unixtime_nanoseconds_todatetime|unixtime_seconds_todatetime|url_decode|url_encode|url_encode_component|week_of_year|welch_test|zip|arg_max|arg_min|avg|avgif|binary_all_and|binary_all_or|binary_all_xor|count|count_distinct|count_distinctif|countif|covariance|covarianceif|covariancep|covariancepif|dcount|dcountif|hll|make_bag|make_bag_if|make_list|make_list_if|make_set|make_set_if|max|maxif|merge_tdigest|min|minif|percentiles|percentilesw|stdev|stdevif|stdevp|sum|sumif|take_any|take_anyif|tdigest|tdigest_merge|variance|varianceif|variancep|variancepif)(?=\\s*\\()"
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.other.kql",
+          "match": "(?i)\\b(accumulate|and|anomalychart|areachart|asc|barchart|best_effort|bool|boolean|by|byte|cancel|card|char|columnchart|cycles|date|datetime|decimal|default|desc|double|dynamic|earliest|edges|external_data|filter|first|flags|float|from|granny-asc|granny-desc|graph-where-edges|graph-where-nodes|guid|id|int|int16|int32|int64|int8|isfuzzy|journal|kind|ladderchart|last|latest|linechart|long|of|on|optional|or|output|pathformat|piechart|pivotchart|plotly|project-smart|real|regex|relaxed|restrict|scatterchart|stackedareachart|string|time|timechart|timeline|timepivot|timespan|title|to|toscalar|treemap|typeof|uint|uint16|uint32|uint64|uint8|ulong|uuid)\\b"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.control.kql",
+          "match": "(?i)(!?)\\b(as|between|consume|contains_cs|contains|count|datatable|distinct|endswith_cs|endswith|equals-cs|equals|evaluate|extend|externaldata|facet|find|fork|getschema|graph-mark-components|graph-match|graph-shortest-paths|graph-to-table|has_all|has_any|has_cs|has|hasprefix_cs|hasprefix|hassuffix_cs|hassuffix|in|in~|invoke|join|lookup|macro-expand|make-graph|make-series|matches regex|mv-apply|mv-expand|\\!between|\\!contains_cs|\\!contains|notcontains|\\!endswith_cs|\\!endswith|not-equals-cs|not-equals|\\!has_cs|\\!has|\\!hasprefix_cs|\\!hasprefix|\\!hassuffix_cs|\\!hassuffix|\\!in|\\!in~|\\!startswith_cs|\\!startswith|parse-kv|parse|parse-where|partition|print|project-away|project-by-names|project-keep|project|project-rename|project-reorder|range|reduce|render|sample-distinct|sample|scan|search|serialize|order|sort|startswith_cs|startswith|summarize|limit|take|top-hitters|top-nested|top|union|where)\\b(~?)"
+        }
+      ]
+    },
+    "functions": {
+      "patterns": [
+        {
+          "name": "support.function.builtin.kql",
+          "match": "(?i)\\b(abs|acos|ago|around|array_concat|array_iff|array_index_of|array_length|array_reverse|array_rotate_left|array_rotate_right|array_shift_left|array_shift_right|array_slice|array_sort_asc|array_sort_desc|array_split|array_sum|asin|assert|atan|atan2|base64_decode_toarray|base64_decode_toguid|base64_decode_tostring|base64_encode_fromarray|base64_encode_fromguid|base64_encode_tostring|beta_cdf|beta_inv|beta_pdf|binary_and|binary_not|binary_or|binary_shift_left|binary_shift_right|binary_xor|bitset_count_ones|case|ceiling|cluster|coalesce|column_ifexists|column_names_of|convert_angle|convert_energy|convert_force|convert_length|convert_mass|convert_speed|convert_temperature|convert_volume|cos|cot|countof|current_cluster_endpoint|current_database|current_principal|current_principal_details|current_principal_is_member_of|cursor_after|cursor_before_or_at|datetime_add|datetime_diff|datetime_local_to_utc|datetime_part|datetime_utc_to_local|dcount_hll|degrees|dynamic_to_json|endofday|endofmonth|endofweek|endofyear|erf|erfc|estimate_data_size|exp|exp10|exp2|extent_id|extent_tags|extract|extract_all|extract_json|floor|format_bytes|format_datetime|format_ipv4|format_ipv4_mask|format_timespan|gamma|gettype|getyear|has_any_index|has_any_ipv4|has_any_ipv4_prefix|has_ipv4|has_ipv4_prefix|hash|hash_combine|hash_many|hash_md5|hash_sha1|hash_sha256|hash_xxhash64|iff|iif|indexof|indexof_regex|ingestion_time|ipv4_compare|ipv4_is_in_any_range|ipv4_is_in_range|ipv4_is_match|ipv4_is_private|ipv4_netmask_suffix|ipv4_range_to_cidr_list|ipv6_compare|ipv6_is_in_any_range|ipv6_is_in_range|ipv6_is_match|isempty|isfinite|isinf|isnan|isnotempty|isutf8|jaccard_index|make_datetime|make_timespan|max_of|merge_tdigest|min_of|monthofyear|new_guid|next|not|now|parse_command_line|parse_csv|parse_ipv4|parse_ipv4_mask|parse_ipv6|parse_ipv6_mask|parse_json|parse_path|parse_url|parse_user_agent|parse_version|parse_xml|percentile_tdigest|percentrank_tdigest|pi|pow|prev|radians|rand|regex_quote|repeat|replace_regex|replace_string|replace_strings|reverse|round|row_cumsum|row_number|row_rank_dense|row_rank_min|row_window_session|series_abs|series_acos|series_add|series_asin|series_atan|series_ceiling|series_cos|series_cosine_similarity|series_decompose|series_decompose_anomalies|series_decompose_forecast|series_divide|series_dot_product|series_equals|series_exp|series_fft|series_fill_backward|series_fill_const|series_fill_forward|series_fill_linear|series_fir|series_fit_2lines|series_fit_2lines_dynamic|series_fit_line|series_fit_line_dynamic|series_fit_poly|series_floor|series_greater|series_greater_equals|series_ifft|series_iir|series_less|series_less_equals|series_magnitude|series_multiply|series_not_equals|series_outliers|series_pearson_correlation|series_periods_detect|series_periods_validate|series_pow|series_product|series_seasonal|series_sign|series_sin|series_stats|series_stats_dynamic|series_subtract|series_sum|series_tan|sign|sin|split|sqrt|startofday|startofmonth|startofweek|startofyear|stored_query_result|strcat|strcat_array|strcat_delim|strcmp|string_size|strlen|strrep|substring|tan|tdigest_merge|tobool|todatetime|todecimal|toguid|tohex|toint|tolong|tolower|toreal|tostring|totimespan|toupper|translate|treepath|trim|trim_end|trim_start|unicode_codepoints_from_string|unicode_codepoints_to_string|unixtime_microseconds_todatetime|unixtime_milliseconds_todatetime|unixtime_nanoseconds_todatetime|unixtime_seconds_todatetime|url_decode|url_encode|url_encode_component|week_of_year|welch_test|zip|arg_max|arg_min|avg|avgif|binary_all_and|binary_all_or|binary_all_xor|count_distinct|count_distinctif|countif|covariance|covarianceif|covariancep|covariancepif|dcount|dcountif|hll|make_bag|make_bag_if|make_list|make_list_if|make_set|make_set_if|max|maxif|merge_tdigest|min|minif|percentiles|percentilesw|stdev|stdevif|stdevp|sum|sumif|take_any|take_anyif|tdigest|tdigest_merge|variance|varianceif|variancep|variancepif)\\b"
+        }
+      ]
+    },
+    "tables": {
+      "patterns": [
+        {
+          "name": "support.class.table.kql",
+          "match": "(?i)\\b(advisorresources|aksresources|alertsmanagementresources|appserviceresources|authorizationresources|awsresources|azurebusinesscontinuityresources|azuredevopsplatformresources|batchresources|capabilityresources|chaosresources|communitygalleryresources|computeresources|containerserviceeventresources|deploymentresources|desktopvirtualizationresources|dnsresources|edgeorderresources|elasticsanresources|extendedlocationresources|extensibilityresourcechanges|featureresources|gcpresources|guestconfigurationresources|healthresourcechanges|healthresources|impactreportresources|insightsresources|iotsecurityresources|kubernetesconfigurationresources|kustoresources|machinesinventoryinsightsresources|maintenanceresourcechanges|maintenanceresources|managedservicesresources|migrateresources|networkresourcechanges|networkresources|orbitalresources|patchassessmentresources|patchinstallationresources|policyresources|quotaresourcechanges|recoveryservicesresources|resourcechanges|resourcecontainerchanges|resourcecontainers|resources|securityresources|servicefabricresources|servicehealthresources|sharedgalleryresources|spotresources|tagsresources)\\b"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.verbatim.kql",
+          "begin": "@\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.kql",
+              "match": "\"\""
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.double.kql",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.kql",
+              "match": "\\\\."
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.single.kql",
+          "begin": "'",
+          "end": "'",
+          "patterns": [
+            {
+              "name": "constant.character.escape.kql",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.kql",
+          "match": "\\b([0-9]+\\.?[0-9]*([eE][+-]?[0-9]+)?[fdm]?)\\b"
+        },
+        {
+          "name": "constant.numeric.hex.kql",
+          "match": "\\b0[xX][0-9a-fA-F]+\\b"
+        }
+      ]
+    },
+    "columns": {
+      "patterns": [
+        {
+          "name": "variable.other.column.assignment.kql",
+          "match": "(?i)(?<!\\.)\\b\\w+(?=\\s*=|\\s*\\.)"
+        },
+        {
+          "name": "variable.other.column.first.kql",
+          "match": "(?i)(?<=\\b(?:as|between|consume|contains_cs|contains|count|datatable|distinct|endswith_cs|endswith|equals-cs|equals|evaluate|extend|externaldata|facet|find|fork|getschema|graph-mark-components|graph-match|graph-shortest-paths|graph-to-table|has_all|has_any|has_cs|has|hasprefix_cs|hasprefix|hassuffix_cs|hassuffix|in|in~|invoke|join|lookup|macro-expand|make-graph|make-series|matches regex|mv-apply|mv-expand|\\!between|\\!contains_cs|\\!contains|notcontains|\\!endswith_cs|\\!endswith|not-equals-cs|not-equals|\\!has_cs|\\!has|\\!hasprefix_cs|\\!hasprefix|\\!hassuffix_cs|\\!hassuffix|\\!in|\\!in~|\\!startswith_cs|\\!startswith|parse-kv|parse|parse-where|partition|print|project-away|project-by-names|project-keep|project|project-rename|project-reorder|range|reduce|render|sample-distinct|sample|scan|search|serialize|order|sort|startswith_cs|startswith|summarize|limit|take|top-hitters|top-nested|top|union|where|accumulate|and|anomalychart|areachart|asc|barchart|best_effort|bin|bool|boolean|by|byte|cancel|card|char|columnchart|cycles|date|datetime|decimal|default|desc|double|dynamic|earliest|edges|external_data|filter|first|flags|float|from|granny-asc|granny-desc|graph|graph-where-edges|graph-where-nodes|guid|id|int|int16|int32|int64|int8|isfuzzy|journal|kind|ladderchart|last|latest|linechart|long|of|on|optional|or|output|pathformat|piechart|pivotchart|plotly|project-smart|real|regex|relaxed|restrict|scatterchart|stackedareachart|string|time|timechart|timeline|timepivot|timespan|title|to|toscalar|treemap|typeof|uint|uint16|uint32|uint64|uint8|ulong|uuid)\\s+)(?<!\\.)\\w+(?=\\s*[,|\\.]|\\s*$)"
+        },
+        {
+          "name": "variable.other.column.between.kql",
+          "match": "(?i)(?<=\\b(?:as|between|consume|contains_cs|contains|count|datatable|distinct|endswith_cs|endswith|equals-cs|equals|evaluate|extend|externaldata|facet|find|fork|getschema|graph-mark-components|graph-match|graph-shortest-paths|graph-to-table|has_all|has_any|has_cs|has|hasprefix_cs|hasprefix|hassuffix_cs|hassuffix|in|in~|invoke|join|lookup|macro-expand|make-graph|make-series|matches regex|mv-apply|mv-expand|\\!between|\\!contains_cs|\\!contains|notcontains|\\!endswith_cs|\\!endswith|not-equals-cs|not-equals|\\!has_cs|\\!has|\\!hasprefix_cs|\\!hasprefix|\\!hassuffix_cs|\\!hassuffix|\\!in|\\!in~|\\!startswith_cs|\\!startswith|parse-kv|parse|parse-where|partition|print|project-away|project-by-names|project-keep|project|project-rename|project-reorder|range|reduce|render|sample-distinct|sample|scan|search|serialize|order|sort|startswith_cs|startswith|summarize|limit|take|top-hitters|top-nested|top|union|where|accumulate|and|anomalychart|areachart|asc|barchart|best_effort|bin|bool|boolean|by|byte|cancel|card|char|columnchart|cycles|date|datetime|decimal|default|desc|double|dynamic|earliest|edges|external_data|filter|first|flags|float|from|granny-asc|granny-desc|graph|graph-where-edges|graph-where-nodes|guid|id|int|int16|int32|int64|int8|isfuzzy|journal|kind|ladderchart|last|latest|linechart|long|of|on|optional|or|output|pathformat|piechart|pivotchart|plotly|project-smart|real|regex|relaxed|restrict|scatterchart|stackedareachart|string|time|timechart|timeline|timepivot|timespan|title|to|toscalar|treemap|typeof|uint|uint16|uint32|uint64|uint8|ulong|uuid)\\s+)(?<!\\.)\\w+(?=\\s+(?:as|between|consume|contains_cs|contains|count|datatable|distinct|endswith_cs|endswith|equals-cs|equals|evaluate|extend|externaldata|facet|find|fork|getschema|graph-mark-components|graph-match|graph-shortest-paths|graph-to-table|has_all|has_any|has_cs|has|hasprefix_cs|hasprefix|hassuffix_cs|hassuffix|in|in~|invoke|join|lookup|macro-expand|make-graph|make-series|matches regex|mv-apply|mv-expand|\\!between|\\!contains_cs|\\!contains|notcontains|\\!endswith_cs|\\!endswith|not-equals-cs|not-equals|\\!has_cs|\\!has|\\!hasprefix_cs|\\!hasprefix|\\!hassuffix_cs|\\!hassuffix|\\!in|\\!in~|\\!startswith_cs|\\!startswith|parse-kv|parse|parse-where|partition|print|project-away|project-by-names|project-keep|project|project-rename|project-reorder|range|reduce|render|sample-distinct|sample|scan|search|serialize|order|sort|startswith_cs|startswith|summarize|limit|take|top-hitters|top-nested|top|union|where|accumulate|and|anomalychart|areachart|asc|barchart|best_effort|bin|bool|boolean|by|byte|cancel|card|char|columnchart|cycles|date|datetime|decimal|default|desc|double|dynamic|earliest|edges|external_data|filter|first|flags|float|from|granny-asc|granny-desc|graph|graph-where-edges|graph-where-nodes|guid|id|int|int16|int32|int64|int8|isfuzzy|journal|kind|ladderchart|last|latest|linechart|long|of|on|optional|or|output|pathformat|piechart|pivotchart|plotly|project-smart|real|regex|relaxed|restrict|scatterchart|stackedareachart|string|time|timechart|timeline|timepivot|timespan|title|to|toscalar|treemap|typeof|uint|uint16|uint32|uint64|uint8|ulong|uuid)\\b|\\s*\\.)"
+        },
+        {
+          "name": "variable.other.column.after.paren.kql",
+          "match": "(?i)(?<=\\(\\s*)(?<!\\.)\\w+(?=\\s+(?:as|between|consume|contains_cs|contains|count|datatable|distinct|endswith_cs|endswith|equals-cs|equals|evaluate|extend|externaldata|facet|find|fork|getschema|graph-mark-components|graph-match|graph-shortest-paths|graph-to-table|has_all|has_any|has_cs|has|hasprefix_cs|hasprefix|hassuffix_cs|hassuffix|in|in~|invoke|join|lookup|macro-expand|make-graph|make-series|matches regex|mv-apply|mv-expand|\\!between|\\!contains_cs|\\!contains|notcontains|\\!endswith_cs|\\!endswith|not-equals-cs|not-equals|\\!has_cs|\\!has|\\!hasprefix_cs|\\!hasprefix|\\!hassuffix_cs|\\!hassuffix|\\!in|\\!in~|\\!startswith_cs|\\!startswith|parse-kv|parse|parse-where|partition|print|project-away|project-by-names|project-keep|project|project-rename|project-reorder|range|reduce|render|sample-distinct|sample|scan|search|serialize|order|sort|startswith_cs|startswith|summarize|limit|take|top-hitters|top-nested|top|union|where|accumulate|and|anomalychart|areachart|asc|barchart|best_effort|bin|bool|boolean|by|byte|cancel|card|char|columnchart|cycles|date|datetime|decimal|default|desc|double|dynamic|earliest|edges|external_data|filter|first|flags|float|from|granny-asc|granny-desc|graph|graph-where-edges|graph-where-nodes|guid|id|int|int16|int32|int64|int8|isfuzzy|journal|kind|ladderchart|last|latest|linechart|long|of|on|optional|or|output|pathformat|piechart|pivotchart|plotly|project-smart|real|regex|relaxed|restrict|scatterchart|stackedareachart|string|time|timechart|timeline|timepivot|timespan|title|to|toscalar|treemap|typeof|uint|uint16|uint32|uint64|uint8|ulong|uuid)\\b|\\s*\\.)"
+        },
+        {
+          "name": "variable.other.column.function.kql",
+          "match": "(?i)(?<=\\()\\s*(?<!\\.)\\w+(?=\\s*[,)\\.])"
+        },
+        {
+          "name": "variable.other.column.function.kql",
+          "match": "(?i)(?<=,\\s*)(?<!\\.)\\w+(?=\\s*[,)\\.])"
+        },
+        {
+          "name": "variable.other.column.kql",
+          "match": "(?i)(?<=,\\s*)(?<!\\.)\\w+(?=\\s*[,|\\.]|\\s*$)"
+        }
+      ]
+    },
+    "properties": {
+      "patterns": [
+        {
+          "name": "meta.other.property.kql",
+          "match": "\\.[a-zA-Z_][a-zA-Z0-9_]*"
+        }
+      ]
+    }
+  }
+}
