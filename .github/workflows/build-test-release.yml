@@ -130,6 +130,15 @@ jobs:
           excludeScopes: dev, test, release
           useGitmojis: false
 
+      - name: Trim Issue Reference Gitmojis from CHANGELOG
+        if: steps.changelog.outputs.changes != ''
+        shell: pwsh
+        run: | # powershell
+          $ChangelogContent = Get-Content 'CHANGELOG.md' -Raw
+          # Replace ':arrow_lower_right:' with nothing
+          $TrimmedContent = $ChangelogContent -replace ':arrow_lower_right: ', ''
+          Set-Content -Path 'CHANGELOG.md' -Value $TrimmedContent -NoNewline
+
       - name: Publish to VS Code Marketplace
         shell: pwsh
         run: | # powershell
