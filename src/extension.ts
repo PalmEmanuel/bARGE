@@ -1,9 +1,8 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { AzureService } from './azure/azureService';
 import { BargePanel } from './bargePanel';
 import { StatusBarManager } from './statusBar';
+import { KustoLanguageServiceProvider } from './kustoLanguageService';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -163,6 +162,10 @@ export function activate(context: vscode.ExtensionContext) {
 		authenticateCommand,
 		statusBar // Add status bar for proper cleanup
 	);
+
+	// Register enhanced Kusto language service (includes hover, completion, signature help, formatting)
+	const kustoLanguageService = new KustoLanguageServiceProvider();
+	kustoLanguageService.register(context);
 
 	// Auto-authenticate if configured
 	const config = vscode.workspace.getConfiguration('barge');

@@ -154,6 +154,13 @@
         "configuration": "./language-configuration.json"
       }
     ],
+    "grammars": [
+      {
+        "language": "kql",
+        "scopeName": "source.kql.arg",
+        "path": "./syntaxes/kql.tmLanguage.json"
+      }
+    ],
     "configuration": {
       "title": "bARGE",
       "properties": {
@@ -179,6 +186,7 @@
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
     "test": "vscode-test",
+    "generate-schema": "node scripts/generate-arg-schema.js",
     "commit-lint": "commitlint --from=HEAD~1 --to=HEAD --verbose",
     "commit-lint-ci": "commitlint --from=origin/main --to=HEAD --verbose",
     "prepare": "husky"
@@ -194,6 +202,7 @@
     "@typescript-eslint/parser": "^8.39.0",
     "@vscode/test-cli": "^0.0.11",
     "@vscode/test-electron": "^2.5.2",
+    "@kusto/language-service-next": "^12.2.0",
     "esbuild": "^0.25.8",
     "eslint": "^9.32.0",
     "husky": "^9.1.7",
