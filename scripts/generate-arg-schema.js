@@ -9,6 +9,7 @@
 const https = require('https');
 const fs = require('fs').promises;
 const path = require('path');
+const { URL } = require('url');
 
 const isNotARG = (item) => {
     // Filter out items not available in Azure Resource Graph
@@ -323,7 +324,13 @@ class ARGSchemaGenerator {
                 }
 
                 // Handle rate limiting specifically for GitHub API
-                if (res.statusCode === 403 && url.includes('api.github.com')) {
+                let isGithubApiHost = false;
+                try {
+                    isGithubApiHost = (new URL(url).hostname === 'api.github.com');
+                } catch (e) {
+                    // If the URL cannot be parsed, do not treat as GitHub API host
+                }
+                if (res.statusCode === 403 && isGithubApiHost) {
                     const resetTime = res.headers['x-ratelimit-reset'];
                     const rateLimitRemaining = res.headers['x-ratelimit-remaining'];
 
