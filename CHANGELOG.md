@@ -6,15 +6,14 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [v1.1.0] - 2025-09-15
 ### New Features
-- [`9d27895`](https://github.com/PalmEmanuel/bARGE/commit/9d27895ac7f287d43df018f905e9b5312919333e) - Add documentation links for join operator kinds in hover and completion items *(PR [#100](https://github.com/PalmEmanuel/bARGE/pull/100) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
 - [`5345188`](https://github.com/PalmEmanuel/bARGE/commit/5345188dfb9d4829b050a1322cce87a945274df0) - Add full syntax highlighting, intellisense with hover, completions and documentation of KQL *(PR [#98](https://github.com/PalmEmanuel/bARGE/pull/98) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
-  - :arrow_lower_right: *addresses issue [#74](https://github.com/PalmEmanuel/bARGE/issues/74) opened by [@PalmEmanuel](https://github.com/PalmEmanuel)*
+  - *addresses issue [#74](https://github.com/PalmEmanuel/bARGE/issues/74) opened by [@PalmEmanuel](https://github.com/PalmEmanuel)*
 - [`9cb585d`](https://github.com/PalmEmanuel/bARGE/commit/9cb585d0d22afdb654c0aefbd2234e0875d25ada) - Added buttons to editor bar to run selected or file query commands *(PR [#97](https://github.com/PalmEmanuel/bARGE/pull/97) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
-  - :arrow_lower_right: *addresses issue [#96](https://github.com/PalmEmanuel/bARGE/issues/96) opened by [@gummigroda](https://github.com/gummigroda)*
+  - *addresses issue [#96](https://github.com/PalmEmanuel/bARGE/issues/96) opened by [@gummigroda](https://github.com/gummigroda)*
 
 ### Bug Fixes
 - [`259f8a6`](https://github.com/PalmEmanuel/bARGE/commit/259f8a6c0796ebddac4a7f3777d52c08499aeb3f) - **panel**: Improved formatting for query execution date and time in results view *(PR [#83](https://github.com/PalmEmanuel/bARGE/pull/83) by [@Copilot](https://github.com/apps/copilot-swe-agent))*
-  - :arrow_lower_right: *fixes issue [#75](https://github.com/PalmEmanuel/bARGE/issues/75) opened by [@PalmEmanuel](https://github.com/PalmEmanuel)*
+  - *fixes issue [#75](https://github.com/PalmEmanuel/bARGE/issues/75) opened by [@PalmEmanuel](https://github.com/PalmEmanuel)*
 
 
 ## [v1.0.1] - 2025-09-09
