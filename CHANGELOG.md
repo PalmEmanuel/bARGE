@@ -4,6 +4,18 @@ All notable changes to the bARGE Visual Studio Code extension will be documented
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [v1.1.0] - 2025-09-15
+### New Features
+- [`5345188`](https://github.com/PalmEmanuel/bARGE/commit/5345188dfb9d4829b050a1322cce87a945274df0) - Add full syntax highlighting, intellisense with hover, completions and documentation of KQL *(PR [#98](https://github.com/PalmEmanuel/bARGE/pull/98) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
+  - *addresses issue [#74](https://github.com/PalmEmanuel/bARGE/issues/74) opened by [@PalmEmanuel](https://github.com/PalmEmanuel)*
+- [`9cb585d`](https://github.com/PalmEmanuel/bARGE/commit/9cb585d0d22afdb654c0aefbd2234e0875d25ada) - Added buttons to editor bar to run selected or file query commands *(PR [#97](https://github.com/PalmEmanuel/bARGE/pull/97) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
+  - *addresses issue [#96](https://github.com/PalmEmanuel/bARGE/issues/96) opened by [@gummigroda](https://github.com/gummigroda)*
+
+### Bug Fixes
+- [`259f8a6`](https://github.com/PalmEmanuel/bARGE/commit/259f8a6c0796ebddac4a7f3777d52c08499aeb3f) - **panel**: Improved formatting for query execution date and time in results view *(PR [#83](https://github.com/PalmEmanuel/bARGE/pull/83) by [@Copilot](https://github.com/apps/copilot-swe-agent))*
+  - *fixes issue [#75](https://github.com/PalmEmanuel/bARGE/issues/75) opened by [@PalmEmanuel](https://github.com/PalmEmanuel)*
+
+
 ## [v1.0.1] - 2025-09-09
 ### Bug Fixes
 - [`345c700`](https://github.com/PalmEmanuel/bARGE/commit/345c7007b0e8e711701605a3d1d39e23c34dd040) - **panel**: Column order is now preserved from query and comparison view updates when re-ordering *(PR [#78](https://github.com/PalmEmanuel/bARGE/pull/78) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
@@ -139,3 +151,4 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 Initial release of bARGE, supporting basic functionality for logging in using [DefaultAzureCredential](https://learn.microsoft.com/en-us/javascript/api/@azure/identity/defaultazurecredential?view=azure-node-latest), running queries and displaying results in a table.
 [v1.0.0]: https://github.com/PalmEmanuel/bARGE/compare/v0.0.13...v1.0.0
 [v1.0.1]: https://github.com/PalmEmanuel/bARGE/compare/v1.0.0...v1.0.1
+[v1.1.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.0.1...v1.1.0
