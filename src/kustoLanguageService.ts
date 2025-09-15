@@ -1419,8 +1419,6 @@ ${example2Code}
 
         // Add all disposables to context
         context.subscriptions.push(...this.disposables);
-
-        console.log('Enhanced Kusto Language Service registered for bARGE');
     }
 
     /**
