@@ -4,6 +4,13 @@ All notable changes to the bARGE Visual Studio Code extension will be documented
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [v1.0.1] - 2025-09-09
+### Bug Fixes
+- [`345c700`](https://github.com/PalmEmanuel/bARGE/commit/345c7007b0e8e711701605a3d1d39e23c34dd040) - **panel**: Column order is now preserved from query and comparison view updates when re-ordering *(PR [#78](https://github.com/PalmEmanuel/bARGE/pull/78) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
+
+### Chores
+
+
 ## [v1.0.0] - 2025-09-08
 ### New Features
 - [`24b0471`](https://github.com/PalmEmanuel/bARGE/commit/24b0471f8283eab1422cce862831338f7a4a8cf2) - **panel**: Improved loading animation with dark & light mode support *(PR [#70](https://github.com/PalmEmanuel/bARGE/pull/70) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
@@ -131,3 +138,4 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 Initial release of bARGE, supporting basic functionality for logging in using [DefaultAzureCredential](https://learn.microsoft.com/en-us/javascript/api/@azure/identity/defaultazurecredential?view=azure-node-latest), running queries and displaying results in a table.
 [v1.0.0]: https://github.com/PalmEmanuel/bARGE/compare/v0.0.13...v1.0.0
+[v1.0.1]: https://github.com/PalmEmanuel/bARGE/compare/v1.0.0...v1.0.1
