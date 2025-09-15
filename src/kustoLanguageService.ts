@@ -102,7 +102,8 @@ export class KustoLanguageServiceProvider implements
         }
 
         // In function context - suggest functions
-        else if (this.isInFunctionContext(linePrefix)) {
+        else if (this.isAfterOperator(linePrefix)) {
+            suggestions.push(...this.getCommonColumns(lowerCurrentWord));
             suggestions.push(...this.filterCompletionItems(this.getKQLFunctions(), lowerCurrentWord));
         }
 
@@ -173,7 +174,7 @@ export class KustoLanguageServiceProvider implements
         // Count quotes to determine if we're inside them
         const singleQuotes = (linePrefix.match(/'/g) || []).length;
         const doubleQuotes = (linePrefix.match(/"/g) || []).length;
-        
+
         // If odd number of quotes, we're inside quotes
         return (singleQuotes % 2 === 1) || (doubleQuotes % 2 === 1);
     }
@@ -184,10 +185,10 @@ export class KustoLanguageServiceProvider implements
     private getResourceTypeReplacementRange(document: vscode.TextDocument, position: vscode.Position, insideQuotes: boolean): vscode.Range | undefined {
         const line = document.lineAt(position).text;
         const linePrefix = line.substring(0, position.character);
-        
+
         // Find the start of the current resource type being typed
         let startPos = position.character;
-        
+
         if (insideQuotes) {
             // We're inside quotes, find the start of the quoted string content
             // Look backwards for the opening quote
@@ -212,7 +213,7 @@ export class KustoLanguageServiceProvider implements
                 }
             }
         }
-        
+
         // Find the end of the current word/quoted content
         let endPos = position.character;
         if (insideQuotes) {
@@ -237,14 +238,14 @@ export class KustoLanguageServiceProvider implements
                 }
             }
         }
-        
+
         if (startPos < endPos) {
             return new vscode.Range(
                 new vscode.Position(position.line, startPos),
                 new vscode.Position(position.line, endPos)
             );
         }
-        
+
         return undefined;
     }
 
@@ -264,10 +265,10 @@ export class KustoLanguageServiceProvider implements
 
         // Track if we're in a joined context (need to find the most recent table before current position)
         let foundPipe = false;
-        
+
         for (const line of lines) {
             const trimmedLine = line.trim();
-            
+
             // Skip empty lines and comments
             if (!trimmedLine || trimmedLine.startsWith('//')) {
                 continue;
@@ -284,7 +285,7 @@ export class KustoLanguageServiceProvider implements
                 foundPipe = true;
                 continue;
             }
-            
+
             // If the line starts with a pipe, we're in the middle of an operator chain
             if (trimmedLine.startsWith('|')) {
                 foundPipe = true;
@@ -353,7 +354,7 @@ export class KustoLanguageServiceProvider implements
                 const item = new vscode.CompletionItem(column.label, vscode.CompletionItemKind.Property);
                 item.detail = column.detail;
                 item.insertText = column.insertText;
-                item.sortText = `4_${column.label}`;
+                item.sortText = `2_${column.label}`;
                 items.push(item);
             }
         }
@@ -366,15 +367,26 @@ export class KustoLanguageServiceProvider implements
      */
     private getOrderByCompletion(filter: string): vscode.CompletionItem[] {
         const items: vscode.CompletionItem[] = [];
-        
+
         if (!filter || 'by'.includes(filter)) {
-            const item = new vscode.CompletionItem('by', vscode.CompletionItemKind.Keyword);
-            item.detail = 'Keyword';
-            item.insertText = 'by ';
+            const byKeyword = this.schema.keywords.find((kw : any) => kw.name.toLowerCase() === 'by');
+
+            const item = new vscode.CompletionItem(byKeyword.name, vscode.CompletionItemKind.Keyword);
+
+            item.detail = `${byKeyword.category}`;
+            item.insertText = byKeyword.name;
+
+            // Use getKQLDocumentation for consistent documentation formatting
+            const documentation = this.getKQLDocumentation(byKeyword.name);
+            if (documentation) {
+                item.documentation = new vscode.MarkdownString(documentation);
+            } else {
+                item.documentation = new vscode.MarkdownString(byKeyword.category);
+            }
             item.sortText = '1_by';
             items.push(item);
         }
-        
+
         return items;
     }
 
@@ -399,7 +411,7 @@ export class KustoLanguageServiceProvider implements
                         item.detail = `Resource Type - ${resourceType} (${data.tables.join(', ')} table${data.tables.length > 1 ? 's' : ''})`;
                         // Only add quotes if we're not already inside them
                         item.insertText = insideQuotes ? resourceType : `'${resourceType}'`;
-                        
+
                         // Calculate replacement range for proper completion
                         if (document && position) {
                             const range = this.getResourceTypeReplacementRange(document, position, insideQuotes);
@@ -407,7 +419,7 @@ export class KustoLanguageServiceProvider implements
                                 item.range = range;
                             }
                         }
-                        
+
                         item.sortText = `5_${resourceType}`;
                         resourceTypes.push(item);
                     }
@@ -420,7 +432,7 @@ export class KustoLanguageServiceProvider implements
                     item.detail = `Resource Type - ${resourceType}${data.tables ? ` (${data.tables.join(', ')} table${data.tables.length > 1 ? 's' : ''})` : ''}`;
                     // Only add quotes if we're not already inside them
                     item.insertText = insideQuotes ? resourceType : `'${resourceType}'`;
-                    
+
                     // Calculate replacement range for proper completion
                     if (document && position) {
                         const range = this.getResourceTypeReplacementRange(document, position, insideQuotes);
@@ -428,7 +440,7 @@ export class KustoLanguageServiceProvider implements
                             item.range = range;
                         }
                     }
-                    
+
                     item.sortText = `5_${resourceType}`;
                     resourceTypes.push(item);
                 }
@@ -692,17 +704,23 @@ export class KustoLanguageServiceProvider implements
         return /\|\s*[a-zA-Z_]*$/.test(linePrefix);
     }
 
-    private isStartOfQuery(linePrefix: string): boolean {
-        const trimmed = linePrefix.trim();
-        return trimmed === '' || /^\s*\/\//.test(linePrefix);
-    }
-
-    private isInFunctionContext(linePrefix: string): boolean {
+    private isAfterOperator(linePrefix: string): boolean {
         return /[a-zA-Z_][a-zA-Z0-9_]*\s*\($|[=\s]\s*[a-zA-Z_]*$/.test(linePrefix);
     }
 
     private isPropertyContext(linePrefix: string): boolean {
-        return /\b(project|extend|where|summarize\s+by)\s+[a-zA-Z0-9_,.\s]*$/i.test(linePrefix) ||
+        // Get operator names from schema data for dynamic regex construction
+        let operatorPattern = '';
+        if (this.schema?.operators) {
+            const operatorNames = this.schema.operators.map((op: any) => op.name).join('|');
+            operatorPattern = `\\b(${operatorNames}\\s+by)\\s+[a-zA-Z0-9_,.\\s]*$`;
+        }
+
+        // Check for operator + by pattern if we have schema data
+        const hasOperatorByPattern = operatorPattern ?
+            new RegExp(operatorPattern, 'i').test(linePrefix) : false;
+
+        return hasOperatorByPattern ||
             /[,\s]\s*[a-zA-Z0-9_]*$/.test(linePrefix);
     }
 
@@ -973,12 +991,12 @@ export class KustoLanguageServiceProvider implements
             if (this.schemaData.operators) {
                 // First try exact match (for operators like in~, !in~ that exist exactly in schema)
                 let operator = this.schemaData.operators.find((op: any) => op.name.toLowerCase() === lowerWord);
-                
+
                 // If not found, try base operator (for operators like contains~ that don't exist exactly)
                 if (!operator) {
                     operator = this.schemaData.operators.find((op: any) => op.name.toLowerCase() === baseOperatorName);
                 }
-                
+
                 if (operator) {
                     // Show operator documentation
                     if (operator.documentation) {
@@ -1090,7 +1108,7 @@ export class KustoLanguageServiceProvider implements
                             .filter((rt: any) => rt.tables && rt.tables.includes(table.name.toLowerCase()))
                             .map((rt: any) => rt.name || rt.type) // Handle both 'name' and 'type' properties
                             .filter((name: string) => name !== undefined); // Filter out undefined values
-                        
+
                         if (tableResourceTypes.length > 0) {
                             hoverContent += `### Resource Types\n`;
                             const displayTypes = tableResourceTypes.slice(0, 5); // Show first 5
