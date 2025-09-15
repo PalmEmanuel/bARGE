@@ -269,6 +269,7 @@ class ARGSchemaGenerator {
             keywords: [], // KQL keywords from Kusto Language Service
             operators: [], // KQL operators from Kusto Language Service
             functions: [], // KQL functions and aggregates from Kusto Language Service
+            joinKinds: [], // Join kinds extracted from join operator documentation
             lastUpdated: new Date().toISOString()
         };
         this.sampleQueries = [];
@@ -1282,6 +1283,12 @@ class ARGSchemaGenerator {
 
                 matchedWord.documentation = cleanedDocumentation;
                 matchedWord.category = 'Operator';
+                
+                // Special case for join operator - extract join kinds from returnInfo
+                if (matchedWord.name.toLowerCase() === 'join' && cleanedDocumentation.returnInfo) {
+                    this.schema.joinKinds = this.parseJoinKinds(cleanedDocumentation.returnInfo);
+                }
+                
                 matchedOperatorsList.push(matchedWord);
                 documentationApplied = true;
             }
@@ -1446,6 +1453,122 @@ class ARGSchemaGenerator {
             .replace(/\s+-\s*\(preview\)$/i, '')  // Remove " - (preview)" from the end
             .replace(/\s*-\s*$/i, '')  // Remove trailing " -" after removing preview
             .trim();
+    }
+
+    /**
+     * Parse join kinds from the join operator's returnInfo markdown table
+     * @param {string} returnInfo - The returnInfo text containing the markdown table
+     * @returns {Array} Array of join kind objects with name, description, schemaInfo, and rowsInfo
+     */
+    parseJoinKinds(returnInfo) {
+        const joinKinds = [];
+        
+        if (!returnInfo) {
+            return joinKinds;
+        }
+
+        // Split the text into lines and find the table
+        const lines = returnInfo.split('\n');
+        let inTable = false;
+        let headerFound = false;
+
+        let sortOrder = 0;
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            
+            // Look for the table header
+            if (line.includes('Join flavor') && line.includes('Returns')) {
+                headerFound = true;
+                continue;
+            }
+            
+            // Skip the separator line (|---|---|---|)
+            if (headerFound && line.match(/^\|\s*[-:]+\s*\|/)) {
+                inTable = true;
+                continue;
+            }
+            
+            // Process table rows
+            if (inTable && line.startsWith('|') && line.endsWith('|')) {
+                const cells = line.split('|').map(cell => cell.trim()).filter(cell => cell.length > 0);
+                
+                if (cells.length >= 2) {
+                    const joinFlavorCell = cells[0];
+                    const returnsCell = cells[1];
+                    
+                    // Skip empty rows or illustration column
+                    if (!joinFlavorCell || joinFlavorCell === 'Join flavor' || !returnsCell || returnsCell === 'Returns') {
+                        continue;
+                    }
+                    
+                    // Parse join flavor names - handle multiple variants like `leftanti`, `anti`, `leftantisemi`
+                    const joinNames = [];
+                    
+                    // Look for backtick-quoted variants first
+                    const backtickMatches = joinFlavorCell.match(/`([^`]+)`/g);
+                    if (backtickMatches) {
+                        backtickMatches.forEach(match => {
+                            const names = match.replace(/`/g, '').split(',').map(n => n.trim());
+                            joinNames.push(...names);
+                        });
+                    }
+                    
+                    // If no backtick variants, get the primary name (before any space or parenthesis)
+                    if (joinNames.length === 0) {
+                        const primaryName = joinFlavorCell.split(/[\s(]/)[0].trim();
+                        if (primaryName && primaryName !== 'Join') {
+                            joinNames.push(primaryName);
+                        }
+                    }
+                    
+                    // Parse the Returns cell to extract description, schema, and rows info
+                    let description = '';
+                    let schemaInfo = '';
+                    let rowsInfo = '';
+                    
+                    // Split by <br /> or line breaks to separate description, schema, and rows
+                    const returnsParts = returnsCell.replace(/<br\s*\/?>/gi, '\n').split('\n');
+                    
+                    for (let j = 0; j < returnsParts.length; j++) {
+                        const part = returnsParts[j].trim();
+                        
+                        if (part.toLowerCase().startsWith('**schema**:')) {
+                            schemaInfo = part.replace(/\*\*schema\*\*:\s*/i, '').trim();
+                        } else if (part.toLowerCase().startsWith('**rows**:')) {
+                            rowsInfo = part.replace(/\*\*rows\*\*:\s*/i, '').trim();
+                        } else if (part && !part.toLowerCase().includes('schema') && !part.toLowerCase().includes('rows')) {
+                            // This is likely the main description
+                            if (!description) {
+                                description = part;
+                            } else {
+                                description += ' ' + part;
+                            }
+                        }
+                    }
+                    
+                    // Create join kind objects for each name variant
+                    for (const name of joinNames) {
+                        if (name) {
+                            sortOrder++;
+                            joinKinds.push({
+                                name: name,
+                                description: description || '',
+                                schemaInfo: schemaInfo || '',
+                                rowsInfo: rowsInfo || '',
+                                sortOrder: `${String(sortOrder).padStart(2, '0')}_joinkind`
+                            });
+                        }
+                    }
+                }
+            }
+            
+            // Stop processing if we hit a non-table line after starting the table
+            if (inTable && !line.startsWith('|') && line.length > 0 && !line.match(/^\s*$/)) {
+                break;
+            }
+        }
+        
+        return joinKinds;
     }
 
     cleanMarkdown(content) {

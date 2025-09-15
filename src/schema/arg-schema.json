@@ -18799,5 +18799,91 @@
       }
     }
   ],
-  "lastUpdated": "2025-09-15T12:39:05.852Z"
+  "joinKinds": [
+    {
+      "name": "innerunique",
+      "description": "Inner join with left side deduplication",
+      "schemaInfo": "All columns from both tables, including the matching keys",
+      "rowsInfo": "All deduplicated rows from the left table that match rows from the right table",
+      "sortOrder": "01_joinkind"
+    },
+    {
+      "name": "inner",
+      "description": "Standard inner join",
+      "schemaInfo": "All columns from both tables, including the matching keys",
+      "rowsInfo": "Only matching rows from both tables",
+      "sortOrder": "02_joinkind"
+    },
+    {
+      "name": "leftouter",
+      "description": "Left outer join",
+      "schemaInfo": "All columns from both tables, including the matching keys",
+      "rowsInfo": "All records from the left table and only matching rows from the right table",
+      "sortOrder": "03_joinkind"
+    },
+    {
+      "name": "rightouter",
+      "description": "Right outer join",
+      "schemaInfo": "All columns from both tables, including the matching keys",
+      "rowsInfo": "All records from the right table and only matching rows from the left table",
+      "sortOrder": "04_joinkind"
+    },
+    {
+      "name": "fullouter",
+      "description": "Full outer join",
+      "schemaInfo": "All columns from both tables, including the matching keys",
+      "rowsInfo": "All records from both tables with unmatched cells populated with null",
+      "sortOrder": "05_joinkind"
+    },
+    {
+      "name": "leftsemi",
+      "description": "Left semi join",
+      "schemaInfo": "All columns from the left table",
+      "rowsInfo": "All records from the left table that match records from the right table",
+      "sortOrder": "06_joinkind"
+    },
+    {
+      "name": "leftanti",
+      "description": "Left anti join and semi variant",
+      "schemaInfo": "All columns from the left table",
+      "rowsInfo": "All records from the left table that don't match records from the right table",
+      "sortOrder": "07_joinkind"
+    },
+    {
+      "name": "anti",
+      "description": "Left anti join and semi variant",
+      "schemaInfo": "All columns from the left table",
+      "rowsInfo": "All records from the left table that don't match records from the right table",
+      "sortOrder": "08_joinkind"
+    },
+    {
+      "name": "leftantisemi",
+      "description": "Left anti join and semi variant",
+      "schemaInfo": "All columns from the left table",
+      "rowsInfo": "All records from the left table that don't match records from the right table",
+      "sortOrder": "09_joinkind"
+    },
+    {
+      "name": "rightsemi",
+      "description": "Right semi join",
+      "schemaInfo": "All columns from the right table",
+      "rowsInfo": "All records from the right table that match records from the left table",
+      "sortOrder": "10_joinkind"
+    },
+    {
+      "name": "rightanti",
+      "description": "Right anti join and semi variant",
+      "schemaInfo": "All columns from the right table",
+      "rowsInfo": "All records from the right table that don't match records from the left table",
+      "sortOrder": "11_joinkind"
+    },
+    {
+      "name": "rightantisemi",
+      "description": "Right anti join and semi variant",
+      "schemaInfo": "All columns from the right table",
+      "rowsInfo": "All records from the right table that don't match records from the left table",
+      "sortOrder": "12_joinkind"
+    }
+  ],
+  "lastUpdated": "2025-09-15T16:41:17.308Z"
 }

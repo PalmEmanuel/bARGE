@@ -96,16 +96,19 @@ export class KustoLanguageServiceProvider implements
             suggestions.push(...this.getOrderByCompletion(lowerCurrentWord));
         }
 
+        // After 'join ' - suggest `kind=`
+        else if (this.isJoinContext(linePrefix)) {
+            suggestions.push(...this.getJoinCompletion(lowerCurrentWord));
+        }
+
+        // After 'kind=' - suggest join kind values
+        else if (this.isKindContext(linePrefix)) {
+            suggestions.push(...this.getKindCompletion(lowerCurrentWord, document, position));
+        }
+
         // After pipe - suggest operators
         else if (this.isAfterPipe(linePrefix)) {
             suggestions.push(...this.filterCompletionItems(this.getKQLOperators(), lowerCurrentWord));
-        }
-
-        // In function context - suggest functions
-        else if (this.isAfterOperator(linePrefix)) {
-            suggestions.push(...this.filterCompletionItems(this.getKQLKeywords(), lowerCurrentWord));
-            suggestions.push(...this.getCommonColumns(lowerCurrentWord));
-            suggestions.push(...this.filterCompletionItems(this.getKQLFunctions(), lowerCurrentWord));
         }
 
         // After 'type ==' or 'type =~' - suggest resource types
@@ -114,6 +117,13 @@ export class KustoLanguageServiceProvider implements
             const tableContext = this.findCurrentTableContext(document, position);
             const insideQuotes = this.isInsideQuotes(linePrefix);
             suggestions.push(...this.filterCompletionItems(this.getResourceTypes(tableContext || undefined, insideQuotes, document, position), lowerCurrentWord));
+        }
+
+        // In function context - suggest functions
+        else if (this.isAfterOperator(linePrefix)) {
+            suggestions.push(...this.filterCompletionItems(this.getKQLKeywords(), lowerCurrentWord));
+            suggestions.push(...this.getCommonColumns(lowerCurrentWord));
+            suggestions.push(...this.filterCompletionItems(this.getKQLFunctions(), lowerCurrentWord));
         }
 
         // In project, extend, where, or summarize by context - suggest properties and functions
@@ -167,6 +177,20 @@ export class KustoLanguageServiceProvider implements
      */
     private isOrderByContext(linePrefix: string): boolean {
         return /\b(sort|order)\s+[a-zA-Z]*$/i.test(linePrefix);
+    }
+
+    /**
+     * Check if we're after 'join' and should suggest 'kind='
+     */
+    private isJoinContext(linePrefix: string): boolean {
+        return /\b(join)\s+[a-zA-Z]*$/i.test(linePrefix);
+    }
+    
+    /**
+     * Check if we're after 'join' and should suggest 'kind='
+     */
+    private isKindContext(linePrefix: string): boolean {
+        return /\b(kind\s*=)\s*[a-zA-Z]*$/i.test(linePrefix);
     }
 
     /**
@@ -387,6 +411,109 @@ export class KustoLanguageServiceProvider implements
             }
             item.sortText = '1_by';
             items.push(item);
+        }
+
+        return items;
+    }
+
+    /**
+     * Get 'kind=' completion after 'join' operator
+     */
+    private getJoinCompletion(filter: string): vscode.CompletionItem[] {
+        const items: vscode.CompletionItem[] = [];
+
+        if (!filter || 'kind='.includes(filter)) {
+            const kindKeyword = this.schema.keywords.find((kw : any) => kw.name.toLowerCase() === 'kind');
+
+            const item = new vscode.CompletionItem(kindKeyword.name, vscode.CompletionItemKind.Keyword);
+
+            item.detail = `${kindKeyword.category}`;
+            item.insertText = `${kindKeyword.name}=`;
+
+            // Use getKQLDocumentation for consistent documentation formatting
+            const documentation = this.getKQLDocumentation(kindKeyword.name);
+            if (documentation) {
+                item.documentation = new vscode.MarkdownString(documentation);
+            } else {
+                item.documentation = new vscode.MarkdownString(kindKeyword.category);
+            }
+            item.sortText = '1_kind';
+            items.push(item);
+        }
+
+        return items;
+    }
+
+    /**
+     * Get completion for join kind values
+     */
+    private getKindCompletion(filter: string, document?: vscode.TextDocument, position?: vscode.Position): vscode.CompletionItem[] {
+        const items: vscode.CompletionItem[] = [];
+
+        // Check if we have join kinds in the schema
+        if (this.schema?.joinKinds && Array.isArray(this.schema.joinKinds)) {
+            // Check if there are already parentheses ahead
+            let hasParenthesesAhead = false;
+            if (document && position) {
+                const line = document.lineAt(position).text;
+                const linePrefix = line.substring(0, position.character);
+                
+                // Find the start and end of the current word being typed
+                const currentWord = this.getCurrentWord(linePrefix);
+                const wordStartPos = position.character - currentWord.length;
+                
+                // Look for the end of the word (in case cursor is in middle of word)
+                let wordEndPos = position.character;
+                while (wordEndPos < line.length && /[a-zA-Z0-9_]/.test(line[wordEndPos])) {
+                    wordEndPos++;
+                }
+                
+                // Check for parentheses after the word ends
+                const textAfterWord = line.substring(wordEndPos).trim();
+                hasParenthesesAhead = /^\s*\(/.test(textAfterWord);
+            }
+
+            for (const joinKind of this.schema.joinKinds) {
+                // Filter based on current input
+                if (!filter || joinKind.name.toLowerCase().includes(filter.toLowerCase())) {
+                    const item = new vscode.CompletionItem(joinKind.name, vscode.CompletionItemKind.Value);
+                    
+                    // Set the detail to the main description
+                    item.detail = joinKind.description;
+                    
+                    // Insert join kind with appropriate formatting based on context
+                    if (hasParenthesesAhead) {
+                        // Just insert the join kind name if parentheses already exist
+                        item.insertText = joinKind.name;
+                    } else {
+                        // Insert join kind with parentheses and cursor positioning
+                        item.insertText = new vscode.SnippetString(`${joinKind.name} (\n    $0\n)`);
+                    }
+                    
+                    // Create comprehensive documentation
+                    const documentation = new vscode.MarkdownString();
+                    documentation.appendMarkdown(`**${joinKind.name}** join\n\n`);
+                    
+                    if (joinKind.description) {
+                        documentation.appendMarkdown(`${joinKind.description}\n\n`);
+                    }
+                    
+                    if (joinKind.schemaInfo) {
+                        documentation.appendMarkdown(`**Schema**: ${joinKind.schemaInfo}\n\n`);
+                    }
+                    
+                    if (joinKind.rowsInfo) {
+                        documentation.appendMarkdown(`**Rows**: ${joinKind.rowsInfo}\n\n`);
+                    }
+                    
+                    item.documentation = documentation;
+                    
+                    // Get sort order consistent with schema from docs
+                    item.sortText = joinKind.sortOrder;
+                    
+                    items.push(item);
+                }
+            }
         }
 
         return items;
@@ -954,7 +1081,7 @@ export class KustoLanguageServiceProvider implements
                     // If we have enhanced documentation, use it
                     if (func.documentation) {
                         const doc = func.documentation;
-                        let hoverContent = `## Function \`${doc.title}\`\n\n`;
+                        let hoverContent = `## Function \`${func.name}()\`\n\n`;
                         hoverContent += `*${func.category}*\n\n`;
 
                         // Description
@@ -1005,6 +1132,28 @@ export class KustoLanguageServiceProvider implements
                 const keyword = this.schemaData.keywords.find((kw: any) => kw.name.toLowerCase() === baseOperatorName);
                 if (keyword) {
                     return `**${keyword.name}** - ${keyword.category}`;
+                }
+            }
+
+            // Check join kinds - provide detailed hover information for join types
+            if (this.schemaData.joinKinds) {
+                const joinKind = this.schemaData.joinKinds.find((jk: any) => jk.name.toLowerCase() === lowerWord);
+                if (joinKind) {
+                    let hoverContent = `## Join flavor \`${joinKind.name}\`\n\n`;
+                    
+                    if (joinKind.description) {
+                        hoverContent += `${joinKind.description}\n\n`;
+                    }
+                    
+                    if (joinKind.schemaInfo) {
+                        hoverContent += `### Schema\n\n${joinKind.schemaInfo}\n\n`;
+                    }
+                    
+                    if (joinKind.rowsInfo) {
+                        hoverContent += `### Rows\n\n${joinKind.rowsInfo}\n\n`;
+                    }
+                    
+                    return hoverContent;
                 }
             }
 
