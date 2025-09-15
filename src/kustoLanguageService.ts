@@ -38,7 +38,7 @@ export class KustoLanguageServiceProvider implements
             let extensionPath = vscode.extensions.getExtension('palmemanuel.barge-vscode')?.extensionPath;
 
             if (extensionPath) {
-                const schemaPath = path.join(extensionPath, 'src', 'schema', 'arg-schema.json');
+                const schemaPath = path.join(extensionPath, 'dist', 'schema', 'arg-schema.json');
 
                 try {
                     const fs = require('fs');
