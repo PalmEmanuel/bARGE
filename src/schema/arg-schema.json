@@ -12767,15 +12767,7 @@
   },
   "keywords": [
     {
-      "name": "access",
-      "category": "Keyword"
-    },
-    {
       "name": "accumulate",
-      "category": "Keyword"
-    },
-    {
-      "name": "alias",
       "category": "Keyword"
     },
     {
@@ -12795,14 +12787,6 @@
       "category": "Keyword"
     },
     {
-      "name": "assert-schema",
-      "category": "Keyword"
-    },
-    {
-      "name": "bagexpansion",
-      "category": "Keyword"
-    },
-    {
       "name": "barchart",
       "category": "Keyword"
     },
@@ -12812,10 +12796,6 @@
     },
     {
       "name": "bin",
-      "category": "Keyword"
-    },
-    {
-      "name": "bin_legacy",
       "category": "Keyword"
     },
     {
@@ -12835,14 +12815,6 @@
       "category": "Keyword"
     },
     {
-      "name": "cachingpolicy",
-      "category": "Keyword"
-    },
-    {
-      "name": "callout",
-      "category": "Keyword"
-    },
-    {
       "name": "cancel",
       "category": "Keyword"
     },
@@ -12859,31 +12831,7 @@
       "category": "Keyword"
     },
     {
-      "name": "commands-and-queries",
-      "category": "Keyword"
-    },
-    {
-      "name": "containscs",
-      "category": "Keyword"
-    },
-    {
       "name": "cycles",
-      "category": "Keyword"
-    },
-    {
-      "name": "database",
-      "category": "Keyword"
-    },
-    {
-      "name": "dataexport",
-      "category": "Keyword"
-    },
-    {
-      "name": "dataformat",
-      "category": "Keyword"
-    },
-    {
-      "name": "datascope",
       "category": "Keyword"
     },
     {
@@ -12895,19 +12843,7 @@
       "category": "Keyword"
     },
     {
-      "name": "datetime_pattern",
-      "category": "Keyword"
-    },
-    {
       "name": "decimal",
-      "category": "Keyword"
-    },
-    {
-      "name": "declare",
-      "category": "Keyword"
-    },
-    {
-      "name": "decodeblocks",
       "category": "Keyword"
     },
     {
@@ -12935,22 +12871,6 @@
       "category": "Keyword"
     },
     {
-      "name": "encodingpolicy",
-      "category": "Keyword"
-    },
-    {
-      "name": "entity_group",
-      "category": "Keyword"
-    },
-    {
-      "name": "expandoutput",
-      "category": "Keyword"
-    },
-    {
-      "name": "extent_tags_retention",
-      "category": "Keyword"
-    },
-    {
       "name": "external_data",
       "category": "Keyword"
     },
@@ -12968,10 +12888,6 @@
     },
     {
       "name": "float",
-      "category": "Keyword"
-    },
-    {
-      "name": "force_remote",
       "category": "Keyword"
     },
     {
@@ -13003,23 +12919,7 @@
       "category": "Keyword"
     },
     {
-      "name": "harddelete",
-      "category": "Keyword"
-    },
-    {
-      "name": "hardretention",
-      "category": "Keyword"
-    },
-    {
-      "name": "hotcache",
-      "category": "Keyword"
-    },
-    {
       "name": "id",
-      "category": "Keyword"
-    },
-    {
-      "name": "inline_external_table",
       "category": "Keyword"
     },
     {
@@ -13067,83 +12967,11 @@
       "category": "Keyword"
     },
     {
-      "name": "let",
-      "category": "Keyword"
-    },
-    {
-      "name": "like",
-      "category": "Keyword"
-    },
-    {
-      "name": "likecs",
-      "category": "Keyword"
-    },
-    {
       "name": "linechart",
       "category": "Keyword"
     },
     {
       "name": "long",
-      "category": "Keyword"
-    },
-    {
-      "name": "matches regex",
-      "category": "Keyword"
-    },
-    {
-      "name": "materialize",
-      "category": "Keyword"
-    },
-    {
-      "name": "materialized-view-combine",
-      "category": "Keyword"
-    },
-    {
-      "name": "materialized-views",
-      "category": "Keyword"
-    },
-    {
-      "name": "mdm",
-      "category": "Keyword"
-    },
-    {
-      "name": "missing",
-      "category": "Keyword"
-    },
-    {
-      "name": "mvapply",
-      "category": "Keyword"
-    },
-    {
-      "name": "mvexpand",
-      "category": "Keyword"
-    },
-    {
-      "name": "nodes",
-      "category": "Keyword"
-    },
-    {
-      "name": "nooptimization",
-      "category": "Keyword"
-    },
-    {
-      "name": "notcontainscs",
-      "category": "Keyword"
-    },
-    {
-      "name": "notlike",
-      "category": "Keyword"
-    },
-    {
-      "name": "notlikecs",
-      "category": "Keyword"
-    },
-    {
-      "name": "null",
-      "category": "Keyword"
-    },
-    {
-      "name": "nulls",
       "category": "Keyword"
     },
     {
@@ -13163,31 +12991,11 @@
       "category": "Keyword"
     },
     {
-      "name": "order",
-      "category": "Keyword"
-    },
-    {
-      "name": "others",
-      "category": "Keyword"
-    },
-    {
       "name": "output",
       "category": "Keyword"
     },
     {
-      "name": "pack",
-      "category": "Keyword"
-    },
-    {
-      "name": "partitioned-by",
-      "category": "Keyword"
-    },
-    {
       "name": "pathformat",
-      "category": "Keyword"
-    },
-    {
-      "name": "pattern",
       "category": "Keyword"
     },
     {
@@ -13207,18 +13015,6 @@
       "category": "Keyword"
     },
     {
-      "name": "queries",
-      "category": "Keyword"
-    },
-    {
-      "name": "query_parameters",
-      "category": "Keyword"
-    },
-    {
-      "name": "query_results",
-      "category": "Keyword"
-    },
-    {
       "name": "real",
       "category": "Keyword"
     },
@@ -13235,75 +13031,7 @@
       "category": "Keyword"
     },
     {
-      "name": "restricted_view_access",
-      "category": "Keyword"
-    },
-    {
-      "name": "row_level_security",
-      "category": "Keyword"
-    },
-    {
-      "name": "rowstore",
-      "category": "Keyword"
-    },
-    {
-      "name": "rowstore_references",
-      "category": "Keyword"
-    },
-    {
-      "name": "rowstore_sealinfo",
-      "category": "Keyword"
-    },
-    {
-      "name": "rowstorepolicy",
-      "category": "Keyword"
-    },
-    {
-      "name": "rowstores",
-      "category": "Keyword"
-    },
-    {
       "name": "scatterchart",
-      "category": "Keyword"
-    },
-    {
-      "name": "seal",
-      "category": "Keyword"
-    },
-    {
-      "name": "seals",
-      "category": "Keyword"
-    },
-    {
-      "name": "set",
-      "category": "Keyword"
-    },
-    {
-      "name": "set-or-append",
-      "category": "Keyword"
-    },
-    {
-      "name": "set-or-replace",
-      "category": "Keyword"
-    },
-    {
-      "name": "shards",
-      "category": "Keyword"
-    },
-    {
-      "name": "simple",
-      "category": "Keyword"
-    },
-    {
-      "name": "softdelete",
-      "category": "Keyword"
-    },
-    {
-      "name": "softretention",
-      "category": "Keyword"
-    },
-    {
-      "name": "sql",
       "category": "Keyword"
     },
     {
@@ -13311,23 +13039,7 @@
       "category": "Keyword"
     },
     {
-      "name": "statistics",
-      "category": "Keyword"
-    },
-    {
-      "name": "step",
-      "category": "Keyword"
-    },
-    {
-      "name": "storedqueryresultcontainers",
-      "category": "Keyword"
-    },
-    {
       "name": "string",
-      "category": "Keyword"
-    },
-    {
-      "name": "tablepurge",
       "category": "Keyword"
     },
     {
@@ -13363,10 +13075,6 @@
       "category": "Keyword"
     },
     {
-      "name": "totable",
-      "category": "Keyword"
-    },
-    {
       "name": "treemap",
       "category": "Keyword"
     },
@@ -13399,43 +13107,7 @@
       "category": "Keyword"
     },
     {
-      "name": "uniqueid",
-      "category": "Keyword"
-    },
-    {
-      "name": "unrestrictedviewers",
-      "category": "Keyword"
-    },
-    {
       "name": "uuid",
-      "category": "Keyword"
-    },
-    {
-      "name": "verbose",
-      "category": "Keyword"
-    },
-    {
-      "name": "view",
-      "category": "Keyword"
-    },
-    {
-      "name": "viewers",
-      "category": "Keyword"
-    },
-    {
-      "name": "views",
-      "category": "Keyword"
-    },
-    {
-      "name": "with",
-      "category": "Keyword"
-    },
-    {
-      "name": "withsource",
-      "category": "Keyword"
-    },
-    {
-      "name": "writeaheadlog",
       "category": "Keyword"
     }
   ],
@@ -13526,7 +13198,7 @@
     },
     {
       "name": "datatable",
-      "category": "Operator",
+      "category": "operator",
       "documentation": {
         "title": "datatable",
         "description": "Creates a table whose schema and values are defined in the query itself.\n\n> \n> This operator doesn't have a pipeline input.",
@@ -13694,7 +13366,7 @@
     },
     {
       "name": "getschema",
-      "category": "Operator",
+      "category": "operator",
       "documentation": {
         "title": "getschema",
         "description": "Produce a table that represents a tabular schema of the input.",
@@ -13750,7 +13422,7 @@
     },
     {
       "name": "graph-to-table",
-      "category": "Operator",
+      "category": "operator",
       "documentation": {
         "title": "graph-to-table",
         "description": "The `graph-to-table` operator exports nodes or edges from a graph to tables.",
@@ -13987,8 +13659,8 @@
       }
     },
     {
-      "name": "matches-regex",
-      "category": "operator",
+      "name": "matches regex",
+      "category": "Operator",
       "documentation": {
         "title": "matches regex",
         "description": "Filters a record set based on a case-sensitive regular expression value.\n\nFor more information about other operators and to determine which operator is most appropriate for your query, see datatype string operators.",
@@ -14324,7 +13996,7 @@
     },
     {
       "name": "partition",
-      "category": "Operator",
+      "category": "operator",
       "documentation": {
         "title": "partition",
         "description": "The partition operator partitions the records of its input table into multiple subtables according to values in a key column. The operator runs a subquery on each subtable, and produces a single output table that is the union of the results of all subqueries.\n\nThe partition operator is useful when you need to perform a subquery only on a subset of rows that belong to the same partition key, and not a query of the whole dataset. These subqueries could include aggregate functions, window functions, top *N* and others.\n\nThe partition operator supports several strategies of subquery operation:\n\n* Native - use with an implicit data source with thousands of key partition values.\n* Shuffle - use with an implicit source with millions of key partition values.\n* Legacy - use with an implicit or explicit source for 64 or less key partition values.",
@@ -14544,6 +14216,20 @@
         "example": "",
         "sourceLength": 6263,
         "url": "https://learn.microsoft.com/en-us/kusto/query/serialize-operator"
+      }
+    },
+    {
+      "name": "order",
+      "category": "Operator",
+      "documentation": {
+        "title": "sort",
+        "description": "Sorts the rows of the input table into order by one or more columns.\n\n> The `sort` and `order` operators are equivalent",
+        "syntax": "*T* `| sort by` *column* [`asc` | `desc`] [`nulls first` | `nulls last`] [`,` ...]",
+        "returnInfo": "A copy of the input table sorted in either ascending or descending order based on the provided column.\n\nWhen the input table contains the special values `null`, `NaN`, `-inf` and `+inf`, the order will be as follows:\n\n| Value| Ascending | Descending|\n|:--|:--|:--|\n|**Nulls first**|`null`,`NaN`,`-inf`,`-5`,`0`,`5`,`+inf`|`null`,`NaN`,`+inf`,`5`,`0`,`-5`|\n|**Nulls last**|`-inf`,`-5`,`0`,`+inf`,`NaN`,`null`|`+inf`,`5`,`0`,`-5`,`NaN`,`null`|\n\n> \n>\n> * Null and NaN values are always grouped together.\n> * The order between null and NaN values is determined by the first and last property because nulls and NaNs don't have an ascending and descending order.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *T* | `string` |  *True* | The tabular input to sort. |\n| *column* | scalar |  *True* | The column of *T* by which to sort. The type of the column values must be numeric, date, time or string.|\n| `asc` or `desc` | `string` | | `asc` sorts into ascending order, low to high. Default is `desc`, high to low. |\n| `nulls first` or `nulls last`  | `string` | | `nulls first` will place the null values at the beginning and `nulls last` will place the null values at the end. Default for `asc` is `nulls first`. Default for `desc` is `nulls last`.|",
+        "example": "StormEvents\n| sort by State asc, StartTime desc",
+        "sourceLength": 3364,
+        "url": "https://learn.microsoft.com/en-us/kusto/query/sort-operator"
       }
     },
     {
@@ -15011,90 +14697,6 @@
       }
     },
     {
-      "name": "bag_has_key",
-      "category": "Function",
-      "documentation": {
-        "title": "bag_has_key()",
-        "description": "Checks whether a dynamic property bag object contains a given key.",
-        "syntax": "`bag_has_key(`*bag*`,`*key*`)`",
-        "returnInfo": "True or false depending on if the key exists in the bag.",
-        "parametersTable": "| Name | Type | Required | Description |\n| -- | -- | -- | -- |\n| *bag* | `dynamic` |  *True* | The property bag to search. |\n| *key* | `string` |  *True* | The key for which to search.  Search for a nested key using the JSONPath notation. Array indexing isn't supported. |",
-        "example": "datatable(input: dynamic)\n[\n    dynamic({'key1' : 123, 'key2': 'abc'}),\n    dynamic({'key1' : 123, 'key3': 'abc'}),\n]\n| extend result = bag_has_key(input, 'key2')\n\ndatatable(input: dynamic)\n[\n    dynamic({'key1': 123, 'key2': {'prop1' : 'abc', 'prop2': 'xyz'}, 'key3': [100, 200]}),\n]\n| extend result = bag_has_key(input, '$.key2.prop1')",
-        "sourceLength": 2712,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/bag-has-key-function"
-      }
-    },
-    {
-      "name": "bag_keys",
-      "category": "Function",
-      "documentation": {
-        "title": "bag_keys()",
-        "description": "Enumerates all the root keys in a dynamic property bag object.",
-        "syntax": "`bag_keys(`*object*`)`",
-        "returnInfo": "An array of keys, order is undetermined.",
-        "parametersTable": "| Name | Type | Required | Description |\n| -- | -- | -- | -- |\n| *object* | `dynamic` |  *True* | The property bag object for which to enumerate keys. |",
-        "example": "datatable(index:long, d:dynamic) [\n    1, dynamic({'a':'b', 'c':123}), \n    2, dynamic({'a':'b', 'c':{'d':123}}),\n    3, dynamic({'a':'b', 'c':[{'d':123}]}),\n    4, dynamic(null),\n    5, dynamic({}),\n    6, dynamic('a'),\n    7, dynamic([])\n]\n| extend keys = bag_keys(d)",
-        "sourceLength": 2021,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/bag-keys-function"
-      }
-    },
-    {
-      "name": "bag_merge",
-      "category": "Function",
-      "documentation": {
-        "title": "bag_merge()",
-        "description": "The function merges multiple `dynamic` property bags into a single `dynamic` property bag object, consolidating all properties from the input bags.",
-        "syntax": "`bag_merge(`*bag1*`,`*bag2*`,`*bag3*`, ...])`",
-        "returnInfo": "A `dynamic` property bag containing the merged results of all input property bags. If a key is present in multiple input bags, the value associated with the key from the leftmost argument takes precedence.",
-        "parametersTable": "| Name | Type | Required | Description |\n| -- | -- | -- | -- |\n| *bag1...bagN* | `dynamic` |  *True* | The property bags to merge. The function accepts between 2 to 64 arguments. |",
-        "example": "print result = bag_merge(\n   dynamic({'A1':12, 'B1':2, 'C1':3}),\n   dynamic({'A2':81, 'B2':82, 'A1':1}))",
-        "sourceLength": 1821,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/bag-merge-function"
-      }
-    },
-    {
-      "name": "bag_pack_columns",
-      "category": "Function",
-      "documentation": {
-        "title": "bag_pack_columns()",
-        "description": "Creates a dynamic property bag object from a list of columns.",
-        "syntax": "`bag_pack_columns(`*column1*`,` *column2*`,... )`",
-        "returnInfo": "Returns a `dynamic` property bag object from the listed *columns*.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*column*| scalar |  *True* | A column to pack. The name of the column is the property name in the property bag.|",
-        "example": "datatable(Id: string, Value: string, Other: long)\n[\n    \"A\", \"val_a\", 1,\n    \"B\", \"val_b\", 2,\n    \"C\", \"val_c\", 3\n]\n| extend Packed = bag_pack_columns(Id, Value)",
-        "sourceLength": 1945,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/bag-pack-columns-function"
-      }
-    },
-    {
-      "name": "bag_remove_keys",
-      "category": "Function",
-      "documentation": {
-        "title": "bag_remove_keys()",
-        "description": "Removes keys and associated values from a `dynamic` property bag.",
-        "syntax": "`bag_remove_keys(`*bag*`,`*keys*`)`",
-        "returnInfo": "Returns a `dynamic` property bag without specified keys and their values.",
-        "parametersTable": "| Name | Type | Required | Description |\n| -- | -- | -- | -- |\n| *bag* | `dynamic` |  *True* | The property bag from which to remove keys. |\n| *keys* | `dynamic` |  *True* | List of keys to be removed from the input. The keys are the first level of the property bag. You can specify keys on the nested levels using JSONPath notation. Array indexing isn't supported. |",
-        "example": "datatable(input:dynamic)\n[\n    dynamic({'key1' : 123,     'key2': 'abc'}),\n    dynamic({'key1' : 'value', 'key3': 42.0}),\n]\n| extend result=bag_remove_keys(input, dynamic(['key2', 'key4']))\n\ndatatable(input:dynamic)\n[\n    dynamic({'key1': 123, 'key2': {'prop1' : 'abc', 'prop2': 'xyz'}, 'key3': [100, 200]}),\n]\n| extend result=bag_remove_keys(input, dynamic(['$.key2.prop1', 'key3']))",
-        "sourceLength": 3075,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/bag-remove-keys-function"
-      }
-    },
-    {
-      "name": "bag_set_key",
-      "category": "Function",
-      "documentation": {
-        "title": "bag_set_key()",
-        "description": "bag_set_key() receives a `dynamic` property-bag, a key and a value. The function sets the given key in the bag to the given value. The function overrides any existing value in case the key already exists.",
-        "syntax": "`bag_set_key(`*bag*`,`*key*`,`*value*`)`",
-        "returnInfo": "Returns a `dynamic` property-bag with specified key-value pairs. If the input bag isn't a property-bag, a `null` value is returned.\n\n> \n> To treat `null`s as empty bags, use `coalesce(x, dynamic({}))`​.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *bag* | `dynamic` |  *True* | The property bag to modify. |\n| *key* | `string` |  *True* | The key to set. Either a JSON path (you can specify a key on the nested levels using JSONPath notation) or the key name for a root level key. Array indexing or root JSON paths aren't supported. |\n| *value* | any scalar data type |  *True* | The value to which the key is set. |",
-        "example": "datatable(input: dynamic) [\n    dynamic({'key1': 1, 'key2': 2}), \n    dynamic({'key1': 1, 'key3': 'abc'}),\n]\n| extend result = bag_set_key(input, 'key3', 3)\n\ndatatable(input: dynamic)[\n    dynamic({'key1': 123, 'key2': {'prop1': 123, 'prop2': 'xyz'}}),\n    dynamic({'key1': 123})\n]\n| extend result = bag_set_key(input, '$.key2.prop1', 'abc')",
-        "sourceLength": 3443,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/bag-set-key-function"
-      }
-    },
-    {
       "name": "base64_decode_toarray",
       "category": "Function",
       "documentation": {
@@ -15232,34 +14834,6 @@
         "example": "print bin(4.5, 1)\n\nprint bin(time(16d), 7d)\n\nprint bin(datetime(1970-05-11 13:45:07), 1d)\n\nlet Start = datetime('2007-04-07');\nlet End = Start + 7d;\nStormEvents\n| where StartTime between (Start .. End)\n| where State == \"CALIFORNIA\" and EventType == \"Strong Wind\"\n| summarize PropertyDamage=sum(DamageProperty) by bin(StartTime, 1d)\n\nlet Start = datetime('2007-04-07');\nlet End = Start + 7d;\nStormEvents\n| where StartTime between (Start .. End)\n| where State == \"CALIFORNIA\" and EventType == \"Strong Wind\"\n| union (\n    range x from 1 to 1 step 1\n    | mv-expand StartTime=range(Start, End, 1d) to typeof(datetime)\n    | extend PropertyDamage=0\n    )\n| summarize PropertyDamage=sum(DamageProperty) by bin(StartTime, 1d)",
         "sourceLength": 5803,
         "url": "https://learn.microsoft.com/en-us/kusto/query/bin-function"
-      }
-    },
-    {
-      "name": "bin_at",
-      "category": "Function",
-      "documentation": {
-        "title": "bin_at()",
-        "description": "Returns the value rounded down to the nearest bin size, which is aligned to a fixed reference point.\n\nIn contrast to the bin() function, where the point of alignment is predefined, bin_at() allows you to define a fixed point for alignment. Results can align before or after the fixed point.",
-        "syntax": "`bin_at` `(`*value*`,`*bin_size*`,`*fixed_point*`)`",
-        "returnInfo": "The nearest multiple of *bin_size* below the given *value* that aligns to the specified *fixed_point*.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *value* | `int`, `long`, `real`, `timespan`, or `datetime` |  *True* | The value to round. |\n| *bin_size* | `int`, `long`, `real`, or `timespan` |  *True* | The size of each bin. |\n| *fixed_point* | `int`, `long`, `real`, `timespan`, or `datetime` |  *True* | A constant of the same type as *value*, which is used as a fixed reference point.|\n\n> \n> If *value* is a `timespan` or `datetime`, then the *bin_size* must be a `timespan`.",
-        "example": "print bin_at(6.5, 2.5, 7)\n\nprint bin_at(time(1h), 1d, 12h)\n\nprint bin_at(datetime(2017-05-15 10:20:00.0), 1d, datetime(1970-01-01 12:00:00.0))\n\nprint bin_at(datetime(2017-05-17 10:20:00.0), 7d, datetime(2017-06-04 00:00:00.0))\n\ndatatable(Date:datetime, NumOfEvents:int)[\ndatetime(2018-02-24T15:14),3,\ndatetime(2018-02-24T15:24),4,\ndatetime(2018-02-23T16:14),4,\ndatetime(2018-02-23T17:29),4,\ndatetime(2018-02-26T15:14),5]\n| summarize TotalEvents=sum(NumOfEvents) by bin_at(Date, 1d, datetime(2018-02-24 15:14:00.0000000))",
-        "sourceLength": 4913,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/bin-at-function"
-      }
-    },
-    {
-      "name": "bin_auto",
-      "category": "Function",
-      "documentation": {
-        "title": "bin_auto()",
-        "description": "Rounds values down to a fixed-size bin, with control over the bin size and starting point provided by a query property.",
-        "syntax": "`bin_auto` `(`*value*`)`",
-        "returnInfo": "The nearest multiple of `query_bin_auto_size` below *value*, shifted so that `query_bin_auto_at`\nwill be translated into itself.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *value* | int, long, real, timespan, or datetime |  *True* |  The value to round into bins. |\n\nTo control the bin size and starting point, set the following parameters before using the function.\n\n| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *query_bin_auto_size* | int, long, real, or timespan |  *True* |  Indicates the size of each bin.|\n| *query_bin_auto_at* | int, long, real, or timespan | |  Indicates one value of *value* which is a \"fixed point\" for which `bin_auto(fixed_point)` == `fixed_point`. Default is 0.|",
-        "example": "set query_bin_auto_size=1h;\nset query_bin_auto_at=datetime(2017-01-01 00:05);\nrange Timestamp from datetime(2017-01-01 00:05) to datetime(2017-01-01 02:00) step 1m\n| summarize count() by bin_auto(Timestamp)",
-        "sourceLength": 1960,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/bin-auto-function"
       }
     },
     {
@@ -15697,20 +15271,6 @@
       }
     },
     {
-      "name": "database",
-      "category": "Function",
-      "documentation": {
-        "title": "database()",
-        "description": ":::moniker range=\"azure-data-explorer\"\nChanges the reference of the query to a specific database within the cluster scope.\n\n> \n>\n> * For more information, see cross-database and cross-cluster queries.\n> * For accessing remote cluster and remote database, see `cluster()` scope function.\n:::moniker-end\n\n:::moniker range=\"microsoft-fabric\"\nChanges the reference of the query to a specific database within the Eventhouse scope.\n<!-- add link in the note to the Cross-database and cross-Eventhouse doc once it is created -->\n> \n>\n> * For accessing remote cluster and remote database, see `cluster()` scope function.\n:::moniker-end\n``",
-        "syntax": "`database(`*databaseName*`)`",
-        "returnInfo": "",
-        "parametersTable": "|Name|Type|Required|Description|\n|:--|:--|:--|:--|\n| *databaseName* | `string` | The name of the database to reference. The *databaseName* can be either the `DatabaseName` or `PrettyName`. The argument must be a constant value and can't come from a subquery evaluation.|",
-        "example": "database('Samples').StormEvents | count\n\nlet foo = (dbName:string)\n{\n    database(dbName).StormEvents | count\n};\nfoo('help')\n\n.create function foo(dbName:string)\n{\n    database(dbName).StormEvents | count\n};",
-        "sourceLength": 2930,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/database-function"
-      }
-    },
-    {
       "name": "datetime_add",
       "category": "Function",
       "documentation": {
@@ -15988,20 +15548,6 @@
         "example": "T\n| where Timestamp > ago(1h)\n| where ActivityId == 'dd0595d4-183e-494e-b88e-54c52fe90e5a'\n| extend tags = extent_tags()\n| summarize by tostring(tags)\n\nT\n| where Timestamp > ago(1h)\n| extend Tags = extent_tags()\n| where Tags has_cs 'MyTag' and Tags !has_cs 'drop-by:MyOtherTag'\n| count",
         "sourceLength": 2161,
         "url": "https://learn.microsoft.com/en-us/kusto/query/extent-tags-function"
-      }
-    },
-    {
-      "name": "external_table",
-      "category": "Function",
-      "documentation": {
-        "title": "external_table()",
-        "description": "References an external table by name.\n\n> \n>\n> The `external_table` function has similar restrictions as the table function.\n> Standard query limits apply to external table queries as well.\n\nTo accelerate queries over external delta tables, see Query acceleration policy.",
-        "syntax": "`external_table(` *TableName* [`,` *MappingName* ] `)`",
-        "returnInfo": "",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *TableName* | `string` |  *True* | The name of the external table being queried. Must reference an external table of kind `blob`, `adl`, or `sql`.|\n| *MappingName* | `string` | | A name of a mapping object that maps fields in the external data shards to columns output.|\n\nThe authentication method to access an external table is based on the connection string provided during its creation, and the permissions required to access the table vary depending on the authentication method. For more information, see Azure Storage external table or SQL Server external table.",
-        "example": "",
-        "sourceLength": 2206,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/external-table-function"
       }
     },
     {
@@ -16621,34 +16167,6 @@
       }
     },
     {
-      "name": "isnotnull",
-      "category": "Function",
-      "documentation": {
-        "title": "isnotnull()",
-        "description": "Returns `true` if the argument isn't null.\n\n> **Deprecated aliases:** notnull()",
-        "syntax": "`isnotnull(`*value*`)`",
-        "returnInfo": "`true` if *value* isn't null and `false` otherwise.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*value*|scalar| *True*| The value to check if not null.|",
-        "example": "StormEvents\n| where isnotnull(BeginLat) and isnotnull(BeginLon)",
-        "sourceLength": 1387,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/isnotnull-function"
-      }
-    },
-    {
-      "name": "isnull",
-      "category": "Function",
-      "documentation": {
-        "title": "isnull()",
-        "description": "Evaluates an expression and returns a Boolean result indicating whether the value is null.\n\n> \n> String values can't be null. Use isempty to determine if a value of type `string` is empty or not.",
-        "syntax": "`isnull(`*Expr*`)`",
-        "returnInfo": "Returns `true` if the value is null and `false` otherwise. Empty strings, arrays, property bags, and objects always return `false`.\n\nThe following table lists return values for different expressions (*x*):\n\n|x                |`isnull(x)`|\n|:-----------------|:-----------|\n|`\"\"`             |`false`    |\n|`\"x\"`            |`false`    |\n|`parse_json(\"\")`  |`true`     |\n|`parse_json(\"[]\")`|`false`    |\n|`parse_json(\"{}\")`|`false`    |",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*Expr*|scalar| *True*| The expression to evaluate whether the value is null. The expression can be any scalar value other than strings, arrays, or objects that always return `false`. For more information, see The dynamic data type.|",
-        "example": "StormEvents\n| where isnull(BeginLat) and isnull(BeginLon)\n| project StartTime, EndTime, EpisodeId, EventId, State, EventType, BeginLat, BeginLon",
-        "sourceLength": 3583,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/isnull-function"
-      }
-    },
-    {
       "name": "isutf8",
       "category": "Function",
       "documentation": {
@@ -16677,62 +16195,6 @@
       }
     },
     {
-      "name": "log",
-      "category": "Function",
-      "documentation": {
-        "title": "log()",
-        "description": "The natural logarithm is the base-e logarithm: the inverse of the natural exponential function (exp).",
-        "syntax": "`log(`*number*`)`",
-        "returnInfo": "* `log()` returns the natural logarithm of the input.\n* `null` if the argument is negative or null or can't be converted to a `real` value.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*number*| `real` |  *True* | The number for which to calculate the logarithm.|",
-        "example": "print result=log(5)",
-        "sourceLength": 1559,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/log-function"
-      }
-    },
-    {
-      "name": "log10",
-      "category": "Function",
-      "documentation": {
-        "title": "log10()",
-        "description": "`log10()` returns the common (base-10) logarithm of the input.",
-        "syntax": "`log10(`*number*`)`",
-        "returnInfo": "* The common logarithm is the base-10 logarithm: the inverse of the exponential function (exp) with base 10.\n* `null` if the argument is negative or null or can't be converted to a `real` value.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*number*| `real` |  *True* | The number for which to calculate the base-10 logarithm.|",
-        "example": "print result=log10(5)",
-        "sourceLength": 1599,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/log10-function"
-      }
-    },
-    {
-      "name": "log2",
-      "category": "Function",
-      "documentation": {
-        "title": "log2()",
-        "description": "The logarithm is the base-2 logarithm: the inverse of the exponential function (exp) with base 2.",
-        "syntax": "`log2(`*number*`)`",
-        "returnInfo": "* The logarithm is the base-2 logarithm: the inverse of the exponential function (exp) with base 2.\n* `null` if the argument is negative or null or can't be converted to a `real` value.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*number*| `real` |  *True* | The number for which to calculate the base-2 logarithm.|",
-        "example": "print result=log2(5)",
-        "sourceLength": 1623,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/log2-function"
-      }
-    },
-    {
-      "name": "loggamma",
-      "category": "Function",
-      "documentation": {
-        "title": "loggamma()",
-        "description": "Computes log of the absolute value of the gamma function",
-        "syntax": "`loggamma(`*number*`)`",
-        "returnInfo": "* Returns the natural logarithm of the absolute value of the gamma function of x.\n* For computing gamma function, see gamma().",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*number*| `real` |  *True* | The number for which to calculate the gamma.|",
-        "example": "print result=loggamma(5)",
-        "sourceLength": 1468,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/loggamma-function"
-      }
-    },
-    {
       "name": "make_datetime",
       "category": "Function",
       "documentation": {
@@ -16758,20 +16220,6 @@
         "example": "print ['timespan'] = make_timespan(1,12,30,55.123)",
         "sourceLength": 1905,
         "url": "https://learn.microsoft.com/en-us/kusto/query/make-timespan-function"
-      }
-    },
-    {
-      "name": "materialized_view",
-      "category": "Function",
-      "documentation": {
-        "title": "materialized_view()",
-        "description": "References the materialized part of a materialized view.\n\nThe `materialized_view()` function supports a way of querying the *materialized* part only of the view, while specifying the max latency the user is willing to tolerate. This option isn't guaranteed to return the most up-to-date records, but should always be more performant than querying the entire view. This function is useful for scenarios in which you're willing to sacrifice some freshness for performance, for example in telemetry dashboards.",
-        "syntax": "`materialized_view(`*ViewName*`,` [ *max_age* ] `)`",
-        "returnInfo": "",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *ViewName*| `string` |  *True*| The name of the materialized view.|\n| *max_age*| `timespan` || If not provided, only the *materialized* part of the view is returned. If provided, the function will return the _materialized_ part of the view if last materialization time is greater than `@now -  max_age`. Otherwise, the entire view is returned, which is identical to querying *ViewName* directly.|",
-        "example": "materialized_view(\"ViewName\")\n\nmaterialized_view(\"ViewName\", 10m)",
-        "sourceLength": 2956,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/materialized-view-function"
       }
     },
     {
@@ -16884,48 +16332,6 @@
         "example": "",
         "sourceLength": 3432,
         "url": "https://learn.microsoft.com/en-us/kusto/query/now-function"
-      }
-    },
-    {
-      "name": "pack",
-      "category": "Function",
-      "documentation": {
-        "title": "bag_pack()",
-        "description": "Creates a dynamic property bag object from a list of keys and values.\n\n> **Deprecated aliases**: pack(), pack_dictionary()",
-        "syntax": "`bag_pack(`*key1*`,` *value1*`,` *key2*`,` *value2*`,... )`",
-        "returnInfo": "Returns a `dynamic` property bag object from the listed *key* and *value* inputs.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*key*| `string` |  *True* | The key name.|\n|*value*| any scalar data type |  *True* | The key value.|\n\n> \n> The *key* and *value* strings are an alternating list the total length of the list must be even.",
-        "example": "print bag_pack(\"Level\", \"Information\", \"ProcessID\", 1234, \"Data\", bag_pack(\"url\", \"www.bing.com\"))\n\ndatatable (\n    Source: int,\n    Destination: int,\n    Message: string\n) [\n    1234, 100, \"AA\", \n    4567, 200, \"BB\",\n    1212, 300, \"CC\" \n]\n| extend MyBag=bag_pack(\"Dest\", Destination, \"Mesg\", Message)\n| project-away Source, Destination, Message\n| extend MyBag_Dest=MyBag.Dest, MyBag_Mesg=MyBag.Mesg\n\nlet SmsMessages = datatable (\n    SourceNumber: string,\n    TargetNumber: string,\n    CharsCount: string\n) [\n    \"555-555-1234\", \"555-555-1212\", \"46\", \n    \"555-555-1234\", \"555-555-1213\", \"50\",\n    \"555-555-1212\", \"555-555-1234\", \"32\" \n];\nlet MmsMessages = datatable (\n    SourceNumber: string,\n    TargetNumber: string,\n    AttachmentSize: string,\n    AttachmentType: string,\n    AttachmentName: string\n) [\n    \"555-555-1212\", \"555-555-1213\", \"200\", \"jpeg\", \"Pic1\",\n    \"555-555-1234\", \"555-555-1212\", \"250\", \"jpeg\", \"Pic2\",\n    \"555-555-1234\", \"555-555-1213\", \"300\", \"png\", \"Pic3\"\n];\nSmsMessages \n| join kind=inner MmsMessages on SourceNumber\n| extend Packed=bag_pack(\"CharsCount\", CharsCount, \"AttachmentSize\", AttachmentSize, \"AttachmentType\", AttachmentType, \"AttachmentName\", AttachmentName) \n| where SourceNumber == \"555-555-1234\"\n| project SourceNumber, TargetNumber, Packed",
-        "sourceLength": 5802,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/pack-function"
-      }
-    },
-    {
-      "name": "pack_all",
-      "category": "Function",
-      "documentation": {
-        "title": "pack_all()",
-        "description": "Creates a dynamic property bag object from all the columns of the tabular expression.\n\n> \n> The representation of the returned object isn't guaranteed to be byte-level-compatible between runs. For example, properties that appear in the bag may appear in a different order.",
-        "syntax": "`pack_all(`[ *ignore_null_empty* ]`)`",
-        "returnInfo": "",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *ignore_null_empty* | `bool` | | Indicates whether to ignore null/empty columns and exclude them from the resulting property bag. The default value is `false`.|",
-        "example": "datatable(SourceNumber:string,TargetNumber:string,CharsCount:long)\n[\n'555-555-1234','555-555-1212',46,\n'555-555-1234','555-555-1213',50,\n'555-555-1313','',42, \n'','555-555-3456',74 \n]\n| extend Packed=pack_all(), PackedIgnoreNullEmpty=pack_all(true)",
-        "sourceLength": 3221,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/pack-all-function"
-      }
-    },
-    {
-      "name": "pack_array",
-      "category": "Function",
-      "documentation": {
-        "title": "pack_array()",
-        "description": "Packs all input values into a dynamic array.",
-        "syntax": "`pack_array(`*value1*`,` [ *value2*, ... ]`)`\n\n`pack_array(*)`",
-        "returnInfo": "A dynamic array that includes the values of *value1*, *value2*, ... *valueN*.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *value1...valueN* | `string` |  *True* | Input expressions to be packed into a dynamic array.|\n| *The wildcard `*`*| `string` | | Providing the wildcard `*` packs all input columns into a dynamic array.|",
-        "example": "range x from 1 to 3 step 1\n| extend y = x * 2\n| extend z = y * 2\n| project pack_array(x, y, z)\n\nrange x from 1 to 3 step 1\n| extend y = tostring(x * 2)\n| extend z = (x * 2) * 1s\n| project pack_array(x, y, z)",
-        "sourceLength": 2249,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/pack-array-function"
       }
     },
     {
@@ -17839,20 +17245,6 @@
       }
     },
     {
-      "name": "series_log",
-      "category": "Function",
-      "documentation": {
-        "title": "series_log()",
-        "description": "Calculates the element-wise natural logarithm function (base-e) of the numeric series input.",
-        "syntax": "`series_log(`*series*`)`",
-        "returnInfo": "Dynamic array of the calculated natural logarithm function. Any non-numeric element yields a `null` element value.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *series* | `dynamic` |  *True* | An array of numeric values on which the natural logarithm function is applied.|",
-        "example": "print s = dynamic([1,2,3])\n| extend s_log = series_log(s)",
-        "sourceLength": 1611,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/series-log-function"
-      }
-    },
-    {
       "name": "series_magnitude",
       "category": "Function",
       "documentation": {
@@ -18091,62 +17483,6 @@
       }
     },
     {
-      "name": "set_difference",
-      "category": "Function",
-      "documentation": {
-        "title": "set_difference()",
-        "description": "Returns a `dynamic` (JSON) array of the set of all distinct values that are in the first array but aren't in other arrays - (((arr1 \\ arr2) \\ arr3) \\ ...).",
-        "syntax": "`set_difference(`*set1*`,` *set2* [`,`*set3*, ...]`)`",
-        "returnInfo": "Returns a dynamic array of the set of all distinct values that are in *set1* but aren't in other arrays.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *set1...setN* | `dynamic` |  *True* | Arrays used to create a difference set. A minimum of 2 arrays are required. See pack_array.|",
-        "example": "range x from 1 to 3 step 1\n| extend y = x * 2\n| extend z = y * 2\n| extend w = z * 2\n| extend a1 = pack_array(x,y,x,z), a2 = pack_array(x, y), a3 = pack_array(x,y,w)\n| project set_difference(a1, a2, a3)\n\nprint arr = set_difference(dynamic([1,2,3]), dynamic([1,2,3]))",
-        "sourceLength": 2467,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/set-difference-function"
-      }
-    },
-    {
-      "name": "set_has_element",
-      "category": "Function",
-      "documentation": {
-        "title": "set_has_element()",
-        "description": "Determines whether the specified set contains the specified element.",
-        "syntax": "`set_has_element(`*set*`,` *value*`)`",
-        "returnInfo": "`true` or `false` depending on if the value exists in the array.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *set* | `dynamic` |  *True* | The input array to search.|\n| *value* | |  *True* | The value for which to search. The value should be of type `long`, `int`, `double`, `datetime`, `timespan`, `decimal`, `string`, `guid`, or `bool`.|",
-        "example": "print arr=dynamic([\"this\", \"is\", \"an\", \"example\"]) \n| project Result=set_has_element(arr, \"example\")",
-        "sourceLength": 1877,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/set-has-element-function"
-      }
-    },
-    {
-      "name": "set_intersect",
-      "category": "Function",
-      "documentation": {
-        "title": "set_intersect()",
-        "description": "Returns a `dynamic` array of the set of all distinct values that are in all arrays - (arr1 ∩ arr2 ∩ ...).",
-        "syntax": "`set_intersect(`*set1*`,` *set2* [`,` *set3*, ...]`)`",
-        "returnInfo": "Returns a dynamic array of the set of all distinct values that are in all arrays.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *set1...setN* | `dynamic` |  *True* | Arrays used to create an intersect set. A minimum of 2 arrays are required. See pack_array.|",
-        "example": "range x from 1 to 3 step 1\n| extend y = x * 2\n| extend z = y * 2\n| extend w = z * 2\n| extend a1 = pack_array(x,y,x,z), a2 = pack_array(x, y), a3 = pack_array(w,x)\n| project set_intersect(a1, a2, a3)\n\nprint arr = set_intersect(dynamic([1, 2, 3]), dynamic([4,5]))",
-        "sourceLength": 2353,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/set-intersect-function"
-      }
-    },
-    {
-      "name": "set_union",
-      "category": "Function",
-      "documentation": {
-        "title": "set_union()",
-        "description": "Returns a `dynamic` array of the set of all distinct values that are in any of the arrays - (arr1 ∪ arr2 ∪ ...).",
-        "syntax": "`set_union(`*set1*`,` *set2* [`,` *set3*, ...]`)`",
-        "returnInfo": "Returns a dynamic array of the set of all distinct values that are in any of arrays.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *set1...setN* | `dynamic` |  *True* | Arrays used to create a union set. A minimum of two arrays are required. See pack_array.|",
-        "example": "",
-        "sourceLength": 2778,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/set-union-function"
-      }
-    },
-    {
       "name": "sign",
       "category": "Function",
       "documentation": {
@@ -18382,20 +17718,6 @@
         "example": "substring(\"123456\", 1)        // 23456\nsubstring(\"123456\", 2, 2)     // 34\nsubstring(\"ABCD\", 0, 2)       // AB\nsubstring(\"123456\", -2, 2)    // 56",
         "sourceLength": 1770,
         "url": "https://learn.microsoft.com/en-us/kusto/query/substring-function"
-      }
-    },
-    {
-      "name": "table",
-      "category": "Function",
-      "documentation": {
-        "title": "table()",
-        "description": "The table() function references a table by providing its name as an expression of type `string`.",
-        "syntax": "`table(` *TableName* [`,` *DataScope*] `)`",
-        "returnInfo": "`table(T)` returns:\n\n* Data from table *T* if a table named *T* exists.\n* Data returned by function *T* if a table named *T* doesn't exist but a function named *T* exists. Function *T* must take no arguments and must return a tabular result.\n* A semantic error is raised if there's no table named *T* and no function named *T*.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*TableName* | `string` |  *True* | The name of the table being referenced. The value of this expression must be constant at the point of call to the function, meaning it cannot vary by the data context.|\n| *DataScope* | `string` | | Used to restrict the table reference to data according to how this data falls under the table's effective cache policy. If used, the actual argument must be one of the Valid data scope values.\n\n### Valid data scope values\n\n|Value|Description|\n|:--|:--|\n| `hotcache`| Only data that is categorized as hot cache will be referenced.|\n| `all`| All the data in the table will be referenced.|\n| `default`| The default is `all`, except if it has been set to `hotcache` by the cluster admin.|",
-        "example": "",
-        "sourceLength": 4424,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/table-function"
       }
     },
     {
@@ -18931,20 +18253,6 @@
       }
     },
     {
-      "name": "buildschema",
-      "category": "Aggregation function",
-      "documentation": {
-        "title": "buildschema()",
-        "description": "Builds the minimal schema that admits all values of *DynamicExpr*.",
-        "syntax": "`buildschema` `(`*DynamicExpr*`)`",
-        "returnInfo": "Returns the minimal schema that admits all values of *DynamicExpr*.\n\n> \n> If the input is a JSON string, use the parse_json() function to convert the JSON to a dynamic value. Otherwise, an error might occur.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*DynamicExpr*| `dynamic` |  *True* | Expression used for the aggregation calculation.",
-        "example": "datatable(value: dynamic) [\n    dynamic({\"x\":1, \"y\":3.5}),\n    dynamic({\"x\":\"somevalue\", \"z\":[1, 2, 3]}),\n    dynamic({\"y\":{\"w\":\"zzz\"}, \"t\":[\"aa\", \"bb\"], \"z\":[\"foo\"]})\n]\n| summarize buildschema(value)",
-        "sourceLength": 3099,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/buildschema-aggregation-function"
-      }
-    },
-    {
       "name": "count",
       "category": "Aggregation function",
       "documentation": {
@@ -19152,20 +18460,6 @@
         "example": "let T = datatable(name:string, day_of_birth:long)\n[\n   \"John\", 9,\n   \"Paul\", 18,\n   \"George\", 25,\n   \"Ringo\", 7\n];\nT\n| summarize make_list_if(name, strlen(name) > 4)",
         "sourceLength": 2786,
         "url": "https://learn.microsoft.com/en-us/kusto/query/make-list-if-aggregation-function"
-      }
-    },
-    {
-      "name": "make_list_with_nulls",
-      "category": "Aggregation function",
-      "documentation": {
-        "title": "make_list_with_nulls()",
-        "description": "Creates a `dynamic` array of all the values of *expr* in the group, including null values.",
-        "syntax": "`make_list_with_nulls(`*expr*`)`",
-        "returnInfo": "Returns a `dynamic` JSON object (array) of all the values of *expr* in the group, including null values.\nIf the input to the `summarize` operator isn't sorted, the order of elements in the resulting array is undefined.\nIf the input to the `summarize` operator is sorted, the order of elements in the resulting array tracks that of the input.\n\n> \n> Use the `array_sort_asc()` or `array_sort_desc()` function to create an ordered list by some key.",
-        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *expr* | `string` |  *True* | The expression that to use to create the array. |",
-        "example": "let shapes = datatable (name:string , sideCount: int)\n[\n    \"triangle\", int(null),\n    \"square\", 4,\n    \"rectangle\", 4,\n    \"pentagon\", 5,\n    \"hexagon\", 6,\n    \"heptagon\", 7,\n    \"octagon\", 8,\n    \"nonagon\", 9,\n    \"decagon\", 10\n];\nshapes\n| summarize mylist = make_list_with_nulls(sideCount)",
-        "sourceLength": 2572,
-        "url": "https://learn.microsoft.com/en-us/kusto/query/make-list-with-nulls-aggregation-function"
       }
     },
     {
@@ -19475,5 +18769,5 @@
       }
     }
   ],
-  "lastUpdated": "2025-09-14T20:49:48.608Z"
+  "lastUpdated": "2025-09-15T09:05:29.275Z"
 }

@@ -12,18 +12,24 @@ const path = require('path');
 
 const isNotARG = (item) => {
     // Filter out items not available in Azure Resource Graph
-    // Should not start with _ or number
-    // Should not start with geo*
-    // Should not contain .
-    // Should not start with 'with_', 'hll_', 'punycode', 'rank_'
-    return item.startsWith('_') ||
+
+    // Should not start with '_' or number
+    return /^_/.test(item) ||
         /^\d/.test(item) ||
-        /^geo/i.test(item) ||
-        item.includes('.') ||
-        /^with_/i.test(item) ||
-        /^hll_/i.test(item) ||
-        /^punycode/i.test(item) ||
-        /^rank_/i.test(item);
+        // Should not start with 'geo', 'with', 'hll_', 'punycode', 'rank_', 'rowstore', 'quer' (query or queries), 'data', 'bag', 'bin_', 'entity_', 'hard', 'soft', 'set', 'node'
+        /^(geo|with|hll_|punycode|rank_|rowstore|quer|data|bag|bin_|entity_|hard|soft|set|node)/i.test(item) ||
+        // Should not contain '.'
+        /\./i.test(item) ||
+        // Should not contain 'schema', 'seal', 'partition', 'like', 'pack', 'null', 'policy', 'cache', 'table', 'containers', 'view', 'log', 'unique', 'security', 'access', 'statistics', 'retention', 'simple', 'shard', 'sql', 'materialize', 'pattern', 'optimization', 'other'
+        /(schema|partition|seal|like|pack|null|policy|cache|table|containers|view|log|unique|security|access|statistics|retention|simple|shard|sql|materialize|pattern|optimization|other)/i.test(item) ||
+        // Should not be 'commands-and-queries', 'force_remote', 'decodeblocks', 'step', 'callout', 'declare', 'expandoutput', 'mdm', 'missing', 'let', 'alias', 'verbose'
+        /^(commands-and-queries|force_remote|decodeblocks|step|callout|declare|expandoutput|mdm|missing|let|alias|verbose)$/i.test(item) ||
+        // Should not match 'containscs' because they're duplicates of 'contains_cs' and 'notcontains_cs'
+        /containscs/i.test(item) ||
+        // Should not match 'matches-regex' because it's 'matches regex'
+        /matches-regex/i.test(item) ||
+        // Should not start with mv without having dash, because there are duplicates of mv-apply and others without dash
+        /^mv[^-]/i.test(item);
 };
 
 // Function to clean markdown content - removes links, includes, Microsoft Learn callouts, and other formatting
@@ -1219,6 +1225,7 @@ class ARGSchemaGenerator {
                 const wordVariations = [
                     name,
                     name.toLowerCase(),
+                    name.replace(/\s/g, '-'),
                     name.replace(/_/g, '-'),
                     name.replace(/_/g, '-').toLowerCase(),
                     name.replace(/-/g, '_'),
