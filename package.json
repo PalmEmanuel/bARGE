@@ -49,12 +49,14 @@
       {
         "command": "barge.runQueryFromFile",
         "title": "Run Query from File",
-        "category": "bARGE"
+        "category": "bARGE",
+        "icon": "$(play)"
       },
       {
         "command": "barge.runQueryFromSelection",
         "title": "Run Selected Query",
-        "category": "bARGE"
+        "category": "bARGE",
+        "icon": "$(debug-line-by-line)"
       },
       {
         "command": "barge.setScope",
@@ -112,6 +114,18 @@
           "title": "bARGE: Run Query from File",
           "when": "resourceExtname == .kql",
           "group": "barge@1"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "barge.runQueryFromFile",
+          "when": "editorLangId == kql || resourceExtname == .kql",
+          "group": "navigation@1"
+        },
+        {
+          "command": "barge.runQueryFromSelection",
+          "when": "editorHasSelection && (editorLangId == kql || resourceExtname == .kql)",
+          "group": "navigation@2"
         }
       ]
     },
