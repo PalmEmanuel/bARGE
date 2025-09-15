@@ -1251,8 +1251,13 @@ class ARGSchemaGenerator {
                 name = realName;
 
                 if (name.toLowerCase() === 'limit') {
-                    // Special case: "limit" keyword in KQL is actually "take" operator
+                    // Special case: "limit" keyword in KQL is same as "take" operator
                     wordVariations.push('take');
+                }
+
+                if (name.toLowerCase() === 'order') {
+                    // Special case: "order" keyword in KQL is same as "sort" operator
+                    wordVariations.push('sort');
                 }
 
                 return docOperatorVariations.some(docVar => wordVariations.includes(docVar));

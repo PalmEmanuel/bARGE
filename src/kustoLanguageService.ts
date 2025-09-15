@@ -91,6 +91,11 @@ export class KustoLanguageServiceProvider implements
             suggestions.push(...this.filterCompletionItems(this.getKQLOperators(), lowerCurrentWord));
         }
 
+        // After 'order' or 'sort' - suggest 'by'
+        else if (this.isOrderByContext(linePrefix)) {
+            suggestions.push(...this.getOrderByCompletion(lowerCurrentWord));
+        }
+
         // After pipe - suggest operators
         else if (this.isAfterPipe(linePrefix)) {
             suggestions.push(...this.filterCompletionItems(this.getKQLOperators(), lowerCurrentWord));
@@ -152,6 +157,13 @@ export class KustoLanguageServiceProvider implements
      */
     private isResourceTypeContext(linePrefix: string): boolean {
         return /\btype\s*(==|=~)\s*['"]*[a-zA-Z0-9./]*$/i.test(linePrefix);
+    }
+
+    /**
+     * Check if we're after 'order' and should suggest 'by'
+     */
+    private isOrderByContext(linePrefix: string): boolean {
+        return /\b(sort|order)\s+[a-zA-Z]*$/i.test(linePrefix);
     }
 
     /**
@@ -346,6 +358,23 @@ export class KustoLanguageServiceProvider implements
             }
         }
 
+        return items;
+    }
+
+    /**
+     * Get 'by' completion after 'order' operator
+     */
+    private getOrderByCompletion(filter: string): vscode.CompletionItem[] {
+        const items: vscode.CompletionItem[] = [];
+        
+        if (!filter || 'by'.includes(filter)) {
+            const item = new vscode.CompletionItem('by', vscode.CompletionItemKind.Keyword);
+            item.detail = 'Keyword';
+            item.insertText = 'by ';
+            item.sortText = '1_by';
+            items.push(item);
+        }
+        
         return items;
     }
 
