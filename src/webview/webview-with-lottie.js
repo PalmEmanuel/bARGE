@@ -39,7 +39,6 @@ window.isLightTheme = function() {
         if (color && color !== 'transparent') {
             const brightness = getBrightness(color);
             if (brightness !== null) {
-                console.log(`Theme detection: color="${color}", brightness=${brightness}`);
                 return brightness > 128; // Light background = light theme
             }
         }

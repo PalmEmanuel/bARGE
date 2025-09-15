@@ -8,11 +8,12 @@ module.exports = {
             'style',    // Code style changes (formatting, semicolons, etc.) - no code logic changes
             'refactor', // Code changes that neither fix bugs nor add features
             'test',     // Add or modify tests
-            'chore',    // Maintenance tasks, build changes, dependency updates
+            'chore',    // Maintenance tasks, build changes
             'perf',     // Performance improvements
             'ci',       // CI/CD pipeline changes
             'dev',      // Development environment changes (esbuild, npm scripts, etc.)
-            'revert'    // Revert changes
+            'revert',    // Revert changes
+            'deps'      // Dependency updates
         ]],
         'scope-enum': [2, 'always', [
             'auth',     // Authentication and Azure service integration
@@ -27,6 +28,7 @@ module.exports = {
         // 'scope-empty': [1, 'never'], // Warn if scope is missing (but allow it)
         'subject-case': [2, 'always', 'sentence-case'],
         'subject-min-length': [2, 'always', 10],
+        'body-max-line-length': [1, 'never', 100],
         'header-max-length': [1, 'never', 100]
     }
 };
