@@ -941,15 +941,6 @@ export class KustoLanguageServiceProvider implements
 
         // Check schema data first if available
         if (this.schemaData) {
-            // First check keywords (where, project, contains, and, or, etc.) regardless of parentheses
-            // Keywords should always be checked first as they're fundamental language constructs
-            if (this.schemaData.keywords) {
-                const keyword = this.schemaData.keywords.find((kw: any) => kw.name.toLowerCase() === baseOperatorName);
-                if (keyword) {
-                    return `**${keyword.name}** - ${keyword.category}`;
-                }
-            }
-
             // If we detect immediate parentheses, prioritize function and aggregate matching
             if (hasImmediateParentheses) {
                 let func = null;
@@ -1005,6 +996,15 @@ export class KustoLanguageServiceProvider implements
                         // Fallback to old format
                         return `**Function: ${func.name}()** - ${func.category}`;
                     }
+                }
+            }
+
+            // Check keywords (where, project, contains, and, or, etc.) when NOT a function call
+            // Keywords are fundamental language constructs
+            if (this.schemaData.keywords) {
+                const keyword = this.schemaData.keywords.find((kw: any) => kw.name.toLowerCase() === baseOperatorName);
+                if (keyword) {
+                    return `**${keyword.name}** - ${keyword.category}`;
                 }
             }
 
@@ -1472,18 +1472,18 @@ ${example2Code}
             // vscode.languages.registerDocumentFormattingEditProvider(documentSelector, this)
         );
 
-        // Set up diagnostics
-        const updateDiagnostics = (document: vscode.TextDocument) => {
-            this.updateDiagnostics(document);
-        };
+        // // Set up diagnostics
+        // const updateDiagnostics = (document: vscode.TextDocument) => {
+        //     this.updateDiagnostics(document);
+        // };
 
-        vscode.workspace.textDocuments.forEach(updateDiagnostics);
+        // vscode.workspace.textDocuments.forEach(updateDiagnostics);
 
-        this.disposables.push(
-            vscode.workspace.onDidOpenTextDocument(updateDiagnostics),
-            vscode.workspace.onDidChangeTextDocument(e => updateDiagnostics(e.document)),
-            vscode.workspace.onDidCloseTextDocument(doc => this.diagnosticCollection.delete(doc.uri))
-        );
+        // this.disposables.push(
+        //     vscode.workspace.onDidOpenTextDocument(updateDiagnostics),
+        //     vscode.workspace.onDidChangeTextDocument(e => updateDiagnostics(e.document)),
+        //     vscode.workspace.onDidCloseTextDocument(doc => this.diagnosticCollection.delete(doc.uri))
+        // );
 
         // Add all disposables to context
         context.subscriptions.push(...this.disposables);

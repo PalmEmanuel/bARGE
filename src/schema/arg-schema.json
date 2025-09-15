@@ -15593,6 +15593,20 @@
       }
     },
     {
+      "name": "floor",
+      "category": "Function",
+      "documentation": {
+        "title": "bin()",
+        "description": "Rounds values down to an integer multiple of a given bin size.\n\nUsed frequently in combination with `summarize by ...`.\nIf you have a scattered set of values, they'll be grouped into a smaller set of specific values.\n\n> The `bin()` and `floor()` functions are equivalent",
+        "syntax": "`bin(`*value*`,`*roundTo*`)`",
+        "returnInfo": "The nearest multiple of *roundTo* below *value*. Null values, a null bin size, or a negative bin size will result in null.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *value* |  int, long, real, timespan, or datetime |  *True* | The value to round down. |\n| *roundTo* |  int, long, real, or timespan |  *True* | The \"bin size\" that divides *value*. |",
+        "example": "print bin(4.5, 1)\n\nprint bin(time(16d), 7d)\n\nprint bin(datetime(1970-05-11 13:45:07), 1d)\n\nlet Start = datetime('2007-04-07');\nlet End = Start + 7d;\nStormEvents\n| where StartTime between (Start .. End)\n| where State == \"CALIFORNIA\" and EventType == \"Strong Wind\"\n| summarize PropertyDamage=sum(DamageProperty) by bin(StartTime, 1d)\n\nlet Start = datetime('2007-04-07');\nlet End = Start + 7d;\nStormEvents\n| where StartTime between (Start .. End)\n| where State == \"CALIFORNIA\" and EventType == \"Strong Wind\"\n| union (\n    range x from 1 to 1 step 1\n    | mv-expand StartTime=range(Start, End, 1d) to typeof(datetime)\n    | extend PropertyDamage=0\n    )\n| summarize PropertyDamage=sum(DamageProperty) by bin(StartTime, 1d)",
+        "sourceLength": 5803,
+        "url": "https://learn.microsoft.com/en-us/kusto/query/bin-function"
+      }
+    },
+    {
       "name": "format_bytes",
       "category": "Function",
       "documentation": {
@@ -18785,5 +18799,5 @@
       }
     }
   ],
-  "lastUpdated": "2025-09-15T12:02:48.812Z"
+  "lastUpdated": "2025-09-15T12:39:05.852Z"
 }

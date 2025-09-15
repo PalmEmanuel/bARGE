@@ -32,10 +32,6 @@ const isNotARG = (item) => {
         /^mv[^-]/i.test(item);
 };
 
-const isNotARGKeyword = (item) => {
-
-};
-
 // Function to clean markdown content - removes links, includes, Microsoft Learn callouts, and other formatting
 function cleanMarkdown(text) {
     if (!text) {
@@ -1362,6 +1358,11 @@ class ARGSchemaGenerator {
             if (func.name.toLowerCase() === 'iif') {
                 // Special case: "iif" in KQL is same as "iff" function
                 wordVariations.push('iff');
+            }
+
+            if (func.name.toLowerCase() === 'floor') {
+                // Special case: "floor" in KQL is same as "bin" function
+                wordVariations.push('bin');
             }
 
             // Find the corresponding documented function
