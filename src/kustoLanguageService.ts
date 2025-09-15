@@ -103,6 +103,7 @@ export class KustoLanguageServiceProvider implements
 
         // In function context - suggest functions
         else if (this.isAfterOperator(linePrefix)) {
+            suggestions.push(...this.filterCompletionItems(this.getKQLKeywords(), lowerCurrentWord));
             suggestions.push(...this.getCommonColumns(lowerCurrentWord));
             suggestions.push(...this.filterCompletionItems(this.getKQLFunctions(), lowerCurrentWord));
         }
@@ -127,6 +128,7 @@ export class KustoLanguageServiceProvider implements
 
         // Default: suggest common operators and functions
         else {
+            suggestions.push(...this.filterCompletionItems(this.getKQLKeywords(), lowerCurrentWord));
             suggestions.push(...this.filterCompletionItems(this.getKQLOperators(), lowerCurrentWord));
             suggestions.push(...this.filterCompletionItems(this.getKQLFunctions(), lowerCurrentWord));
 
@@ -705,7 +707,18 @@ export class KustoLanguageServiceProvider implements
     }
 
     private isAfterOperator(linePrefix: string): boolean {
-        return /[a-zA-Z_][a-zA-Z0-9_]*\s*\($|[=\s]\s*[a-zA-Z_]*$/.test(linePrefix);
+        let operatorPattern = '';
+        if (this.schema?.operators) {
+            const operatorNames = this.schema.operators.map((op: any) => op.name).join('|');
+            operatorPattern = `\\b(${operatorNames}\\s+by)\\s+[a-zA-Z0-9_,.\\s]*$`;
+        }
+
+        // Check for operator + by pattern if we have schema data
+        const hasOperatorByPattern = operatorPattern ?
+            new RegExp(operatorPattern, 'i').test(linePrefix) : false;
+
+        return hasOperatorByPattern ||
+            /[a-zA-Z_][a-zA-Z0-9_]*\s*\($|[=\s]\s*[a-zA-Z_]*$/.test(linePrefix);
     }
 
     private isPropertyContext(linePrefix: string): boolean {
@@ -726,27 +739,6 @@ export class KustoLanguageServiceProvider implements
 
     private getKQLOperators(): vscode.CompletionItem[] {
         const operators: vscode.CompletionItem[] = [];
-
-        // Use schema data for keywords
-        if (this.schema?.keywords) {
-            for (const kw of this.schema.keywords) {
-                const item = new vscode.CompletionItem(kw.name, vscode.CompletionItemKind.Keyword);
-                item.detail = `${kw.category}`;
-                item.insertText = kw.name;
-
-                // Use getKQLDocumentation for consistent documentation formatting
-                const documentation = this.getKQLDocumentation(kw.name);
-                if (documentation) {
-                    item.documentation = new vscode.MarkdownString(documentation);
-                } else {
-                    item.documentation = new vscode.MarkdownString(kw.category);
-                }
-
-                item.sortText = `2_${kw.name}`;
-                item.filterText = kw.name;
-                operators.push(item);
-            }
-        }
 
         // Use schema data for operators
         if (this.schema?.operators) {
@@ -770,6 +762,33 @@ export class KustoLanguageServiceProvider implements
         }
 
         return operators;
+    }
+
+    private getKQLKeywords(): vscode.CompletionItem[] {
+        const keywords: vscode.CompletionItem[] = [];
+
+        // Use schema data to complete only keywords and & or
+        if (this.schema?.keywords) {
+            for (const kw of this.schema.keywords.filter((k: any) => k.name.toLowerCase() === 'and' || k.name.toLowerCase() === 'or')) {
+                const item = new vscode.CompletionItem(kw.name, vscode.CompletionItemKind.Keyword);
+                item.detail = `${kw.category}`;
+                item.insertText = kw.name;
+
+                // Use getKQLDocumentation for consistent documentation formatting
+                const documentation = this.getKQLDocumentation(kw.name);
+                if (documentation) {
+                    item.documentation = new vscode.MarkdownString(documentation);
+                } else {
+                    item.documentation = new vscode.MarkdownString(kw.category);
+                }
+
+                item.sortText = `1_${kw.name}`;
+                item.filterText = kw.name;
+                keywords.push(item);
+            }
+        }
+
+        return keywords;
     }
 
     /**

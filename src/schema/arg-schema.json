@@ -13682,7 +13682,7 @@
         "returnInfo": "",
         "parametersTable": "|Name|Type|Required|Description|\n|:--|:--|:--|:--|\n|`ItemIndex`| `string` ||Indicates the name of a column of type `long` that's appended to the input as part of the array-expansion phase and indicates the 0-based array index of the expanded value.|\n|`Name`| `string` ||The name to assign the array-expanded values of each array-expanded expression. If not specified, the name of the column is used if available. A random name is generated if *ArrayExpression* isn't a simple column name.|\n|`ArrayExpression`| `dynamic` | *True*|The array whose values are array-expanded. If the expression is the name of a column in the input, the input column is removed from the input and a new column of the same name, or *ColumnName* if specified, appears in the output.|\n|`Typename`| `string` ||The name of the type that the individual elements of the `dynamic` array *ArrayExpression* take. Elements that don't conform to this type are replaced by a null value. If unspecified, `dynamic` is used by default.|\n|`RowLimit`| `int` ||A limit on the number of records to generate from each record of the input. If unspecified, 2147483647 is used.|\n|`SubQuery`| `string` ||A tabular query expression with an implicit tabular source that gets applied to each array-expanded subtable.|\n\n>\n> Unlike the `mv-expand` operator, the `mv-apply` operator doesn't support `bagexpand=array` expansion. If the expression to be expanded is a property bag and not an array, you can use an inner `mv-expand` operator (see the following example).",
         "example": "",
-        "sourceLength": 12829,
+        "sourceLength": 12767,
         "url": "https://learn.microsoft.com/en-us/kusto/query/mv-apply-operator"
       }
     },
@@ -15889,6 +15889,19 @@
     {
       "name": "iff",
       "category": "Function",
+      "documentation": {
+        "title": "iff()",
+        "description": "Returns the *:::no-loc text=\"then\":::* value when the *:::no-loc text=\"if\":::* condition evaluates to `true`, otherwise it returns the *:::no-loc text=\"else\":::* value.\n\n> The `iff()` and `iif()` functions are equivalent.",
+        "syntax": "`iff(`*:::no-loc text=\"if\":::*`,` *:::no-loc text=\"then\":::*`,` *:::no-loc text=\"else\":::*`)`",
+        "returnInfo": "This function returns the  *:::no-loc text=\"then\":::* value when the *:::no-loc text=\"if\":::* condition evaluates to `true`, otherwise it returns the *:::no-loc text=\"else\":::* value.",
+        "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*:::no-loc text=\"if\":::*| `string` |  *True* | An expression that evaluates to a boolean value.|\n|*:::no-loc text=\"then\":::*| scalar |  *True* | An expression that returns its value when the *:::no-loc text=\"if\":::* condition evaluates to `true`.|\n|*:::no-loc text=\"else\":::*| scalar |  *True* | An expression that returns its value when the *:::no-loc text=\"if\":::* condition evaluates to `false`.|",
+        "example": "",
+        "sourceLength": 4241,
+        "url": "https://learn.microsoft.com/en-us/kusto/query/iff-function"
+      }
+    },
+    {
+      "name": "iif",
       "documentation": {
         "title": "iff()",
         "description": "Returns the *:::no-loc text=\"then\":::* value when the *:::no-loc text=\"if\":::* condition evaluates to `true`, otherwise it returns the *:::no-loc text=\"else\":::* value.\n\n> The `iff()` and `iif()` functions are equivalent.",
@@ -18769,5 +18782,5 @@
       }
     }
   ],
-  "lastUpdated": "2025-09-15T09:05:29.275Z"
+  "lastUpdated": "2025-09-15T11:37:05.079Z"
 }

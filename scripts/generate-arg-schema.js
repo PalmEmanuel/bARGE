@@ -32,6 +32,10 @@ const isNotARG = (item) => {
         /^mv[^-]/i.test(item);
 };
 
+const isNotARGKeyword = (item) => {
+
+};
+
 // Function to clean markdown content - removes links, includes, Microsoft Learn callouts, and other formatting
 function cleanMarkdown(text) {
     if (!text) {
@@ -1354,6 +1358,12 @@ class ARGSchemaGenerator {
                 func.name.replace(/-/g, '_'),
                 func.name.replace(/-/g, '_').toLowerCase()
             ];
+
+            if (func.name.toLowerCase() === 'iif') {
+                // Special case: "iif" in KQL is same as "iff" function
+                wordVariations.push('iff');
+            }
+
             // Find the corresponding documented function
             const docFunction = allDocumentedFunctions.find(docFunc => {
                 return wordVariations.includes(docFunc.name);
@@ -1361,7 +1371,7 @@ class ARGSchemaGenerator {
 
             if (docFunction) {
                 func.documentation = docFunction.documentation;
-                func.category = docFunction.documentation.category;
+                func.category = docFunction.documentation.category ? docFunction.documentation.category : 'Function';
                 // Remove the inner category from documentation
                 delete docFunction.documentation.category;
                 matchedFunctionsList.push(func);
