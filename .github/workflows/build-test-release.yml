@@ -135,7 +135,7 @@ jobs:
         shell: pwsh
         run: | # powershell
           $ChangelogContent = Get-Content 'CHANGELOG.md' -Raw
-          # Replace ':arrow_lower_right:' with nothing
+          # Remove ':arrow_lower_right:' with trailing space
           $TrimmedContent = $ChangelogContent -replace ':arrow_lower_right: ', ''
           Set-Content -Path 'CHANGELOG.md' -Value $TrimmedContent -NoNewline
 
