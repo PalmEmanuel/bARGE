@@ -4,6 +4,14 @@ All notable changes to the bARGE Visual Studio Code extension will be documented
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [v1.1.2] - 2025-09-16
+### New Features
+- [`7105c86`](https://github.com/PalmEmanuel/bARGE/commit/7105c868ee2db5bae6a653b202498c2aabd3d11a) - Add configuration setting to hide login messages *(PR [#110](https://github.com/PalmEmanuel/bARGE/pull/110) by [@Copilot](https://github.com/apps/copilot-swe-agent))*
+  - *addresses issue [#89](https://github.com/PalmEmanuel/bARGE/issues/89) opened by [@PalmEmanuel](https://github.com/PalmEmanuel)*
+- [`d0ebc4c`](https://github.com/PalmEmanuel/bARGE/commit/d0ebc4ce4f3cc6495ea1e5526d61539999eef215) - Add configuration settings to disable intellisense hover or completions *(PR [#111](https://github.com/PalmEmanuel/bARGE/pull/111) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
+  - *addresses issue [#95](https://github.com/PalmEmanuel/bARGE/issues/95) opened by [@PalmEmanuel](https://github.com/PalmEmanuel)*
+
+
 ## [v1.1.1] - 2025-09-15
 ### Bug Fixes
 - [`3d343ba`](https://github.com/PalmEmanuel/bARGE/commit/3d343baa41e5db66795201c4a648b909ec3f6209) - Update schema path to use the distribution folder *(PR [#108](https://github.com/PalmEmanuel/bARGE/pull/108) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
@@ -158,3 +166,4 @@ Initial release of bARGE, supporting basic functionality for logging in using [D
 [v1.0.1]: https://github.com/PalmEmanuel/bARGE/compare/v1.0.0...v1.0.1
 [v1.1.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.0.1...v1.1.0
 [v1.1.1]: https://github.com/PalmEmanuel/bARGE/compare/v1.1.0...v1.1.1
+[v1.1.2]: https://github.com/PalmEmanuel/bARGE/compare/v1.1.1...v1.1.2
