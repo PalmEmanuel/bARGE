@@ -20,13 +20,14 @@ bARGE is a Visual Studio Code extension that brings Azure Resource Graph queryin
 ## Installation
 
 1. [Install the extension](https://marketplace.visualstudio.com/items?itemName=PalmEmanuel.barge-vscode) from the VS Code marketplace
-2. Run the following command in VS Code's Quick Open panel (CTRL / CMD + P):
+2. Search for `bARGE` and install it through the VS Code Extensions menu (CTRL / CMD + SHIFT + X)
+3. Run the following command in VS Code's Quick Open panel (CTRL / CMD + P):
 
 ```
 ext install PalmEmanuel.barge-vscode
 ```
 
-3. Or [build from source](#building-from-source) for development
+4. Or [build from source](#building-from-source) for development
 
 ## Using bARGE
 
