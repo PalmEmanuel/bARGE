@@ -68,6 +68,12 @@ export class KustoLanguageServiceProvider implements
         token: vscode.CancellationToken,
         context: vscode.CompletionContext
     ): Promise<vscode.CompletionItem[]> {
+        const config = vscode.workspace.getConfiguration('barge');
+        const enableCompletions = config.get('enableCompletions', true);
+        if (!enableCompletions) {
+            return [];
+        }
+
         const line = document.lineAt(position).text;
         const linePrefix = line.substring(0, position.character);
         const currentWord = this.getCurrentWord(linePrefix);
@@ -589,6 +595,14 @@ export class KustoLanguageServiceProvider implements
         position: vscode.Position,
         token: vscode.CancellationToken
     ): Promise<vscode.Hover | null> {
+        // Check if hover is enabled in configuration
+        const config = vscode.workspace.getConfiguration('barge');
+        const enableHoverTooltips = config.get('enableHoverTooltips', true);
+        
+        if (!enableHoverTooltips) {
+            return null;
+        }
+
         // Use enhanced word range detection to handle operators like !contains, mv-apply
         const enhancedWordInfo = this.getEnhancedWordRange(document, position);
         if (!enhancedWordInfo) {

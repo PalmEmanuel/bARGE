@@ -173,6 +173,16 @@
           "type": "boolean",
           "default": false,
           "description": "Hide login notifications and messages, except errors."
+        },
+        "barge.enableHoverTooltips": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable IntelliSense hover tooltips for KQL syntax."
+        },
+        "barge.enableCompletions": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable IntelliSense completions for KQL syntax."
         }
       }
     }
