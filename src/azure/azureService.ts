@@ -273,7 +273,7 @@ export class AzureService {
                 const hideLoginMessages = config.get('hideLoginMessages', false);
                 
                 if (!hideLoginMessages) {
-                    vscode.window.showInformationMessage(`Signed in as ${this.currentAccount} from [existing login](https://learn.microsoft.com/en-us/javascript/api/@azure/identity/defaultazurecredential?view=azure-node-latest)!`);
+                    vscode.window.showInformationMessage(`Signed in as ${this.currentAccount} from [existing login](https://learn.microsoft.com/en-us/javascript/api/@azure/identity/defaultazurecredential?view=azure-node-latest&wt.mc_id=DT-MVP-5005372)!`);
                 }
                 return true;
             }

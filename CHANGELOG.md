@@ -73,7 +73,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ### Added
 
-- Added sign-in account picker that shows available Microsoft accounts in VS Code alongside the [DefaultAzureCredential](https://learn.microsoft.com/en-us/javascript/api/@azure/identity/defaultazurecredential?view=azure-node-latest) option [#31](https://github.com/PalmEmanuel/bARGE/pull/31)
+- Added sign-in account picker that shows available Microsoft accounts in VS Code alongside the [DefaultAzureCredential](https://learn.microsoft.com/en-us/javascript/api/@azure/identity/defaultazurecredential?wt.mc_id=DT-MVP-5005372) option [#31](https://github.com/PalmEmanuel/bARGE/pull/31)
 - Added default keybinding `F5` for running a KQL query file [#31](https://github.com/PalmEmanuel/bARGE/pull/31)
 
 ### Changed
@@ -153,7 +153,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [v0.0.1] - 2025-08-30
 
-Initial release of bARGE, supporting basic functionality for logging in using [DefaultAzureCredential](https://learn.microsoft.com/en-us/javascript/api/@azure/identity/defaultazurecredential?view=azure-node-latest), running queries and displaying results in a table.
+Initial release of bARGE, supporting basic functionality for logging in using [DefaultAzureCredential](https://learn.microsoft.com/en-us/javascript/api/@azure/identity/defaultazurecredential?view=azure-node-latest&wt.mc_id=DT-MVP-5005372), running queries and displaying results in a table.
 [v1.0.0]: https://github.com/PalmEmanuel/bARGE/compare/v0.0.13...v1.0.0
 [v1.0.1]: https://github.com/PalmEmanuel/bARGE/compare/v1.0.0...v1.0.1
 [v1.1.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.0.1...v1.1.0
