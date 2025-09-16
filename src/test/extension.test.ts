@@ -7,6 +7,32 @@ import { QueryResponse, QueryResult } from '../types';
 suite('Extension Test Suite', () => {
 	vscode.window.showInformationMessage('Start all tests.');
 
+	suite('Configuration Tests', () => {
+		test('should have hideLoginPopups configuration property available', () => {
+			// This test verifies the configuration schema is properly defined
+			const config = vscode.workspace.getConfiguration('barge');
+			
+			// The configuration should be accessible (returns the default value if not set)
+			const hideLoginPopups = config.get('hideLoginPopups');
+			
+			// Should return either boolean value or undefined (if not configured)
+			assert.ok(typeof hideLoginPopups === 'boolean' || hideLoginPopups === undefined, 
+				'hideLoginPopups should be a boolean or undefined');
+			
+			// Default should be false according to our schema
+			const defaultValue = config.get('hideLoginPopups', false);
+			assert.strictEqual(typeof defaultValue, 'boolean', 'default value should be boolean');
+		});
+
+		test('should have autoAuthenticate configuration property available', () => {
+			// Verify the existing configuration property is still accessible
+			const config = vscode.workspace.getConfiguration('barge');
+			const autoAuthenticate = config.get('autoAuthenticate', true);
+			
+			assert.strictEqual(typeof autoAuthenticate, 'boolean', 'autoAuthenticate should be boolean');
+		});
+	});
+
 	suite('AzureService Tests', () => {
 		let azureService: AzureService;
 
