@@ -68,6 +68,12 @@ export class KustoLanguageServiceProvider implements
         token: vscode.CancellationToken,
         context: vscode.CompletionContext
     ): Promise<vscode.CompletionItem[]> {
+        const config = vscode.workspace.getConfiguration('barge');
+        const enableCompletions = config.get('enableCompletions', true);
+        if (!enableCompletions) {
+            return [];
+        }
+
         const line = document.lineAt(position).text;
         const linePrefix = line.substring(0, position.character);
         const currentWord = this.getCurrentWord(linePrefix);
