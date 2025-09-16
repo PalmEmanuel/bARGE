@@ -14,7 +14,7 @@ bARGE is a Visual Studio Code extension that brings Azure Resource Graph queryin
 - **Comparison**: Select two or more rows for comparison to see differences in their properties.
 - **Copy & Export**: Easily copy selected cells as formatted text or for Excel, or export entire results to CSV for further analysis.
 - **Scope Selection**: Choose the subscription or tenant scope for your queries.
-- **Authentication Options**: Authenticate using [DefaultAzureCredential](https://learn.microsoft.com/en-us/javascript/api/@azure/identity/defaultazurecredential?view=azure-node-latest) or VS Code's built-in Microsoft account provider.
+- **Authentication Options**: Authenticate using [DefaultAzureCredential](https://learn.microsoft.com/en-us/javascript/api/@azure/identity/defaultazurecredential?view=azure-node-latest&wt.mc_id=DT-MVP-5005372) or VS Code's built-in Microsoft account provider.
 - **Adaptive Layout and Theme**: The results panel adapts to your VS Code layout for both vertical and horizontal splits, and respects your theme settings for light and dark mode.
 
 ## Installation
@@ -38,7 +38,7 @@ The status bar at the bottom of VS Code shows the account currently logged into 
 
 ![Sign In](media/readme/gifs/sign-in.gif)
 
-By default, the extension will attempt to use the available tokens from the [DefaultAzureCredential](https://learn.microsoft.com/en-us/javascript/api/@azure/identity/defaultazurecredential?view=azure-node-latest) chain, which in order includes:
+By default, the extension will attempt to use the available tokens from the [DefaultAzureCredential](https://learn.microsoft.com/en-us/javascript/api/@azure/identity/defaultazurecredential?view=azure-node-latest&wt.mc_id=DT-MVP-5005372) chain, which in order includes:
 
 - Environment Variables
 - Workload Identity
@@ -81,6 +81,7 @@ bARGE supports functionality expected from modern tables and Azure Resource Grap
 The extension supports the following configuration options in VS Code settings:
 
 - `barge.autoAuthenticate`: Automatically authenticate with Azure on extension activation (default: true)
+- `barge.hideLoginMessages`: Hide login notifications and messages, except errors (default: false)
 - `barge.enableHoverTooltips`: Enable IntelliSense hover tooltips for Azure Resource Graph elements and KQL syntax like keywords, operators, functions, and tables (default: true)
 - `barge.enableCompletions`: Enable IntelliSense completions for Azure Resource Graph elements and KQL syntax like keywords, operators, functions, and tables (default: true)
 
@@ -112,9 +113,9 @@ If the problem persists, please create an Issue and try to describe the unexpect
 
 ## Resources
 
-- [Azure Resource Graph Documentation](https://docs.microsoft.com/en-us/azure/governance/resource-graph/)
-- [Azure Resource Graph Sample Queries](https://docs.microsoft.com/en-us/azure/governance/resource-graph/samples/starter)
-- [Azure Resource Graph Query Language](https://learn.microsoft.com/en-us/azure/governance/resource-graph/concepts/query-language)
+- [Azure Resource Graph Documentation](https://docs.microsoft.com/en-us/azure/governance/resource-graph?wt.mc_id=DT-MVP-5005372)
+- [Azure Resource Graph Sample Queries](https://docs.microsoft.com/en-us/azure/governance/resource-graph/samples/starter?wt.mc_id=DT-MVP-5005372)
+- [Azure Resource Graph Query Language](https://learn.microsoft.com/en-us/azure/governance/resource-graph/concepts/query-language?wt.mc_id=DT-MVP-5005372)
 
 <!-- References -->
 [bARGEDownloads]: https://img.shields.io/visual-studio-marketplace/d/PalmEmanuel.barge-vscode?label=bARGE%20Downloads

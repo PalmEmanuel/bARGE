@@ -167,7 +167,12 @@
         "barge.autoAuthenticate": {
           "type": "boolean",
           "default": true,
-          "description": "Automatically authenticate to Azure using DefaultAzureCredential on extension activation."
+          "description": "Automatically authenticate to Azure using DefaultAzureCredential on extension activation"
+        },
+        "barge.hideLoginMessages": {
+          "type": "boolean",
+          "default": false,
+          "description": "Hide login notifications and messages, except errors."
         },
         "barge.enableHoverTooltips": {
           "type": "boolean",

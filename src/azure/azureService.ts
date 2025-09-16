@@ -267,7 +267,14 @@ export class AzureService {
 
                 this.notifyLoadingStatusChanged(false);
                 this.notifyAuthStatusChanged();
-                vscode.window.showInformationMessage(`Signed in as ${this.currentAccount} from [existing login](https://learn.microsoft.com/en-us/javascript/api/@azure/identity/defaultazurecredential?view=azure-node-latest)!`);
+                
+                // Check if login popups should be hidden
+                const config = vscode.workspace.getConfiguration('barge');
+                const hideLoginMessages = config.get('hideLoginMessages', false);
+                
+                if (!hideLoginMessages) {
+                    vscode.window.showInformationMessage(`Signed in as ${this.currentAccount} from [existing login](https://learn.microsoft.com/en-us/javascript/api/@azure/identity/defaultazurecredential?view=azure-node-latest&wt.mc_id=DT-MVP-5005372)!`);
+                }
                 return true;
             }
         } catch (error) {
@@ -320,7 +327,13 @@ export class AzureService {
             this.notifyLoadingStatusChanged(false);
             this.notifyAuthStatusChanged();
 
-            vscode.window.showInformationMessage(`Signed in as ${session.account.label} from VS Code!`);
+            // Check if login popups should be hidden
+            const config = vscode.workspace.getConfiguration('barge');
+            const hideLoginMessages = config.get('hideLoginMessages', false);
+            
+            if (!hideLoginMessages) {
+                vscode.window.showInformationMessage(`Signed in as ${session.account.label} from VS Code!`);
+            }
             return true;
         } catch (error) {
             console.error('VS Code authentication error:', error);
@@ -588,9 +601,15 @@ export class AzureService {
             });
 
             if (selected) {
+                // Check if login popups should be hidden
+                const config = vscode.workspace.getConfiguration('barge');
+                const hideLoginMessages = config.get('hideLoginMessages', false);
+                
                 if (selected.label === 'Tenant Scope') {
                     this.currentScope = { type: 'tenant' };
-                    vscode.window.showInformationMessage('Scope set to: Tenant (all subscriptions)');
+                    if (!hideLoginMessages) {
+                        vscode.window.showInformationMessage('Scope set to: Tenant (all subscriptions)');
+                    }
                 } else {
                     const subscription = subscriptions.find(sub => sub.displayName === selected.label);
                     if (subscription) {
@@ -598,12 +617,20 @@ export class AzureService {
                             type: 'subscription',
                             subscriptions: [subscription.subscriptionId]
                         };
-                        vscode.window.showInformationMessage(`Scope set to: ${selected.label}`);
+                        if (!hideLoginMessages) {
+                            vscode.window.showInformationMessage(`Scope set to: ${selected.label}`);
+                        }
                     }
                 }
             }
         } catch (error) {
-            vscode.window.showErrorMessage(`Failed to set scope: ${error}`);
+            // Check if login popups should be hidden
+            const config = vscode.workspace.getConfiguration('barge');
+            const hideLoginMessages = config.get('hideLoginMessages', false);
+            
+            if (!hideLoginMessages) {
+                vscode.window.showErrorMessage(`Failed to set scope: ${error}`);
+            }
         }
     }
 
