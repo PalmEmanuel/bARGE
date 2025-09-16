@@ -4,6 +4,11 @@ All notable changes to the bARGE Visual Studio Code extension will be documented
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [v1.1.1] - 2025-09-15
+### Bug Fixes
+- [`3d343ba`](https://github.com/PalmEmanuel/bARGE/commit/3d343baa41e5db66795201c4a648b909ec3f6209) - Update schema path to use the distribution folder *(PR [#108](https://github.com/PalmEmanuel/bARGE/pull/108) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
+
+
 ## [v1.1.0] - 2025-09-15
 ### New Features
 - [`5345188`](https://github.com/PalmEmanuel/bARGE/commit/5345188dfb9d4829b050a1322cce87a945274df0) - Add full syntax highlighting, intellisense with hover, completions and documentation of KQL *(PR [#98](https://github.com/PalmEmanuel/bARGE/pull/98) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
@@ -152,3 +157,4 @@ Initial release of bARGE, supporting basic functionality for logging in using [D
 [v1.0.0]: https://github.com/PalmEmanuel/bARGE/compare/v0.0.13...v1.0.0
 [v1.0.1]: https://github.com/PalmEmanuel/bARGE/compare/v1.0.0...v1.0.1
 [v1.1.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.0.1...v1.1.0
+[v1.1.1]: https://github.com/PalmEmanuel/bARGE/compare/v1.1.0...v1.1.1
