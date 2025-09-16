@@ -157,15 +157,6 @@ export class AzureService {
         this.notifyLoadingStatusChanged(true, AzureService.SIGNING_IN_MESSAGE);
         
         try {
-            // Check if login popups should be hidden
-            const config = vscode.workspace.getConfiguration('barge');
-            const hideLoginPopups = config.get('hideLoginPopups', false);
-
-            if (hideLoginPopups) {
-                // When hiding popups, use DefaultAzureCredential directly
-                return await this.authenticateWithDefaultCredential();
-            }
-
             // Messages here use codicons - https://microsoft.github.io/vscode-codicons/dist/codicon.html
             // Always build picker items starting with DefaultAzureCredential option
             const defaultCredentialOption = '$(azure) Use DefaultAzureCredential';
@@ -247,12 +238,7 @@ export class AzureService {
 
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error);
-            const config = vscode.workspace.getConfiguration('barge');
-            const hideLoginPopups = config.get('hideLoginPopups', false);
-            
-            if (!hideLoginPopups) {
-                vscode.window.showErrorMessage(`Failed to authenticate: ${errorMessage}`);
-            }
+            vscode.window.showErrorMessage(`Failed to authenticate: ${errorMessage}`);
             console.error('Authentication failed:', error);
             this.notifyLoadingStatusChanged(false);
             return false;
@@ -284,9 +270,9 @@ export class AzureService {
                 
                 // Check if login popups should be hidden
                 const config = vscode.workspace.getConfiguration('barge');
-                const hideLoginPopups = config.get('hideLoginPopups', false);
+                const hideLoginMessages = config.get('hideLoginMessages', false);
                 
-                if (!hideLoginPopups) {
+                if (!hideLoginMessages) {
                     vscode.window.showInformationMessage(`Signed in as ${this.currentAccount} from [existing login](https://learn.microsoft.com/en-us/javascript/api/@azure/identity/defaultazurecredential?view=azure-node-latest)!`);
                 }
                 return true;
@@ -295,28 +281,14 @@ export class AzureService {
             console.error('DefaultAzureCredential authentication error:', error);
             this.clearAuthentication();
             this.notifyLoadingStatusChanged(false);
-            
-            // Check if login popups should be hidden
-            const config = vscode.workspace.getConfiguration('barge');
-            const hideLoginPopups = config.get('hideLoginPopups', false);
-            
-            if (!hideLoginPopups) {
-                vscode.window.showErrorMessage('Failed to authenticate! Try logging into Azure CLI, or to VS Code with a Microsoft account.');
-            }
+            vscode.window.showErrorMessage('Failed to authenticate! Try logging into Azure CLI, or to VS Code with a Microsoft account.');
             return false;
         }
 
         // If we reach here, authentication failed
         this.clearAuthentication();
         this.notifyLoadingStatusChanged(false);
-        
-        // Check if login popups should be hidden
-        const config = vscode.workspace.getConfiguration('barge');
-        const hideLoginPopups = config.get('hideLoginPopups', false);
-        
-        if (!hideLoginPopups) {
-            vscode.window.showErrorMessage('Failed to authenticate! Try logging into Azure CLI, or to VS Code with a Microsoft account.');
-        }
+        vscode.window.showErrorMessage('Failed to authenticate! Try logging into Azure CLI, or to VS Code with a Microsoft account.');
         return false;
     }
 
@@ -335,13 +307,7 @@ export class AzureService {
             );
 
             if (!session) {
-                // Check if login popups should be hidden
-                const config = vscode.workspace.getConfiguration('barge');
-                const hideLoginPopups = config.get('hideLoginPopups', false);
-                
-                if (!hideLoginPopups) {
-                    vscode.window.showErrorMessage(`Failed to authenticate with VS Code!`);
-                }
+                vscode.window.showErrorMessage(`Failed to authenticate with VS Code!`);
                 this.notifyLoadingStatusChanged(false);
                 return false;
             }
@@ -363,9 +329,9 @@ export class AzureService {
 
             // Check if login popups should be hidden
             const config = vscode.workspace.getConfiguration('barge');
-            const hideLoginPopups = config.get('hideLoginPopups', false);
+            const hideLoginMessages = config.get('hideLoginMessages', false);
             
-            if (!hideLoginPopups) {
+            if (!hideLoginMessages) {
                 vscode.window.showInformationMessage(`Signed in as ${session.account.label} from VS Code!`);
             }
             return true;
@@ -373,14 +339,7 @@ export class AzureService {
             console.error('VS Code authentication error:', error);
             this.clearAuthentication();
             this.notifyLoadingStatusChanged(false);
-            
-            // Check if login popups should be hidden
-            const config = vscode.workspace.getConfiguration('barge');
-            const hideLoginPopups = config.get('hideLoginPopups', false);
-            
-            if (!hideLoginPopups) {
-                vscode.window.showErrorMessage(`Failed to authenticate with VS Code: ${error}`);
-            }
+            vscode.window.showErrorMessage(`Failed to authenticate with VS Code: ${error}`);
             return false;
         }
     }
@@ -644,11 +603,11 @@ export class AzureService {
             if (selected) {
                 // Check if login popups should be hidden
                 const config = vscode.workspace.getConfiguration('barge');
-                const hideLoginPopups = config.get('hideLoginPopups', false);
+                const hideLoginMessages = config.get('hideLoginMessages', false);
                 
                 if (selected.label === 'Tenant Scope') {
                     this.currentScope = { type: 'tenant' };
-                    if (!hideLoginPopups) {
+                    if (!hideLoginMessages) {
                         vscode.window.showInformationMessage('Scope set to: Tenant (all subscriptions)');
                     }
                 } else {
@@ -658,7 +617,7 @@ export class AzureService {
                             type: 'subscription',
                             subscriptions: [subscription.subscriptionId]
                         };
-                        if (!hideLoginPopups) {
+                        if (!hideLoginMessages) {
                             vscode.window.showInformationMessage(`Scope set to: ${selected.label}`);
                         }
                     }
@@ -667,9 +626,9 @@ export class AzureService {
         } catch (error) {
             // Check if login popups should be hidden
             const config = vscode.workspace.getConfiguration('barge');
-            const hideLoginPopups = config.get('hideLoginPopups', false);
+            const hideLoginMessages = config.get('hideLoginMessages', false);
             
-            if (!hideLoginPopups) {
+            if (!hideLoginMessages) {
                 vscode.window.showErrorMessage(`Failed to set scope: ${error}`);
             }
         }

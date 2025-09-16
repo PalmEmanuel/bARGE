@@ -169,10 +169,10 @@
           "default": true,
           "description": "Automatically authenticate to Azure using DefaultAzureCredential on extension activation"
         },
-        "barge.hideLoginPopups": {
+        "barge.hideLoginMessages": {
           "type": "boolean",
           "default": false,
-          "description": "Hide login popup dialogs and messages (automatically use DefaultAzureCredential without prompts)"
+          "description": "Hide login notifications and messages, except errors."
         }
       }
     }

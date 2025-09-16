@@ -81,7 +81,7 @@ bARGE supports functionality expected from modern tables and Azure Resource Grap
 The extension supports the following configuration options in VS Code settings:
 
 - `barge.autoAuthenticate`: Automatically authenticate with Azure on extension activation (default: true)
-- `barge.hideLoginPopups`: Hide login popup dialogs and messages (automatically use DefaultAzureCredential without prompts) (default: false)
+- `barge.hideLoginMessages`: Hide login notifications and messages, except errors (default: false)
 
 The default keybindings for executing queries are also possible to change.
 
