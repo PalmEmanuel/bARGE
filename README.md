@@ -81,6 +81,8 @@ bARGE supports functionality expected from modern tables and Azure Resource Grap
 The extension supports the following configuration options in VS Code settings:
 
 - `barge.autoAuthenticate`: Automatically authenticate with Azure on extension activation (default: true)
+- `barge.enableHoverTooltips`: Enable IntelliSense hover tooltips for Azure Resource Graph elements and KQL syntax like keywords, operators, functions, and tables (default: true)
+- `barge.enableCompletions`: Enable IntelliSense completions for Azure Resource Graph elements and KQL syntax like keywords, operators, functions, and tables (default: true)
 
 The default keybindings for executing queries are also possible to change.
 

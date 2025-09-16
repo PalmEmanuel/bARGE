@@ -167,7 +167,17 @@
         "barge.autoAuthenticate": {
           "type": "boolean",
           "default": true,
-          "description": "Automatically authenticate to Azure using DefaultAzureCredential on extension activation"
+          "description": "Automatically authenticate to Azure using DefaultAzureCredential on extension activation."
+        },
+        "barge.enableHoverTooltips": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable IntelliSense hover tooltips for KQL syntax."
+        },
+        "barge.enableCompletions": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable IntelliSense completions for KQL syntax."
         }
       }
     }
