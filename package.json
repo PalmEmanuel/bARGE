@@ -168,6 +168,11 @@
           "type": "boolean",
           "default": true,
           "description": "Automatically authenticate to Azure using DefaultAzureCredential on extension activation"
+        },
+        "barge.enableHoverTooltips": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable hover tooltips for KQL syntax"
         }
       }
     }

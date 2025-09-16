@@ -589,6 +589,14 @@ export class KustoLanguageServiceProvider implements
         position: vscode.Position,
         token: vscode.CancellationToken
     ): Promise<vscode.Hover | null> {
+        // Check if hover is enabled in configuration
+        const config = vscode.workspace.getConfiguration('barge');
+        const enableHoverTooltips = config.get('enableHoverTooltips', true);
+        
+        if (!enableHoverTooltips) {
+            return null;
+        }
+
         // Use enhanced word range detection to handle operators like !contains, mv-apply
         const enhancedWordInfo = this.getEnhancedWordRange(document, position);
         if (!enhancedWordInfo) {
