@@ -33,6 +33,7 @@ export interface QueryResponse {
     data?: QueryResult;
     error?: string;
     errorDetails?: string;
+    rawError?: any; // Raw error response for detailed debugging
 }
 
 export interface AuthScope {

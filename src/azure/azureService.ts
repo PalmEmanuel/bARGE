@@ -393,6 +393,7 @@ export class AzureService {
             if (error instanceof Error && (error as any).details) {
                 const newError = new Error(`Query execution failed: ${error.message}`);
                 (newError as any).details = (error as any).details;
+                (newError as any).rawError = (error as any).rawError; // Preserve raw error data too!
                 throw newError;
             } else {
                 throw new Error(`Query execution failed: ${error}`);
@@ -432,9 +433,11 @@ export class AzureService {
         if (!response.ok) {
             let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
             let errorDetails = '';
+            let rawErrorBody: any = null;
 
             try {
                 const errorBody = await response.json() as any;
+                rawErrorBody = errorBody; // Capture the raw error response
 
                 if (errorBody.error) {
                     const error = errorBody.error;
@@ -501,6 +504,7 @@ export class AzureService {
 
             const error = new Error(errorMessage);
             (error as any).details = errorDetails;
+            (error as any).rawError = rawErrorBody; // Attach raw error data
             throw error;
         }
 

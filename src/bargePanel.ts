@@ -98,6 +98,7 @@ export class BargePanel {
         } catch (error) {
             let errorMessage = 'Unknown error occurred';
             let errorDetails = '';
+            let rawError: any = null;
 
             if (error instanceof Error) {
                 errorMessage = error.message;
@@ -127,6 +128,11 @@ export class BargePanel {
                         errorDetails = error.message;
                     }
                 }
+
+                // Extract raw error if available
+                if ((error as any).rawError) {
+                    rawError = (error as any).rawError;
+                }
             } else {
                 errorMessage = String(error);
             }
@@ -134,7 +140,8 @@ export class BargePanel {
             const response: QueryResponse = {
                 success: false,
                 error: errorMessage,
-                errorDetails: errorDetails
+                errorDetails: errorDetails,
+                rawError: rawError
             };
 
             this._panel.webview.postMessage({
