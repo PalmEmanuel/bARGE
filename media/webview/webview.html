@@ -1030,6 +1030,89 @@
             white-space: pre-wrap;
             word-break: break-all;
         }
+
+        .error-toggle-container {
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        .error-toggle-control {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85em;
+            font-family: var(--vscode-font-family);
+        }
+
+        .error-toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .error-toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .error-toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--vscode-button-secondaryBackground, #3c3c3c);
+            border: 1px solid var(--vscode-button-border, transparent);
+            transition: .3s;
+            border-radius: 12px;
+        }
+
+        .error-toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: var(--vscode-button-foreground, white);
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .error-toggle-slider {
+            background-color: var(--vscode-button-background);
+        }
+
+        input:focus + .error-toggle-slider {
+            outline: 1px solid var(--vscode-focusBorder);
+            outline-offset: 2px;
+        }
+
+        input:checked + .error-toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        .error-toggle-label {
+            color: var(--vscode-foreground);
+            font-weight: 500;
+        }
+
+        .error-raw-content {
+            background: rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            padding: 12px;
+            margin-top: 8px;
+            font-family: var(--vscode-editor-font-family);
+            font-size: 0.85em;
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow-x: auto;
+            text-align: left;
+        }
     </style>
 </head>
 

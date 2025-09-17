@@ -1887,7 +1887,7 @@ function reorderColumn(fromIndex, toIndex) {
     updateDetailsAfterSort();
 }
 
-function displayError(error, errorDetails) {
+function displayError(error, errorDetails, rawError) {
     const tableContainer = document.getElementById('tableContainer');
     const resultsInfo = document.getElementById('resultsInfo');
     const exportBtn = document.getElementById('exportBtn');
@@ -1900,12 +1900,15 @@ function displayError(error, errorDetails) {
         errorHtml += '<div class="error-message">' + escapeHtml(error) + '</div>';
     }
     
+    // Content container that will be toggled
+    errorHtml += '<div id="errorContentContainer">';
+    
     // Details section - render each as separate compact boxes
     if (errorDetails && errorDetails.trim()) {
         const detailSections = errorDetails.split('\n---\n'); // Split by our separator
         
         if (detailSections.length > 0) {
-            errorHtml += '<div class="error-details-container">';
+            errorHtml += '<div class="error-details-container" id="parsedErrorContent">';
             
             detailSections.forEach((section, index) => {
                 if (section.trim()) {
@@ -1938,6 +1941,32 @@ function displayError(error, errorDetails) {
         }
     }
     
+    // Raw error content (hidden by default)
+    if (rawError) {
+        const rawErrorJson = JSON.stringify(rawError, null, 2);
+        errorHtml += '<div class="error-raw-content" id="rawErrorContent" style="display: none;">';
+        errorHtml += escapeHtml(rawErrorJson);
+        errorHtml += '</div>';
+    }
+    
+    errorHtml += '</div>'; // Close errorContentContainer
+    
+    // Add toggle control if we have raw error data
+    const hasRawError = rawError && typeof rawError === 'object' && rawError !== null && Object.keys(rawError).length > 0;
+    
+    if (hasRawError) {
+        errorHtml += '<div class="error-toggle-container">';
+        errorHtml += '<div class="error-toggle-control">';
+        errorHtml += '<span class="error-toggle-label">Parsed Error</span>';
+        errorHtml += '<label class="error-toggle-switch">';
+        errorHtml += '<input type="checkbox" id="errorToggleInput" onchange="toggleErrorDisplay()">';
+        errorHtml += '<span class="error-toggle-slider"></span>';
+        errorHtml += '</label>';
+        errorHtml += '<span class="error-toggle-label">Raw Error</span>';
+        errorHtml += '</div>';
+        errorHtml += '</div>';
+    }
+    
     errorHtml += '</div>';
     
     if (tableContainer) {
@@ -1948,6 +1977,37 @@ function displayError(error, errorDetails) {
     }
     if (exportBtn) {
         exportBtn.style.display = 'none';
+    }
+}
+
+// Error display toggle functionality
+function toggleErrorDisplay() {
+    const toggleInput = document.getElementById('errorToggleInput');
+    const parsedContent = document.getElementById('parsedErrorContent');
+    const rawContent = document.getElementById('rawErrorContent');
+    
+    if (!toggleInput) {
+        return;
+    }
+    
+    const isShowingRaw = toggleInput.checked;
+    
+    if (isShowingRaw) {
+        // Switch to raw view
+        if (rawContent) {
+            rawContent.style.display = 'block';
+        }
+        if (parsedContent) {
+            parsedContent.style.display = 'none';
+        }
+    } else {
+        // Switch to parsed view
+        if (rawContent) {
+            rawContent.style.display = 'none';
+        }
+        if (parsedContent) {
+            parsedContent.style.display = 'block';
+        }
     }
 }
 
@@ -2712,7 +2772,7 @@ window.addEventListener('message', event => {
             if (message.payload.success) {
                 displayResults(message.payload.data);
             } else {
-                displayError(message.payload.error, message.payload.errorDetails);
+                displayError(message.payload.error, message.payload.errorDetails, message.payload.rawError);
             }
             break;
     }
