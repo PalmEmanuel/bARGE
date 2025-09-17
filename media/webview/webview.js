@@ -1952,7 +1952,7 @@ function displayError(error, errorDetails, rawError) {
     errorHtml += '</div>'; // Close errorContentContainer
     
     // Add toggle control if we have raw error data
-    const hasRawError = rawError && Object.keys(rawError).length > 0;
+    const hasRawError = rawError && typeof rawError === 'object' && rawError !== null && Object.keys(rawError).length > 0;
     
     if (hasRawError) {
         errorHtml += '<div class="error-toggle-container">';
