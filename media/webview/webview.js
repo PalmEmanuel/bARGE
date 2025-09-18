@@ -1,6 +1,75 @@
 const vscode = acquireVsCodeApi();
 let currentResults = null;
 let sortState = { column: null, direction: null };
+let resolvedColumns = new Map(); // Store resolved identity data by column index
+let resolvedCells = new Set(); // Store individually resolved cells as "row-col" strings
+
+// GUID detection utilities
+const GUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function isGuid(value) {
+    if (typeof value !== 'string') {
+        return false;
+    }
+    return GUID_REGEX.test(value);
+}
+
+function isGuidColumn(columnData, threshold = 0.7) {
+    if (!columnData || columnData.length === 0) {
+        return false;
+    }
+
+    // Filter out null/undefined values
+    const nonNullValues = columnData.filter(value => value !== null && value !== undefined);
+    
+    if (nonNullValues.length === 0) {
+        return false;
+    }
+
+    // Count how many values are GUIDs
+    const guidCount = nonNullValues.filter(value => isGuid(value)).length;
+    
+    // Return true if threshold percentage of values are GUIDs
+    return (guidCount / nonNullValues.length) >= threshold;
+}
+
+function isLikelyIdentityColumn(columnName) {
+    const lowerColumnName = columnName.toLowerCase().replace(/[_\s-]/g, '');
+    const identityNames = [
+        'principalid', 'objectid', 'userid', 'groupid', 'applicationid',
+        'serviceprincipalid', 'clientid', 'assignedto', 'assignedby',
+        'createdby', 'modifiedby', 'ownerid', 'memberid'
+    ];
+    
+    return identityNames.some(name => 
+        lowerColumnName.includes(name) || lowerColumnName.endsWith('id')
+    );
+}
+
+function shouldShowResolveButton(columnName, columnData) {
+    return isLikelyIdentityColumn(columnName) && isGuidColumn(columnData);
+}
+
+function isColumnResolvedOrHasResolvedVersion(columnIndex) {
+    // Check if this column index is directly in resolvedColumns (meaning it's a resolved column)
+    if (resolvedColumns.has(columnIndex)) {
+        return true;
+    }
+    
+    // Check if there's a resolved column for this original column that was FULLY resolved
+    // Look for a resolved column that has this column as its originalColumnIndex
+    for (const [resolvedColumnIndex, columnInfo] of resolvedColumns.entries()) {
+        if (columnInfo.originalColumnIndex === columnIndex && !columnInfo.isSingleCellResolution) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+function isCellIndividuallyResolved(row, col) {
+    return resolvedCells.has(`${row}-${col}`);
+}
 
 function escapeHtml(text) {
     if (typeof text !== 'string') {
@@ -29,6 +98,35 @@ function formatTimestamp(timestamp) {
 function formatCellValue(cell) {
     if (cell === null || cell === undefined) {
         return { displayValue: '<em style="color: var(--vscode-descriptionForeground);">null</em>', tooltipValue: 'null' };
+    }
+
+    // Check if this is already formatted HTML (marked with special prefix)
+    if (typeof cell === 'string' && cell.startsWith('__HTML__')) {
+        const htmlContent = cell.substring(8); // Remove the __HTML__ prefix
+        
+        // Extract custom tooltip content if it exists
+        const tooltipMatch = htmlContent.match(/data-tooltip="([^"]+)"/);
+        let tooltipValue;
+        if (tooltipMatch) {
+            // Decode the tooltip content
+            tooltipValue = tooltipMatch[1].replace(/&quot;/g, '"');
+        } else {
+            // Fallback: strip HTML for tooltip
+            tooltipValue = htmlContent.replace(/<[^>]*>/g, '');
+        }
+        
+        return {
+            displayValue: htmlContent, // Don't escape HTML for these special cases
+            tooltipValue: tooltipValue
+        };
+    }
+
+    // Check if this is already formatted HTML (for loading spinners and resolved identities)
+    if (typeof cell === 'string' && (cell.includes('<div class="guid-loading">') || cell.includes('<span class="resolved-identity">') || cell.includes('<em style="color:'))) {
+        return {
+            displayValue: cell, // Don't escape HTML for these special cases
+            tooltipValue: cell.replace(/<[^>]*>/g, '') // Strip HTML for tooltip
+        };
     }
 
     if (typeof cell === 'object') {
@@ -78,6 +176,12 @@ function displayResults(result, preserveDetailsPane = false) {
         closeDetails();
     }
 
+    // Reset resolved columns and cells when new query results come in (unless preserving details pane)
+    if (!preserveDetailsPane) {
+        resolvedColumns.clear();
+        resolvedCells.clear();
+    }
+
     const tableContainer = document.getElementById('tableContainer');
     const resultsInfo = document.getElementById('resultsInfo');
     const exportBtn = document.getElementById('exportBtn');
@@ -107,6 +211,11 @@ function displayResults(result, preserveDetailsPane = false) {
     result.columns.forEach((col, index) => {
         const sortClass = sortState.column === index ?
             (sortState.direction === 'asc' ? 'sorted-asc' : 'sorted-desc') : '';
+        
+        // Get column data for GUID detection
+        const columnData = result.data.map(row => row[index]);
+        const showResolveBtn = shouldShowResolveButton(col.name, columnData) && !isColumnResolvedOrHasResolvedVersion(index);
+        
         tableHtml += '<th class="' + sortClass + '" ' +
             'draggable="true" ' +
             'data-col-index="' + index + '" ' +
@@ -115,10 +224,28 @@ function displayResults(result, preserveDetailsPane = false) {
             'ondragover="handleDragOver(event)"' +
             'ondrop="handleDrop(event, ' + index + ')"' +
             'ondragend="handleDragEnd(event)"' +
-            'style="width: ' + (col.width || 'auto') + ';"' +
+            'style="width: ' + (col.width || 'auto') + '; position: relative;"' +
             'title="' + col.name + '">' +
-            '<span class="header-text">' + col.name + '</span>' +
-            '<div class="resize-handle" onmousedown="startResize(event, ' + index + ')"></div>' +
+            '<span class="header-text">' + col.name + '</span>';
+        
+        // Add resolve button if this is a GUID column
+        if (showResolveBtn) {
+            tableHtml += '<button class="resolve-guid-btn" onclick="showResolveMenu(event, ' + index + ', \'' + 
+                col.name + '\')" title="Resolve GUIDs in this column" style="' +
+                'position: absolute; right: 24px; top: 50%; transform: translateY(-50%); ' +
+                'background: none; border: none; cursor: pointer; padding: 4px; ' +
+                'color: var(--vscode-descriptionForeground); opacity: 0.7; ' +
+                'transition: opacity 0.2s ease; border-radius: 2px;">' +
+                '<svg viewBox="0 0 16 16" style="width: 14px; height: 14px; fill: currentColor;">' +
+                '<rect x="1" y="6" width="6" height="4" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/>' +
+                '<rect x="6" y="7" width="4" height="2" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/>' +
+                '<rect x="9" y="7.5" width="3" height="1" rx="0.5" fill="none" stroke="currentColor" stroke-width="1.5"/>' +
+                '<line x1="12" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
+                '<circle cx="3.5" cy="8" r="1" fill="none" stroke="currentColor" stroke-width="1"/>' +
+                '</svg></button>';
+        }
+        
+        tableHtml += '<div class="resize-handle" onmousedown="startResize(event, ' + index + ')"></div>' +
             '</th>';
     });
 
@@ -837,6 +964,8 @@ function createContextMenu() {
     let hasJsonCell = false;
     let rightClickedCellKey = null;
     let cellIsNull = false;
+    let isGuidCell = false; // Track if this is a GUID cell that can be resolved
+    let isErrorCell = false; // Track if this is an error cell
 
     if (rightClickedCell && currentResults && currentResults.data) {
         const { row, col } = rightClickedCell;
@@ -846,8 +975,28 @@ function createContextMenu() {
             cellIsNull = cellValue === null || cellValue === undefined;
             hasValidRightClick = !cellIsNull; // Only valid if not null
             rightClickedCellKey = row + '-' + col;
+            
+            // Check for JSON objects or resolved identity cells
             if (typeof cellValue === 'object' && cellValue !== null) {
                 hasJsonCell = true;
+            } else if (typeof cellValue === 'string' && cellValue.startsWith('__HTML__') && cellValue.includes('resolved-identity')) {
+                // Resolved identity cells should be treated as JSON cells
+                hasJsonCell = true;
+                
+                // Check if this is an error cell
+                if (cellValue.includes('error-cell')) {
+                    isErrorCell = true;
+                }
+            }
+            
+            // Check if this is a GUID that can be resolved
+            if (typeof cellValue === 'string' && !cellValue.startsWith('__HTML__') && currentResults.columns[col]) {
+                const columnName = currentResults.columns[col].name;
+                const columnData = currentResults.data.map(row => row[col]);
+                if (shouldShowResolveButton(columnName, columnData) && isGuid(cellValue) && 
+                    !isColumnResolvedOrHasResolvedVersion(col) && !isCellIndividuallyResolved(row, col)) {
+                    isGuidCell = true;
+                }
             }
         }
     }
@@ -874,8 +1023,8 @@ function createContextMenu() {
     let copyItem = null;
     const hasMultipleSelected = rightClickedSelectedCell && hasSelection && selectedCells.size > 1;
 
-    // Only show single cell copy if we don't have multiple cells selected
-    if (!hasMultipleSelected) {
+    // Only show single cell copy if we don't have multiple cells selected AND it's not an error cell
+    if (!hasMultipleSelected && !isErrorCell) {
         copyItem = document.createElement('div');
         copyItem.className = 'context-menu-item ' + (hasValidRightClick ? '' : 'disabled');
         copyItem.innerHTML = '<span>Copy</span>';
@@ -916,9 +1065,21 @@ function createContextMenu() {
     if (hasJsonCell && !(rightClickedSelectedCell && selectedCells.size > 1)) {
         copyFormattedItem = document.createElement('div');
         copyFormattedItem.className = 'context-menu-item';
-        copyFormattedItem.innerHTML = '<span>Copy Formatted</span>';
+        copyFormattedItem.innerHTML = '<span>Copy Data Formatted</span>';
         copyFormattedItem.addEventListener('click', () => {
             copyRightClickedCellFormatted();
+            hideContextMenu();
+        });
+    }
+
+    // Copy compressed option for single cell (only show if right-clicked cell contains JSON AND not in multi-selection context)
+    let copyCompressedItem = null;
+    if (hasJsonCell && !(rightClickedSelectedCell && selectedCells.size > 1)) {
+        copyCompressedItem = document.createElement('div');
+        copyCompressedItem.className = 'context-menu-item';
+        copyCompressedItem.innerHTML = '<span>Copy Data Compressed</span>';
+        copyCompressedItem.addEventListener('click', () => {
+            copyRightClickedCellCompressed();
             hideContextMenu();
         });
     }
@@ -926,6 +1087,18 @@ function createContextMenu() {
     // Copy selection formatted option - REMOVED per user request
     // Don't show formatted option for multi-cell selections
     let copySelectionFormattedItem = null;
+
+    // Resolve GUID option (only show if this is a GUID cell in a valid column)
+    let resolveGuidItem = null;
+    if (isGuidCell && hasValidRightClick) {
+        resolveGuidItem = document.createElement('div');
+        resolveGuidItem.className = 'context-menu-item';
+        resolveGuidItem.innerHTML = '<span>Resolve as Identity</span>';
+        resolveGuidItem.addEventListener('click', () => {
+            resolveSingleGuid(rightClickedCell.row, rightClickedCell.col);
+            hideContextMenu();
+        });
+    }
 
     // Add all menu items
     if (copyItem) {
@@ -940,8 +1113,14 @@ function createContextMenu() {
     if (copyFormattedItem) {
         customContextMenu.appendChild(copyFormattedItem);
     }
+    if (copyCompressedItem) {
+        customContextMenu.appendChild(copyCompressedItem);
+    }
     if (copySelectionFormattedItem) {
         customContextMenu.appendChild(copySelectionFormattedItem);
+    }
+    if (resolveGuidItem) {
+        customContextMenu.appendChild(resolveGuidItem);
     }
 
     document.body.appendChild(customContextMenu);
@@ -1196,10 +1375,7 @@ function copySelectedCellsWithHeaders() {
             rowGroups[cell.row] = {};
         }
         // Format the cell value for copying
-        let copyValue = cell.value;
-        if (typeof copyValue === 'object' && copyValue !== null) {
-            copyValue = JSON.stringify(copyValue);
-        }
+        const copyValue = cleanCellValueForCopy(cell.value);
         rowGroups[cell.row][cell.col] = copyValue || '';
     });
 
@@ -1249,7 +1425,16 @@ function copySelectedCellsFormatted() {
     // Format cells for copying - use formatted JSON for objects, regular text for others
     const formattedCells = cellData.map(cell => {
         let copyValue = cell.value;
-        if (typeof copyValue === 'object' && copyValue !== null) {
+        
+        // Handle special __HTML__ prefixed values by extracting the text content
+        if (typeof copyValue === 'string' && copyValue.startsWith('__HTML__')) {
+            const htmlContent = copyValue.substring(8); // Remove __HTML__ prefix
+            
+            // Create a temporary element to extract text content
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlContent;
+            copyValue = tempDiv.textContent || tempDiv.innerText || '';
+        } else if (typeof copyValue === 'object' && copyValue !== null) {
             // Use formatted JSON (like in tooltip) for objects
             try {
                 copyValue = JSON.stringify(copyValue, null, 2);
@@ -1274,7 +1459,7 @@ function copySelectedCellsFormatted() {
     });
 }
 
-function copyRightClickedCell() {
+function copyRightClickedCellCompressed() {
     if (!rightClickedCell || !currentResults || !currentResults.data ||
         isNaN(rightClickedCell.row) || isNaN(rightClickedCell.col) ||
         rightClickedCell.row < 0 || rightClickedCell.col < 0 ||
@@ -1286,12 +1471,81 @@ function copyRightClickedCell() {
     const cellValue = currentResults.data[rightClickedCell.row][rightClickedCell.col];
     let copyValue = cellValue;
 
-    // Format the cell value for copying
-    if (typeof copyValue === 'object' && copyValue !== null) {
+    // Handle special __HTML__ prefixed resolved identity values  
+    if (typeof copyValue === 'string' && copyValue.startsWith('__HTML__') && copyValue.includes('resolved-identity')) {
+        // Extract JSON data from data-tooltip attribute
+        const tooltipMatch = copyValue.match(/data-tooltip="([^"]+)"/);
+        if (tooltipMatch) {
+            try {
+                // Decode the tooltip content and parse as JSON
+                const decodedTooltip = tooltipMatch[1].replace(/&quot;/g, '"');
+                const jsonData = JSON.parse(decodedTooltip);
+                copyValue = JSON.stringify(jsonData); // Compressed (no formatting)
+            } catch (error) {
+                // Fallback to text content if JSON parsing fails
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = copyValue.substring(8);
+                copyValue = tempDiv.textContent || tempDiv.innerText || '';
+            }
+        } else {
+            // Fallback to text content
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = copyValue.substring(8);
+            copyValue = tempDiv.textContent || tempDiv.innerText || '';
+        }
+    } else if (typeof copyValue === 'object' && copyValue !== null) {
+        // Compressed JSON (no formatting)
+        try {
+            copyValue = JSON.stringify(copyValue);
+        } catch (error) {
+            copyValue = String(copyValue);
+        }
+    } else {
+        copyValue = String(copyValue || '');
+    }
+
+    // Copy to clipboard
+    navigator.clipboard.writeText(copyValue).then(() => {
+        // Copy successful - no feedback needed
+    }).catch(err => {
+        console.error('Failed to copy to clipboard:', err);
+        fallbackCopyTextToClipboard(copyValue);
+    });
+}
+
+// Helper function to clean cell values for copying (handles __HTML__ prefix)
+function cleanCellValueForCopy(cellValue) {
+    let copyValue = cellValue;
+
+    // Handle special __HTML__ prefixed values by extracting the text content
+    if (typeof copyValue === 'string' && copyValue.startsWith('__HTML__')) {
+        const htmlContent = copyValue.substring(8); // Remove __HTML__ prefix
+        
+        // Create a temporary element to extract text content
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = htmlContent;
+        copyValue = tempDiv.textContent || tempDiv.innerText || '';
+    } else if (typeof copyValue === 'object' && copyValue !== null) {
+        // Format the cell value for copying
         copyValue = JSON.stringify(copyValue);
     } else {
         copyValue = String(copyValue || '');
     }
+
+    return copyValue;
+}
+
+function copyRightClickedCell() {
+    if (!rightClickedCell || !currentResults || !currentResults.data ||
+        isNaN(rightClickedCell.row) || isNaN(rightClickedCell.col) ||
+        rightClickedCell.row < 0 || rightClickedCell.col < 0 ||
+        rightClickedCell.row >= currentResults.data.length ||
+        rightClickedCell.col >= (currentResults.data[rightClickedCell.row] || []).length) {
+        return;
+    }
+
+    const cellValue = currentResults.data[rightClickedCell.row][rightClickedCell.col];
+    const copyValue = cleanCellValueForCopy(cellValue);
 
     // Copy to clipboard
     navigator.clipboard.writeText(copyValue).then(() => {
@@ -1314,8 +1568,37 @@ function copyRightClickedCellFormatted() {
     const cellValue = currentResults.data[rightClickedCell.row][rightClickedCell.col];
     let copyValue = cellValue;
 
-    // Format the cell value for copying
-    if (typeof copyValue === 'object' && copyValue !== null) {
+    // Handle special __HTML__ prefixed resolved identity values
+    if (typeof copyValue === 'string' && copyValue.startsWith('__HTML__') && copyValue.includes('resolved-identity')) {
+        // Extract JSON data from data-tooltip attribute
+        const tooltipMatch = copyValue.match(/data-tooltip="([^"]+)"/);
+        if (tooltipMatch) {
+            try {
+                // Decode the tooltip content and parse as JSON
+                const decodedTooltip = tooltipMatch[1].replace(/&quot;/g, '"');
+                const jsonData = JSON.parse(decodedTooltip);
+                copyValue = JSON.stringify(jsonData, null, 2);
+            } catch (error) {
+                // Fallback to text content if JSON parsing fails
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = copyValue.substring(8);
+                copyValue = tempDiv.textContent || tempDiv.innerText || '';
+            }
+        } else {
+            // Fallback to text content
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = copyValue.substring(8);
+            copyValue = tempDiv.textContent || tempDiv.innerText || '';
+        }
+    } else if (typeof copyValue === 'string' && copyValue.startsWith('__HTML__')) {
+        const htmlContent = copyValue.substring(8); // Remove __HTML__ prefix
+        
+        // Create a temporary element to extract text content
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = htmlContent;
+        copyValue = tempDiv.textContent || tempDiv.innerText || '';
+    } else if (typeof copyValue === 'object' && copyValue !== null) {
+        // Format the cell value for copying
         // Use formatted JSON (like in tooltip) for objects
         try {
             copyValue = JSON.stringify(copyValue, null, 2);
@@ -1636,10 +1919,7 @@ function copySelectedCells() {
             rowGroups[cell.row] = {};
         }
         // Format the cell value for copying (use raw value for objects, formatted for display)
-        let copyValue = cell.value;
-        if (typeof copyValue === 'object' && copyValue !== null) {
-            copyValue = JSON.stringify(copyValue);
-        }
+        const copyValue = cleanCellValueForCopy(cell.value);
         rowGroups[cell.row][cell.col] = copyValue || '';
     });
 
@@ -2775,6 +3055,30 @@ window.addEventListener('message', event => {
                 displayError(message.payload.error, message.payload.errorDetails, message.payload.rawError);
             }
             break;
+        case 'guidResolved':
+            console.log('Received guidResolved message:', message.payload);
+            if (message.payload) {
+                if (message.payload.responseTarget === 'single-cell') {
+                    updateSingleResolvedCell(message.payload.cellPosition, message.payload.resolvedData, message.payload.isPartial);
+                } else {
+                    updateResolvedColumn(message.payload.columnIndex, message.payload.resolvedData, message.payload.isPartial);
+                }
+            }
+            break;
+        case 'confirmationResult':
+            console.log('Received confirmation result:', message.payload);
+            if (message.payload.confirmationType === 'bulkResolve' && message.payload.confirmed && window.pendingResolution) {
+                console.log('User confirmed bulk resolution, proceeding...');
+                const { columnIndex, columnName, resolveType } = window.pendingResolution;
+                // Clear the pending resolution
+                window.pendingResolution = null;
+                // Continue with the resolution (call the function again but skip confirmation)
+                continueResolveGuidColumn(columnIndex, columnName, resolveType);
+            } else if (message.payload.confirmationType === 'bulkResolve') {
+                console.log('User cancelled bulk resolution');
+                window.pendingResolution = null;
+            }
+            break;
     }
 });
 
@@ -2910,4 +3214,498 @@ function stopResizing() {
 
     document.removeEventListener('mousemove', handleResizing);
     document.removeEventListener('mouseup', stopResizing);
+}
+
+// GUID Resolution functionality
+function showResolveMenu(event, columnIndex, columnName) {
+    event.stopPropagation();
+    event.preventDefault();
+    
+    // Remove any existing menu
+    const existingMenu = document.querySelector('.resolve-context-menu');
+    if (existingMenu) {
+        existingMenu.remove();
+    }
+    
+    // Create context menu
+    const menu = document.createElement('div');
+    menu.className = 'resolve-context-menu';
+    
+    const menuItem = document.createElement('div');
+    menuItem.className = 'resolve-context-menu-item';
+    menuItem.textContent = 'Resolve as Identity';
+    menuItem.onclick = () => resolveGuidColumn(columnIndex, columnName, 'identity');
+    
+    menu.appendChild(menuItem);
+    
+    // Position menu relative to button
+    const rect = event.target.getBoundingClientRect();
+    menu.style.left = rect.left + 'px';
+    menu.style.top = (rect.bottom + 2) + 'px';
+    
+    document.body.appendChild(menu);
+    
+    // Close menu when clicking elsewhere
+    setTimeout(() => {
+        document.addEventListener('click', closeResolveMenu);
+    }, 0);
+}
+
+function closeResolveMenu() {
+    const menu = document.querySelector('.resolve-context-menu');
+    if (menu) {
+        menu.remove();
+    }
+    document.removeEventListener('click', closeResolveMenu);
+}
+
+function resolveSingleGuid(row, col) {
+    console.log('resolveSingleGuid called:', { row, col });
+    
+    if (!currentResults || !currentResults.data || !currentResults.data[row] || currentResults.data[row][col] === undefined) {
+        console.log('Invalid cell reference');
+        return;
+    }
+    
+    const cellValue = currentResults.data[row][col];
+    if (!isGuid(cellValue)) {
+        console.log('Cell value is not a GUID:', cellValue);
+        return;
+    }
+    
+    // Get column info
+    const columnName = currentResults.columns[col].name;
+    
+    // Create a new resolved column if it doesn't exist yet
+    let resolvedColumnIndex = col + 1;
+    const expectedResolvedColumnName = columnName + '_Resolved';
+    
+    // Check if resolved column already exists
+    let needToCreateColumn = true;
+    if (currentResults.columns[resolvedColumnIndex] && 
+        currentResults.columns[resolvedColumnIndex].name === expectedResolvedColumnName) {
+        needToCreateColumn = false;
+    }
+    
+    if (needToCreateColumn) {
+        // Create the resolved column but mark it as single-cell resolution
+        resolvedColumnIndex = addResolvedColumnForSingleCell(col, columnName, 'identity');
+        
+        // Set loading animation for the target cell immediately
+        currentResults.data[row][resolvedColumnIndex] = '__HTML__<div class="guid-loading"></div>';
+        
+        // Clear the loading spinner from all cells except the one we're resolving
+        currentResults.data.forEach((dataRow, rowIndex) => {
+            if (rowIndex !== row) {
+                dataRow[resolvedColumnIndex] = ''; // Empty for non-resolved cells
+            }
+        });
+        
+        // Re-render to show the new column with only one loading cell
+        displayResults(currentResults, true);
+    } else {
+        // Column exists, just add loading to this specific cell
+        currentResults.data[row][resolvedColumnIndex] = '__HTML__<div class="guid-loading"></div>';
+        displayResults(currentResults, true);
+    }
+    
+    // Resolve the single GUID
+    vscode.postMessage({
+        type: 'resolveGuids',
+        payload: {
+            columnIndex: resolvedColumnIndex,
+            columnName: columnName,
+            guids: [cellValue],
+            resolveType: 'identity',
+            responseTarget: 'single-cell',
+            cellPosition: { row, col: resolvedColumnIndex }
+        }
+    });
+}
+
+function resolveGuidColumn(columnIndex, columnName, resolveType) {
+    console.log('resolveGuidColumn called:', { columnIndex, columnName, resolveType });
+    closeResolveMenu();
+    
+    if (!currentResults || !currentResults.data) {
+        console.log('No current results or data');
+        return;
+    }
+    
+    // Extract unique GUIDs from column
+    const columnData = currentResults.data.map(row => row[columnIndex]);
+    const guids = [...new Set(columnData.filter(value => isGuid(value)))];
+    
+    console.log('Found GUIDs:', guids);
+    console.log('Number of GUIDs found:', guids.length);
+    
+    if (guids.length === 0) {
+        console.log('No valid GUIDs found');
+        vscode.postMessage({
+            type: 'showError',
+            payload: 'No valid GUIDs found in this column.'
+        });
+        return;
+    }
+    
+    // Check if more than 20 GUIDs to resolve, ask for confirmation
+    console.log('Checking if confirmation needed. GUIDs count:', guids.length);
+    if (guids.length > 20) {
+        console.log('Showing VS Code confirmation dialog');
+        
+        // Store the resolution parameters to continue after confirmation
+        window.pendingResolution = {
+            columnIndex,
+            columnName,
+            resolveType,
+            guids
+        };
+        
+        // Send confirmation request to VS Code
+        vscode.postMessage({
+            type: 'showConfirmation',
+            payload: {
+                message: `This will make ${guids.length} API calls to resolve ${currentResults.data.length} rows. This may take some time. Do you want to continue?`,
+                confirmationType: 'bulkResolve'
+            }
+        });
+        return; // Stop execution here, will continue in message handler
+    }
+    
+    // If no confirmation needed, continue with resolution
+    continueResolveGuidColumn(columnIndex, columnName, resolveType);
+}
+
+function continueResolveGuidColumn(columnIndex, columnName, resolveType) {
+    console.log('continueResolveGuidColumn called:', { columnIndex, columnName, resolveType });
+    
+    if (!currentResults || !currentResults.data) {
+        console.log('No current results or data');
+        return;
+    }
+    
+    // Extract unique GUIDs from column
+    const columnData = currentResults.data.map(row => row[columnIndex]);
+    const guids = [...new Set(columnData.filter(value => isGuid(value)))];
+    
+    console.log('Found GUIDs for continuation:', guids);
+    
+    if (guids.length === 0) {
+        console.log('No valid GUIDs found');
+        vscode.postMessage({
+            type: 'showError',
+            payload: 'No valid GUIDs found in this column.'
+        });
+        return;
+    }
+    
+    // Check if there's already a resolved column for this original column
+    let newColumnIndex = -1;
+    const expectedResolvedColumnName = columnName + '_Resolved';
+    
+    // Look for existing resolved column
+    for (const [resolvedColIndex, columnInfo] of resolvedColumns.entries()) {
+        if (columnInfo.originalColumnIndex === columnIndex && 
+            currentResults.columns[resolvedColIndex] && 
+            currentResults.columns[resolvedColIndex].name === expectedResolvedColumnName) {
+            newColumnIndex = resolvedColIndex;
+            break;
+        }
+    }
+    
+    if (newColumnIndex === -1) {
+        // No existing resolved column, create a new one
+        newColumnIndex = addResolvedColumn(columnIndex, columnName, resolveType);
+    } else {
+        // Reuse existing resolved column, fill it with loading spinners for all rows
+        currentResults.data.forEach((row, rowIndex) => {
+            if (!row[newColumnIndex] || row[newColumnIndex] === '') {
+                // Randomize both starting point and animation speed with 100% variation
+                const randomOffset = -Math.random() * 3; // Random point in cycle
+                const randomDuration = 1.5 + Math.random() * 3; // Duration between 1.5s and 4.5s (100% variation)
+                row[newColumnIndex] = `__HTML__<div class="guid-loading" style="--animation-delay: ${randomOffset}s; --animation-duration: ${randomDuration}s;"></div>`;
+            }
+        });
+        
+        // Update the column info to mark it as no longer single-cell resolution
+        if (resolvedColumns.has(newColumnIndex)) {
+            const columnInfo = resolvedColumns.get(newColumnIndex);
+            columnInfo.isSingleCellResolution = false;
+            columnInfo.isLoading = true;
+        }
+        
+        // Re-render to show loading spinners
+        displayResults(currentResults, true);
+    }
+    
+    // Send message to extension to resolve GUIDs
+    console.log('Sending resolveGuids message to extension');
+    vscode.postMessage({
+        type: 'resolveGuids',
+        payload: {
+            columnIndex: newColumnIndex, // Use the new column index, not the original
+            columnName: columnName,
+            guids: guids,
+            resolveType: resolveType
+        }
+    });
+}
+
+function addResolvedColumn(originalColumnIndex, originalColumnName, resolveType) {
+    if (!currentResults) {
+        return -1;
+    }
+    
+    const newColumnName = originalColumnName + '_Resolved';
+    const newColumnIndex = originalColumnIndex + 1;
+    
+    // Add new column definition
+    const newColumn = {
+        name: newColumnName,
+        type: 'string'
+    };
+    
+    currentResults.columns.splice(newColumnIndex, 0, newColumn);
+    
+    // Add empty data for new column with loading spinners
+    currentResults.data.forEach((row, rowIndex) => {
+        // Randomize both starting point and animation speed with 100% variation
+        const randomOffset = -Math.random() * 3; // Random point in cycle
+        const randomDuration = 1.5 + Math.random() * 3; // Duration between 1.5s and 4.5s (100% variation)
+        const loadingHtml = `__HTML__<div class="guid-loading" style="--animation-delay: ${randomOffset}s; --animation-duration: ${randomDuration}s;"></div>`;
+        row.splice(newColumnIndex, 0, loadingHtml);
+    });
+    
+    // Mark this column as being resolved
+    resolvedColumns.set(newColumnIndex, {
+        originalColumnIndex: originalColumnIndex,
+        originalColumnName: originalColumnName,
+        resolveType: resolveType,
+        isLoading: true
+    });
+    
+    // Re-render table
+    displayResults(currentResults, true);
+    
+    // Return the new column index
+    return newColumnIndex;
+}
+
+function addResolvedColumnForSingleCell(originalColumnIndex, originalColumnName, resolveType) {
+    if (!currentResults) {
+        return -1;
+    }
+    
+    const newColumnName = originalColumnName + '_Resolved';
+    const newColumnIndex = originalColumnIndex + 1;
+    
+    // Add new column definition
+    const newColumn = {
+        name: newColumnName,
+        type: 'string'
+    };
+    
+    currentResults.columns.splice(newColumnIndex, 0, newColumn);
+    
+    // Add empty data for new column (no loading spinners by default)
+    currentResults.data.forEach(row => {
+        row.splice(newColumnIndex, 0, '');
+    });
+    
+    // Mark this column as being resolved for single cells (different from full column resolution)
+    resolvedColumns.set(newColumnIndex, {
+        originalColumnIndex: originalColumnIndex,
+        originalColumnName: originalColumnName,
+        resolveType: resolveType,
+        isLoading: true,
+        isSingleCellResolution: true
+    });
+    
+    // Re-render table
+    displayResults(currentResults, true);
+    
+    // Return the new column index
+    return newColumnIndex;
+}
+
+function updateSingleResolvedCell(cellPosition, resolvedData, isPartial = false) {
+    console.log('updateSingleResolvedCell called:', { cellPosition, resolvedData, isPartial });
+    
+    if (!currentResults || !currentResults.data || !cellPosition) {
+        console.log('Invalid parameters for single cell update');
+        return;
+    }
+    
+    const { row, col } = cellPosition;
+    if (!currentResults.data[row] || currentResults.data[row][col] === undefined) {
+        console.log('Invalid cell position:', cellPosition);
+        return;
+    }
+    
+    // Create resolved map from response
+    const resolvedMap = new Map();
+    if (resolvedData && Array.isArray(resolvedData)) {
+        resolvedData.forEach(item => {
+            if (item.id) {
+                resolvedMap.set(item.id, item);
+            }
+        });
+    }
+    
+    // Find the original GUID from the original column (col - 1 since resolved column is col + 1)
+    const originalCol = col - 1;
+    const originalGuid = currentResults.data[row][originalCol];
+    
+    if (originalGuid && isGuid(originalGuid) && resolvedMap.has(originalGuid)) {
+        const resolved = resolvedMap.get(originalGuid);
+        if (resolved && !resolved.error) {
+            const displayName = resolved.displayName || resolved.userPrincipalName || 'Unknown';
+            const tooltip = JSON.stringify(resolved, null, 2);
+            currentResults.data[row][col] = `__HTML__<span class="resolved-identity" data-tooltip="${tooltip.replace(/"/g, '&quot;')}">${displayName}</span>`;
+            
+            // Track this cell as individually resolved
+            resolvedCells.add(`${row}-${originalCol}`);
+        } else {
+            // Extract the most meaningful error message from the error structure
+            let errorMessage = 'Failed to resolve GUID';
+            
+            if (resolved?.errorDetails) {
+                // Try to get the actual Graph API error message
+                if (resolved.errorDetails.fullApiResponse?.responseBody?.error?.message) {
+                    errorMessage = resolved.errorDetails.fullApiResponse.responseBody.error.message;
+                } else if (resolved.errorDetails.message) {
+                    errorMessage = resolved.errorDetails.message;
+                }
+            } else if (resolved?.error) {
+                errorMessage = resolved.error;
+            }
+            
+            currentResults.data[row][col] = `__HTML__<span class="resolved-identity error-cell" data-tooltip="${errorMessage}" style="color: var(--vscode-errorForeground);">Failed to resolve</span>`;
+        }
+    } else {
+        // Check if we have any resolved data for this GUID
+        const guidResolved = resolvedData.find(item => item.id === originalGuid);
+        if (guidResolved) {
+            // Extract the most meaningful error message from the error structure
+            let errorMessage = 'Failed to resolve GUID';
+            
+            if (guidResolved?.errorDetails) {
+                // Try to get the actual Graph API error message
+                if (guidResolved.errorDetails.fullApiResponse?.responseBody?.error?.message) {
+                    errorMessage = guidResolved.errorDetails.fullApiResponse.responseBody.error.message;
+                } else if (guidResolved.errorDetails.message) {
+                    errorMessage = guidResolved.errorDetails.message;
+                }
+            } else if (guidResolved?.error) {
+                errorMessage = guidResolved.error;
+            }
+            
+            currentResults.data[row][col] = `__HTML__<span class="resolved-identity error-cell" data-tooltip="${errorMessage}" style="color: var(--vscode-errorForeground);">Failed to resolve</span>`;
+        } else {
+            // Fallback error
+            currentResults.data[row][col] = `__HTML__<span class="resolved-identity error-cell" data-tooltip="No resolution data received" style="color: var(--vscode-errorForeground);">Failed to resolve</span>`;
+        }
+    }
+    
+    // Refresh the display
+    displayResults(currentResults, true);
+}
+
+function updateResolvedColumn(columnIndex, resolvedData, isPartial = false) {
+    console.log('updateResolvedColumn called:', { columnIndex, resolvedData, isPartial });
+    console.log('Current resolvedColumns Map:', resolvedColumns);
+    console.log('resolvedColumns.has(columnIndex):', resolvedColumns.has(columnIndex));
+    
+    if (!currentResults || !resolvedColumns.has(columnIndex)) {
+        console.log('No current results or resolved column not found');
+        console.log('currentResults exists:', !!currentResults);
+        console.log('resolvedColumns.has(columnIndex):', resolvedColumns.has(columnIndex));
+        console.log('Available keys in resolvedColumns:', Array.from(resolvedColumns.keys()));
+        return;
+    }
+    
+    const columnInfo = resolvedColumns.get(columnIndex);
+    const originalColumnIndex = columnInfo.originalColumnIndex;
+    
+    console.log('Column info:', columnInfo);
+    
+    // For partial updates, merge with existing resolved data
+    if (isPartial && columnInfo.resolvedData) {
+        // Create a map of existing resolved data
+        const existingMap = new Map();
+        columnInfo.resolvedData.forEach(identity => {
+            existingMap.set(identity.id, identity);
+        });
+        
+        // Add new resolved data to existing map (overwriting if exists)
+        resolvedData.forEach(identity => {
+            existingMap.set(identity.id, identity);
+        });
+        
+        // Update columnInfo with merged data
+        columnInfo.resolvedData = Array.from(existingMap.values());
+    } else {
+        // For final updates, replace all resolved data
+        columnInfo.resolvedData = resolvedData;
+    }
+    
+    // Create lookup map for resolved identities from current batch
+    const resolvedMap = new Map();
+    resolvedData.forEach(identity => {
+        resolvedMap.set(identity.id, identity);
+    });
+    
+    console.log('Resolved map:', resolvedMap);
+    
+    // Update data in resolved column
+    currentResults.data.forEach(row => {
+        const originalValue = row[originalColumnIndex];
+        if (isGuid(originalValue)) {
+            if (resolvedMap.has(originalValue)) {
+                // Only update rows for GUIDs that were included in this batch
+                const resolved = resolvedMap.get(originalValue);
+                if (resolved && !resolved.error) {
+                    const displayName = resolved.displayName || resolved.userPrincipalName || 'Unknown';
+                    const tooltip = JSON.stringify(resolved, null, 2);
+                    row[columnIndex] = `__HTML__<span class="resolved-identity" data-tooltip="${tooltip.replace(/"/g, '&quot;')}">${displayName}</span>`;
+                } else {
+                    // Extract the most meaningful error message from the error structure
+                    let errorMessage = 'Failed to resolve GUID';
+                    
+                    if (resolved?.errorDetails) {
+                        // Try to get the actual Graph API error message
+                        if (resolved.errorDetails.fullApiResponse?.responseBody?.error?.message) {
+                            errorMessage = resolved.errorDetails.fullApiResponse.responseBody.error.message;
+                        } else if (resolved.errorDetails.message) {
+                            errorMessage = resolved.errorDetails.message;
+                        }
+                    } else if (resolved?.error) {
+                        errorMessage = resolved.error;
+                    }
+                    
+                    row[columnIndex] = `__HTML__<span class="resolved-identity error-cell" data-tooltip="${errorMessage}" style="color: var(--vscode-errorForeground);">Failed to resolve</span>`;
+                }
+            } else if (!isPartial) {
+                // For final updates, fill in any remaining unresolved GUIDs with placeholder
+                if (row[columnIndex] === undefined || row[columnIndex] === '') {
+                    row[columnIndex] = '__HTML__<em style="color: var(--vscode-descriptionForeground);">Not resolved</em>';
+                }
+            }
+            // For partial updates, don't touch GUIDs not in this batch - leave them as they are
+        } else if (!isPartial) {
+            // For non-GUIDs, only set placeholder on final update
+            row[columnIndex] = '__HTML__<em style="color: var(--vscode-descriptionForeground);">-</em>';
+        }
+    });
+    
+    // Mark as no longer loading only for final updates
+    if (!isPartial) {
+        columnInfo.isLoading = false;
+    }
+    resolvedColumns.set(columnIndex, columnInfo);
+    
+    console.log('Re-rendering table with resolved data');
+    
+    // Re-render table
+    displayResults(currentResults, true);
 }

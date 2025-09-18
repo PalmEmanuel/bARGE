@@ -42,7 +42,7 @@ export interface AuthScope {
 }
 
 export interface WebviewMessage {
-    type: 'runQuery' | 'exportCsv' | 'authenticate' | 'getSubscriptions' | 'runFileQuery';
+    type: 'runQuery' | 'exportCsv' | 'authenticate' | 'getSubscriptions' | 'runFileQuery' | 'resolveGuids' | 'showError' | 'showConfirmation';
     payload?: any;
 }
 
@@ -180,4 +180,41 @@ export namespace showSchema {
         readonly Plugins: readonly unknown[];
         readonly Databases: Databases;
     }
+}
+
+/**
+ * Types for GUID resolution functionality
+ */
+export interface IdentityInfo {
+    id: string;
+    displayName?: string;
+    userPrincipalName?: string;
+    mail?: string;
+    objectType?: 'user' | 'group' | 'servicePrincipal' | 'application';
+    error?: string;
+    errorDetails?: {
+        type: string;
+        message: string;
+        stack?: string;
+        timestamp: string;
+        objectType?: string;
+        fullApiResponse?: any;
+    };
+}
+
+export interface ResolveGuidRequest {
+    columnIndex: number;
+    columnName: string;
+    guids: string[];
+    resolveType: 'identity';
+    responseTarget?: string;
+    cellPosition?: {row: number, col: number};
+}
+
+export interface ResolveGuidResponse {
+    columnIndex: number;
+    resolvedData: IdentityInfo[];
+    responseTarget?: string;
+    cellPosition?: {row: number, col: number};
+    isPartial?: boolean;
 }

@@ -392,6 +392,115 @@
             background-color: transparent !important;
         }
 
+        /* Resolve GUID button styles */
+        .resolve-guid-btn {
+            background: none !important;
+            border: none !important;
+            cursor: pointer !important;
+            padding: 2px !important;
+            color: var(--vscode-descriptionForeground) !important;
+            opacity: 0.7 !important;
+            transition: all 0.2s ease !important;
+            border-radius: 2px !important;
+            pointer-events: auto !important;
+        }
+
+        .resolve-guid-btn:hover {
+            opacity: 1 !important;
+            color: var(--vscode-foreground) !important;
+        }
+
+        .resolve-guid-btn:active {
+            color: var(--vscode-foreground) !important;
+        }
+
+        /* Context menu for resolve options */
+        .resolve-context-menu {
+            position: absolute;
+            background: var(--vscode-menu-background);
+            border: 1px solid var(--vscode-menu-border);
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            min-width: 150px;
+            padding: 4px 0;
+        }
+
+        .resolve-context-menu-item {
+            padding: 8px 16px;
+            cursor: pointer;
+            color: var(--vscode-menu-foreground);
+            font-size: 13px;
+            transition: background-color 0.1s ease;
+        }
+
+        .resolve-context-menu-item:hover {
+            background-color: var(--vscode-menu-selectionBackground);
+            color: var(--vscode-menu-selectionForeground);
+        }
+
+        .resolve-context-menu-item:active {
+            background-color: var(--vscode-menu-selectionBackground);
+            opacity: 0.8;
+        }
+
+        /* Loading chillwave effect for resolved columns */
+        .guid-loading {
+            display: inline-block;
+            width: 100%;
+            height: 100%;
+            min-height: 20px;
+            position: relative;
+            overflow: hidden;
+            background: transparent;
+        }
+
+        .guid-loading::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--vscode-textLink-foreground);
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 20'%3E%3Cpath d='M0 10c15 0 15-5 30-5s15 5 30 5 15-5 30-5s15 5 30 5 15-5 30-5s15 5 30 5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+            -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 20'%3E%3Cpath d='M0 10c15 0 15-5 30-5s15 5 30 5 15-5 30-5s15 5 30 5 15-5 30-5s15 5 30 5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+            mask-size: 120px 20px;
+            -webkit-mask-size: 120px 20px;
+            mask-repeat: repeat-x;
+            -webkit-mask-repeat: repeat-x;
+            opacity: 0.6;
+            animation: chillwave-flow var(--animation-duration, 3s) linear infinite;
+            animation-delay: var(--animation-delay, 0s);
+        }
+
+        .guid-loading-spinner {
+            /* This element is no longer needed but keeping for backward compatibility */
+            display: none;
+        }
+
+        @keyframes chillwave-flow {
+            0% {
+                mask-position-x: 0px;
+                -webkit-mask-position-x: 0px;
+            }
+            100% {
+                mask-position-x: 120px;
+                -webkit-mask-position-x: 120px;
+            }
+        }
+
+        /* Resolved identity cell styling */
+        .resolved-identity {
+            color: var(--vscode-textLink-foreground);
+        }
+
+        /* Resolve button hover effect */
+        .resolve-guid-btn:hover {
+            opacity: 1 !important;
+            background-color: var(--vscode-toolbar-hoverBackground) !important;
+        }
+
         .json-viewer {
             font-family: var(--vscode-editor-font-family, 'Consolas', 'Monaco', monospace);
             font-size: 0.9em;

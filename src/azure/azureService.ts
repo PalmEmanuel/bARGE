@@ -1,7 +1,7 @@
 import { DefaultAzureCredential, TokenCredential } from '@azure/identity';
 import { SubscriptionClient } from '@azure/arm-subscriptions';
 import * as vscode from 'vscode';
-import { AzureSubscription, QueryResult, ColumnDefinition, AuthScope } from '../types';
+import { AzureSubscription, QueryResult, ColumnDefinition, AuthScope, IdentityInfo } from '../types';
 import { VSCodeCredential } from './vsCodeCredential';
 
 export class AzureService {
@@ -640,5 +640,231 @@ export class AzureService {
 
     public getCurrentScope(): AuthScope {
         return this.currentScope;
+    }
+
+    /**
+     * Resolve identity GUIDs using Microsoft Graph API
+     */
+    public async resolveIdentityGuids(
+        guids: string[], 
+        onPartialResult?: (resolvedIdentities: IdentityInfo[]) => void
+    ): Promise<IdentityInfo[]> {
+        this.validateAuthentication();
+        
+        if (!this.credential) {
+            throw new Error('No credential available for authentication');
+        }
+
+        try {
+            // Get access token for Microsoft Graph
+            console.log('Getting access token for Microsoft Graph...');
+            const tokenResponse = await this.credential.getToken(['https://graph.microsoft.com/.default']);
+            if (!tokenResponse) {
+                throw new Error('Failed to get access token for Microsoft Graph');
+            }
+
+            const results: IdentityInfo[] = [];
+            
+            // Process GUIDs in batches of 15 (Graph API limit for $filter with 'or')
+            const batchSize = 15;
+            for (let i = 0; i < guids.length; i += batchSize) {
+                const batch = guids.slice(i, i + batchSize);
+                const batchResults = await this.resolveIdentityBatch(batch, tokenResponse.token, onPartialResult);
+                results.push(...batchResults);
+            }
+
+            return results;
+        } catch (error) {
+            throw new Error(`Failed to resolve identity GUIDs: ${error}`);
+        }
+    }
+
+    private async resolveIdentityBatch(
+        guids: string[], 
+        accessToken: string, 
+        onPartialResult?: (resolvedIdentities: IdentityInfo[]) => void
+    ): Promise<IdentityInfo[]> {
+        const results: IdentityInfo[] = [];
+        const apiErrors = new Map<string, any>(); // Track API errors per GUID
+        
+        // Try to resolve as users first
+        try {
+            const userResults = await this.queryGraphObjects('users', guids, accessToken);
+            const userIdentities = userResults.map(user => this.mapToIdentityInfo(user, 'user'));
+            results.push(...userIdentities);
+            
+            // Send partial results immediately
+            if (onPartialResult && userIdentities.length > 0) {
+                onPartialResult(userIdentities);
+            }
+        } catch (error) {
+            console.warn('Error querying users:', error);
+            // Track this error for all unresolved GUIDs
+            guids.forEach(guid => {
+                if (!results.some(r => r.id === guid)) {
+                    apiErrors.set(guid, {
+                        objectType: 'users',
+                        error: error,
+                        timestamp: new Date().toISOString()
+                    });
+                }
+            });
+        }
+
+        // Find remaining unresolved GUIDs
+        const resolvedIds = new Set(results.map(r => r.id));
+        const unresolvedGuids = guids.filter(guid => !resolvedIds.has(guid));
+
+        if (unresolvedGuids.length > 0) {
+            // Try to resolve remaining as service principals
+            try {
+                const spResults = await this.queryGraphObjects('servicePrincipals', unresolvedGuids, accessToken);
+                const spIdentities = spResults.map(sp => this.mapToIdentityInfo(sp, 'servicePrincipal'));
+                results.push(...spIdentities);
+                
+                // Send partial results immediately
+                if (onPartialResult && spIdentities.length > 0) {
+                    onPartialResult(spIdentities);
+                }
+            } catch (error) {
+                console.warn('Error querying service principals:', error);
+                // Update API errors for still unresolved GUIDs
+                unresolvedGuids.forEach(guid => {
+                    if (!results.some(r => r.id === guid)) {
+                        apiErrors.set(guid, {
+                            objectType: 'servicePrincipals',
+                            error: error,
+                            timestamp: new Date().toISOString()
+                        });
+                    }
+                });
+            }
+        }
+
+        // Find still unresolved GUIDs
+        const finalResolvedIds = new Set(results.map(r => r.id));
+        const stillUnresolvedGuids = guids.filter(guid => !finalResolvedIds.has(guid));
+
+        if (stillUnresolvedGuids.length > 0) {
+            // Try to resolve remaining as groups
+            try {
+                const groupResults = await this.queryGraphObjects('groups', stillUnresolvedGuids, accessToken);
+                const groupIdentities = groupResults.map(group => this.mapToIdentityInfo(group, 'group'));
+                results.push(...groupIdentities);
+                
+                // Send partial results immediately
+                if (onPartialResult && groupIdentities.length > 0) {
+                    onPartialResult(groupIdentities);
+                }
+            } catch (error) {
+                console.warn('Error querying groups:', error);
+                // Update API errors for still unresolved GUIDs
+                stillUnresolvedGuids.forEach(guid => {
+                    if (!results.some(r => r.id === guid)) {
+                        apiErrors.set(guid, {
+                            objectType: 'groups',
+                            error: error,
+                            timestamp: new Date().toISOString()
+                        });
+                    }
+                });
+            }
+        }
+
+        // Add error entries for any still unresolved GUIDs with detailed API error information
+        const finalResolvedIds2 = new Set(results.map(r => r.id));
+        const finalUnresolvedGuids = guids.filter(guid => !finalResolvedIds2.has(guid));
+        
+        const errorIdentities: IdentityInfo[] = [];
+        finalUnresolvedGuids.forEach(guid => {
+            const apiError = apiErrors.get(guid);
+            const identityInfo: IdentityInfo = {
+                id: guid,
+                error: 'Could not resolve identity'
+            };
+
+            if (apiError) {
+                identityInfo.errorDetails = {
+                    type: 'API_ERROR',
+                    message: apiError.error?.message || 'Unknown API error',
+                    stack: apiError.error?.stack,
+                    timestamp: apiError.timestamp,
+                    objectType: apiError.objectType,
+                    fullApiResponse: {
+                        httpStatus: apiError.error?.httpStatus,
+                        httpStatusText: apiError.error?.httpStatusText,
+                        url: apiError.error?.url,
+                        responseBody: apiError.error?.responseBody,
+                        responseText: apiError.error?.responseText,
+                        errorTimestamp: apiError.error?.timestamp
+                    }
+                };
+            }
+
+            errorIdentities.push(identityInfo);
+        });
+
+        results.push(...errorIdentities);
+        
+        // Send error results immediately
+        if (onPartialResult && errorIdentities.length > 0) {
+            onPartialResult(errorIdentities);
+        }
+
+        return results;
+    }
+
+    private async queryGraphObjects(objectType: string, guids: string[], accessToken: string): Promise<any[]> {
+        if (guids.length === 0) {
+            return [];
+        }
+
+        // Build filter query with OR conditions
+        const filterConditions = guids.map(guid => `id eq '${guid}'`).join(' or ');
+        const url = `https://graph.microsoft.com/v1.0/${objectType}?$filter=${encodeURIComponent(filterConditions)}&$select=id,displayName,userPrincipalName,mail,appId`;
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            let errorText: string;
+            let errorBody: any;
+            
+            try {
+                errorText = await response.text();
+                errorBody = JSON.parse(errorText);
+            } catch (parseError) {
+                errorText = await response.text();
+                errorBody = { rawResponse: errorText };
+            }
+
+            const detailedError = new Error(`Graph API error for ${objectType}: ${response.status} ${response.statusText}`);
+            (detailedError as any).httpStatus = response.status;
+            (detailedError as any).httpStatusText = response.statusText;
+            (detailedError as any).url = url;
+            (detailedError as any).responseBody = errorBody;
+            (detailedError as any).responseText = errorText;
+            (detailedError as any).timestamp = new Date().toISOString();
+            
+            throw detailedError;
+        }
+
+        const data = await response.json() as { value?: any[] };
+        return data.value || [];
+    }
+
+    private mapToIdentityInfo(graphObject: any, objectType: 'user' | 'group' | 'servicePrincipal'): IdentityInfo {
+        return {
+            id: graphObject.id,
+            displayName: graphObject.displayName,
+            userPrincipalName: graphObject.userPrincipalName,
+            mail: graphObject.mail,
+            objectType: objectType
+        };
     }
 }
