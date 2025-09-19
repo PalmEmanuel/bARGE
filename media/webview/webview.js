@@ -617,7 +617,15 @@ function showCustomTooltip(event, element) {
     }
 
     const tooltip = createTooltip();
-    const tooltipText = element.getAttribute('data-tooltip');
+    let tooltipText = element.getAttribute('data-tooltip');
+    
+    // If no tooltip on the element itself, check for child elements with tooltip
+    if (!tooltipText || tooltipText.trim() === '') {
+        const childWithTooltip = element.querySelector('[data-tooltip]');
+        if (childWithTooltip) {
+            tooltipText = childWithTooltip.getAttribute('data-tooltip');
+        }
+    }
 
     if (!tooltipText || tooltipText.trim() === '') {
         // Don't show tooltip if content is empty
