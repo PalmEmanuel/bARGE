@@ -150,7 +150,7 @@ function updateCellWithErrorAnimation(targetCell, newHtml, delay = 0, row, col) 
                     if (currentLoadingElement && currentLoadingElement.classList.contains('error-animation')) {
                         currentLoadingElement.classList.add('fade-out');
                         
-                        // Start content replacement early in the fade-out for seamless transition
+                        // Start content replacement right as fade-out completes for seamless transition
                         setTimeout(() => {
                             const fadedElement = targetCell.querySelector('.guid-loading.fade-out');
                             if (fadedElement) {
@@ -165,7 +165,7 @@ function updateCellWithErrorAnimation(targetCell, newHtml, delay = 0, row, col) 
                             }
                             // Remove from animating cells set
                             markCellNotAnimating(row, col);
-                        }, 200); // Start content replacement halfway through fade-out
+                        }, 400); // Replace content right as fade-out completes (0.4s)
                     } else {
                         // Animation was interrupted, remove from tracking
                         markCellNotAnimating(row, col);
