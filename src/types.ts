@@ -198,6 +198,11 @@ export interface IdentityInfo {
         stack?: string;
         timestamp: string;
         objectType?: string;
+        allErrors?: Array<{
+            objectType: string;
+            message?: string;
+            timestamp: string;
+        }>;
         fullApiResponse?: any;
     };
 }
@@ -209,6 +214,7 @@ export interface ResolveGuidRequest {
     resolveType: 'identity';
     responseTarget?: string;
     cellPosition?: {row: number, col: number};
+    selectedCells?: {row: number, col: number}[];
 }
 
 export interface ResolveGuidResponse {
@@ -216,5 +222,6 @@ export interface ResolveGuidResponse {
     resolvedData: IdentityInfo[];
     responseTarget?: string;
     cellPosition?: {row: number, col: number};
+    selectedCells?: {row: number, col: number}[];
     isPartial?: boolean;
 }

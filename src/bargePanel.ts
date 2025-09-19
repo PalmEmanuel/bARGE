@@ -79,6 +79,7 @@ export class BargePanel {
                                 resolvedData: partialResults,
                                 responseTarget: request.responseTarget,
                                 cellPosition: request.cellPosition,
+                                selectedCells: request.selectedCells,
                                 isPartial: true
                             };
                             
@@ -95,6 +96,7 @@ export class BargePanel {
                         resolvedData: resolvedData,
                         responseTarget: request.responseTarget,
                         cellPosition: request.cellPosition,
+                        selectedCells: request.selectedCells,
                         isPartial: false
                     };
                     
