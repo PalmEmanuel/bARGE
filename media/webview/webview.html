@@ -468,16 +468,22 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: var(--vscode-textLink-foreground);
+            background: var(--wave-color, var(--vscode-textLink-foreground));
             mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 20'%3E%3Cpath d='M0 10c15 0 15-5 30-5s15 5 30 5 15-5 30-5s15 5 30 5 15-5 30-5s15 5 30 5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
             -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 20'%3E%3Cpath d='M0 10c15 0 15-5 30-5s15 5 30 5 15-5 30-5s15 5 30 5 15-5 30-5s15 5 30 5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
             mask-size: 120px 20px;
             -webkit-mask-size: 120px 20px;
             mask-repeat: repeat-x;
             -webkit-mask-repeat: repeat-x;
-            opacity: 0.6;
+            opacity: var(--wave-opacity, 0.6);
             animation: chillwave-flow var(--animation-duration, 3s) linear infinite;
             animation-delay: var(--animation-delay, 0s);
+            transition: background 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+
+        .guid-loading.error-animation {
+            --wave-color: var(--vscode-errorForeground);
+            --wave-opacity: 0.8;
         }
         
         @keyframes chillwave-flow {
@@ -497,6 +503,23 @@
             display: inline-block;
             line-height: 1.2em; /* Match the loading animation height */
             min-height: 1.2em; /* Ensure consistent height */
+        }
+
+        /* Fade-in animation for resolved content */
+        .fade-in-content {
+            opacity: 0;
+            animation: fadeInContent 0.3s ease-out forwards;
+        }
+
+        @keyframes fadeInContent {
+            from {
+                opacity: 0;
+                transform: translateY(2px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Resolve button hover effect */

@@ -118,6 +118,76 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// Helper function to animate error state transition
+function updateCellWithErrorAnimation(targetCell, newHtml, delay = 0, row, col) {
+    if (!targetCell) {
+        return false;
+    }
+    
+    const cellKey = `${row}-${col}`;
+    const loadingElement = targetCell.querySelector('.guid-loading');
+    if (loadingElement) {
+        // Mark this cell as animating during the error animation process
+        animatingCells.add(cellKey);
+        
+        // Mark this cell as being processed to avoid double-processing
+        if (loadingElement.dataset.fading === 'true') {
+            return false; // Already being processed
+        }
+        loadingElement.dataset.fading = 'true';
+        
+        // Add delay before starting the error animation
+        setTimeout(() => {
+            // Double-check the element still exists
+            const currentLoadingElement = targetCell.querySelector('.guid-loading');
+            if (currentLoadingElement && !currentLoadingElement.classList.contains('error-animation')) {
+                // Add error animation class to trigger red color transition and pulse
+                currentLoadingElement.classList.add('error-animation');
+                
+                // Wait for error animation to complete, then fade out
+                setTimeout(() => {
+                    // Add fade-out class after error animation
+                    if (currentLoadingElement && currentLoadingElement.classList.contains('error-animation')) {
+                        currentLoadingElement.classList.add('fade-out');
+                        
+                        // Start content replacement early in the fade-out for seamless transition
+                        setTimeout(() => {
+                            const fadedElement = targetCell.querySelector('.guid-loading.fade-out');
+                            if (fadedElement) {
+                                const cleanHtml = newHtml.replace('__HTML__', '');
+                                targetCell.innerHTML = cleanHtml;
+                                
+                                // Add fade-in animation to the new content immediately
+                                const newContent = targetCell.querySelector('.resolved-identity, .error-cell');
+                                if (newContent) {
+                                    newContent.classList.add('fade-in-content');
+                                }
+                            }
+                            // Remove from animating cells set
+                            markCellNotAnimating(row, col);
+                        }, 200); // Start content replacement halfway through fade-out
+                    } else {
+                        // Animation was interrupted, remove from tracking
+                        markCellNotAnimating(row, col);
+                    }
+                }, 300); // Reduced from 600ms to match faster timing
+            } else {
+                // Animation was interrupted, remove from tracking
+                markCellNotAnimating(row, col);
+            }
+        }, delay);
+        
+        return true;
+    } else {
+        // No loading animation, update immediately (but still respect delay)
+        setTimeout(() => {
+            const cleanHtml = newHtml.replace('__HTML__', '');
+            targetCell.innerHTML = cleanHtml;
+        }, delay);
+        return false;
+    }
+}
+
 // Helper function to smoothly transition from loading animation to resolved content
 function updateCellWithFade(targetCell, newHtml, delay = 0, row, col) {
     if (!targetCell) {
@@ -144,17 +214,23 @@ function updateCellWithFade(targetCell, newHtml, delay = 0, row, col) {
                 // Add fade-out class to trigger animation
                 currentLoadingElement.classList.add('fade-out');
                 
-                // Wait for fade-out to complete, then update content
+                // Replace content right as fade-out completes for seamless transition
                 setTimeout(() => {
                     // Final check - only replace if the fade-out element is still there
                     const fadedElement = targetCell.querySelector('.guid-loading.fade-out');
                     if (fadedElement) {
                         const cleanHtml = newHtml.replace('__HTML__', '');
                         targetCell.innerHTML = cleanHtml;
+                        
+                        // Add fade-in animation to the new content immediately
+                        const newContent = targetCell.querySelector('.resolved-identity, .error-cell');
+                        if (newContent) {
+                            newContent.classList.add('fade-in-content');
+                        }
                     }
                     // Remove from animating cells set
                     markCellNotAnimating(row, col);
-                }, 400); // Match the CSS transition duration
+                }, 400); // Replace content right as fade-out completes (0.4s)
             } else {
                 // Animation was interrupted, remove from tracking
                 markCellNotAnimating(row, col);
@@ -3952,8 +4028,12 @@ function updateSingleResolvedCell(cellPosition, resolvedData, isPartial = false)
             // Check if we're transitioning from loading animation to resolved content
             const hasLoadingAnimation = targetCell.querySelector('.guid-loading');
             const isResolved = currentResults.data[row][col].includes('resolved-identity');
+            const isError = currentResults.data[row][col].includes('error-cell');
             
-            if (hasLoadingAnimation && isResolved) {
+            if (hasLoadingAnimation && isError) {
+                // Transitioning from loading to error - use error animation
+                updateCellWithErrorAnimation(targetCell, currentResults.data[row][col], 0, row, col);
+            } else if (hasLoadingAnimation && isResolved) {
                 // Transitioning from loading to resolved - use fade
                 updateCellWithFade(targetCell, currentResults.data[row][col], 0, row, col);
             } else if (isCellSafeToUpdate(targetCell, row, col)) {
@@ -4099,8 +4179,13 @@ function updateMultipleResolvedCells(selectedCells, resolvedData, isPartial = fa
                 // Check if we're transitioning from loading animation to resolved content
                 const hasLoadingAnimation = targetCell.querySelector('.guid-loading');
                 const isResolved = currentResults.data[row][col].includes('resolved-identity');
+                const isError = currentResults.data[row][col].includes('error-cell');
                 
-                if (hasLoadingAnimation && isResolved) {
+                if (hasLoadingAnimation && isError) {
+                    // Transitioning from loading to error - use error animation with staggered delay
+                    const delay = index * 150;
+                    updateCellWithErrorAnimation(targetCell, currentResults.data[row][col], delay, row, col);
+                } else if (hasLoadingAnimation && isResolved) {
                     // Transitioning from loading to resolved - use fade with staggered delay
                     const delay = index * 150;
                     updateCellWithFade(targetCell, currentResults.data[row][col], delay, row, col);
@@ -4250,8 +4335,13 @@ function updateResolvedColumn(columnIndex, resolvedData, isPartial = false) {
                 // Check if we're transitioning from loading animation to resolved content
                 const hasLoadingAnimation = targetCell.querySelector('.guid-loading');
                 const isResolved = row[columnIndex].includes('resolved-identity');
+                const isError = row[columnIndex].includes('error-cell');
                 
-                if (hasLoadingAnimation && isResolved) {
+                if (hasLoadingAnimation && isError) {
+                    // Transitioning from loading to error - use error animation with staggered delay
+                    const delay = rowIndex * 100;
+                    updateCellWithErrorAnimation(targetCell, row[columnIndex], delay, rowIndex, columnIndex);
+                } else if (hasLoadingAnimation && isResolved) {
                     // Transitioning from loading to resolved - use fade with staggered delay
                     const delay = rowIndex * 100;
                     updateCellWithFade(targetCell, row[columnIndex], delay, rowIndex, columnIndex);
