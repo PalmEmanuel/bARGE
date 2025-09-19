@@ -3,6 +3,7 @@ let currentResults = null;
 let sortState = { column: null, direction: null };
 let resolvedColumns = new Map(); // Store resolved identity data by column index
 let resolvedCells = new Set(); // Store individually resolved cells as "row-col" strings
+let animatingCells = new Set(); // Track cells that are currently animating to avoid disruption
 
 // GUID detection utilities
 const GUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -50,6 +51,32 @@ function shouldShowResolveButton(columnName, columnData) {
     return isLikelyIdentityColumn(columnName) && isGuidColumn(columnData);
 }
 
+// Helper function to check if a cell is safe to update (not currently animating)
+function isCellSafeToUpdate(targetCell, row, col) {
+    const cellKey = `${row}-${col}`;
+    
+    // If cell is marked as animating, it's not safe unless we're specifically fading it
+    if (animatingCells.has(cellKey)) {
+        return false;
+    }
+    
+    // Check if cell has an active animation (not fading out)
+    const loadingElement = targetCell ? targetCell.querySelector('.guid-loading:not(.fade-out)') : null;
+    if (loadingElement) {
+        // Mark this cell as animating to track it
+        animatingCells.add(cellKey);
+        return false;
+    }
+    
+    return true;
+}
+
+// Helper function to mark a cell as no longer animating
+function markCellNotAnimating(row, col) {
+    const cellKey = `${row}-${col}`;
+    animatingCells.delete(cellKey);
+}
+
 // Generate truly random animation values for each loading element
 function getRandomAnimationValues() {
     // Use performance.now() to add extra entropy and ensure uniqueness
@@ -89,6 +116,60 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+// Helper function to smoothly transition from loading animation to resolved content
+function updateCellWithFade(targetCell, newHtml, delay = 0, row, col) {
+    if (!targetCell) {
+        return false;
+    }
+    
+    const cellKey = `${row}-${col}`;
+    const loadingElement = targetCell.querySelector('.guid-loading');
+    if (loadingElement) {
+        // Mark this cell as animating during the fade process
+        animatingCells.add(cellKey);
+        
+        // Mark this cell as being processed to avoid double-processing
+        if (loadingElement.dataset.fading === 'true') {
+            return false; // Already fading
+        }
+        loadingElement.dataset.fading = 'true';
+        
+        // Add delay before starting the fade-out
+        setTimeout(() => {
+            // Double-check the element still exists and isn't already faded
+            const currentLoadingElement = targetCell.querySelector('.guid-loading');
+            if (currentLoadingElement && !currentLoadingElement.classList.contains('fade-out')) {
+                // Add fade-out class to trigger animation
+                currentLoadingElement.classList.add('fade-out');
+                
+                // Wait for fade-out to complete, then update content
+                setTimeout(() => {
+                    // Final check - only replace if the fade-out element is still there
+                    const fadedElement = targetCell.querySelector('.guid-loading.fade-out');
+                    if (fadedElement) {
+                        const cleanHtml = newHtml.replace('__HTML__', '');
+                        targetCell.innerHTML = cleanHtml;
+                    }
+                    // Remove from animating cells set
+                    markCellNotAnimating(row, col);
+                }, 400); // Match the CSS transition duration
+            } else {
+                // Animation was interrupted, remove from tracking
+                markCellNotAnimating(row, col);
+            }
+        }, delay);
+        
+        return true;
+    } else {
+        // No loading animation, update immediately (but still respect delay)
+        setTimeout(() => {
+            const cleanHtml = newHtml.replace('__HTML__', '');
+            targetCell.innerHTML = cleanHtml;
+        }, delay);
+        return true;
+    }
 }
 
 function getFriendlyTypeName(objectType) {
@@ -309,16 +390,16 @@ function displayResults(result, preserveDetailsPane = false) {
     tableHtml += '</tbody></table>';
     tableContainer.innerHTML = tableHtml;
 
-    // Update detail button states after table regeneration
-    setTimeout(() => {
-        updateDetailButtonStates();
-    }, 0);
-
     // Add context menu event listener to the table
     const table = tableContainer.querySelector('.results-table');
     if (table) {
         table.addEventListener('contextmenu', handleTableContextMenu);
     }
+
+    // Update detail button states after table regeneration
+    setTimeout(() => {
+        updateDetailButtonStates();
+    }, 0);
 }
 
 // Loading indicator functionality
@@ -3396,9 +3477,11 @@ function resolveSingleGuid(row, col) {
         if (table) {
             const targetCell = table.querySelector(`[data-row="${row}"][data-col="${resolvedColumnIndex}"]`);
             if (targetCell) {
-                // Extract the HTML content without the __HTML__ prefix
-                const cleanHtml = loadingHtml.replace('__HTML__', '');
-                targetCell.innerHTML = cleanHtml;
+                // Use smooth transition function to update the cell
+                if (!updateCellWithFade(targetCell, loadingHtml)) {
+                    // Fallback: re-render if cell update failed
+                    displayResults(currentResults, true);
+                }
             } else {
                 // Fallback: re-render if we can't find the specific cell
                 displayResults(currentResults, true);
@@ -3483,8 +3566,9 @@ function resolveMultipleGuids(selectedGuidCells, columnIndex) {
             cellsToUpdate.forEach(({ row, col, html }) => {
                 const targetCell = table.querySelector(`[data-row="${row}"][data-col="${col}"]`);
                 if (targetCell) {
-                    const cleanHtml = html.replace('__HTML__', '');
-                    targetCell.innerHTML = cleanHtml;
+                    if (!updateCellWithFade(targetCell, html)) {
+                        needsFullRender = true;
+                    }
                 } else {
                     needsFullRender = true;
                 }
@@ -3641,8 +3725,9 @@ function continueResolveGuidColumn(columnIndex, columnName, resolveType) {
             cellsToUpdate.forEach(({ row, col, html }) => {
                 const targetCell = table.querySelector(`[data-row="${row}"][data-col="${col}"]`);
                 if (targetCell) {
-                    const cleanHtml = html.replace('__HTML__', '');
-                    targetCell.innerHTML = cleanHtml;
+                    if (!updateCellWithFade(targetCell, html)) {
+                        needsFullRender = true;
+                    }
                 } else {
                     needsFullRender = true;
                 }
@@ -3859,8 +3944,34 @@ function updateSingleResolvedCell(cellPosition, resolvedData, isPartial = false)
         }
     }
     
-    // Refresh the display
-    displayResults(currentResults, true);
+    // Update the specific cell in the DOM with fade transition when transitioning from loading to resolved
+    const table = document.querySelector('.results-table');
+    if (table) {
+        const targetCell = table.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+        if (targetCell && currentResults.data[row] && currentResults.data[row][col]) {
+            // Check if we're transitioning from loading animation to resolved content
+            const hasLoadingAnimation = targetCell.querySelector('.guid-loading');
+            const isResolved = currentResults.data[row][col].includes('resolved-identity');
+            
+            if (hasLoadingAnimation && isResolved) {
+                // Transitioning from loading to resolved - use fade
+                updateCellWithFade(targetCell, currentResults.data[row][col], 0, row, col);
+            } else if (isCellSafeToUpdate(targetCell, row, col)) {
+                // Not transitioning from loading, or not resolved content - update immediately if safe
+                const cleanHtml = currentResults.data[row][col].replace('__HTML__', '');
+                targetCell.innerHTML = cleanHtml;
+            }
+            // If cell is not safe to update (animating), skip the update to avoid restarting animation
+        } else {
+            // Fallback: re-render if we can't find the specific cell
+            console.log('Single cell update: Cell not found, triggering full render');
+            displayResults(currentResults, true);
+        }
+    } else {
+        // Fallback: re-render if table doesn't exist
+        console.log('Single cell update: table not found, triggering full render');
+        displayResults(currentResults, true);
+    }
 }
 
 function updateMultipleResolvedCells(selectedCells, resolvedData, isPartial = false) {
@@ -3978,8 +4089,43 @@ function updateMultipleResolvedCells(selectedCells, resolvedData, isPartial = fa
         }
     });
     
-    // Refresh the display
-    displayResults(currentResults, true);
+    // Update the specific cells in the DOM with fade transitions when transitioning from loading to resolved
+    const table = document.querySelector('.results-table');
+    if (table) {
+        let needsFullRender = false;
+        selectedCells.forEach(({ row, col }, index) => {
+            const targetCell = table.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+            if (targetCell && currentResults.data[row] && currentResults.data[row][col]) {
+                // Check if we're transitioning from loading animation to resolved content
+                const hasLoadingAnimation = targetCell.querySelector('.guid-loading');
+                const isResolved = currentResults.data[row][col].includes('resolved-identity');
+                
+                if (hasLoadingAnimation && isResolved) {
+                    // Transitioning from loading to resolved - use fade with staggered delay
+                    const delay = index * 150;
+                    updateCellWithFade(targetCell, currentResults.data[row][col], delay, row, col);
+                } else if (isCellSafeToUpdate(targetCell, row, col)) {
+                    // Not transitioning from loading, or not resolved content - update immediately if safe
+                    const cleanHtml = currentResults.data[row][col].replace('__HTML__', '');
+                    targetCell.innerHTML = cleanHtml;
+                }
+                // If cell is not safe to update (animating), skip the update to avoid restarting animation
+            } else {
+                needsFullRender = true;
+                console.log('Multiple cells: Cell not found or no data for', { row, col, targetCell: !!targetCell, hasData: !!(currentResults.data[row] && currentResults.data[row][col]) });
+            }
+        });
+        
+        // Only fallback to full render if some cells couldn't be updated individually
+        if (needsFullRender) {
+            console.log('Multiple cells update triggered full render - this will restart animations');
+            displayResults(currentResults, true);
+        }
+    } else {
+        // Fallback: re-render if table doesn't exist
+        console.log('Multiple cells update: table not found, triggering full render');
+        displayResults(currentResults, true);
+    }
 }
 
 function updateResolvedColumn(columnIndex, resolvedData, isPartial = false) {
@@ -4092,8 +4238,43 @@ function updateResolvedColumn(columnIndex, resolvedData, isPartial = false) {
     }
     resolvedColumns.set(columnIndex, columnInfo);
     
-    console.log('Re-rendering table with resolved data');
+    console.log('Updating individual cells with resolved data');
     
-    // Re-render table
-    displayResults(currentResults, true);
+    // Update individual cells with fade transitions when transitioning from loading to resolved
+    const table = document.querySelector('.results-table');
+    if (table) {
+        let needsFullRender = false;
+        currentResults.data.forEach((row, rowIndex) => {
+            const targetCell = table.querySelector(`[data-row="${rowIndex}"][data-col="${columnIndex}"]`);
+            if (targetCell && row[columnIndex]) {
+                // Check if we're transitioning from loading animation to resolved content
+                const hasLoadingAnimation = targetCell.querySelector('.guid-loading');
+                const isResolved = row[columnIndex].includes('resolved-identity');
+                
+                if (hasLoadingAnimation && isResolved) {
+                    // Transitioning from loading to resolved - use fade with staggered delay
+                    const delay = rowIndex * 100;
+                    updateCellWithFade(targetCell, row[columnIndex], delay, rowIndex, columnIndex);
+                } else if (isCellSafeToUpdate(targetCell, rowIndex, columnIndex)) {
+                    // Not transitioning from loading, or not resolved content - update immediately if safe
+                    const cleanHtml = row[columnIndex].replace('__HTML__', '');
+                    targetCell.innerHTML = cleanHtml;
+                }
+                // If cell is not safe to update (animating), skip the update to avoid restarting animation
+            } else {
+                needsFullRender = true;
+                console.log('Column update: Cell not found for', { rowIndex, columnIndex, targetCell: !!targetCell, hasData: !!(row[columnIndex]) });
+            }
+        });
+        
+        // Only fallback to full render if some cells couldn't be updated individually
+        if (needsFullRender) {
+            console.log('Column update triggered full render - this will restart animations');
+            displayResults(currentResults, true);
+        }
+    } else {
+        // Fallback: re-render if table doesn't exist
+        console.log('Column update: table not found, triggering full render');
+        displayResults(currentResults, true);
+    }
 }

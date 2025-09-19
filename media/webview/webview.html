@@ -453,6 +453,12 @@
             overflow: hidden;
             background: transparent;
             line-height: 1.2em; /* Match the height for consistency */
+            opacity: 1;
+            transition: opacity 0.4s ease-out;
+        }
+
+        .guid-loading.fade-out {
+            opacity: 0;
         }
 
         .guid-loading::before {
@@ -473,12 +479,7 @@
             animation: chillwave-flow var(--animation-duration, 3s) linear infinite;
             animation-delay: var(--animation-delay, 0s);
         }
-
-        .guid-loading-spinner {
-            /* This element is no longer needed but keeping for backward compatibility */
-            display: none;
-        }
-
+        
         @keyframes chillwave-flow {
             0% {
                 mask-position-x: 0px;
