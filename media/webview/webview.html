@@ -414,6 +414,18 @@
             color: var(--vscode-foreground) !important;
         }
 
+        /* Disabled state for resolve buttons */
+        .resolve-guid-btn[disabled] {
+            opacity: 0.3 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
+        }
+
+        .resolve-guid-btn[disabled]:hover {
+            opacity: 0.3 !important;
+            color: var(--vscode-descriptionForeground) !important;
+        }
+
         /* Context menu for resolve options */
         .resolve-context-menu {
             position: absolute;
@@ -530,6 +542,29 @@
                 opacity: 1;
                 transform: translateY(0);
             }
+        }
+
+        /* Column expansion animation for newly added resolved columns */
+        .column-expanding {
+            animation: expandColumn 0.4s ease-out forwards;
+            transform-origin: left center;
+        }
+
+        @keyframes expandColumn {
+            from {
+                transform: scaleX(0);
+                opacity: 0.3;
+            }
+            to {
+                transform: scaleX(1);
+                opacity: 1;
+            }
+        }
+
+        /* Ensure text in expanding column doesn't wrap during animation */
+        .column-expanding {
+            white-space: nowrap;
+            overflow: hidden;
         }
 
         /* Resolve button hover effect */
