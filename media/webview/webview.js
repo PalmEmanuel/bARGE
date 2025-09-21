@@ -1230,6 +1230,9 @@ function handleTableContextMenu(event) {
         customContextMenu = null;
     }
 
+    // Hide any existing resolve menu
+    closeResolveMenu();
+
     // Create context menu
     const contextMenu = createContextMenu();
 
@@ -3809,6 +3812,9 @@ function showResolveMenu(event, columnIndex, columnName) {
     event.stopPropagation();
     event.preventDefault();
     
+    // Hide any existing context menu
+    hideContextMenu();
+    
     // Remove any existing menu
     const existingMenu = document.querySelector('.resolve-context-menu');
     if (existingMenu) {
@@ -3825,13 +3831,10 @@ function showResolveMenu(event, columnIndex, columnName) {
     menuItem.onclick = () => resolveGuidColumn(columnIndex, columnName, 'identity');
     
     menu.appendChild(menuItem);
-    
-    // Position menu relative to button
-    const rect = event.target.getBoundingClientRect();
-    menu.style.left = rect.left + 'px';
-    menu.style.top = (rect.bottom + 2) + 'px';
-    
     document.body.appendChild(menu);
+    
+    // Use the existing smart positioning function
+    positionContextMenu(event, menu);
     
     // Close menu when clicking elsewhere
     setTimeout(() => {
