@@ -146,6 +146,7 @@ function clearCurrentlyResolvingColumnIfDone(columnName) {
         if (columnIndex === -1) {
             currentlyResolvingColumn = null;
             updateResolveButtonStates();
+            updateExportButtonState();
             return;
         }
         
@@ -158,6 +159,7 @@ function clearCurrentlyResolvingColumnIfDone(columnName) {
             currentlyResolvingColumn = null;
             // Button visibility will be automatically updated based on remaining unresolved GUIDs
             updateResolveButtonStates();
+            updateExportButtonState();
         }
     }
 }
@@ -199,6 +201,18 @@ function updateResolveButtonStates() {
             }
         }
     });
+}
+
+// Helper function to update export button state based on resolution status
+function updateExportButtonState() {
+    const exportBtn = document.getElementById('exportBtn');
+    if (!exportBtn) return;
+    
+    const isResolutionInProgress = currentlyResolvingColumn !== null;
+    exportBtn.disabled = isResolutionInProgress;
+    exportBtn.style.opacity = isResolutionInProgress ? '0.5' : '1';
+    exportBtn.style.cursor = isResolutionInProgress ? 'not-allowed' : 'pointer';
+    exportBtn.title = isResolutionInProgress ? 'Export disabled during identity resolution' : 'Export results to CSV';
 }
 
 // Helper function to check if a cell is an error that can be re-resolved
@@ -469,6 +483,12 @@ function displayResults(result, preserveDetailsPane = false) {
     if (!preserveDetailsPane) {
         resolvedColumns.clear();
         resolvedCells.clear();
+        
+        // Reset any ongoing identity resolution state
+        currentlyResolvingColumn = null;
+        
+        // Update export button state since resolution was cancelled
+        updateExportButtonState();
     }
 
     const tableContainer = document.getElementById('tableContainer');
@@ -485,7 +505,14 @@ function displayResults(result, preserveDetailsPane = false) {
     const executionTimeText = result.executionTimeMs ?
         ' • ' + result.executionTimeMs + 'ms' : '';
     resultsInfo.textContent = result.totalRecords + ' results' + executionTimeText + ' • ' + formatTimestamp(result.timestamp);
+    
+    // Show export button but disable it if identity resolution is in progress
     exportBtn.style.display = 'block';
+    const isResolutionInProgress = currentlyResolvingColumn !== null;
+    exportBtn.disabled = isResolutionInProgress;
+    exportBtn.style.opacity = isResolutionInProgress ? '0.5' : '1';
+    exportBtn.style.cursor = isResolutionInProgress ? 'not-allowed' : 'pointer';
+    exportBtn.title = 'Export results to CSV';
 
     let tableHtml = '<table class="results-table"><thead><tr>';
 
@@ -593,6 +620,7 @@ function displayResults(result, preserveDetailsPane = false) {
     // Update detail button states after table regeneration
     setTimeout(() => {
         updateDetailButtonStates();
+        updateResolveButtonStates();
         
         // Clear the isNewColumn flag for any resolved columns after animation completes
         resolvedColumns.forEach((columnInfo, columnName) => {
@@ -1051,6 +1079,9 @@ function clearSelection() {
     document.querySelectorAll('.results-table td.selected').forEach(cell => {
         cell.classList.remove('selected');
     });
+    
+    // Hide any open context menus when clearing selection
+    hideContextMenu();
 }
 
 // Drag selection functionality
@@ -2239,6 +2270,11 @@ function sortTable(columnIndex) {
 }
 
 function exportToCsv() {
+    // Prevent export during identity resolution
+    if (currentlyResolvingColumn !== null) {
+        return;
+    }
+    
     if (currentResults) {
         // Clean the data before export to remove HTML markup from resolved cells
         const cleanedData = {
@@ -2249,10 +2285,10 @@ function exportToCsv() {
         };
 
         const now = new Date();
-        const timestamp = now.getFullYear() +
-            String(now.getMonth() + 1).padStart(2, '0') +
+        const timestamp = now.getFullYear() + '-' +
+            String(now.getMonth() + 1).padStart(2, '0') + '-' +
             String(now.getDate()).padStart(2, '0') + '-' +
-            String(now.getHours()).padStart(2, '0') +
+            String(now.getHours()).padStart(2, '0') + '-' +
             String(now.getMinutes()).padStart(2, '0');
 
         vscode.postMessage({
@@ -2290,6 +2326,9 @@ function clearSelection() {
     document.querySelectorAll('.results-table td.selected').forEach(cell => {
         cell.classList.remove('selected');
     });
+    
+    // Hide any open context menus when clearing selection
+    hideContextMenu();
 }
 
 // Drag selection functionality
@@ -3536,6 +3575,7 @@ window.addEventListener('message', event => {
     switch (message.type) {
         case 'queryStart':
             showLoadingIndicator();
+            hideContextMenu(); // Hide any open context menu when starting a new query
             break;
         case 'queryResult':
             hideLoadingIndicator();
@@ -3599,6 +3639,7 @@ window.addEventListener('message', event => {
                 // Clear the resolving column and update button states since resolution was cancelled
                 currentlyResolvingColumn = null;
                 updateResolveButtonStates();
+                updateExportButtonState();
             }
             break;
     }
@@ -3826,6 +3867,7 @@ function resolveSingleGuid(row, col) {
     
     // Update button states without full table re-render
     updateResolveButtonStates();
+    updateExportButtonState();
     
     // Get column info (use original column for naming)
     const columnName = currentResults.columns[originalColumnIndex].name;
@@ -3938,6 +3980,7 @@ function resolveMultipleGuids(selectedGuidCells, columnIndex) {
     
     // Update button states without full table re-render
     updateResolveButtonStates();
+    updateExportButtonState();
     
     // Create a new resolved column if it doesn't exist yet (use original column name)
     const expectedResolvedColumnName = originalColumnName + '_Resolved';
@@ -4045,6 +4088,7 @@ function resolveGuidColumn(columnIndex, columnName, resolveType) {
     
     // Update button states immediately to disable all buttons
     updateResolveButtonStates();
+    updateExportButtonState();
     
     // Extract unique GUIDs from column
     const columnData = currentResults.data.map(row => row[columnIndex]);
@@ -4055,6 +4099,7 @@ function resolveGuidColumn(columnIndex, columnName, resolveType) {
         currentlyResolvingColumn = null;
         // Update button states to re-enable them
         updateResolveButtonStates();
+        updateExportButtonState();
         vscode.postMessage({
             type: 'showError',
             payload: 'No valid GUIDs found in this column.'
@@ -4083,6 +4128,7 @@ function resolveGuidColumn(columnIndex, columnName, resolveType) {
         
         // Update button states to show disabled button states while waiting for confirmation
         updateResolveButtonStates();
+        updateExportButtonState();
         
         return; // Stop execution here, will continue in message handler
     }
@@ -4389,6 +4435,7 @@ function updateSingleResolvedCell(cellPosition, resolvedData, isPartial = false)
         if (currentlyResolvingColumn === originalColumnName) {
             currentlyResolvingColumn = null;
             updateResolveButtonStates();
+            updateExportButtonState();
         }
     }
     
@@ -4590,6 +4637,7 @@ function updateMultipleResolvedCells(selectedCells, resolvedData, isPartial = fa
         } else if (!isPartial) {
             // Update button states without full re-render for completed resolutions
             updateResolveButtonStates();
+            updateExportButtonState();
         }
     } else {
         // Fallback: re-render if table doesn't exist
@@ -4706,15 +4754,18 @@ function updateResolvedColumn(resolvedColumnName, resolvedData, isPartial = fals
         if (currentlyResolvingColumn === columnInfo.originalColumnName) {
             currentlyResolvingColumn = null;
             updateResolveButtonStates();
+            updateExportButtonState();
         }
         
         // Always update button states after clearing, regardless of whether it worked
         updateResolveButtonStates();
+        updateExportButtonState();
         
         // Fallback: if the clearing didn't work, force clear it
         if (currentlyResolvingColumn !== null) {
             currentlyResolvingColumn = null;
             updateResolveButtonStates();
+            updateExportButtonState();
         }
         
         // Refresh the table to update button states after clearing the resolving column
@@ -4766,6 +4817,7 @@ function updateResolvedColumn(resolvedColumnName, resolvedData, isPartial = fals
             // For final updates (non-partial), just update button states instead of full re-render
             // to avoid interrupting animations and breaking event handlers
             updateResolveButtonStates();
+            updateExportButtonState();
         }
     } else {
         // Fallback: re-render if table doesn't exist
