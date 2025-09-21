@@ -79,15 +79,35 @@ function shouldShowResolveButton(columnName, columnData) {
     }
     
     // Check if there are any unresolved GUIDs left in the column
-    const hasUnresolvedGuids = columnData.some(value => {
-        // Raw unresolved GUIDs
+    // A GUID is considered "resolved" if there's a corresponding resolved column
+    // with content for that row (either successful resolution or error content)
+    const unresolvedGuids = [];
+    const hasUnresolvedGuids = columnData.some((value, index) => {
+        // Only check actual GUIDs in the original column
         if (typeof value === 'string' && !value.startsWith('__HTML__') && isGuid(value)) {
-            return true;
+            // Check if there's a resolved column with content for this row
+            const resolvedColumnName = columnName + '_Resolved';
+            const resolvedColumnIndex = getColumnIndexByName(resolvedColumnName);
+            const hasResolvedContent = resolvedColumnIndex !== -1 && 
+                currentResults.data[index] && 
+                currentResults.data[index][resolvedColumnIndex] && 
+                currentResults.data[index][resolvedColumnIndex] !== '';
+            
+            if (!hasResolvedContent) {
+                unresolvedGuids.push({ value, rowIndex: index });
+                return true;
+            }
         }
         return false;
     });
     
-    return isIdentityColumn && hasGuids && hasUnresolvedGuids;
+    // If there are no unresolved GUIDs left in the original column, hide the button
+    // This handles the case where multi-cell resolution completed all GUIDs in the column
+    if (!hasUnresolvedGuids) {
+        return false;
+    }
+    
+    return isIdentityColumn && hasGuids;
 }
 
 // Helper function to check if a cell is safe to update (not currently animating)
@@ -1023,7 +1043,7 @@ let isDragging = false;
 let dragStartCell = null;
 let dragCurrentCell = null;
 
-function selectCell(cellElement, row, col) {
+function selectCell(cellElement, row, col, skipClearSelection = false) {
     // Don't handle click if we just finished a drag operation
     if (isDragging) {
         return;
@@ -1037,7 +1057,9 @@ function selectCell(cellElement, row, col) {
         selectRange(selectionStart.row, selectionStart.col, row, col);
     } else {
         // Regular click - clear previous selection and select this cell
-        clearSelection();
+        if (!skipClearSelection) {
+            clearSelection();
+        }
         toggleCellSelection(cellElement, row, col);
         selectionStart = { row, col };
     }
@@ -1184,12 +1206,15 @@ function handleTableContextMenu(event) {
 
     if (selectedCells.size <= 1) {
         // If we have 0 or 1 cells selected, select the right-clicked cell
-        selectCell(target, row, col);
+        selectCell(target, row, col, true); // Skip clearSelection to preserve rightClickedCell
     } else if (selectedCells.size > 1 && !isRightClickedCellSelected) {
         // If we have multiple cells selected but right-clicked outside the selection,
         // clear selection and select just the right-clicked cell
+        // Save rightClickedCell before clearSelection since it calls hideContextMenu which clears it
+        const savedRightClickedCell = rightClickedCell;
         clearSelection();
-        selectCell(target, row, col);
+        rightClickedCell = savedRightClickedCell; // Restore it
+        selectCell(target, row, col, true); // Skip clearSelection to preserve rightClickedCell
     }
     // If multiple cells selected and right-clicked on one of them, keep current selection
 
@@ -4430,13 +4455,14 @@ function updateSingleResolvedCell(cellPosition, resolvedData, isPartial = false)
     // Clear the currently resolving column if this is the final update for single-cell resolution
     if (!isPartial) {
         const originalColumnName = currentResults.columns[originalCol].name;
-        // For multi-cell resolution that's complete (!isPartial), always clear the resolving state
+        // For single-cell resolution that's complete (!isPartial), always clear the resolving state
         // This allows users to start new resolution batches even if some GUIDs remain unresolved
         if (currentlyResolvingColumn === originalColumnName) {
             currentlyResolvingColumn = null;
-            updateResolveButtonStates();
-            updateExportButtonState();
         }
+        // Always update button states after single-cell resolution completion, regardless of resolving column state
+        updateResolveButtonStates();
+        updateExportButtonState();
     }
     
     // Update the specific cell in the DOM with fade transition when transitioning from loading to resolved
@@ -4464,10 +4490,20 @@ function updateSingleResolvedCell(cellPosition, resolvedData, isPartial = false)
         } else {
             // Fallback: re-render if we can't find the specific cell
             displayResults(currentResults, true);
+            // Ensure button states are updated even in fallback scenario
+            if (!isPartial) {
+                updateResolveButtonStates();
+                updateExportButtonState();
+            }
         }
     } else {
         // Fallback: re-render if table doesn't exist
         displayResults(currentResults, true);
+        // Ensure button states are updated even in fallback scenario
+        if (!isPartial) {
+            updateResolveButtonStates();
+            updateExportButtonState();
+        }
     }
 }
 
@@ -4629,6 +4665,7 @@ function updateMultipleResolvedCells(selectedCells, resolvedData, isPartial = fa
             // For multi-cell resolution that's complete (!isPartial), always clear the resolving state
             currentlyResolvingColumn = null;
             updateResolveButtonStates();
+            updateExportButtonState();
         }
         
         // Only fallback to full render if some cells couldn't be updated individually
@@ -4642,6 +4679,11 @@ function updateMultipleResolvedCells(selectedCells, resolvedData, isPartial = fa
     } else {
         // Fallback: re-render if table doesn't exist
         displayResults(currentResults, true);
+        // Ensure button states are updated even in fallback scenario
+        if (!isPartial) {
+            updateResolveButtonStates();
+            updateExportButtonState();
+        }
     }
 }
 
