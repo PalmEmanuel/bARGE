@@ -4077,17 +4077,10 @@ function resolveMultipleGuids(selectedGuidCells, columnIndex) {
         }
     }
     
-    // Extract GUIDs from selected cells, handling error cells properly
+    // Extract GUIDs from selected cells - always use original column since we're re-resolving
     const guids = selectedGuidCells.map(({ row, col }) => {
-        const cellValue = currentResults.data[row][col];
-        
-        // If this is an error cell, get the original GUID from the original column
-        if (isCellResolutionError(cellValue)) {
-            return currentResults.data[row][originalColumnIndex];
-        }
-        
-        // For normal GUID cells, return the cell value directly
-        return cellValue;
+        // Always get the GUID from the original column, regardless of what's in the resolved column
+        return currentResults.data[row][originalColumnIndex];
     }).filter(guid => isGuid(guid)); // Filter out any non-GUID values
     
     // Resolve the selected GUIDs
