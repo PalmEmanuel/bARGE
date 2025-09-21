@@ -1,7 +1,7 @@
 import { DefaultAzureCredential, TokenCredential } from '@azure/identity';
 import { SubscriptionClient } from '@azure/arm-subscriptions';
 import * as vscode from 'vscode';
-import { AzureSubscription, QueryResult, ColumnDefinition, AuthScope } from '../types';
+import { AzureSubscription, QueryResult, ColumnDefinition, AuthScope, IdentityInfo } from '../types';
 import { VSCodeCredential } from './vsCodeCredential';
 
 export class AzureService {
@@ -640,5 +640,253 @@ export class AzureService {
 
     public getCurrentScope(): AuthScope {
         return this.currentScope;
+    }
+
+    /**
+     * Resolve identity GUIDs using Microsoft Graph API
+     */
+    public async resolveIdentityGuids(
+        guids: string[], 
+        onPartialResult?: (resolvedIdentities: IdentityInfo[]) => void
+    ): Promise<IdentityInfo[]> {
+        this.validateAuthentication();
+        
+        if (!this.credential) {
+            throw new Error('No credential available for authentication');
+        }
+
+        try {
+            // Get access token for Microsoft Graph
+            console.log('Getting access token for Microsoft Graph...');
+            const tokenResponse = await this.credential.getToken(['https://graph.microsoft.com/.default']);
+            if (!tokenResponse) {
+                throw new Error('Failed to get access token for Microsoft Graph');
+            }
+
+            const results: IdentityInfo[] = [];
+            
+            // Process GUIDs in batches of 15
+            const batchSize = 15;
+            for (let i = 0; i < guids.length; i += batchSize) {
+                const batch = guids.slice(i, i + batchSize);
+                const batchResults = await this.resolveIdentityBatch(batch, tokenResponse.token, onPartialResult);
+                results.push(...batchResults);
+            }
+
+            return results;
+        } catch (error) {
+            throw new Error(`Failed to resolve identity GUIDs: ${error}`);
+        }
+    }
+
+    private async resolveIdentityBatch(
+        guids: string[], 
+        accessToken: string, 
+        onPartialResult?: (resolvedIdentities: IdentityInfo[]) => void
+    ): Promise<IdentityInfo[]> {
+        const results: IdentityInfo[] = [];
+        const apiErrors = new Map<string, any[]>(); // Track multiple API errors per GUID
+        
+        // Helper function to add error for GUID
+        const addErrorForGuid = (guid: string, objectType: string, error: any) => {
+            if (!apiErrors.has(guid)) {
+                apiErrors.set(guid, []);
+            }
+            apiErrors.get(guid)!.push({
+                objectType: objectType,
+                error: error,
+                timestamp: new Date().toISOString()
+            });
+        };
+        
+        // Try to resolve as users first
+        const usersResult = await this.queryGraphObjectsWithDetails('users', guids, accessToken);
+        const userIdentities = usersResult.found.map(user => this.mapToIdentityInfo(user, 'user'));
+        results.push(...userIdentities);
+        
+        // Track errors for GUIDs not found in users
+        usersResult.errors.forEach(({ guid, error }) => {
+            addErrorForGuid(guid, 'users', error);
+        });
+        
+        // Send partial results immediately
+        if (onPartialResult && userIdentities.length > 0) {
+            onPartialResult(userIdentities);
+        }
+
+        // Find remaining unresolved GUIDs
+        const resolvedIds = new Set(results.map(r => r.id));
+        const unresolvedGuids = guids.filter(guid => !resolvedIds.has(guid));
+
+        if (unresolvedGuids.length > 0) {
+            // Try to resolve remaining as service principals
+            const spResult = await this.queryGraphObjectsWithDetails('servicePrincipals', unresolvedGuids, accessToken);
+            const spIdentities = spResult.found.map(sp => this.mapToIdentityInfo(sp, 'servicePrincipal'));
+            results.push(...spIdentities);
+            
+            // Track errors for GUIDs not found in service principals
+            spResult.errors.forEach(({ guid, error }) => {
+                addErrorForGuid(guid, 'servicePrincipals', error);
+            });
+            
+            // Send partial results immediately
+            if (onPartialResult && spIdentities.length > 0) {
+                onPartialResult(spIdentities);
+            }
+        }
+
+        // Find still unresolved GUIDs
+        const finalResolvedIds = new Set(results.map(r => r.id));
+        const stillUnresolvedGuids = guids.filter(guid => !finalResolvedIds.has(guid));
+
+        if (stillUnresolvedGuids.length > 0) {
+            // Try to resolve remaining as groups
+            const groupsResult = await this.queryGraphObjectsWithDetails('groups', stillUnresolvedGuids, accessToken);
+            const groupIdentities = groupsResult.found.map(group => this.mapToIdentityInfo(group, 'group'));
+            results.push(...groupIdentities);
+            
+            // Track errors for GUIDs not found in groups
+            groupsResult.errors.forEach(({ guid, error }) => {
+                addErrorForGuid(guid, 'groups', error);
+            });
+            
+            // Send partial results immediately
+            if (onPartialResult && groupIdentities.length > 0) {
+                onPartialResult(groupIdentities);
+            }
+        }
+
+        // Add error entries for any still unresolved GUIDs with detailed API error information
+        const finalResolvedIds2 = new Set(results.map(r => r.id));
+        const finalUnresolvedGuids = guids.filter(guid => !finalResolvedIds2.has(guid));
+        
+        const errorIdentities: IdentityInfo[] = [];
+        finalUnresolvedGuids.forEach(guid => {
+            const guidErrors = apiErrors.get(guid) || [];
+            const identityInfo: IdentityInfo = {
+                id: guid,
+                error: this.createErrorSummary(guidErrors)
+            };
+
+            if (guidErrors.length > 0) {
+                // Use the most recent error for detailed information, but include all in summary
+                const latestError = guidErrors[guidErrors.length - 1];
+                identityInfo.errorDetails = {
+                    type: 'API_ERROR',
+                    message: this.createErrorSummary(guidErrors),
+                    stack: latestError.error?.stack,
+                    timestamp: latestError.timestamp,
+                    objectType: latestError.objectType,
+                    allErrors: guidErrors.map(e => ({
+                        objectType: e.objectType,
+                        message: e.error?.message,
+                        timestamp: e.timestamp
+                    })),
+                    fullApiResponse: {
+                        httpStatus: latestError.error?.httpStatus,
+                        httpStatusText: latestError.error?.httpStatusText,
+                        url: latestError.error?.url,
+                        responseBody: latestError.error?.responseBody,
+                        responseText: latestError.error?.responseText,
+                        errorTimestamp: latestError.error?.timestamp
+                    }
+                };
+            }
+
+            errorIdentities.push(identityInfo);
+        });
+
+        results.push(...errorIdentities);
+        
+        // Only send error results as final results, not as partial results
+        // This prevents showing "Failed to resolve" messages for identities that might be resolved in later attempts
+
+        return results;
+    }
+
+    private createErrorSummary(errors: any[]): string {
+        if (errors.length === 0) {
+            return 'Could not resolve identity.';
+        }
+        
+        return 'Identity not found.';
+    }
+
+    private async queryGraphObjectsWithDetails(objectType: string, guids: string[], accessToken: string): Promise<{
+        found: any[],
+        errors: Array<{ guid: string, error: any }>
+    }> {
+        if (guids.length === 0) {
+            return { found: [], errors: [] };
+        }
+
+        const found: any[] = [];
+        const errors: Array<{ guid: string, error: any }> = [];
+
+        // Query each GUID individually to get precise error responses
+        for (const guid of guids) {
+            try {
+                const response = await fetch(`https://graph.microsoft.com/v1.0/${objectType}/${guid}`, {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    found.push(result);
+                } else {
+                    // Parse actual API error response
+                    let errorDetail;
+                    try {
+                        const errorResponse = await response.json() as any;
+                        console.log('bARGE: Graph API Error Response for', objectType, guid, ':', JSON.stringify(errorResponse, null, 2));
+                        errorDetail = {
+                            message: errorResponse.error?.message || `HTTP ${response.status}: ${response.statusText}`,
+                            code: errorResponse.error?.code || 'UnknownError',
+                            httpStatus: response.status,
+                            objectType: objectType,
+                            fullApiResponse: errorResponse
+                        };
+                    } catch (parseError) {
+                        console.log('bARGE: Failed to parse error response for', objectType, guid, '- Status:', response.status, response.statusText);
+                        // If we can't parse the error response, create a basic error
+                        errorDetail = {
+                            message: `HTTP ${response.status}: ${response.statusText}`,
+                            code: 'UnknownError',
+                            httpStatus: response.status,
+                            objectType: objectType
+                        };
+                    }
+                    
+                    errors.push({ guid, error: errorDetail });
+                }
+            } catch (networkError) {
+                // Network or other unexpected errors
+                const errorMessage = networkError instanceof Error ? networkError.message : 'Network error occurred';
+                errors.push({ 
+                    guid, 
+                    error: {
+                        message: errorMessage,
+                        code: 'NetworkError',
+                        objectType: objectType,
+                        originalError: networkError
+                    }
+                });
+            }
+        }
+
+        return { found, errors };
+    }
+
+    private mapToIdentityInfo(graphObject: any, objectType: 'user' | 'group' | 'servicePrincipal'): IdentityInfo {
+        return {
+            id: graphObject.id,
+            displayName: graphObject.displayName,
+            userPrincipalName: graphObject.userPrincipalName,
+            mail: graphObject.mail,
+            objectType: objectType
+        };
     }
 }

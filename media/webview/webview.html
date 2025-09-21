@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>bARGE - boosted Azure Resource Graph Explorer</title>
+    <link href="{{CODICONS_URI}}" rel="stylesheet" />
     <style>
         body {
             font-family: var(--vscode-font-family);
@@ -337,6 +338,61 @@
             background-color: var(--vscode-list-hoverBackground) !important;
         }
 
+        /* Resolve GUID button styling */
+        .resolve-guid-btn {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 20px !important;
+            height: 20px !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            background: none !important;
+            border: none !important;
+            cursor: pointer !important;
+            border-radius: 4px !important;
+            outline: none !important;
+            transition: background-color 0.2s ease !important;
+        }
+
+        .resolve-guid-btn:hover:not([disabled]) {
+            background-color: var(--vscode-toolbar-hoverBackground, rgba(255, 255, 255, 0.1)) !important;
+        }
+
+        .resolve-guid-btn[disabled] {
+            cursor: not-allowed !important;
+            opacity: 0.3 !important;
+        }
+
+        .resolve-guid-btn .icon {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 100% !important;
+            height: 100% !important;
+            pointer-events: none !important;
+        }
+
+        .resolve-guid-btn .icon .codicon {
+            color: var(--vscode-foreground) !important;
+            font-size: 14px !important;
+            font-weight: bold !important;
+            line-height: 1 !important;
+            transition: color 0.2s ease !important;
+        }
+
+        .resolve-guid-btn:hover:not([disabled]) .icon .codicon {
+            color: #ffffff !important;
+        }
+
+        .resolve-guid-btn:active:not([disabled]) .icon .codicon {
+            transform: scale(1.1) !important;
+        }
+
+        .resolve-guid-btn[disabled] .icon .codicon {
+            color: var(--vscode-disabledForeground, #666) !important;
+        }
+
         th.detail-button-cell.select-all-header:hover svg {
             opacity: 1 !important;
             transform: scale(1.1);
@@ -390,6 +446,187 @@
             outline: none !important;
             box-shadow: none !important;
             background-color: transparent !important;
+        }
+
+        /* Resolve GUID button styles */
+        .resolve-guid-btn {
+            background: none !important;
+            border: none !important;
+            cursor: pointer !important;
+            padding: 2px !important;
+            color: var(--vscode-descriptionForeground) !important;
+            opacity: 0.7 !important;
+            transition: all 0.2s ease !important;
+            border-radius: 2px !important;
+            pointer-events: auto !important;
+        }
+
+        .resolve-guid-btn:hover {
+            opacity: 1 !important;
+            color: var(--vscode-foreground) !important;
+        }
+
+        .resolve-guid-btn:active {
+            color: var(--vscode-foreground) !important;
+        }
+
+        /* Disabled state for resolve buttons */
+        .resolve-guid-btn[disabled] {
+            opacity: 0.3 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
+        }
+
+        .resolve-guid-btn[disabled]:hover {
+            opacity: 0.3 !important;
+            color: var(--vscode-descriptionForeground) !important;
+        }
+
+        /* Context menu for resolve options */
+        .resolve-context-menu {
+            position: absolute;
+            background: var(--vscode-menu-background);
+            border: 1px solid var(--vscode-menu-border);
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            min-width: 150px;
+            padding: 4px 0;
+        }
+
+        .resolve-context-menu-item {
+            padding: 8px 16px;
+            cursor: pointer;
+            color: var(--vscode-menu-foreground);
+            font-size: 13px;
+            transition: background-color 0.1s ease;
+        }
+
+        .resolve-context-menu-item:hover {
+            background-color: var(--vscode-menu-selectionBackground);
+            color: var(--vscode-menu-selectionForeground);
+        }
+
+        .resolve-context-menu-item:active {
+            background-color: var(--vscode-menu-selectionBackground);
+            opacity: 0.8;
+        }
+
+        /* Loading chillwave effect for resolved columns */
+        .guid-loading {
+            display: inline-block;
+            width: 100%;
+            height: 1.2em; /* Use em-based height to match text line height */
+            position: relative;
+            overflow: hidden;
+            background: transparent;
+            line-height: 1.2em; /* Match the height for consistency */
+            opacity: 0; /* Start invisible for fade-in */
+            transition: opacity 0.4s ease-out;
+            animation: fadeInWave 0.4s ease-in forwards;
+        }
+
+        @keyframes fadeInWave {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .guid-loading.fade-out {
+            opacity: 0;
+        }
+
+        .guid-loading::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--wave-color, var(--vscode-textLink-foreground));
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 20'%3E%3Cpath d='M0 10c15 0 15-5 30-5s15 5 30 5 15-5 30-5s15 5 30 5 15-5 30-5s15 5 30 5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+            -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 20'%3E%3Cpath d='M0 10c15 0 15-5 30-5s15 5 30 5 15-5 30-5s15 5 30 5 15-5 30-5s15 5 30 5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+            mask-size: 120px 20px;
+            -webkit-mask-size: 120px 20px;
+            mask-repeat: repeat-x;
+            -webkit-mask-repeat: repeat-x;
+            opacity: var(--wave-opacity, 0.6);
+            animation: chillwave-flow var(--animation-duration, 3s) linear infinite;
+            animation-delay: var(--animation-delay, 0s);
+            transition: background 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+
+        .guid-loading.error-animation {
+            --wave-color: var(--vscode-errorForeground);
+            --wave-opacity: 0.8;
+        }
+        
+        @keyframes chillwave-flow {
+            0% {
+                mask-position-x: 0px;
+                -webkit-mask-position-x: 0px;
+            }
+            100% {
+                mask-position-x: 120px;
+                -webkit-mask-position-x: 120px;
+            }
+        }
+
+        /* Resolved identity cell styling */
+        .resolved-identity {
+            color: var(--vscode-textLink-foreground);
+            display: inline-block;
+            line-height: 1.2em; /* Match the loading animation height */
+            min-height: 1.2em; /* Ensure consistent height */
+        }
+
+        /* Fade-in animation for resolved content */
+        .fade-in-content {
+            opacity: 0;
+            animation: fadeInContent 0.3s ease-out forwards;
+        }
+
+        @keyframes fadeInContent {
+            from {
+                opacity: 0;
+                transform: translateY(2px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Column expansion animation for newly added resolved columns */
+        .column-expanding {
+            animation: expandColumn 0.4s ease-out forwards;
+            transform-origin: left center;
+        }
+
+        @keyframes expandColumn {
+            from {
+                transform: scaleX(0);
+                opacity: 0.3;
+            }
+            to {
+                transform: scaleX(1);
+                opacity: 1;
+            }
+        }
+
+        /* Ensure text in expanding column doesn't wrap during animation */
+        .column-expanding {
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        /* Resolve button hover effect */
+        .resolve-guid-btn:hover {
+            opacity: 1 !important;
+            background-color: var(--vscode-toolbar-hoverBackground) !important;
         }
 
         .json-viewer {

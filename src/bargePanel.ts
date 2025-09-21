@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
 import { AzureService } from './azure/azureService';
-import { WebviewMessage, QueryResponse } from './types';
+import { WebviewMessage, QueryResponse, ResolveGuidRequest, ResolveGuidResponse, IdentityInfo } from './types';
 
 export class BargePanel {
     public static currentPanel: BargePanel | undefined;
@@ -28,7 +28,10 @@ export class BargePanel {
             { viewColumn: vscode.ViewColumn.Active, preserveFocus: false },
             {
                 enableScripts: true,
-                localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'media')],
+                localResourceRoots: [
+                    vscode.Uri.joinPath(extensionUri, 'media'),
+                    vscode.Uri.joinPath(extensionUri, 'node_modules', '@vscode', 'codicons')
+                ],
                 retainContextWhenHidden: true
             }
         );
@@ -62,6 +65,104 @@ export class BargePanel {
                     await this._exportToCsv(data, filename);
                 } catch (error) {
                     vscode.window.showErrorMessage(`CSV export failed: ${error}`);
+                }
+                break;
+            case 'resolveGuids':
+                try {
+                    const request: ResolveGuidRequest = message.payload;
+                    
+                    // Use streaming callback to send partial results as they come in
+                    const resolvedData = await this._azureService.resolveIdentityGuids(
+                        request.guids,
+                        (partialResults: IdentityInfo[]) => {
+                            // Send partial results immediately to webview
+                            console.log('Sending partial results:', partialResults);
+                            const partialResponse: ResolveGuidResponse = {
+                                columnIndex: request.columnIndex,
+                                resolvedData: partialResults,
+                                responseTarget: request.responseTarget,
+                                cellPosition: request.cellPosition,
+                                selectedCells: request.selectedCells,
+                                isPartial: true
+                            };
+                            
+                            this._panel.webview.postMessage({
+                                type: 'guidResolved',
+                                payload: partialResponse
+                            });
+                        }
+                    );
+                                        
+                    // Send final complete response
+                    const response: ResolveGuidResponse = {
+                        columnIndex: request.columnIndex,
+                        resolvedData: resolvedData,
+                        responseTarget: request.responseTarget,
+                        cellPosition: request.cellPosition,
+                        selectedCells: request.selectedCells,
+                        isPartial: false
+                    };
+                    
+                    console.log('Sending response back to webview:', response);
+                    this._panel.webview.postMessage({
+                        type: 'guidResolved',
+                        payload: response
+                    });
+                } catch (error) {
+                    console.error('GUID resolution error:', error);
+                    vscode.window.showErrorMessage(`GUID resolution failed: ${error}`);
+                    
+                    // Create detailed error response for webview
+                    const errorResponse: ResolveGuidResponse = {
+                        columnIndex: message.payload?.columnIndex || 0,
+                        resolvedData: (message.payload?.guids || []).map((guid: string) => ({
+                            id: guid,
+                            error: error instanceof Error ? error.message : String(error),
+                            errorDetails: {
+                                type: error instanceof Error ? error.constructor.name : 'Unknown',
+                                message: error instanceof Error ? error.message : String(error),
+                                stack: error instanceof Error ? error.stack : undefined,
+                                timestamp: new Date().toISOString()
+                            }
+                        })),
+                        responseTarget: message.payload?.responseTarget,
+                        cellPosition: message.payload?.cellPosition
+                    };
+                    
+                    this._panel.webview.postMessage({
+                        type: 'guidResolved',
+                        payload: errorResponse
+                    });
+                }
+                break;
+            case 'showConfirmation':
+                try {
+                    const { message: confirmMessage, confirmationType } = message.payload;
+                    const result = await vscode.window.showWarningMessage(
+                        confirmMessage,
+                        { modal: true },
+                        'Yes',
+                        'No'
+                    );
+                    
+                    // Send result back to webview
+                    this._panel.webview.postMessage({
+                        type: 'confirmationResult',
+                        payload: {
+                            confirmed: result === 'Yes',
+                            confirmationType: confirmationType
+                        }
+                    });
+                } catch (error) {
+                    console.error('Confirmation dialog error:', error);
+                    // Send failure result
+                    this._panel.webview.postMessage({
+                        type: 'confirmationResult',
+                        payload: {
+                            confirmed: false,
+                            confirmationType: message.payload?.confirmationType
+                        }
+                    });
                 }
                 break;
         }
@@ -205,7 +306,7 @@ export class BargePanel {
     }
 
     private _getHtmlForWebview() {
-        // Generate a nonce for Content Security Policy
+        // Generate a nonce for script security
         const nonce = crypto.randomBytes(16).toString('base64');
 
         const htmlPath = path.join(this._extensionUri.fsPath, 'media', 'webview', 'webview.html');
@@ -220,10 +321,15 @@ export class BargePanel {
             vscode.Uri.joinPath(this._extensionUri, 'media', 'webview', 'webview-bundle.js')
         );
 
+        const codiconsUri = this._panel.webview.asWebviewUri(
+            vscode.Uri.joinPath(this._extensionUri, 'node_modules', '@vscode', 'codicons', 'dist', 'codicon.css')
+        );
+
         // Replace placeholders
         html = html.replace(/{{NONCE}}/g, nonce);
         html = html.replace(/{{WEBVIEW_URI}}/g, webviewUri.toString());
         html = html.replace(/{{WEBVIEW_BUNDLE_URI}}/g, webviewBundleUri.toString());
+        html = html.replace(/{{CODICONS_URI}}/g, codiconsUri.toString());
 
         return html;
     }
