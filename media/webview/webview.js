@@ -7,7 +7,7 @@ let animatingCells = new Set(); // Track cells that are currently animating to a
 let currentlyResolvingColumn = null; // Track which column name is currently being resolved to prevent conflicts
 
 // GUID detection utilities
-const GUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const GUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 // Utility function to get current column index by name
 function getColumnIndexByName(columnName) {
