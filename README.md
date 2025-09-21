@@ -78,7 +78,7 @@ bARGE supports functionality expected from modern tables and Azure Resource Grap
 
 ![Query with Row Comparison](media/readme/gifs/query-comparison.gif)
 
-## Resolve Identities
+### Resolve Identities
 
 bARGE can resolve GUIDs in query results against Entra ID to find the names and more details about identities, either by individual rows or entire columns.
 
