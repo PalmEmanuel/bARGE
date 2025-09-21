@@ -11,6 +11,7 @@ bARGE is a Visual Studio Code extension that brings Azure Resource Graph queryin
 - **Run KQL Queries**: Execute Kusto Query Language (KQL) queries against Azure Resource Graph directly from VS Code.
 - **KQL Language Support**: Syntax highlighting, intellisense with completions and hover documentation with context and links.
 - **Results Panel**: View query results in a dedicated panel with sortable and resizable columns.
+- **Resolve Identities against Entra ID**: Resolve GUIDs in query results against Entra ID for more details about identities.
 - **Comparison**: Select two or more rows for comparison to see differences in their properties.
 - **Copy & Export**: Easily copy selected cells as formatted text or for Excel, or export entire results to CSV for further analysis.
 - **Scope Selection**: Choose the subscription or tenant scope for your queries.
@@ -76,6 +77,16 @@ bARGE supports functionality expected from modern tables and Azure Resource Grap
 - Select multiple rows in the results table for comparison and quick overview of matching or differing properties
 
 ![Query with Row Comparison](media/readme/gifs/query-comparison.gif)
+
+## Resolve Identities
+
+bARGE can resolve GUIDs in query results against Entra ID to find the names and more details about identities, either by individual rows or entire columns.
+
+**NOTE**: This requires read access in Entra ID.
+
+![Resolve Identities](media/readme/gifs/resolve-ids.gif)
+
+This feature is particularly useful when exporting the results to CSV for reports or further analysis, as it can add context to otherwise cryptic GUIDs.
 
 ## Configuration
 
