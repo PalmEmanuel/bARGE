@@ -2240,10 +2240,18 @@ function sortTable(columnIndex) {
 
 function exportToCsv() {
     if (currentResults) {
+        // Clean the data before export to remove HTML markup from resolved cells
+        const cleanedData = {
+            ...currentResults,
+            data: currentResults.data.map(row => 
+                row.map(cell => cleanCellValueForCopy(cell))
+            )
+        };
+
         vscode.postMessage({
             type: 'exportCsv',
             payload: {
-                data: currentResults,
+                data: cleanedData,
                 filename: 'barge-results-' + new Date().toISOString().replace(/[:.]/g, '-') + '.csv'
             }
         });
