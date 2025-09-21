@@ -30,7 +30,7 @@ export class BargePanel {
                 enableScripts: true,
                 localResourceRoots: [
                     vscode.Uri.joinPath(extensionUri, 'media'),
-                    vscode.Uri.joinPath(extensionUri, 'node_modules')
+                    vscode.Uri.joinPath(extensionUri, 'node_modules', '@vscode', 'codicons')
                 ],
                 retainContextWhenHidden: true
             }

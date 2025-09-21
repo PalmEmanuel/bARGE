@@ -665,7 +665,7 @@ export class AzureService {
 
             const results: IdentityInfo[] = [];
             
-            // Process GUIDs in batches of 15 (Graph API limit for $filter with 'or')
+            // Process GUIDs in batches of 15
             const batchSize = 15;
             for (let i = 0; i < guids.length; i += batchSize) {
                 const batch = guids.slice(i, i + batchSize);
