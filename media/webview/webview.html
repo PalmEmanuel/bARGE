@@ -376,12 +376,17 @@
         .resolve-guid-btn .icon .codicon {
             color: var(--vscode-foreground) !important;
             font-size: 14px !important;
+            font-weight: bold !important;
             line-height: 1 !important;
             transition: color 0.2s ease !important;
         }
 
         .resolve-guid-btn:hover:not([disabled]) .icon .codicon {
             color: #ffffff !important;
+        }
+
+        .resolve-guid-btn:active:not([disabled]) .icon .codicon {
+            transform: scale(1.1) !important;
         }
 
         .resolve-guid-btn[disabled] .icon .codicon {
