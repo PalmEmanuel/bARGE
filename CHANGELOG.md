@@ -4,6 +4,14 @@ All notable changes to the bARGE Visual Studio Code extension will be documented
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [v1.2.0] - 2025-09-21
+### New Features
+- [`5ce0332`](https://github.com/PalmEmanuel/bARGE/commit/5ce03329d8a9d09959b6b1a3c1fa0be918befad6) - Add feature to resolve GUIDs in results as Entra ID identities *(PR [#123](https://github.com/PalmEmanuel/bARGE/pull/123) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
+  - *addresses issue [#15](https://github.com/PalmEmanuel/bARGE/issues/15) opened by [@PalmEmanuel](https://github.com/PalmEmanuel)*
+- [`76ee617`](https://github.com/PalmEmanuel/bARGE/commit/76ee61798d11743674fecff83a4be3d73f493e56) - **panel**: Query errors now have an option to display raw error data *(PR [#117](https://github.com/PalmEmanuel/bARGE/pull/117) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
+  - *addresses issue [#88](https://github.com/PalmEmanuel/bARGE/issues/88) opened by [@PalmEmanuel](https://github.com/PalmEmanuel)*
+
+
 ## [v1.1.2] - 2025-09-16
 ### New Features
 - [`7105c86`](https://github.com/PalmEmanuel/bARGE/commit/7105c868ee2db5bae6a653b202498c2aabd3d11a) - Add configuration setting to hide login messages *(PR [#110](https://github.com/PalmEmanuel/bARGE/pull/110) by [@Copilot](https://github.com/apps/copilot-swe-agent))*
@@ -167,3 +175,4 @@ Initial release of bARGE, supporting basic functionality for logging in using [D
 [v1.1.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.0.1...v1.1.0
 [v1.1.1]: https://github.com/PalmEmanuel/bARGE/compare/v1.1.0...v1.1.1
 [v1.1.2]: https://github.com/PalmEmanuel/bARGE/compare/v1.1.1...v1.1.2
+[v1.2.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.1.2...v1.2.0
