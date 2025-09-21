@@ -28,7 +28,10 @@ export class BargePanel {
             { viewColumn: vscode.ViewColumn.Active, preserveFocus: false },
             {
                 enableScripts: true,
-                localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'media')],
+                localResourceRoots: [
+                    vscode.Uri.joinPath(extensionUri, 'media'),
+                    vscode.Uri.joinPath(extensionUri, 'node_modules')
+                ],
                 retainContextWhenHidden: true
             }
         );
@@ -303,7 +306,7 @@ export class BargePanel {
     }
 
     private _getHtmlForWebview() {
-        // Generate a nonce for Content Security Policy
+        // Generate a nonce for script security
         const nonce = crypto.randomBytes(16).toString('base64');
 
         const htmlPath = path.join(this._extensionUri.fsPath, 'media', 'webview', 'webview.html');
@@ -318,10 +321,15 @@ export class BargePanel {
             vscode.Uri.joinPath(this._extensionUri, 'media', 'webview', 'webview-bundle.js')
         );
 
+        const codiconsUri = this._panel.webview.asWebviewUri(
+            vscode.Uri.joinPath(this._extensionUri, 'node_modules', '@vscode', 'codicons', 'dist', 'codicon.css')
+        );
+
         // Replace placeholders
         html = html.replace(/{{NONCE}}/g, nonce);
         html = html.replace(/{{WEBVIEW_URI}}/g, webviewUri.toString());
         html = html.replace(/{{WEBVIEW_BUNDLE_URI}}/g, webviewBundleUri.toString());
+        html = html.replace(/{{CODICONS_URI}}/g, codiconsUri.toString());
 
         return html;
     }

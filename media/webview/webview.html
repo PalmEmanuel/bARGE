@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>bARGE - boosted Azure Resource Graph Explorer</title>
+    <link href="{{CODICONS_URI}}" rel="stylesheet" />
     <style>
         body {
             font-family: var(--vscode-font-family);
@@ -335,6 +336,56 @@
 
         th.detail-button-cell.select-all-header:hover {
             background-color: var(--vscode-list-hoverBackground) !important;
+        }
+
+        /* Resolve GUID button styling */
+        .resolve-guid-btn {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 20px !important;
+            height: 20px !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            background: none !important;
+            border: none !important;
+            cursor: pointer !important;
+            border-radius: 4px !important;
+            outline: none !important;
+            transition: background-color 0.2s ease !important;
+        }
+
+        .resolve-guid-btn:hover:not([disabled]) {
+            background-color: var(--vscode-toolbar-hoverBackground, rgba(255, 255, 255, 0.1)) !important;
+        }
+
+        .resolve-guid-btn[disabled] {
+            cursor: not-allowed !important;
+            opacity: 0.3 !important;
+        }
+
+        .resolve-guid-btn .icon {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 100% !important;
+            height: 100% !important;
+            pointer-events: none !important;
+        }
+
+        .resolve-guid-btn .icon .codicon {
+            color: var(--vscode-foreground) !important;
+            font-size: 14px !important;
+            line-height: 1 !important;
+            transition: color 0.2s ease !important;
+        }
+
+        .resolve-guid-btn:hover:not([disabled]) .icon .codicon {
+            color: #ffffff !important;
+        }
+
+        .resolve-guid-btn[disabled] .icon .codicon {
+            color: var(--vscode-disabledForeground, #666) !important;
         }
 
         th.detail-button-cell.select-all-header:hover svg {
@@ -1350,8 +1401,8 @@
         window.webviewConfig = {
         };
     </script>
-    <script nonce="{{NONCE}}" src="{{WEBVIEW_BUNDLE_URI}}"></script>
-    <script nonce="{{NONCE}}" src="{{WEBVIEW_URI}}/webview.js"></script>
+    <script src="{{WEBVIEW_BUNDLE_URI}}" nonce="{{NONCE}}"></script>
+    <script src="{{WEBVIEW_URI}}/webview.js" nonce="{{NONCE}}"></script>
 </body>
 
 </html>

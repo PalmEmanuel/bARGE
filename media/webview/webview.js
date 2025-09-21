@@ -532,18 +532,9 @@ function displayResults(result, preserveDetailsPane = false) {
             const clickHandler = isDisabled ? '' : 'onclick="showResolveMenu(event, ' + index + ', \'' + col.name + '\')"';
             
             tableHtml += '<button class="resolve-guid-btn" ' + disabledAttr + ' ' + clickHandler + ' title="' + 
-                (isDisabled ? 'Another column is being resolved' : 'Resolve GUIDs in this column') + '" style="' +
-                'position: absolute; right: 24px; top: 50%; transform: translateY(-50%); ' +
-                'background: none; border: none; padding: 4px; ' +
-                'color: var(--vscode-descriptionForeground); opacity: 0.7; cursor: pointer; ' +
-                'transition: opacity 0.2s ease; border-radius: 2px;">' +
-                '<svg viewBox="0 0 16 16" style="width: 14px; height: 14px; fill: currentColor;">' +
-                '<rect x="1" y="6" width="6" height="4" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/>' +
-                '<rect x="6" y="7" width="4" height="2" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/>' +
-                '<rect x="9" y="7.5" width="3" height="1" rx="0.5" fill="none" stroke="currentColor" stroke-width="1.5"/>' +
-                '<line x1="12" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
-                '<circle cx="3.5" cy="8" r="1" fill="none" stroke="currentColor" stroke-width="1"/>' +
-                '</svg></button>';
+                (isDisabled ? 'Another column is being resolved' : 'Resolve GUIDs in this column') + '" ' +
+                'style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%);">' +
+                '<div class="icon"><i class="codicon codicon-search-sparkle"></i></div></button>';
         }
         
         tableHtml += '<div class="resize-handle" onmousedown="startResize(event, ' + index + ')"></div>' +
