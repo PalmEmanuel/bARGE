@@ -2248,11 +2248,18 @@ function exportToCsv() {
             )
         };
 
+        const now = new Date();
+        const timestamp = now.getFullYear() +
+            String(now.getMonth() + 1).padStart(2, '0') +
+            String(now.getDate()).padStart(2, '0') + '-' +
+            String(now.getHours()).padStart(2, '0') +
+            String(now.getMinutes()).padStart(2, '0');
+
         vscode.postMessage({
             type: 'exportCsv',
             payload: {
                 data: cleanedData,
-                filename: 'barge-results-' + new Date().toISOString().replace(/[:.]/g, '-') + '.csv'
+                filename: 'barge-results-' + timestamp + '.csv'
             }
         });
     }
