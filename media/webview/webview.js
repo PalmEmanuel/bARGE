@@ -569,7 +569,7 @@ function displayResults(result, preserveDetailsPane = false) {
             'ondragover="handleDragOver(event)"' +
             'ondrop="handleDrop(event, ' + index + ')"' +
             'ondragend="handleDragEnd(event)"' +
-            'style="width: ' + (col.width || 'auto') + '; position: relative;"' +
+            'style="position: relative;"' +
             'title="' + col.name + '">' +
             '<span class="header-text">' + col.name + '</span>';
         
@@ -2601,16 +2601,27 @@ function handleResize(event) {
     if (!isResizing || currentResizeColumn === null) return;
 
     const diff = event.clientX - startX;
-    const newWidth = Math.max(60, startWidth + diff); // Minimum width of 60px
-
     const th = document.querySelector('th[data-col-index="' + currentResizeColumn + '"]');
-    if (th) {
-        th.style.width = newWidth + 'px';
+    if (!th) return;
 
-        // Store the width in our data
-        if (currentResults && currentResults.columns[currentResizeColumn]) {
-            currentResults.columns[currentResizeColumn].width = newWidth + 'px';
-        }
+    // Get header text element (assume first child text node or span)
+    let headerTextEl = th.querySelector('.header-text') || th;
+    // Create a temporary span to measure text width
+    const tempSpan = document.createElement('span');
+    tempSpan.style.visibility = 'hidden';
+    tempSpan.style.position = 'absolute';
+    tempSpan.style.whiteSpace = 'nowrap';
+    tempSpan.textContent = headerTextEl.textContent;
+    document.body.appendChild(tempSpan);
+    const minWidth = tempSpan.offsetWidth + 30;
+    document.body.removeChild(tempSpan);
+
+    const newWidth = Math.max(minWidth, startWidth + diff);
+    th.style.width = newWidth + 'px';
+
+    // Store the width in our data
+    if (currentResults && currentResults.columns[currentResizeColumn]) {
+        currentResults.columns[currentResizeColumn].width = newWidth + 'px';
     }
 }
 
