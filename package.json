@@ -218,7 +218,7 @@
     "@vscode/test-cli": "^0.0.11",
     "@vscode/test-electron": "^2.5.2",
     "@kusto/language-service-next": "^12.2.0",
-    "esbuild": "^0.25.10",
+    "esbuild": "^0.25.11",
     "eslint": "^9.36.0",
     "husky": "^9.1.7",
     "npm-run-all": "^4.1.5",
