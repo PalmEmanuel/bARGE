@@ -4,6 +4,12 @@ All notable changes to the bARGE Visual Studio Code extension will be documented
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [v1.2.1] - 2025-10-26
+### Bug Fixes
+- [`184d728`](https://github.com/PalmEmanuel/bARGE/commit/184d7280553e567b0f32ec7340f95f3a5c162b8c) - Improved column sizing of results table, allowing horizontal scrolling *(PR [#154](https://github.com/PalmEmanuel/bARGE/pull/154) by [@Copilot](https://github.com/apps/copilot-swe-agent))*
+  - *fixes issue [#153](https://github.com/PalmEmanuel/bARGE/issues/153) opened by [@PalmEmanuel](https://github.com/PalmEmanuel)*
+
+
 ## [v1.2.0] - 2025-09-21
 ### New Features
 - [`5ce0332`](https://github.com/PalmEmanuel/bARGE/commit/5ce03329d8a9d09959b6b1a3c1fa0be918befad6) - Add feature to resolve GUIDs in results as Entra ID identities *(PR [#123](https://github.com/PalmEmanuel/bARGE/pull/123) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
@@ -176,3 +182,4 @@ Initial release of bARGE, supporting basic functionality for logging in using [D
 [v1.1.1]: https://github.com/PalmEmanuel/bARGE/compare/v1.1.0...v1.1.1
 [v1.1.2]: https://github.com/PalmEmanuel/bARGE/compare/v1.1.1...v1.1.2
 [v1.2.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.1.2...v1.2.0
+[v1.2.1]: https://github.com/PalmEmanuel/bARGE/compare/v1.2.0...v1.2.1
