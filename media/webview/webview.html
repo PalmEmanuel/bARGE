@@ -423,10 +423,6 @@
             pointer-events: none !important;
         }
 
-        th.detail-button-cell {
-            overflow: hidden !important;
-        }
-
         .detail-button-cell:hover {
             background-color: transparent !important;
         }
@@ -712,7 +708,8 @@
         }
 
         .comparison-table {
-            min-width: 100%;
+            width: 100%;
+            min-width: max-content;
             border-collapse: collapse;
             border: 1px solid var(--vscode-widget-border);
         }
@@ -873,7 +870,8 @@
         }
 
         .results-table {
-            min-width: 100%;
+            width: 100%;
+            min-width: max-content;
             border-collapse: collapse;
             font-size: 0.9em;
             table-layout: fixed;
@@ -889,9 +887,9 @@
             cursor: pointer;
             user-select: none;
             z-index: 10;
-            min-width: 60px;
+            width: 120px;
+            min-width: max-content;
             resize: horizontal;
-            overflow: hidden;
         }
 
         .results-table th:hover {
@@ -939,6 +937,7 @@
             cursor: pointer;
             user-select: none;
             position: relative;
+            min-width: max-content;
             /* Prevent focus outline issues */
             outline: none !important;
         }
