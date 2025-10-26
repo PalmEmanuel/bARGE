@@ -294,15 +294,19 @@
         }
 
         .detail-button-cell {
-            width: 36px !important;
-            min-width: 36px !important;
-            max-width: 36px !important;
             text-align: center;
             padding: 2px !important;
             vertical-align: middle;
             position: relative;
             /* Prevent focus outline issues */
             outline: none !important;
+        }
+
+        .results-table .detail-button-cell,
+        .results-table th.detail-button-cell {
+            width: 36px !important;
+            min-width: 36px !important;
+            max-width: 36px !important;
         }
 
         .detail-button-cell:focus,
@@ -887,9 +891,16 @@
             cursor: pointer;
             user-select: none;
             z-index: 10;
-            width: 120px;
             min-width: max-content;
             resize: horizontal;
+        }
+
+        .results-table th:not(.detail-button-cell):not(:last-child) {
+            width: 120px;
+        }
+
+        .results-table th:last-child {
+            width: auto;
         }
 
         .results-table th:hover {
