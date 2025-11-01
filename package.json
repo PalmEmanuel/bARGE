@@ -229,7 +229,7 @@
     "@azure/arm-subscriptions": "^5.1.0",
     "@azure/identity": "^4.13.0",
     "@azure/msal-node": "^3.8.1",
-    "@vscode/codicons": "0.0.40",
+    "@vscode/codicons": "0.0.41",
     "lottie-web": "^5.13.0"
   }
 }
