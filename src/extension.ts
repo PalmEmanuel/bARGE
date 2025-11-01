@@ -328,7 +328,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Update decoration on selection, active editor change, and document edits
 	const selListener = vscode.window.onDidChangeTextEditorSelection(e => updateImplicitDecoration(e.textEditor));
-	const activeListener = vscode.window.onDidChangeActiveTextEditor(editor => updateImplicitDecoration(editor ?? undefined));
+	const activeListener = vscode.window.onDidChangeActiveTextEditor(editor => updateImplicitDecoration(editor));
 	const docListener = vscode.workspace.onDidChangeTextDocument(e => {
 		if (vscode.window.activeTextEditor && e.document === vscode.window.activeTextEditor.document) {
 			updateImplicitDecoration(vscode.window.activeTextEditor);
