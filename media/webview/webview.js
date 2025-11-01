@@ -59,7 +59,7 @@ function isPotentialIdentityColumn(columnName) {
         'correlationid', 'transactionid', 'sessionid', 'requestid', 'subscriptionid', 'tenantid', 'resourceid'
     ];
 
-    // Check if column name isn't an id that shouldn't be resolved as identity
+    // Check if column name is not in the list of excluded ID types
     return !excludedNames.some(excluded =>
         lowerColumnName.includes(excluded)
     );
