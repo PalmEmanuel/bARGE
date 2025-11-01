@@ -83,7 +83,7 @@
         {
           "command": "barge.runQueryFromSelection",
           "title": "Run Selected Query",
-          "when": "editorHasSelection && (editorLangId == kql || resourceExtname == .kql || editorLangId == powershell || resourceExtname == .ps1 || editorLangId == plaintext)"
+          "when": "(editorHasSelection || barge.hasImplicitQuery) && (editorLangId == kql || resourceExtname == .kql || editorLangId == powershell || resourceExtname == .ps1 || editorLangId == plaintext)"
         },
         {
           "command": "barge.setScope",
@@ -104,7 +104,7 @@
         {
           "command": "barge.runQueryFromSelection",
           "title": "bARGE: Run Selected Query",
-          "when": "editorHasSelection && (editorLangId == kql || resourceExtname == .kql || editorLangId == powershell || resourceExtname == .ps1 || editorLangId == plaintext)",
+          "when": "(editorHasSelection || barge.hasImplicitQuery) && (editorLangId == kql || resourceExtname == .kql || editorLangId == powershell || resourceExtname == .ps1 || editorLangId == plaintext)",
           "group": "barge@2"
         }
       ],
@@ -124,7 +124,7 @@
         },
         {
           "command": "barge.runQueryFromSelection",
-          "when": "editorHasSelection && (editorLangId == kql || resourceExtname == .kql)",
+          "when": "(editorHasSelection || barge.hasImplicitQuery) && (editorLangId == kql || resourceExtname == .kql)",
           "group": "navigation@2"
         }
       ]
@@ -133,7 +133,7 @@
       {
         "command": "barge.runQueryFromSelection",
         "key": "f8",
-        "when": "editorTextFocus && editorHasSelection && (editorLangId == kql || resourceExtname == .kql)"
+        "when": "editorTextFocus && (editorHasSelection || barge.hasImplicitQuery) && (editorLangId == kql || resourceExtname == .kql)"
       },
       {
         "command": "barge.runQueryFromFile",

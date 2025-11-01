@@ -102,14 +102,26 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		const selection = activeEditor.selection;
-		const query = activeEditor.document.getText(selection).trim();
-		
-		if (!query) {
-			vscode.window.showErrorMessage('No text selected or selection is empty');
+		let selectedText = activeEditor.document.getText(selection);
+		let queryText = selectedText.trim();
+
+		// If there's no explicit selection
+		// compute the implicit query range based on blank lines above/below the cursor.
+		if (!selectedText) {
+			const implicitRange = getImplicitQueryRange(activeEditor.document, selection.active);
+			if (!implicitRange) {
+				vscode.window.showErrorMessage('No text selected and no implicit query selection found');
+				return;
+			}
+			queryText = activeEditor.document.getText(implicitRange).trim();
+		}
+
+		if (!queryText) {
+			vscode.window.showErrorMessage('No text selected and no implicit query selection found');
 			return;
 		}
 
-		await runQueryInPanel(query, 'selection', activeEditor.document.fileName);
+		await runQueryInPanel(queryText, 'selection', activeEditor.document.fileName);
 	});
 
 	// Register scope setting command
@@ -166,6 +178,167 @@ export function activate(context: vscode.ExtensionContext) {
 	// Register enhanced Kusto language service (includes hover, completion, signature help, formatting)
 	const kustoLanguageService = new KustoLanguageServiceProvider();
 	kustoLanguageService.register(context);
+
+	// Slight, subtle highlight used to indicate the implicit query under cursor.
+	let implicitQueryDecoration: vscode.TextEditorDecorationType | undefined;
+
+	function createImplicitDecoration() {
+		// Dispose previous decoration if present
+		if (implicitQueryDecoration) {
+			implicitQueryDecoration.dispose();
+		}
+
+		// Choose background color based on theme kind
+		const themeKind = vscode.window.activeColorTheme.kind;
+		let backgroundColor: string;
+
+		switch (themeKind) {
+			case vscode.ColorThemeKind.Light:
+				// Light theme: very subtle dark grey
+				backgroundColor = 'rgba(0, 0, 0, 0.04)';
+				break;
+			case vscode.ColorThemeKind.Dark:
+				// Dark theme: very subtle light grey
+				backgroundColor = 'rgba(255, 255, 255, 0.04)';
+				break;
+			case vscode.ColorThemeKind.HighContrastLight:
+				// High contrast light: more visible dark overlay
+				backgroundColor = 'rgba(0, 0, 0, 0.12)';
+				break;
+			case vscode.ColorThemeKind.HighContrast:
+				// High contrast dark: more visible light overlay
+				backgroundColor = 'rgba(255, 255, 255, 0.16)';
+				break;
+			default:
+				// Fallback to dark theme color
+				backgroundColor = 'rgba(255, 255, 255, 0.04)';
+				break;
+		}
+
+		implicitQueryDecoration = vscode.window.createTextEditorDecorationType({
+			backgroundColor: backgroundColor
+		});
+
+		return implicitQueryDecoration;
+	}
+
+	// Create initial decoration
+	createImplicitDecoration();
+
+	// When the active color theme changes recreate the decoration so theme token
+	// changes are picked up immediately (some themes may map tokens differently).
+	const themeListener = vscode.window.onDidChangeActiveColorTheme(() => {
+		createImplicitDecoration();
+		updateImplicitDecoration();
+	});
+
+	function getImplicitQueryRange(document: vscode.TextDocument, position: vscode.Position): vscode.Range | null {
+		const totalLines = document.lineCount;
+		let line = position.line;
+
+		// If the cursor is on an empty line, check if the line above has content.
+		// If so, include this empty line as the trailing line of the query above.
+		if (document.lineAt(line).text.trim() === '') {
+			if (line > 0 && document.lineAt(line - 1).text.trim() !== '') {
+				// The line above has content, so find the start of that query
+				let prevEmpty = -1;
+				for (let i = line - 2; i >= 0; i--) {
+					if (document.lineAt(i).text.trim() === '') {
+						prevEmpty = i;
+						break;
+					}
+				}
+				const startLine = prevEmpty === -1 ? 0 : prevEmpty + 1;
+				
+				// Include the current empty line as the end
+				const startPos = new vscode.Position(startLine, 0);
+				const endPos = document.lineAt(line).range.end;
+				return new vscode.Range(startPos, endPos);
+			}
+			// Otherwise, no implicit selection on empty lines
+			return null;
+		}
+
+		// Find the nearest empty line strictly above the cursor
+		let prevEmpty = -1;
+		for (let i = line - 1; i >= 0; i--) {
+			if (document.lineAt(i).text.trim() === '') {
+				prevEmpty = i;
+				break;
+			}
+		}
+		const startLine = prevEmpty === -1 ? 0 : prevEmpty + 1;
+
+		// Find the nearest empty line strictly below the cursor
+		let nextEmpty = -1;
+		for (let i = line + 1; i < totalLines; i++) {
+			if (document.lineAt(i).text.trim() === '') {
+				nextEmpty = i;
+				break;
+			}
+		}
+		const endLine = nextEmpty === -1 ? totalLines - 1 : nextEmpty - 1;
+
+		let s = startLine;
+		let e = endLine;
+		// Trim any accidental empty lines at the boundaries
+		while (s <= e && document.lineAt(s).text.trim() === '') {
+			s++;
+		}
+		while (e >= s && document.lineAt(e).text.trim() === '') {
+			e--;
+		}
+		if (s > e) {
+			return null;
+		}
+
+		const startPos = new vscode.Position(s, 0);
+		const endPos = document.lineAt(e).range.end;
+		return new vscode.Range(startPos, endPos);
+	}
+
+	function updateImplicitDecoration(editor?: vscode.TextEditor | undefined) {
+		const active = editor ?? vscode.window.activeTextEditor;
+		if (!active) {
+			// Clear context when no active editor
+			vscode.commands.executeCommand('setContext', 'barge.hasImplicitQuery', false);
+			return;
+		}
+
+		// Determine if we should show the implicit decoration
+		let rangeToDecorate: vscode.Range | null = null;
+
+		// Only apply to KQL or .kql files
+		const langId = active.document.languageId;
+		const isKqlFile = langId === 'kql' || active.document.fileName.endsWith('.kql');
+
+		// Only show decoration if: it's a KQL file, no text is selected, and we found a valid range
+		if (isKqlFile && active.selection.isEmpty) {
+			const cursor = active.selection.active;
+			rangeToDecorate = getImplicitQueryRange(active.document, cursor);
+		}
+
+		// Set context for command visibility (whether text is selected OR implicit query exists)
+		const hasSelectionOrImplicit = isKqlFile && (!active.selection.isEmpty || rangeToDecorate !== null);
+		vscode.commands.executeCommand('setContext', 'barge.hasImplicitQuery', hasSelectionOrImplicit);
+
+		// Apply decoration: either the range or empty array to clear
+		active.setDecorations(implicitQueryDecoration!, rangeToDecorate ? [rangeToDecorate] : []);
+	}
+
+	// Update decoration on selection, active editor change, and document edits
+	const selListener = vscode.window.onDidChangeTextEditorSelection(e => updateImplicitDecoration(e.textEditor));
+	const activeListener = vscode.window.onDidChangeActiveTextEditor(editor => updateImplicitDecoration(editor ?? undefined));
+	const docListener = vscode.workspace.onDidChangeTextDocument(e => {
+		if (vscode.window.activeTextEditor && e.document === vscode.window.activeTextEditor.document) {
+			updateImplicitDecoration(vscode.window.activeTextEditor);
+		}
+	});
+
+	// Run an initial update for the active editor on activation
+	updateImplicitDecoration(vscode.window.activeTextEditor);
+
+	context.subscriptions.push(implicitQueryDecoration!, selListener, activeListener, docListener, themeListener);
 
 	// Auto-authenticate if configured
 	const config = vscode.workspace.getConfiguration('barge');
