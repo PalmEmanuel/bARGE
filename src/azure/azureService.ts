@@ -45,6 +45,7 @@ export class AzureService {
     private clearAuthentication(): void {
         this.authenticated = false;
         this.currentAccount = null;
+        this.currentSubscriptions = [];
         this.credential = null;
         this.notifyAuthStatusChanged();
     }
