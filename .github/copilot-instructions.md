@@ -151,7 +151,8 @@ All commits and pull request titles **MUST** have a subject in normal sentence c
 - **style**: Code style changes (formatting, semicolons, etc.) - no code logic changes
 - **refactor**: Code changes that neither fix bugs nor add features
 - **test**: Add or modify tests
-- **chore**: Maintenance tasks, build changes, dependency updates
+- **chore**: Maintenance tasks, build changes
+- **deps**: Dependency updates
 - **perf**: Performance improvements
 - **ci**: CI/CD pipeline changes
 - **build**: Build system changes (esbuild, npm scripts, etc.)

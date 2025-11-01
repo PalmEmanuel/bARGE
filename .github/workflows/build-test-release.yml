@@ -126,7 +126,7 @@ jobs:
           token: ${{ github.token }}
           tag: ${{ github.ref_name }}
           reverseOrder: true
-          excludeTypes: docs, style, refactor, test, ci, dev, deps, chore, revert
+          excludeTypes: docs, style, refactor, test, ci, dev, chore, revert
           excludeScopes: dev, test, release
           useGitmojis: false
 
