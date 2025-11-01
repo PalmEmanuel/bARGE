@@ -349,11 +349,9 @@ export class AzureService {
             const accessToken = tokenResponse.token;
 
             const requestBody: any = {
-                query: `
-resourcecontainers
+                query: `resourcecontainers
 | where type == 'microsoft.resources/subscriptions'
-| project subscriptionId, displayName = name, tenantId
-                `,
+| project subscriptionId, displayName = name, tenantId`,
                 // Request object array format for simpler parsing
                 options: { resultFormat: 'objectArray' }
             };
