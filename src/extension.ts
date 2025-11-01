@@ -297,7 +297,7 @@ export function activate(context: vscode.ExtensionContext) {
 		return new vscode.Range(startPos, endPos);
 	}
 
-	function updateImplicitDecoration(editor?: vscode.TextEditor | undefined) {
+	function updateImplicitDecoration(editor?: vscode.TextEditor) {
 		const active = editor ?? vscode.window.activeTextEditor;
 		if (!active) {
 			// Clear context when no active editor
