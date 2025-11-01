@@ -1,16 +1,16 @@
 import { DefaultAzureCredential, TokenCredential } from '@azure/identity';
-import { SubscriptionClient } from '@azure/arm-subscriptions';
 import * as vscode from 'vscode';
 import { AzureSubscription, QueryResult, ColumnDefinition, AuthScope, IdentityInfo } from '../types';
 import { VSCodeCredential } from './vsCodeCredential';
 
 export class AzureService {
     private credential: DefaultAzureCredential | VSCodeCredential | null = null;
-    private subscriptionClient: SubscriptionClient | null = null;
     private currentScope: AuthScope = { type: 'tenant' }; // Default to tenant scope
     private authenticated = false;
     private currentAccount: string | null = null;
+    private currentSubscriptions: AzureSubscription[] = [];
     private static readonly ARM_RESOURCE_DEFAULT_SCOPE = 'https://management.azure.com/.default';
+    private static readonly ARG_API_VERSION = '2024-04-01';
 
     private static readonly SIGNING_IN_MESSAGE = 'Signing in...';
 
@@ -26,7 +26,7 @@ export class AzureService {
     }
 
     private validateAuthentication(): void {
-        if (!this.credential || !this.subscriptionClient || !this.authenticated) {
+        if (!this.credential || !this.authenticated) {
             throw new Error('Not authenticated, please sign in first!');
         }
     }
@@ -46,7 +46,6 @@ export class AzureService {
         this.authenticated = false;
         this.currentAccount = null;
         this.credential = null;
-        this.subscriptionClient = null;
         this.notifyAuthStatusChanged();
     }
 
@@ -68,7 +67,7 @@ export class AzureService {
                     this.clearAuthentication();
                     return false;
                 }
-                
+
                 // Also verify we can still get accounts from VS Code
                 const accounts = await vscode.authentication.getAccounts('microsoft');
                 const sessionStillExists = accounts.some(account => account.id === session.account.id);
@@ -83,10 +82,10 @@ export class AzureService {
                 this.clearAuthentication();
                 return false;
             }
-            
+
             // Verify that the token is for the expected account
             const currentTokenAccount = await this.extractAccountFromToken(tokenResponse.token);
-            
+
             // If we have a current account stored, check if it matches the token
             if (this.currentAccount && currentTokenAccount && this.currentAccount !== currentTokenAccount) {
                 // This could be a legitimate account switch or an unexpected change
@@ -100,7 +99,7 @@ export class AzureService {
                     return false;
                 }
             }
-            
+
             // Token is valid, ensure our state reflects this
             if (!this.authenticated) {
                 this.authenticated = true;
@@ -143,7 +142,7 @@ export class AzureService {
         try {
             const jwt = token.split('.')[1];
             const payload = JSON.parse(atob(jwt));
-            
+
             // Try different identity claims in order of preference
             // These are the same claims used in authenticateWithDefaultCredential
             return payload.upn || payload.unique_name || payload.email || payload.name || payload.oid || null;
@@ -155,7 +154,7 @@ export class AzureService {
 
     async authenticate(): Promise<boolean> {
         this.notifyLoadingStatusChanged(true, AzureService.SIGNING_IN_MESSAGE);
-        
+
         try {
             // Messages here use codicons - https://microsoft.github.io/vscode-codicons/dist/codicon.html
             // Always build picker items starting with DefaultAzureCredential option
@@ -251,27 +250,24 @@ export class AzureService {
         try {
             // Fall back to DefaultAzureCredential (Azure CLI, managed identity, etc.)
             this.credential = new DefaultAzureCredential();
-            this.subscriptionClient = new SubscriptionClient(this.credential);
             // Get token to verify authentication and get identity
             const token = await this.credential.getToken([AzureService.ARM_RESOURCE_DEFAULT_SCOPE]);
 
             if (token) {
-                this.subscriptionClient = new SubscriptionClient(this.credential as TokenCredential);
-
                 // Set authenticated state before testing with getSubscriptions
                 this.authenticated = true;
                 this.currentAccount = await this.extractAccountFromToken(token.token);
 
-                // Test authentication by listing subscriptions
-                await this.getSubscriptions();
+                // Get available subscriptions for account
+                this.currentSubscriptions = await this.getSubscriptions();
 
                 this.notifyLoadingStatusChanged(false);
                 this.notifyAuthStatusChanged();
-                
+
                 // Check if login popups should be hidden
                 const config = vscode.workspace.getConfiguration('barge');
                 const hideLoginMessages = config.get('hideLoginMessages', false);
-                
+
                 if (!hideLoginMessages) {
                     vscode.window.showInformationMessage(`Signed in as ${this.currentAccount} from [existing login](https://learn.microsoft.com/en-us/javascript/api/@azure/identity/defaultazurecredential?view=azure-node-latest&wt.mc_id=DT-MVP-5005372)!`);
                 }
@@ -315,14 +311,12 @@ export class AzureService {
             // Set up our service clients with the VS Code credential
             this.credential = new VSCodeCredential(session);
 
-            this.subscriptionClient = new SubscriptionClient(this.credential as TokenCredential);
-
             // Set authenticated state before testing with getSubscriptions
             this.authenticated = true;
             this.currentAccount = session.account.label;
 
-            // Test authentication by getting subscriptions
-            await this.getSubscriptions();
+            // Get available subscriptions for account
+            this.currentSubscriptions = await this.getSubscriptions();
 
             this.notifyLoadingStatusChanged(false);
             this.notifyAuthStatusChanged();
@@ -330,7 +324,7 @@ export class AzureService {
             // Check if login popups should be hidden
             const config = vscode.workspace.getConfiguration('barge');
             const hideLoginMessages = config.get('hideLoginMessages', false);
-            
+
             if (!hideLoginMessages) {
                 vscode.window.showInformationMessage(`Signed in as ${session.account.label} from VS Code!`);
             }
@@ -348,16 +342,57 @@ export class AzureService {
         this.validateAuthentication();
 
         try {
+            const tokenResponse = await this.credential!.getToken(AzureService.ARM_RESOURCE_DEFAULT_SCOPE);
+            if (!tokenResponse) {
+                throw new Error('Failed to get access token');
+            }
+            const accessToken = tokenResponse.token;
+
+            const requestBody: any = {
+                query: `
+resourcecontainers
+| where type == 'microsoft.resources/subscriptions'
+| project subscriptionId, displayName = name, tenantId
+                `,
+                // Request object array format for simpler parsing
+                options: { resultFormat: 'objectArray' }
+            };
+
+            const response = await fetch(
+                'https://management.azure.com/providers/Microsoft.ResourceGraph/resources?api-version=' + AzureService.ARG_API_VERSION,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                }
+            );
+
+            if (!response.ok) {
+                let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                try {
+                    const errorBody = await response.json() as any;
+                    if (errorBody?.error?.message) {
+                        errorMessage = errorBody.error.message;
+                    }
+                } catch {
+                    // ignore parse error, keep default message
+                }
+                throw new Error(errorMessage);
+            }
+
+            const result = await response.json() as any;
+
             const subscriptions: AzureSubscription[] = [];
 
-            for await (const subscription of this.subscriptionClient!.subscriptions.list()) {
-                if (subscription.subscriptionId && subscription.displayName) {
-                    subscriptions.push({
-                        subscriptionId: subscription.subscriptionId,
-                        displayName: subscription.displayName,
-                        tenantId: subscription.tenantId || ''
-                    });
-                }
+            for (const subscription of result.data) {
+                subscriptions.push({
+                    subscriptionId: subscription.subscriptionId,
+                    displayName: subscription.displayName,
+                    tenantId: subscription.tenantId
+                });
             }
 
             return subscriptions;
@@ -419,7 +454,7 @@ export class AzureService {
         }
 
         const response = await fetch(
-            'https://management.azure.com/providers/Microsoft.ResourceGraph/resources?api-version=2024-04-01',
+            'https://management.azure.com/providers/Microsoft.ResourceGraph/resources?api-version=' + AzureService.ARG_API_VERSION,
             {
                 method: 'POST',
                 headers: {
@@ -554,7 +589,7 @@ export class AzureService {
         // Preserve column order from the first object (like Azure Portal ARG Explorer)
         // This maintains the order specified in KQL project statements
         const firstObjectKeys = Object.keys(objects[0]);
-        
+
         // Get all unique property names from all objects, but maintain order from first object
         const allKeys = new Set<string>(firstObjectKeys);
         objects.forEach(obj => {
@@ -582,9 +617,9 @@ export class AzureService {
     }
 
     public async setScope(): Promise<void> {
-        try {
-            const subscriptions = await this.getSubscriptions();
+        this.validateAuthentication();
 
+        try {
             // Create quick pick items
             const items: vscode.QuickPickItem[] = [
                 {
@@ -592,7 +627,7 @@ export class AzureService {
                     description: 'Query across all subscriptions in the tenant',
                     detail: 'Recommended for most queries'
                 },
-                ...subscriptions.map(sub => ({
+                ...this.currentSubscriptions.map(sub => ({
                     label: sub.displayName,
                     description: sub.subscriptionId,
                     detail: `Subscription scope`
@@ -608,14 +643,14 @@ export class AzureService {
                 // Check if login popups should be hidden
                 const config = vscode.workspace.getConfiguration('barge');
                 const hideLoginMessages = config.get('hideLoginMessages', false);
-                
+
                 if (selected.label === 'Tenant Scope') {
                     this.currentScope = { type: 'tenant' };
                     if (!hideLoginMessages) {
                         vscode.window.showInformationMessage('Scope set to: Tenant (all subscriptions)');
                     }
                 } else {
-                    const subscription = subscriptions.find(sub => sub.displayName === selected.label);
+                    const subscription = this.currentSubscriptions.find(sub => sub.displayName === selected.label);
                     if (subscription) {
                         this.currentScope = {
                             type: 'subscription',
@@ -631,7 +666,7 @@ export class AzureService {
             // Check if login popups should be hidden
             const config = vscode.workspace.getConfiguration('barge');
             const hideLoginMessages = config.get('hideLoginMessages', false);
-            
+
             if (!hideLoginMessages) {
                 vscode.window.showErrorMessage(`Failed to set scope: ${error}`);
             }
@@ -646,11 +681,11 @@ export class AzureService {
      * Resolve identity GUIDs using Microsoft Graph API
      */
     public async resolveIdentityGuids(
-        guids: string[], 
+        guids: string[],
         onPartialResult?: (resolvedIdentities: IdentityInfo[]) => void
     ): Promise<IdentityInfo[]> {
         this.validateAuthentication();
-        
+
         if (!this.credential) {
             throw new Error('No credential available for authentication');
         }
@@ -664,7 +699,7 @@ export class AzureService {
             }
 
             const results: IdentityInfo[] = [];
-            
+
             // Process GUIDs in batches of 15
             const batchSize = 15;
             for (let i = 0; i < guids.length; i += batchSize) {
@@ -680,13 +715,13 @@ export class AzureService {
     }
 
     private async resolveIdentityBatch(
-        guids: string[], 
-        accessToken: string, 
+        guids: string[],
+        accessToken: string,
         onPartialResult?: (resolvedIdentities: IdentityInfo[]) => void
     ): Promise<IdentityInfo[]> {
         const results: IdentityInfo[] = [];
         const apiErrors = new Map<string, any[]>(); // Track multiple API errors per GUID
-        
+
         // Helper function to add error for GUID
         const addErrorForGuid = (guid: string, objectType: string, error: any) => {
             if (!apiErrors.has(guid)) {
@@ -698,17 +733,17 @@ export class AzureService {
                 timestamp: new Date().toISOString()
             });
         };
-        
+
         // Try to resolve as users first
         const usersResult = await this.queryGraphObjectsWithDetails('users', guids, accessToken);
         const userIdentities = usersResult.found.map(user => this.mapToIdentityInfo(user, 'user'));
         results.push(...userIdentities);
-        
+
         // Track errors for GUIDs not found in users
         usersResult.errors.forEach(({ guid, error }) => {
             addErrorForGuid(guid, 'users', error);
         });
-        
+
         // Send partial results immediately
         if (onPartialResult && userIdentities.length > 0) {
             onPartialResult(userIdentities);
@@ -723,12 +758,12 @@ export class AzureService {
             const spResult = await this.queryGraphObjectsWithDetails('servicePrincipals', unresolvedGuids, accessToken);
             const spIdentities = spResult.found.map(sp => this.mapToIdentityInfo(sp, 'servicePrincipal'));
             results.push(...spIdentities);
-            
+
             // Track errors for GUIDs not found in service principals
             spResult.errors.forEach(({ guid, error }) => {
                 addErrorForGuid(guid, 'servicePrincipals', error);
             });
-            
+
             // Send partial results immediately
             if (onPartialResult && spIdentities.length > 0) {
                 onPartialResult(spIdentities);
@@ -744,12 +779,12 @@ export class AzureService {
             const groupsResult = await this.queryGraphObjectsWithDetails('groups', stillUnresolvedGuids, accessToken);
             const groupIdentities = groupsResult.found.map(group => this.mapToIdentityInfo(group, 'group'));
             results.push(...groupIdentities);
-            
+
             // Track errors for GUIDs not found in groups
             groupsResult.errors.forEach(({ guid, error }) => {
                 addErrorForGuid(guid, 'groups', error);
             });
-            
+
             // Send partial results immediately
             if (onPartialResult && groupIdentities.length > 0) {
                 onPartialResult(groupIdentities);
@@ -759,7 +794,7 @@ export class AzureService {
         // Add error entries for any still unresolved GUIDs with detailed API error information
         const finalResolvedIds2 = new Set(results.map(r => r.id));
         const finalUnresolvedGuids = guids.filter(guid => !finalResolvedIds2.has(guid));
-        
+
         const errorIdentities: IdentityInfo[] = [];
         finalUnresolvedGuids.forEach(guid => {
             const guidErrors = apiErrors.get(guid) || [];
@@ -797,7 +832,7 @@ export class AzureService {
         });
 
         results.push(...errorIdentities);
-        
+
         // Only send error results as final results, not as partial results
         // This prevents showing "Failed to resolve" messages for identities that might be resolved in later attempts
 
@@ -808,7 +843,7 @@ export class AzureService {
         if (errors.length === 0) {
             return 'Could not resolve identity.';
         }
-        
+
         return 'Identity not found.';
     }
 
@@ -859,14 +894,14 @@ export class AzureService {
                             objectType: objectType
                         };
                     }
-                    
+
                     errors.push({ guid, error: errorDetail });
                 }
             } catch (networkError) {
                 // Network or other unexpected errors
                 const errorMessage = networkError instanceof Error ? networkError.message : 'Network error occurred';
-                errors.push({ 
-                    guid, 
+                errors.push({
+                    guid,
                     error: {
                         message: errorMessage,
                         code: 'NetworkError',
