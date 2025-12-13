@@ -180,7 +180,7 @@ jobs:
           generate_release_notes: false
 
       - name: Create Pull Request for Updated Release Files
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ github.token }}
           commit-message: |
