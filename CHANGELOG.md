@@ -4,6 +4,15 @@ All notable changes to the bARGE Visual Studio Code extension will be documented
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [v1.3.0] - 2025-11-01
+### New Features
+- [`7ee5bae`](https://github.com/PalmEmanuel/bARGE/commit/7ee5bae20c17b3a52c7f1df3d3f6f7039f3aaaae) - Add implicit query selection based on cursor position *(PR [#178](https://github.com/PalmEmanuel/bARGE/pull/178) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
+  - *addresses issue [#113](https://github.com/PalmEmanuel/bARGE/issues/113) opened by [@PalmEmanuel](https://github.com/PalmEmanuel)*
+- [`0fb5d30`](https://github.com/PalmEmanuel/bARGE/commit/0fb5d302d17499d6e34077dab134c8d907284886) - Improved identification of potential identity guid columns *(PR [#177](https://github.com/PalmEmanuel/bARGE/pull/177) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
+  - *addresses issue [#174](https://github.com/PalmEmanuel/bARGE/issues/174) opened by [@PalmEmanuel](https://github.com/PalmEmanuel)*
+- [`1b63518`](https://github.com/PalmEmanuel/bARGE/commit/1b63518831d0bd41f6a1601d9078fec630cbbeea) - Improve subscription scope retrieval time, remove package dependency for subscriptions *(PR [#175](https://github.com/PalmEmanuel/bARGE/pull/175) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
+
+
 ## [v1.2.2] - 2025-10-26
 ### Bug Fixes
 - [`1cfdb51`](https://github.com/PalmEmanuel/bARGE/commit/1cfdb51f0be4d8a07308dec82f17bc905dcf34cd) - **panel**: Ensure details button column remains correctly sized for all result table sizes *(PR [#161](https://github.com/PalmEmanuel/bARGE/pull/161) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
@@ -189,3 +198,4 @@ Initial release of bARGE, supporting basic functionality for logging in using [D
 [v1.2.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.1.2...v1.2.0
 [v1.2.1]: https://github.com/PalmEmanuel/bARGE/compare/v1.2.0...v1.2.1
 [v1.2.2]: https://github.com/PalmEmanuel/bARGE/compare/v1.2.1...v1.2.2
+[v1.3.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.2.2...v1.3.0
