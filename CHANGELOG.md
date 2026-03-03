@@ -4,6 +4,11 @@ All notable changes to the bARGE Visual Studio Code extension will be documented
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [v1.5.0] - 2026-03-03
+### New Features
+- [`4bb502c`](https://github.com/PalmEmanuel/bARGE/commit/4bb502c291fb918881bb8b7285ff0f8639f8c2eb) - Adds support for more than 1000 records, added setting for API call paging size *(PR [#213](https://github.com/PalmEmanuel/bARGE/pull/213) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
+
+
 ## [v1.4.0] - 2026-03-03
 ### New Features
 - [`6f19400`](https://github.com/PalmEmanuel/bARGE/commit/6f1940099c65a9f7573b874ad4b60f90562691e8) - The header of the query results table is now frozen and follows scrolling *(PR [#201](https://github.com/PalmEmanuel/bARGE/pull/201) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
@@ -206,3 +211,4 @@ Initial release of bARGE, supporting basic functionality for logging in using [D
 [v1.2.2]: https://github.com/PalmEmanuel/bARGE/compare/v1.2.1...v1.2.2
 [v1.3.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.2.2...v1.3.0
 [v1.4.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.3.0...v1.4.0
+[v1.5.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.4.0...v1.5.0
