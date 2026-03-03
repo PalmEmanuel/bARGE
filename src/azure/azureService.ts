@@ -401,7 +401,7 @@ export class AzureService {
         }
     }
 
-    async runQuery(query: string, subscriptionIds?: string[]): Promise<QueryResult> {
+    async runQuery(query: string, subscriptionIds?: string[], onProgress?: (info: { fetchedRows: number; totalRecords: number; currentPage: number }) => void): Promise<QueryResult> {
         console.log('bARGE: runQuery called with:', { query, subscriptionIds, currentScope: this.currentScope });
         this.validateAuthentication();
         this.notifyLoadingStatusChanged(true, 'Running query...');
@@ -412,7 +412,7 @@ export class AzureService {
         const effectiveSubscriptions = this.currentScope.type === 'tenant' ? undefined : (subscriptionIds || this.currentScope.subscriptions);
 
         try {
-            const result = await this.runQueryViaRestApi(query, effectiveSubscriptions);
+            const result = await this.runQueryViaRestApi(query, effectiveSubscriptions, onProgress);
             const executionTime = Date.now() - startTime;
             this.notifyLoadingStatusChanged(false);
             return {
@@ -435,7 +435,7 @@ export class AzureService {
         }
     }
 
-    private async runQueryViaRestApi(query: string, subscriptionIds?: string[]): Promise<QueryResult> {
+    private async runQueryViaRestApi(query: string, subscriptionIds?: string[], onProgress?: (info: { fetchedRows: number; totalRecords: number; currentPage: number }) => void): Promise<QueryResult> {
         // Get access token from credential
         const tokenResponse = await this.credential!.getToken(AzureService.ARM_RESOURCE_DEFAULT_SCOPE);
         if (!tokenResponse) {
@@ -443,8 +443,22 @@ export class AzureService {
         }
         const accessToken = tokenResponse.token;
 
+        const url = 'https://management.azure.com/providers/Microsoft.ResourceGraph/resources?api-version=' + AzureService.ARG_API_VERSION;
+        const headers = {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+        };
+
+        // Read page size from VS Code settings
+        const config = vscode.workspace.getConfiguration('barge');
+        const pageSize = config.get<number>('queryPageSize', 1000);
+
         const requestBody: any = {
-            query: query
+            query: query,
+            options: {
+                resultFormat: 'table',
+                $top: pageSize
+            }
         };
 
         // Only add subscriptions if we're in subscription scope
@@ -452,129 +466,159 @@ export class AzureService {
             requestBody.subscriptions = subscriptionIds;
         }
 
-        const response = await fetch(
-            'https://management.azure.com/providers/Microsoft.ResourceGraph/resources?api-version=' + AzureService.ARG_API_VERSION,
-            {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(requestBody)
+        let allRows: any[][] = [];
+        let columns: ColumnDefinition[] = [];
+        let totalRecords = 0;
+        let skipToken: string | undefined;
+        let pageNumber = 0;
+
+        do {
+            pageNumber++;
+
+            if (skipToken) {
+                requestBody.options.$skipToken = skipToken;
             }
-        );
 
-        if (!response.ok) {
-            let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-            let errorDetails = '';
-            let rawErrorBody: any = null;
+            const response = await fetch(url, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(requestBody)
+            });
 
-            try {
-                const errorBody = await response.json() as any;
-                rawErrorBody = errorBody; // Capture the raw error response
+            if (!response.ok) {
+                let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                let errorDetails = '';
+                let rawErrorBody: any = null;
 
-                if (errorBody.error) {
-                    const error = errorBody.error;
+                try {
+                    const errorBody = await response.json() as any;
+                    rawErrorBody = errorBody; // Capture the raw error response
 
-                    // Use correlation/support message as main error message if available
-                    if (error.message && (error.message.includes('correlationId') || error.message.includes('timestamp'))) {
-                        errorMessage = error.message;
-                    } else if (error.code && error.message) {
-                        errorMessage = `${error.code}: ${error.message}`;
-                    } else if (error.message) {
-                        errorMessage = error.message;
-                    } else if (error.code) {
-                        errorMessage = error.code;
-                    }
+                    if (errorBody.error) {
+                        const error = errorBody.error;
 
-                    // Parse all details into separate sections
-                    if (error.details && Array.isArray(error.details) && error.details.length > 0) {
-                        const detailSections: string[] = [];
+                        // Use correlation/support message as main error message if available
+                        if (error.message && (error.message.includes('correlationId') || error.message.includes('timestamp'))) {
+                            errorMessage = error.message;
+                        } else if (error.code && error.message) {
+                            errorMessage = `${error.code}: ${error.message}`;
+                        } else if (error.message) {
+                            errorMessage = error.message;
+                        } else if (error.code) {
+                            errorMessage = error.code;
+                        }
 
-                        error.details.forEach((detail: any) => {
-                            const detailParts: string[] = [];
+                        // Parse all details into separate sections
+                        if (error.details && Array.isArray(error.details) && error.details.length > 0) {
+                            const detailSections: string[] = [];
 
-                            // Add code if available
-                            if (detail.code) {
-                                detailParts.push(`Code: ${detail.code}`);
-                            }
+                            error.details.forEach((detail: any) => {
+                                const detailParts: string[] = [];
 
-                            // Add message if available and different from code
-                            if (detail.message && detail.message !== detail.code) {
-                                detailParts.push(`Message: ${detail.message}`);
-                            }
+                                // Add code if available
+                                if (detail.code) {
+                                    detailParts.push(`Code: ${detail.code}`);
+                                }
 
-                            // Add location info for parser failures
-                            if (detail.line !== undefined) {
-                                detailParts.push(`Line: ${detail.line}`);
-                            }
-                            if (detail.characterPositionInLine !== undefined) {
-                                detailParts.push(`Position: ${detail.characterPositionInLine}`);
-                            }
-                            if (detail.token) {
-                                detailParts.push(`Token: "${detail.token}"`);
-                            }
+                                // Add message if available and different from code
+                                if (detail.message && detail.message !== detail.code) {
+                                    detailParts.push(`Message: ${detail.message}`);
+                                }
 
-                            // Add any other properties we haven't handled
-                            Object.keys(detail).forEach(key => {
-                                if (!['code', 'message', 'line', 'characterPositionInLine', 'token'].includes(key)) {
-                                    detailParts.push(`${key}: ${detail[key]}`);
+                                // Add location info for parser failures
+                                if (detail.line !== undefined) {
+                                    detailParts.push(`Line: ${detail.line}`);
+                                }
+                                if (detail.characterPositionInLine !== undefined) {
+                                    detailParts.push(`Position: ${detail.characterPositionInLine}`);
+                                }
+                                if (detail.token) {
+                                    detailParts.push(`Token: "${detail.token}"`);
+                                }
+
+                                // Add any other properties we haven't handled
+                                Object.keys(detail).forEach(key => {
+                                    if (!['code', 'message', 'line', 'characterPositionInLine', 'token'].includes(key)) {
+                                        detailParts.push(`${key}: ${detail[key]}`);
+                                    }
+                                });
+
+                                if (detailParts.length > 0) {
+                                    detailSections.push(detailParts.join('\n'));
                                 }
                             });
 
-                            if (detailParts.length > 0) {
-                                detailSections.push(detailParts.join('\n'));
+                            if (detailSections.length > 0) {
+                                errorDetails = detailSections.join('\n---\n'); // Use separator between sections
                             }
-                        });
-
-                        if (detailSections.length > 0) {
-                            errorDetails = detailSections.join('\n---\n'); // Use separator between sections
                         }
                     }
+                } catch (parseError) {
+                    console.warn('Could not parse error response:', parseError);
                 }
-            } catch (parseError) {
-                console.warn('Could not parse error response:', parseError);
+
+                const error = new Error(errorMessage);
+                (error as any).details = errorDetails;
+                (error as any).rawError = rawErrorBody; // Attach raw error data
+                throw error;
             }
 
-            const error = new Error(errorMessage);
-            (error as any).details = errorDetails;
-            (error as any).rawError = rawErrorBody; // Attach raw error data
-            throw error;
-        }
+            const result = await response.json() as any;
+            console.log(`bARGE: REST API response (page ${pageNumber}):`, result);
 
-        const result = await response.json() as any;
-        console.log('bARGE: REST API response:', result);
+            // Extract total records from first page
+            if (pageNumber === 1) {
+                totalRecords = result.totalRecords || 0;
+            }
 
-        let tableData: any;
+            let tableData: any;
 
-        // Handle different response formats
-        if (result && result.data && Array.isArray(result.data)) {
-            // REST API returns objects in an array, need to convert to table format
-            tableData = this.convertObjectArrayToTable(result.data);
-        } else if (result && result.data && result.data.columns && result.data.rows) {
-            // Already in table format
-            tableData = result.data;
-        } else if (result && result.columns && result.rows) {
-            // Direct table format
-            tableData = result;
-        } else {
-            console.error('Unexpected response format from REST API:', result);
-            throw new Error('Unexpected response format from REST API');
-        }
+            // Handle different response formats
+            if (result && result.data && Array.isArray(result.data)) {
+                // REST API returns objects in an array, need to convert to table format
+                tableData = this.convertObjectArrayToTable(result.data);
+            } else if (result && result.data && result.data.columns && result.data.rows) {
+                // Already in table format
+                tableData = result.data;
+            } else if (result && result.columns && result.rows) {
+                // Direct table format
+                tableData = result;
+            } else {
+                console.error('Unexpected response format from REST API:', result);
+                throw new Error('Unexpected response format from REST API');
+            }
 
-        // Extract column definitions
-        const columns: ColumnDefinition[] = tableData.columns?.map((col: any) => ({
-            name: col.name,
-            type: col.type
-        })) || [];
+            // Extract column definitions from first page
+            if (pageNumber === 1) {
+                columns = tableData.columns?.map((col: any) => ({
+                    name: col.name,
+                    type: col.type
+                })) || [];
+            }
 
-        // Extract row data
-        const data: any[][] = tableData.rows || [];
+            // Accumulate rows
+            const pageRows: any[][] = tableData.rows || [];
+            allRows = allRows.concat(pageRows);
+
+            // Get skipToken for next page
+            skipToken = result.$skipToken;
+
+            // Report progress only when there are more records than a single page
+            if (onProgress && totalRecords > pageSize) {
+                onProgress({ fetchedRows: allRows.length, totalRecords, currentPage: pageNumber });
+            }
+
+            // Update status bar for multi-page queries
+            if (skipToken) {
+                this.notifyLoadingStatusChanged(true, `Fetching results... (${allRows.length}/${totalRecords} records)`);
+            }
+
+        } while (skipToken);
 
         return {
             columns,
-            data,
-            totalRecords: data.length,
+            data: allRows,
+            totalRecords: totalRecords || allRows.length,
             query,
             timestamp: new Date().toISOString()
         };

@@ -177,7 +177,13 @@ export class BargePanel {
 
             this._panel.reveal();
 
-            const result = await this._azureService.runQuery(query);
+            const result = await this._azureService.runQuery(query, undefined, (progress) => {
+                // Send pagination progress to webview overlay
+                this._panel.webview.postMessage({
+                    type: 'queryProgress',
+                    payload: progress
+                });
+            });
 
             if (result && result.columns) {
                 result.columns = result.columns.map((col: any) => ({

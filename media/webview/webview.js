@@ -698,8 +698,13 @@ function showLoadingIndicator() {
     loadingMessage.className = 'loading-message';
     loadingMessage.textContent = randomMessage;
 
+    const loadingProgress = document.createElement('div');
+    loadingProgress.className = 'loading-progress';
+    loadingProgress.id = 'loadingProgress';
+
     loadingContent.appendChild(loadingAnimation);
     loadingContent.appendChild(loadingMessage);
+    loadingContent.appendChild(loadingProgress);
     loadingOverlay.appendChild(loadingContent);
 
     contentWrapper.style.position = 'relative';
@@ -732,6 +737,13 @@ function hideLoadingIndicator() {
             }
         }
         loadingOverlay.remove();
+    }
+}
+
+function updateLoadingProgress(text) {
+    const progressEl = document.getElementById('loadingProgress');
+    if (progressEl) {
+        progressEl.textContent = text;
     }
 }
 
@@ -3615,6 +3627,12 @@ window.addEventListener('message', event => {
         case 'queryStart':
             showLoadingIndicator();
             hideContextMenu(); // Hide any open context menu when starting a new query
+            break;
+        case 'queryProgress':
+            if (message.payload) {
+                const { fetchedRows, totalRecords, currentPage } = message.payload;
+                updateLoadingProgress(`Fetching page ${currentPage}... (${fetchedRows.toLocaleString()} / ${totalRecords.toLocaleString()} records)`);
+            }
             break;
         case 'queryResult':
             hideLoadingIndicator();
