@@ -183,6 +183,13 @@
           "type": "boolean",
           "default": true,
           "description": "Enable IntelliSense completions for KQL syntax."
+        },
+        "barge.queryPageSize": {
+          "type": "integer",
+          "default": 1000,
+          "minimum": 1,
+          "maximum": 1000,
+          "markdownDescription": "Number of records to fetch per Azure Resource Graph API call.\n\n*Warning: Low values may result in rate limiting.*"
         }
       }
     }

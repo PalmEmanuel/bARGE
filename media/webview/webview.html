@@ -1174,6 +1174,17 @@
             /* Even smaller when in horizontal layout (details panel on right) */
         }
 
+        .loading-progress {
+            font-size: clamp(11px, min(1.8vh, 3vw), 16px);
+            color: var(--vscode-descriptionForeground);
+            position: absolute;
+            bottom: 8%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            width: 100%;
+        }
+
         .results-table tr:nth-child(even) {
             background-color: var(--vscode-editor-widget-background);
         }
