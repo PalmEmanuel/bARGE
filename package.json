@@ -217,9 +217,9 @@
     "@typescript-eslint/parser": "^8.46.3",
     "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.5.2",
-    "@kusto/language-service-next": "^12.2.0",
+    "@kusto/language-service-next": "^12.3.1",
     "esbuild": "^0.27.0",
-    "eslint": "^9.39.0",
+    "eslint": "^9.39.1",
     "husky": "^9.1.7",
     "npm-run-all": "^4.1.5",
     "typescript": "^5.9.3",
@@ -228,7 +228,7 @@
   "dependencies": {
     "@azure/identity": "^4.13.0",
     "@azure/msal-node": "^3.8.1",
-    "@vscode/codicons": "0.0.41",
+    "@vscode/codicons": "0.0.42",
     "lottie-web": "^5.13.0"
   }
 }

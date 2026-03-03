@@ -46,9 +46,11 @@
 
         /* Table section */
         .table-section {
+            flex: 1;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            min-height: 0;
         }
 
         .table-container {
@@ -57,7 +59,7 @@
             margin: 15px;
             border: 1px solid var(--vscode-widget-border);
             border-radius: 4px;
-            min-height: 200px;
+            min-height: 0;
         }
 
         /* Details section */
@@ -297,9 +299,16 @@
             text-align: center;
             padding: 2px !important;
             vertical-align: middle;
-            position: relative;
             /* Prevent focus outline issues */
             outline: none !important;
+        }
+
+        /* Freeze the select/detail button when scrolling horizontally */
+        .results-table td.detail-button-cell {
+            position: sticky;
+            left: 0;
+            z-index: 5;
+            background-color: var(--vscode-editor-background);
         }
 
         .results-table .detail-button-cell,
@@ -322,13 +331,14 @@
         .results-table td.detail-button-cell:focus-visible {
             outline: none !important;
             box-shadow: none !important;
-            background-color: transparent !important;
         }
 
         th.detail-button-cell {
             cursor: default !important;
             user-select: none !important;
-            position: relative !important;
+            position: sticky !important;
+            left: 0 !important;
+            z-index: 20 !important;
             pointer-events: auto !important;
         }
 
@@ -428,7 +438,7 @@
         }
 
         .detail-button-cell:hover {
-            background-color: transparent !important;
+            background-color: var(--vscode-editor-background) !important;
         }
 
         /* Additional comprehensive focus prevention for detail buttons */
@@ -876,18 +886,20 @@
         .results-table {
             width: 100%;
             min-width: max-content;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
             font-size: 0.9em;
             table-layout: fixed;
         }
 
         .results-table th {
             background-color: var(--vscode-sideBar-background, var(--vscode-editor-background));
-            border: 1px solid var(--vscode-widget-border);
+            border-bottom: 2px solid var(--vscode-widget-border);
+            border-right: 1px solid var(--vscode-widget-border);
             padding: 8px;
             text-align: left;
             position: sticky;
-            top: -1px;
+            top: 0;
             cursor: pointer;
             user-select: none;
             z-index: 10;
@@ -901,6 +913,7 @@
 
         .results-table th:last-child {
             width: auto;
+            border-right: none;
         }
 
         .results-table th:hover {
@@ -940,7 +953,8 @@
         }
 
         .results-table td {
-            border: 1px solid var(--vscode-widget-border);
+            border-bottom: 1px solid var(--vscode-widget-border);
+            border-right: 1px solid var(--vscode-widget-border);
             padding: 6px 8px;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -951,6 +965,10 @@
             min-width: max-content;
             /* Prevent focus outline issues */
             outline: none !important;
+        }
+
+        .results-table td:last-child {
+            border-right: none;
         }
 
         .results-table td:focus,

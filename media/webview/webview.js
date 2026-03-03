@@ -570,7 +570,6 @@ function displayResults(result, preserveDetailsPane = false) {
             'ondragover="handleDragOver(event)"' +
             'ondrop="handleDrop(event, ' + index + ')"' +
             'ondragend="handleDragEnd(event)"' +
-            'style="position: relative;"' +
             'title="' + col.name + '">' +
             '<span class="header-text">' + col.name + '</span>';
 
