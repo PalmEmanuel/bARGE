@@ -4,6 +4,12 @@ All notable changes to the bARGE Visual Studio Code extension will be documented
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [v1.4.0] - 2026-03-03
+### New Features
+- [`6f19400`](https://github.com/PalmEmanuel/bARGE/commit/6f1940099c65a9f7573b874ad4b60f90562691e8) - The header of the query results table is now frozen and follows scrolling *(PR [#201](https://github.com/PalmEmanuel/bARGE/pull/201) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
+  - *addresses issue [#198](https://github.com/PalmEmanuel/bARGE/issues/198) opened by [@gummigroda](https://github.com/gummigroda)*
+
+
 ## [v1.3.0] - 2025-11-01
 ### New Features
 - [`7ee5bae`](https://github.com/PalmEmanuel/bARGE/commit/7ee5bae20c17b3a52c7f1df3d3f6f7039f3aaaae) - Add implicit query selection based on cursor position *(PR [#178](https://github.com/PalmEmanuel/bARGE/pull/178) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
@@ -199,3 +205,4 @@ Initial release of bARGE, supporting basic functionality for logging in using [D
 [v1.2.1]: https://github.com/PalmEmanuel/bARGE/compare/v1.2.0...v1.2.1
 [v1.2.2]: https://github.com/PalmEmanuel/bARGE/compare/v1.2.1...v1.2.2
 [v1.3.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.2.2...v1.3.0
+[v1.4.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.3.0...v1.4.0
