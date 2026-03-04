@@ -3,6 +3,7 @@ import { AzureService } from './azure/azureService';
 import { BargePanel } from './bargePanel';
 import { StatusBarManager } from './statusBar';
 import { KustoLanguageServiceProvider } from './kustoLanguageService';
+import { BargeCodeLensProvider } from './codeLensProvider';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -141,6 +142,11 @@ export function activate(context: vscode.ExtensionContext) {
 		await azureService.authenticate();
 	});
 
+	// Register CodeLens command to run a query directly from the lens
+	const runFromCodeLensCommand = vscode.commands.registerCommand('barge.runQueryFromCodeLens', async (queryText: string, fileName: string) => {
+		await runQueryInPanel(queryText, 'selection', fileName);
+	});
+
 	// Helper function to run query in panel
 	async function runQueryInPanel(query: string, source: 'file' | 'selection', fileName?: string) {
 		try {
@@ -172,12 +178,31 @@ export function activate(context: vscode.ExtensionContext) {
 		runQueryFromSelectionCommand,
 		setScopeCommand,
 		authenticateCommand,
+		runFromCodeLensCommand,
 		statusBar // Add status bar for proper cleanup
 	);
 
 	// Register enhanced Kusto language service (includes hover, completion, signature help, formatting)
 	const kustoLanguageService = new KustoLanguageServiceProvider();
 	kustoLanguageService.register(context);
+
+	// Register CodeLens provider for "Run Query" buttons above query blocks
+	const codeLensProvider = new BargeCodeLensProvider();
+	context.subscriptions.push(
+		vscode.languages.registerCodeLensProvider(
+			{ language: 'kql' },
+			codeLensProvider
+		)
+	);
+
+	// Refresh CodeLens when the setting changes
+	context.subscriptions.push(
+		vscode.workspace.onDidChangeConfiguration(e => {
+			if (e.affectsConfiguration('barge.enableRunQueryCodeLens')) {
+				codeLensProvider.refresh();
+			}
+		})
+	);
 
 	// Slight, subtle highlight used to indicate the implicit query under cursor.
 	let implicitQueryDecoration: vscode.TextEditorDecorationType | undefined;
