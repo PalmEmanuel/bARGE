@@ -47,8 +47,24 @@
         "category": "bARGE"
       },
       {
+        "command": "barge.setScope",
+        "title": "Set Query Scope",
+        "category": "bARGE"
+      },
+      {
+        "command": "barge.authenticate",
+        "title": "Sign In",
+        "category": "bARGE"
+      },
+      {
         "command": "barge.runQueryFromFile",
         "title": "Run Query from File",
+        "category": "bARGE",
+        "icon": "$(play)"
+      },
+      {
+        "command": "barge.runQueryFromFileNewTab",
+        "title": "Run Query from File (New Tab)",
         "category": "bARGE",
         "icon": "$(play)"
       },
@@ -59,14 +75,10 @@
         "icon": "$(debug-line-by-line)"
       },
       {
-        "command": "barge.setScope",
-        "title": "Set Query Scope",
-        "category": "bARGE"
-      },
-      {
-        "command": "barge.authenticate",
-        "title": "Sign In",
-        "category": "bARGE"
+        "command": "barge.runQueryFromSelectionNewTab",
+        "title": "Run Selected Query (New Tab)",
+        "category": "bARGE",
+        "icon": "$(debug-line-by-line)"
       }
     ],
     "menus": {
@@ -102,10 +114,22 @@
           "group": "barge@1"
         },
         {
+          "command": "barge.runQueryFromFileNewTab",
+          "title": "bARGE: Run Query from File (New Tab)",
+          "when": "editorLangId == kql || resourceExtname == .kql",
+          "group": "barge@2"
+        },
+        {
           "command": "barge.runQueryFromSelection",
           "title": "bARGE: Run Selected Query",
           "when": "(editorHasSelection || barge.hasImplicitQuery) && (editorLangId == kql || resourceExtname == .kql || editorLangId == powershell || resourceExtname == .ps1 || editorLangId == plaintext)",
-          "group": "barge@2"
+          "group": "barge@3"
+        },
+        {
+          "command": "barge.runQueryFromSelectionNewTab",
+          "title": "bARGE: Run Selected Query (New Tab)",
+          "when": "(editorHasSelection || barge.hasImplicitQuery) && (editorLangId == kql || resourceExtname == .kql || editorLangId == powershell || resourceExtname == .ps1 || editorLangId == plaintext)",
+          "group": "barge@4"
         }
       ],
       "explorer/context": [
@@ -138,6 +162,18 @@
       {
         "command": "barge.runQueryFromFile",
         "key": "f5",
+        "when": "editorTextFocus && (editorLangId == kql || resourceExtname == .kql)"
+      },
+      {
+        "command": "barge.runQueryFromSelectionNewTab",
+        "key": "ctrl+f8",
+        "mac": "cmd+f8",
+        "when": "editorTextFocus && (editorHasSelection || barge.hasImplicitQuery) && (editorLangId == kql || resourceExtname == .kql)"
+      },
+      {
+        "command": "barge.runQueryFromFileNewTab",
+        "key": "ctrl+f5",
+        "mac": "cmd+f5",
         "when": "editorTextFocus && (editorLangId == kql || resourceExtname == .kql)"
       }
     ],

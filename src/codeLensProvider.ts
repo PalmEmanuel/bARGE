@@ -30,13 +30,19 @@ export class BargeCodeLensProvider implements vscode.CodeLensProvider {
                 continue;
             }
 
-            const lens = new vscode.CodeLens(block, {
-                title: '► Run Query',
+            const runLens = new vscode.CodeLens(block, {
+                title: '► Run',
                 command: 'barge.runQueryFromCodeLens',
                 arguments: [queryText, document.fileName],
                 tooltip: 'Run this query in bARGE'
             });
-            lenses.push(lens);
+            const newTabLens = new vscode.CodeLens(block, {
+                title: '► Run (New Tab)',
+                command: 'barge.runQueryFromCodeLensNewTab',
+                arguments: [queryText, document.fileName],
+                tooltip: 'Run this query in a new bARGE tab'
+            });
+            lenses.push(runLens, newTabLens);
         }
 
         return lenses;

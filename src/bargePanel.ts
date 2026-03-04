@@ -6,25 +6,114 @@ import { AzureService } from './azure/azureService';
 import { WebviewMessage, QueryResponse, ResolveGuidRequest, ResolveGuidResponse, IdentityInfo } from './types';
 
 export class BargePanel {
-    public static currentPanel: BargePanel | undefined;
+    /** All live panels. */
+    private static _panels: Set<BargePanel> = new Set();
+    /** Per-file target panel — the one that "Run Query" writes to. */
+    private static _targetPanels: Map<string, BargePanel> = new Map();
+    /** File key of the currently-active editor (undefined when not in a supported file). */
+    private static _activeFileKey: string | undefined;
+    /** Monotonically increasing counter for stable creation ordering. */
+    private static _globalCreationCounter = 0;
     public static readonly viewType = 'bargeResults';
 
     private readonly _panel: vscode.WebviewPanel;
     private readonly _azureService: AzureService;
     private readonly _extensionUri: vscode.Uri;
+    private _sourceFileKey: string;
+    private readonly _creationOrder: number;
     private _disposables: vscode.Disposable[] = [];
 
-    public static createOrShow(extensionUri: vscode.Uri, azureService: AzureService) {
-        if (BargePanel.currentPanel) {
-            // Don't force repositioning - just reveal where it currently is
-            BargePanel.currentPanel._panel.reveal();
-            return;
+    // ── public static API ──────────────────────────────────────────────
+
+    /**
+     * Derive a panel-tracking key from a file name.
+     * Returns the basename (e.g. "storage.kql") or "untitled" for no-file contexts.
+     */
+    public static getFileKey(fileName?: string): string {
+        if (!fileName || fileName === '' || fileName.startsWith('Untitled')) {
+            return 'untitled';
+        }
+        return path.basename(fileName);
+    }
+
+    /**
+     * Get or create the target panel for a given file.
+     * If a target already exists it is revealed; otherwise a new panel is created.
+     */
+    public static getOrCreateForFile(extensionUri: vscode.Uri, azureService: AzureService, fileKey: string): BargePanel {
+        const existing = BargePanel._targetPanels.get(fileKey);
+        if (existing) {
+            existing._panel.reveal();
+            return existing;
+        }
+        return BargePanel._createPanel(extensionUri, azureService, fileKey);
+    }
+
+    /**
+     * Create a new panel for a file and promote it to the target for that file.
+     */
+    public static createNewForFile(extensionUri: vscode.Uri, azureService: AzureService, fileKey: string): BargePanel {
+        return BargePanel._createPanel(extensionUri, azureService, fileKey);
+    }
+
+    /**
+     * Update the active file key (called when the active editor changes).
+     * Hides/shows the focus indicator on panel titles accordingly.
+     */
+    public static setActiveFileKey(fileKey: string | undefined): void {
+        if (BargePanel._activeFileKey === fileKey) { return; }
+        BargePanel._activeFileKey = fileKey;
+        BargePanel._updateAllTitles();
+    }
+
+    /**
+     * Return the current target panel for a file, if any.
+     */
+    public static getTargetForFile(fileKey: string): BargePanel | undefined {
+        return BargePanel._targetPanels.get(fileKey);
+    }
+
+    /**
+     * Re-key all panels associated with `oldKey` to `newKey`.
+     * Called when a source file is renamed.
+     */
+    public static handleFileRename(oldKey: string, newKey: string): void {
+        if (oldKey === newKey) { return; }
+
+        // Move target mapping
+        const target = BargePanel._targetPanels.get(oldKey);
+        if (target) {
+            BargePanel._targetPanels.delete(oldKey);
+            // If the new key already has a target, keep the existing one.
+            // Otherwise promote the old target.
+            if (!BargePanel._targetPanels.has(newKey)) {
+                BargePanel._targetPanels.set(newKey, target);
+            }
         }
 
-        // Create panel in bottom area by default
+        // Update every panel's source file key
+        for (const panel of BargePanel._panels) {
+            if (panel._sourceFileKey === oldKey) {
+                panel._sourceFileKey = newKey;
+            }
+        }
+
+        // Update active file key if it matched the old name
+        if (BargePanel._activeFileKey === oldKey) {
+            BargePanel._activeFileKey = newKey;
+        }
+
+        BargePanel._updateAllTitles();
+    }
+
+    // ── internal helpers ───────────────────────────────────────────────
+
+    private static _createPanel(extensionUri: vscode.Uri, azureService: AzureService, fileKey: string): BargePanel {
+        BargePanel._globalCreationCounter++;
+
         const panel = vscode.window.createWebviewPanel(
             BargePanel.viewType,
-            'bARGE - boosted Azure Resource Graph Explorer',
+            'bARGE', // placeholder — _updateAllTitles sets the real title
             { viewColumn: vscode.ViewColumn.Active, preserveFocus: false },
             {
                 enableScripts: true,
@@ -36,21 +125,100 @@ export class BargePanel {
             }
         );
 
-        BargePanel.currentPanel = new BargePanel(panel, extensionUri, azureService);
+        const bargePanel = new BargePanel(panel, extensionUri, azureService, fileKey, BargePanel._globalCreationCounter);
+        BargePanel._panels.add(bargePanel);
+        BargePanel._targetPanels.set(fileKey, bargePanel);
+        BargePanel._updateAllTitles();
 
         // Move to bottom panel after creation
         vscode.commands.executeCommand('workbench.action.moveEditorToBelowGroup');
+
+        return bargePanel;
     }
 
-    private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, azureService: AzureService) {
+    /**
+     * Recompute every panel's title and icon.
+     *
+     * Title format:  bARGE[: filename][ (N)]
+     *   : filename   — shown for file-associated panels (omitted for "untitled")
+     *   (N)          — shown when more than one panel exists for the same file
+     * Icon:          filled blue circle on the target panel whose file matches the active editor
+     */
+    private static _updateAllTitles(): void {
+        // Group panels by file key, sorted by creation order
+        const groups = new Map<string, BargePanel[]>();
+        for (const panel of BargePanel._panels) {
+            const key = panel._sourceFileKey;
+            if (!groups.has(key)) { groups.set(key, []); }
+            groups.get(key)!.push(panel);
+        }
+
+        for (const [fileKey, panels] of groups) {
+            panels.sort((a, b) => a._creationOrder - b._creationOrder);
+
+            const target = BargePanel._targetPanels.get(fileKey);
+            const isActiveFile = BargePanel._activeFileKey === fileKey;
+
+            for (let i = 0; i < panels.length; i++) {
+                const p = panels[i];
+                const isTarget = p === target && isActiveFile;
+
+                const baseName = fileKey === 'untitled'
+                    ? 'bARGE'
+                    : `bARGE: ${fileKey}`;
+                const suffix = panels.length > 1 ? ` (${i + 1})` : '';
+
+                p._panel.title = `${baseName}${suffix}`;
+
+                if (isTarget) {
+                    p._panel.iconPath = {
+                        light: vscode.Uri.joinPath(p._extensionUri, 'media', 'icons', 'target-light.svg'),
+                        dark: vscode.Uri.joinPath(p._extensionUri, 'media', 'icons', 'target-dark.svg')
+                    };
+                } else {
+                    p._panel.iconPath = undefined;
+                }
+            }
+        }
+    }
+
+    // ── instance ───────────────────────────────────────────────────────
+
+    private constructor(
+        panel: vscode.WebviewPanel,
+        extensionUri: vscode.Uri,
+        azureService: AzureService,
+        sourceFileKey: string,
+        creationOrder: number
+    ) {
         this._panel = panel;
         this._azureService = azureService;
         this._extensionUri = extensionUri;
+        this._sourceFileKey = sourceFileKey;
+        this._creationOrder = creationOrder;
         this._update();
         this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
         this._panel.webview.onDidReceiveMessage(
             (message: WebviewMessage) => {
                 this._handleMessage(message);
+            },
+            null,
+            this._disposables
+        );
+        // When a bARGE panel gains focus, promote it to target for its file.
+        // Only update the active file key if the panel belongs to the already-active
+        // file — otherwise clicking a panel for another file would steal the indicator
+        // from the file the user is actually editing.
+        this._panel.onDidChangeViewState(
+            (e) => {
+                if (e.webviewPanel.active) {
+                    BargePanel._targetPanels.set(this._sourceFileKey, this);
+
+                    if (BargePanel._activeFileKey === this._sourceFileKey || BargePanel._activeFileKey === undefined) {
+                        BargePanel._activeFileKey = this._sourceFileKey;
+                    }
+                    BargePanel._updateAllTitles();
+                }
             },
             null,
             this._disposables
@@ -297,7 +465,27 @@ export class BargePanel {
     }
 
     public dispose() {
-        BargePanel.currentPanel = undefined;
+        BargePanel._panels.delete(this);
+
+        // If this was the target for its file, promote the most recently created survivor
+        if (BargePanel._targetPanels.get(this._sourceFileKey) === this) {
+            BargePanel._targetPanels.delete(this._sourceFileKey);
+
+            let fallback: BargePanel | undefined;
+            for (const p of BargePanel._panels) {
+                if (p._sourceFileKey === this._sourceFileKey) {
+                    if (!fallback || p._creationOrder > fallback._creationOrder) {
+                        fallback = p;
+                    }
+                }
+            }
+            if (fallback) {
+                BargePanel._targetPanels.set(this._sourceFileKey, fallback);
+            }
+        }
+
+        BargePanel._updateAllTitles();
+
         this._panel.dispose();
         while (this._disposables.length) {
             const x = this._disposables.pop();
