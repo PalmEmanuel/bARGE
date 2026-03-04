@@ -4,6 +4,13 @@ All notable changes to the bARGE Visual Studio Code extension will be documented
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [v1.6.0] - 2026-03-04
+### New Features
+- [`f3326ab`](https://github.com/PalmEmanuel/bARGE/commit/f3326abca3445331873b13358260c16e9e381f63) - Queries can now be run in new tabs to retain results *(PR [#221](https://github.com/PalmEmanuel/bARGE/pull/221) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
+  - *addresses issue [#200](https://github.com/PalmEmanuel/bARGE/issues/200) opened by [@gummigroda](https://github.com/gummigroda)*
+- [`a3291e5`](https://github.com/PalmEmanuel/bARGE/commit/a3291e56202dc074b95c2e08bb05404fd7849667) - Add CodeLens buttons to run queries directly from KQL blocks *(PR [#215](https://github.com/PalmEmanuel/bARGE/pull/215) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
+
+
 ## [v1.5.0] - 2026-03-03
 ### New Features
 - [`4bb502c`](https://github.com/PalmEmanuel/bARGE/commit/4bb502c291fb918881bb8b7285ff0f8639f8c2eb) - Adds support for more than 1000 records, added setting for API call paging size *(PR [#213](https://github.com/PalmEmanuel/bARGE/pull/213) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
@@ -212,3 +219,4 @@ Initial release of bARGE, supporting basic functionality for logging in using [D
 [v1.3.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.2.2...v1.3.0
 [v1.4.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.3.0...v1.4.0
 [v1.5.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.4.0...v1.5.0
+[v1.6.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.5.0...v1.6.0
