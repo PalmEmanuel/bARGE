@@ -184,6 +184,11 @@
           "default": true,
           "description": "Enable IntelliSense completions for KQL syntax."
         },
+        "barge.enableRunQueryCodeLens": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show 'Run Query' buttons above query blocks in KQL files."
+        },
         "barge.queryPageSize": {
           "type": "integer",
           "default": 1000,
