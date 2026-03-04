@@ -55,7 +55,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Register command to open results panel
 	const openResultsCommand = vscode.commands.registerCommand('barge.openResults', () => {
-		BargePanel.createOrShow(context.extensionUri, azureService);
+		const fileKey = getActiveFileKey();
+		BargePanel.getOrCreateForFile(context.extensionUri, azureService, fileKey);
 	});
 
 	// Register command to run query from current file
@@ -147,25 +148,107 @@ export function activate(context: vscode.ExtensionContext) {
 		await runQueryInPanel(queryText, 'selection', fileName);
 	});
 
-	// Helper function to run query in panel
+	// Register CodeLens command to run a query in a new tab
+	const runFromCodeLensNewTabCommand = vscode.commands.registerCommand('barge.runQueryFromCodeLensNewTab', async (queryText: string, fileName: string) => {
+		await runQueryInNewTab(queryText, 'selection', fileName);
+	});
+
+	// Register command to run query from file in a new tab
+	const runQueryFromFileNewTabCommand = vscode.commands.registerCommand('barge.runQueryFromFileNewTab', async (uri?: vscode.Uri) => {
+		let document: vscode.TextDocument;
+		let fileName: string;
+
+		if (uri) {
+			try {
+				document = await vscode.workspace.openTextDocument(uri);
+				fileName = uri.fsPath;
+			} catch (error) {
+				const errorMsg = (error && typeof error === 'object' && 'message' in error) ? (error as Error).message : '';
+				vscode.window.showErrorMessage(`Failed to open file.${errorMsg ? ' Error: ' + errorMsg : ''}`);
+				return;
+			}
+		} else {
+			const activeEditor = vscode.window.activeTextEditor;
+			if (!activeEditor) {
+				vscode.window.showErrorMessage('No active file found');
+				return;
+			}
+			document = activeEditor.document;
+			fileName = document.fileName;
+		}
+
+		const query = document.getText().trim();
+		if (!query) {
+			vscode.window.showErrorMessage('File is empty or contains no query');
+			return;
+		}
+
+		await runQueryInNewTab(query, 'file', fileName);
+	});
+
+	// Register command to run query from selection in a new tab
+	const runQueryFromSelectionNewTabCommand = vscode.commands.registerCommand('barge.runQueryFromSelectionNewTab', async () => {
+		const activeEditor = vscode.window.activeTextEditor;
+		if (!activeEditor) {
+			vscode.window.showErrorMessage('No active file found');
+			return;
+		}
+
+		const selection = activeEditor.selection;
+		let selectedText = activeEditor.document.getText(selection);
+		let queryText = selectedText.trim();
+
+		if (!selectedText) {
+			const implicitRange = getImplicitQueryRange(activeEditor.document, selection.active);
+			if (!implicitRange) {
+				vscode.window.showErrorMessage('No text selected and no implicit query selection found');
+				return;
+			}
+			queryText = activeEditor.document.getText(implicitRange).trim();
+		}
+
+		if (!queryText) {
+			vscode.window.showErrorMessage('No text selected and no implicit query selection found');
+			return;
+		}
+
+		await runQueryInNewTab(queryText, 'selection', activeEditor.document.fileName);
+	});
+
+	// Derive the file key for panel routing from the active editor
+	function getActiveFileKey(): string {
+		const editor = vscode.window.activeTextEditor;
+		if (!editor) { return BargePanel.getFileKey(); }
+		return BargePanel.getFileKey(editor.document.fileName);
+	}
+
+	// Helper function to run query in the target panel for its source file
 	async function runQueryInPanel(query: string, source: 'file' | 'selection', fileName?: string) {
 		try {
-			// Ensure authentication
 			if (!azureService.isAuthenticated()) {
 				const authResult = await azureService.authenticate();
-				if (!authResult) {
-					return;
-				}
+				if (!authResult) { return; }
 			}
 
-			// Create or show the panel
-			BargePanel.createOrShow(context.extensionUri, azureService);
-			
-			// Run the query
-			if (BargePanel.currentPanel) {
-				await BargePanel.currentPanel.runQuery(query, source, fileName);
+			const fileKey = BargePanel.getFileKey(fileName);
+			const panel = BargePanel.getOrCreateForFile(context.extensionUri, azureService, fileKey);
+			await panel.runQuery(query, source, fileName);
+		} catch (error) {
+			vscode.window.showErrorMessage(`Query execution failed: ${error}`);
+		}
+	}
+
+	// Helper function to run query in a brand-new tab (promoted to target)
+	async function runQueryInNewTab(query: string, source: 'file' | 'selection', fileName?: string) {
+		try {
+			if (!azureService.isAuthenticated()) {
+				const authResult = await azureService.authenticate();
+				if (!authResult) { return; }
 			}
-			
+
+			const fileKey = BargePanel.getFileKey(fileName);
+			const panel = BargePanel.createNewForFile(context.extensionUri, azureService, fileKey);
+			await panel.runQuery(query, source, fileName);
 		} catch (error) {
 			vscode.window.showErrorMessage(`Query execution failed: ${error}`);
 		}
@@ -179,6 +262,9 @@ export function activate(context: vscode.ExtensionContext) {
 		setScopeCommand,
 		authenticateCommand,
 		runFromCodeLensCommand,
+		runFromCodeLensNewTabCommand,
+		runQueryFromFileNewTabCommand,
+		runQueryFromSelectionNewTabCommand,
 		statusBar // Add status bar for proper cleanup
 	);
 
@@ -203,6 +289,36 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		})
 	);
+
+	// Track the active editor so panel titles show the focus indicator.
+	// When editor is undefined a non-editor view (e.g. a bARGE webview) has focus;
+	// the panel's own onDidChangeViewState handles that case, so we leave the key alone.
+	function updateActiveFileKeyFromEditor(editor?: vscode.TextEditor): void {
+		if (!editor) { return; }
+
+		const langId = editor.document.languageId;
+		const isSupported = langId === 'kql'
+			|| editor.document.fileName.endsWith('.kql')
+			|| langId === 'powershell'
+			|| editor.document.fileName.endsWith('.ps1')
+			|| langId === 'plaintext';
+		BargePanel.setActiveFileKey(isSupported ? BargePanel.getFileKey(editor.document.fileName) : undefined);
+	}
+
+	// Set initial state and subscribe to editor changes
+	updateActiveFileKeyFromEditor(vscode.window.activeTextEditor);
+	const activeEditorTracker = vscode.window.onDidChangeActiveTextEditor(updateActiveFileKeyFromEditor);
+	context.subscriptions.push(activeEditorTracker);
+
+	// Re-key panels when source files are renamed
+	const renameTracker = vscode.workspace.onDidRenameFiles(e => {
+		for (const { oldUri, newUri } of e.files) {
+			const oldKey = BargePanel.getFileKey(oldUri.fsPath);
+			const newKey = BargePanel.getFileKey(newUri.fsPath);
+			BargePanel.handleFileRename(oldKey, newKey);
+		}
+	});
+	context.subscriptions.push(renameTracker);
 
 	// Slight, subtle highlight used to indicate the implicit query under cursor.
 	let implicitQueryDecoration: vscode.TextEditorDecorationType | undefined;
