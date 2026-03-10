@@ -2530,6 +2530,7 @@ function showFilterDropdown(columnIndex, headerElement) {
             const label = item.dataset.label.toLowerCase();
             item.style.display = label.includes(query) ? '' : 'none';
         });
+        updateAllCheckboxState();
     });
     searchBox.addEventListener('click', e => e.stopPropagation());
 
@@ -2577,16 +2578,64 @@ function showFilterDropdown(columnIndex, headerElement) {
     allLabel.className = 'filter-label';
     allLabel.textContent = 'All';
 
+    const allCount = document.createElement('span');
+    allCount.className = 'filter-count';
+    allCount.style.display = 'none';
+
+    // Helper: update "All" checkbox label, count, and indeterminate state
+    function updateAllCheckboxState(preserveAllState) {
+        const hasSearch = searchBox.value.length > 0;
+        const visibleItems = list.querySelectorAll('.filter-value-item:not([style*="display: none"])');
+        const visibleCheckboxes = Array.from(visibleItems).map(item => item.querySelector('.filter-checkbox'));
+        const checkedCount = visibleCheckboxes.filter(cb => cb.checked).length;
+        const totalVisible = visibleCheckboxes.length;
+
+        if (hasSearch) {
+            allLabel.textContent = 'All matching';
+            allCount.textContent = totalVisible;
+            allCount.style.display = '';
+            if (!preserveAllState) {
+                allCheckbox.checked = totalVisible > 0 && checkedCount === totalVisible;
+            }
+            allCheckmark.classList.remove('indeterminate');
+        } else {
+            allLabel.textContent = 'All';
+            allCount.style.display = 'none';
+            if (!preserveAllState) {
+                allCheckbox.checked = checkedCount === 0;
+            }
+            if (allCheckbox.checked) {
+                allCheckmark.classList.remove('indeterminate');
+            } else if (checkedCount > 0 && checkedCount < totalVisible) {
+                allCheckmark.classList.add('indeterminate');
+            } else {
+                allCheckmark.classList.remove('indeterminate');
+            }
+        }
+    }
+
     allItem.appendChild(allCheckbox);
     allItem.appendChild(allCheckmark);
     allItem.appendChild(allLabel);
+    allItem.appendChild(allCount);
     allItem.addEventListener('click', (e) => {
         e.stopPropagation();
-        allCheckbox.checked = !allCheckbox.checked;
-        if (allCheckbox.checked) {
-            // Uncheck all individual values
-            list.querySelectorAll('.filter-value-item .filter-checkbox').forEach(cb => { cb.checked = false; });
+        const hasSearch = searchBox.value.length > 0;
+        if (hasSearch) {
+            // Toggle only visible (matching) items
+            const visibleItems = list.querySelectorAll('.filter-value-item:not([style*="display: none"])');
+            const visibleCheckboxes = Array.from(visibleItems).map(item => item.querySelector('.filter-checkbox'));
+            const allVisible = visibleCheckboxes.length > 0 && visibleCheckboxes.every(cb => cb.checked);
+            visibleCheckboxes.forEach(cb => { cb.checked = !allVisible; });
+            allCheckbox.checked = !allVisible;
+        } else {
+            allCheckbox.checked = !allCheckbox.checked;
+            if (allCheckbox.checked) {
+                // Uncheck all individual values
+                list.querySelectorAll('.filter-value-item .filter-checkbox').forEach(cb => { cb.checked = false; });
+            }
         }
+        updateAllCheckboxState(true);
         onFilterChange();
     });
     dropdown.appendChild(allItem);
@@ -2604,6 +2653,7 @@ function showFilterDropdown(columnIndex, headerElement) {
         if (checkbox.checked) {
             allCheckbox.checked = false;
         }
+        updateAllCheckboxState();
     }
 
     for (const v of values) {
@@ -2642,6 +2692,9 @@ function showFilterDropdown(columnIndex, headerElement) {
         list.appendChild(item);
     }
     dropdown.appendChild(list);
+
+    // Set initial indeterminate state
+    updateAllCheckboxState();
 
     // ── Commit filter state helper ────────────────────────
     function commitFilters() {
@@ -2730,6 +2783,19 @@ function showFilterDropdown(columnIndex, headerElement) {
         cleanup();
     }
     function cleanup() {
+        // Before closing: uncheck hidden (non-matching) items and commit
+        if (searchBox.value.length > 0) {
+            list.querySelectorAll('.filter-value-item').forEach(item => {
+                if (item.style.display === 'none') {
+                    const cb = item.querySelector('.filter-checkbox');
+                    if (cb) { cb.checked = false; }
+                }
+            });
+            searchBox.value = '';
+            // Show all items again
+            list.querySelectorAll('.filter-value-item').forEach(item => { item.style.display = ''; });
+            commitFilters();
+        }
         closeFilterDropdown();
         document.removeEventListener('click', outsideClickHandler);
         const tableContainer = document.querySelector('.table-container');

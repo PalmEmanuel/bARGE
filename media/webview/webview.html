@@ -932,6 +932,10 @@
             background-color: var(--vscode-list-hoverBackground);
         }
 
+        .header-text {
+            white-space: nowrap;
+        }
+
         .results-table th.sorted-asc .header-text::after {
             content: ' ↑';
         }
@@ -970,6 +974,7 @@
             align-items: center;
             gap: 4px;
             width: 100%;
+            flex-wrap: nowrap;
         }
 
         /* ── Column filter button ─────────────────────────────── */
@@ -1143,6 +1148,20 @@
             border: solid var(--vscode-foreground);
             border-width: 0 1.5px 1.5px 0;
             transform: rotate(45deg) translate(-0.5px, -0.5px);
+        }
+
+        .filter-checkmark.indeterminate {
+            border-color: var(--vscode-foreground);
+        }
+
+        .filter-checkmark.indeterminate::after {
+            content: '';
+            display: block;
+            width: 8px;
+            height: 0;
+            border: solid var(--vscode-foreground);
+            border-width: 0 0 1.5px 0;
+            transform: none;
         }
 
         .filter-item:hover .filter-checkmark {
