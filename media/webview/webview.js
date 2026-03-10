@@ -2587,6 +2587,7 @@ function selectAllCells() {
 
 // Column resizing functionality
 let isResizing = false;
+let justResized = false;
 let currentResizeColumn = null;
 let startX = 0;
 let startWidth = 0;
@@ -2639,6 +2640,7 @@ function handleResize(event) {
 
 function stopResize() {
     isResizing = false;
+    justResized = true;
     currentResizeColumn = null;
     document.removeEventListener('mousemove', handleResize);
     document.removeEventListener('mouseup', stopResize);
@@ -2649,6 +2651,11 @@ function stopResize() {
 let draggedColumn = null;
 
 function handleHeaderClick(event, columnIndex) {
+    // Don't sort if we just finished resizing a column
+    if (justResized) {
+        justResized = false;
+        return;
+    }
     // Only sort if we're not clicking on the resize handle
     if (!event.target.classList.contains('resize-handle')) {
         sortTable(columnIndex);
