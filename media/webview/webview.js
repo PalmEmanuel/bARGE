@@ -1,6 +1,6 @@
 const vscode = acquireVsCodeApi();
 let currentResults = null;
-let fullData = null; // Unfiltered original data — filtering operates on this
+let fullData = null; // Unfiltered original data - filtering operates on this
 let sortState = { column: null, direction: null };
 let resolvedColumns = new Map(); // Store resolved identity data by resolved column name
 let resolvedCells = new Set(); // Store individually resolved cells as "row-col" strings
@@ -12,7 +12,10 @@ let currentlyResolvingColumn = null; // Track which column name is currently bei
 let columnFilters = new Map();
 let activeFilterDropdown = null; // Currently open filter dropdown column index
 let stickyFilters = false; // When true, filters persist across query re-runs (matched by column name)
-let savedFiltersByName = new Map(); // Map<columnName, { all, includedKeys }> — saved when sticky is on
+let savedFiltersByName = new Map(); // Map<columnName, { all, includedKeys }> - saved when sticky is on
+let autoApplyFilters = true; // Global preference for auto-apply in filter dropdowns
+let _navigatingToFilter = false; // Suppresses scroll-close during chip navigation
+let _queryRunning = false; // True while a query is executing
 
 // GUID detection utilities
 const GUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -232,16 +235,21 @@ function updateResolveButtonStates() {
     });
 }
 
-// Helper function to update export button state based on resolution status
+// Helper function to update export button state based on resolution status and data availability
 function updateExportButtonState() {
     const exportBtn = document.getElementById('exportBtn');
     if (!exportBtn) return;
 
+    const hasData = currentResults && currentResults.data && currentResults.data.length > 0;
     const isResolutionInProgress = currentlyResolvingColumn !== null;
-    exportBtn.disabled = isResolutionInProgress;
-    exportBtn.style.opacity = isResolutionInProgress ? '0.5' : '1';
-    exportBtn.style.cursor = isResolutionInProgress ? 'not-allowed' : 'pointer';
-    exportBtn.title = isResolutionInProgress ? 'Export disabled during identity resolution' : 'Export results to CSV';
+    const shouldDisable = !hasData || isResolutionInProgress || _queryRunning;
+    exportBtn.disabled = shouldDisable;
+    exportBtn.style.opacity = shouldDisable ? '0.5' : '1';
+    exportBtn.style.cursor = shouldDisable ? 'not-allowed' : 'pointer';
+    exportBtn.title = _queryRunning ? 'Query in progress'
+        : !hasData ? 'No results to export'
+        : isResolutionInProgress ? 'Export disabled during identity resolution'
+        : 'Export results to CSV';
 }
 
 // Helper function to check if a cell is an error that can be re-resolved
@@ -507,6 +515,7 @@ function displayResults(result, preserveDetailsPane = false) {
     if (!preserveDetailsPane) {
         fullData = result.data ? [...result.data] : null;
         columnFilters.clear();
+        sortState = { column: null, direction: null };
         closeFilterDropdown();
 
         // Restore sticky filters if enabled
@@ -544,7 +553,7 @@ function displayResults(result, preserveDetailsPane = false) {
         } else {
             tableContainer.innerHTML = '<div class="no-results">No results found.</div>';
             resultsInfo.textContent = 'No results.';
-            exportBtn.style.display = 'none';
+            updateExportButtonState();
             return;
         }
     }
@@ -553,13 +562,11 @@ function displayResults(result, preserveDetailsPane = false) {
         ' • ' + result.executionTimeMs + 'ms' : '';
     resultsInfo.textContent = result.totalRecords + ' results' + executionTimeText + ' • ' + formatTimestamp(result.timestamp);
 
-    // Show export button but disable it if identity resolution is in progress
-    exportBtn.style.display = 'block';
-    const isResolutionInProgress = currentlyResolvingColumn !== null;
-    exportBtn.disabled = isResolutionInProgress;
-    exportBtn.style.opacity = isResolutionInProgress ? '0.5' : '1';
-    exportBtn.style.cursor = isResolutionInProgress ? 'not-allowed' : 'pointer';
-    exportBtn.title = 'Export results to CSV';
+    // Render filter chips (shows dormant sticky chips on fresh queries)
+    renderFilterChips();
+
+    // Update export button state (enable if data available and no resolution in progress)
+    updateExportButtonState();
 
     let tableHtml = '<table class="results-table"><thead><tr>';
 
@@ -2508,6 +2515,8 @@ function updateFilterInfo() {
         if (clearBtn) { clearBtn.disabled = true; }
         if (invertBtn) { invertBtn.disabled = true; }
     }
+
+    renderFilterChips();
 }
 
 /**
@@ -2515,6 +2524,7 @@ function updateFilterInfo() {
  */
 function clearAllFilters() {
     columnFilters.clear();
+    savedFiltersByName.clear();
     closeFilterDropdown();
     applyFilters();
     updateFilterHeaderIcons();
@@ -2557,6 +2567,19 @@ function invertAllFilters() {
 }
 
 /**
+ * Toggle sticky pin button state and call toggleStickyFilters.
+ */
+function toggleStickyPin() {
+    const btn = document.getElementById('stickyPinBtn');
+    const nowPinned = !stickyFilters;
+    if (btn) {
+        btn.classList.toggle('pinned', nowPinned);
+        btn.title = 'Keep filter selections between queries, matched by column names';
+    }
+    toggleStickyFilters(nowPinned);
+}
+
+/**
  * Toggle sticky filters on/off.
  */
 function toggleStickyFilters(enabled) {
@@ -2567,14 +2590,22 @@ function toggleStickyFilters(enabled) {
     } else {
         savedFiltersByName.clear();
     }
+    renderFilterChips();
 }
 
 /**
  * Save current column filters keyed by column name for sticky restore.
  */
 function saveStickyFilters() {
-    savedFiltersByName.clear();
     if (!currentResults || !currentResults.columns) { return; }
+
+    // Remove saved entries for columns present in the current query
+    // (they'll be re-added below if they still have active filters)
+    for (const col of currentResults.columns) {
+        savedFiltersByName.delete(col.name);
+    }
+
+    // Save current active filters by column name
     for (const [colIdx, filter] of columnFilters) {
         if (filter.all) { continue; }
         const colName = currentResults.columns[colIdx]?.name;
@@ -2606,6 +2637,226 @@ function restoreStickyFilters() {
         }
     });
     return restored;
+}
+
+/**
+ * Render filter chips in the footer.
+ * Shows active filters as solid chips, saved-but-dormant sticky filters as dimmed chips.
+ * Chips that don't fit are hidden, with a "+N" button to open an upward popup.
+ */
+
+function renderFilterChips() {
+    const badge = document.getElementById('filterBadge');
+    if (!badge) { return; }
+    closeChipsPopup();
+
+    const chips = getFilterChipData();
+    if (chips.size === 0) {
+        badge.classList.remove('visible', 'has-active');
+        badge.textContent = '';
+        return;
+    }
+
+    const hasActive = [...chips.values()].some(c => c.active);
+    badge.textContent = chips.size;
+    badge.classList.add('visible');
+    badge.classList.toggle('has-active', hasActive);
+}
+
+/**
+ * Collect filter chip data: active + dormant filters.
+ */
+function getFilterChipData() {
+    const chips = new Map();
+
+    if (currentResults && currentResults.columns) {
+        for (const [colIdx, filter] of columnFilters) {
+            if (filter.all) { continue; }
+            const colName = currentResults.columns[colIdx]?.name;
+            if (colName) {
+                chips.set(colName, { active: true });
+            }
+        }
+    }
+
+    if (stickyFilters) {
+        for (const [colName] of savedFiltersByName) {
+            if (!chips.has(colName)) {
+                chips.set(colName, { active: false });
+            }
+        }
+    }
+
+    return chips;
+}
+
+/**
+ * Create a single chip DOM element.
+ */
+function createChipElement(colName, active) {
+    const chip = document.createElement('span');
+    chip.className = 'filter-chip' + (active ? '' : ' dormant');
+    chip.title = colName + (active
+        ? ' (click to open filter)'
+        : ' (saved, not in current results)');
+
+    // Click chip label area to navigate to column and open filter (active only)
+    chip.addEventListener('click', (e) => {
+        if (!active) { return; }
+        if (e.target.closest('.filter-chip-remove')) { return; }
+        closeChipsPopup();
+        navigateToColumnFilter(colName);
+    });
+
+    const label = document.createElement('span');
+    label.className = 'filter-chip-label';
+    label.textContent = colName;
+    chip.appendChild(label);
+
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'filter-chip-remove';
+    removeBtn.title = 'Remove filter';
+    removeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        removeFilterChip(colName);
+    });
+    chip.appendChild(removeBtn);
+
+    return chip;
+}
+
+/**
+ * Navigate to a column by name, scroll it into view, and open its filter dropdown.
+ */
+function navigateToColumnFilter(colName) {
+    if (!currentResults || !currentResults.columns) { return; }
+    const colIdx = currentResults.columns.findIndex(c => c.name === colName);
+    if (colIdx === -1) { return; }
+
+    const th = document.querySelector('th[data-col-index="' + colIdx + '"]');
+    if (!th) { return; }
+
+    const container = document.getElementById('tableContainer');
+    _navigatingToFilter = true;
+
+    const openDropdown = () => {
+        _navigatingToFilter = false;
+        closeFilterDropdown();
+        activeFilterDropdown = colIdx;
+        showFilterDropdown(colIdx, th);
+    };
+
+    // Scroll the target column header into view (center for full visibility)
+    th.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+
+    if (container) {
+        let scrolled = false;
+        let noScrollTimer;
+
+        // Detect if a scroll actually starts
+        const onScroll = () => {
+            scrolled = true;
+            clearTimeout(noScrollTimer);
+            container.removeEventListener('scroll', onScroll);
+        };
+
+        // When scrolling finishes, open dropdown
+        const onScrollEnd = () => {
+            container.removeEventListener('scroll', onScroll);
+            clearTimeout(noScrollTimer);
+            openDropdown();
+        };
+
+        container.addEventListener('scroll', onScroll);
+        container.addEventListener('scrollend', onScrollEnd, { once: true });
+
+        // If no scroll event fires within 50ms, element is already in view
+        noScrollTimer = setTimeout(() => {
+            if (!scrolled) {
+                container.removeEventListener('scroll', onScroll);
+                container.removeEventListener('scrollend', onScrollEnd);
+                openDropdown();
+            }
+        }, 50);
+    } else {
+        openDropdown();
+    }
+}
+
+/**
+ * Toggle the upward chips popup showing all chips.
+ */
+function toggleChipsPopup() {
+    const existing = document.querySelector('.filter-chips-popup');
+    if (existing) {
+        closeChipsPopup();
+        return;
+    }
+
+    const wrapper = document.getElementById('filterBadgeWrapper');
+    if (!wrapper) { return; }
+
+    const chips = getFilterChipData();
+    if (chips.size === 0) { return; }
+
+    const popup = document.createElement('div');
+    popup.className = 'filter-chips-popup';
+
+    const activeCount = [...chips.values()].filter(c => c.active).length;
+    const dormantCount = chips.size - activeCount;
+
+    const header = document.createElement('div');
+    header.className = 'chips-popup-header';
+    header.textContent = activeCount > 0
+        ? 'Filters' + (dormantCount > 0 ? ' (' + dormantCount + ' saved)' : '')
+        : 'Saved Filters';
+    popup.appendChild(header);
+
+    const list = document.createElement('div');
+    list.className = 'chips-popup-list';
+    for (const [colName, info] of chips) {
+        list.appendChild(createChipElement(colName, info.active));
+    }
+    popup.appendChild(list);
+
+    wrapper.appendChild(popup);
+
+    // Close on outside click
+    const closeHandler = (e) => {
+        if (!popup.contains(e.target) && !e.target.closest('.filter-badge')) {
+            closeChipsPopup();
+            document.removeEventListener('click', closeHandler);
+        }
+    };
+    setTimeout(() => document.addEventListener('click', closeHandler), 0);
+}
+
+/**
+ * Close the chips popup if open.
+ */
+function closeChipsPopup() {
+    const popup = document.querySelector('.filter-chips-popup');
+    if (popup) { popup.remove(); }
+}
+
+/**
+ * Remove an individual filter by column name (from chip × button).
+ */
+function removeFilterChip(colName) {
+    // Remove from active filters
+    if (currentResults && currentResults.columns) {
+        currentResults.columns.forEach((col, idx) => {
+            if (col.name === colName) {
+                columnFilters.delete(idx);
+            }
+        });
+    }
+
+    // Remove from saved sticky filters
+    savedFiltersByName.delete(colName);
+
+    applyFilters();
+    updateFilterHeaderIcons();
 }
 
 /**
@@ -2849,7 +3100,7 @@ function showFilterDropdown(columnIndex, headerElement) {
         requestAnimationFrame(() => { suppressScroll = false; });
     }
 
-    let autoApply = true;
+    let autoApply = autoApplyFilters;
 
     function onFilterChange() {
         if (autoApply) { commitFilters(); }
@@ -2865,7 +3116,7 @@ function showFilterDropdown(columnIndex, headerElement) {
     const autoApplyCheckbox = document.createElement('input');
     autoApplyCheckbox.type = 'checkbox';
     autoApplyCheckbox.className = 'filter-checkbox';
-    autoApplyCheckbox.checked = true;
+    autoApplyCheckbox.checked = autoApply;
     autoApplyCheckbox.addEventListener('click', e => e.stopPropagation());
 
     const autoApplyCheckmark = document.createElement('span');
@@ -2881,6 +3132,7 @@ function showFilterDropdown(columnIndex, headerElement) {
         e.stopPropagation();
         autoApplyCheckbox.checked = !autoApplyCheckbox.checked;
         autoApply = autoApplyCheckbox.checked;
+        autoApplyFilters = autoApply;
         applyBtn.disabled = autoApply;
         if (autoApply) { commitFilters(); }
     });
@@ -2889,7 +3141,7 @@ function showFilterDropdown(columnIndex, headerElement) {
     applyBtn.textContent = 'Apply';
     applyBtn.className = 'filter-action-btn';
     applyBtn.style.marginLeft = 'auto';
-    applyBtn.disabled = true;
+    applyBtn.disabled = autoApply;
     applyBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         commitFilters();
@@ -2922,17 +3174,35 @@ function showFilterDropdown(columnIndex, headerElement) {
     dropdown.style.left = rect.left + 'px';
     document.body.appendChild(dropdown);
 
+    // If dropdown goes off the right edge, flip to align right side with header
+    const dropdownRect = dropdown.getBoundingClientRect();
+    if (dropdownRect.right > window.innerWidth) {
+        dropdown.style.left = '';
+        dropdown.style.right = (window.innerWidth - rect.right) + 'px';
+    }
+
     // Focus the search box
     setTimeout(() => searchBox.focus(), 0);
 
     // Close on outside click or scroll
     function outsideClickHandler(e) {
+        // If our dropdown was already removed (e.g. by a new dropdown opening), just self-clean
+        if (!document.contains(dropdown)) {
+            document.removeEventListener('click', outsideClickHandler);
+            return;
+        }
         if (!dropdown.contains(e.target) && !e.target.closest('.filter-btn')) {
             cleanup();
         }
     }
     function scrollHandler() {
-        if (suppressScroll) { return; }
+        // If our dropdown was already removed, just self-clean
+        if (!document.contains(dropdown)) {
+            const tc = document.querySelector('.table-container');
+            if (tc) { tc.removeEventListener('scroll', scrollHandler); }
+            return;
+        }
+        if (suppressScroll || _navigatingToFilter) { return; }
         cleanup();
     }
     function cleanup() {
@@ -3350,8 +3620,13 @@ function autoFitColumn(columnIndex) {
 
     const headerTextEl = th.querySelector('.header-text') || th;
     headerSpan.textContent = headerTextEl.textContent;
-    let maxWidth = headerSpan.offsetWidth;
+    let headerTextWidth = headerSpan.offsetWidth;
     document.body.removeChild(headerSpan);
+
+    // Account for header-actions (sort arrow + filter button + resolve button + padding)
+    const headerActions = th.querySelector('.header-actions');
+    const actionsWidth = headerActions ? headerActions.offsetWidth : 0;
+    const headerMinWidth = headerTextWidth + actionsWidth + 16; // 16px for padding
 
     // Measure each cell in the column using cell font
     const rows = document.querySelectorAll('.results-table tbody tr');
@@ -3366,20 +3641,21 @@ function autoFitColumn(columnIndex) {
         : window.getComputedStyle(document.body).font;
     document.body.appendChild(cellSpan);
 
+    let maxCellWidth = 0;
     rows.forEach(row => {
         const cell = row.children[columnIndex + 1]; // +1 for details button column
         if (cell) {
             cellSpan.textContent = cell.textContent;
-            if (cellSpan.offsetWidth > maxWidth) {
-                maxWidth = cellSpan.offsetWidth;
+            if (cellSpan.offsetWidth > maxCellWidth) {
+                maxCellWidth = cellSpan.offsetWidth;
             }
         }
     });
 
     document.body.removeChild(cellSpan);
 
-    // Add small buffer for clean fit
-    const fitWidth = maxWidth + 2;
+    // Use the wider of header (with actions) or cell content, plus small buffer
+    const fitWidth = Math.max(headerMinWidth, maxCellWidth + 2);
     th.style.width = fitWidth + 'px';
 
     if (currentResults.columns[columnIndex]) {
@@ -3613,7 +3889,7 @@ function displayError(error, errorDetails, rawError) {
         resultsInfo.textContent = 'Query execution failed.';
     }
     if (exportBtn) {
-        exportBtn.style.display = 'none';
+        updateExportButtonState();
     }
 }
 
@@ -4401,6 +4677,8 @@ window.addEventListener('message', event => {
 
     switch (message.type) {
         case 'queryStart':
+            _queryRunning = true;
+            updateExportButtonState();
             showLoadingIndicator();
             hideContextMenu(); // Hide any open context menu when starting a new query
             break;
@@ -4411,6 +4689,7 @@ window.addEventListener('message', event => {
             }
             break;
         case 'queryResult':
+            _queryRunning = false;
             hideLoadingIndicator();
 
             if (message.payload.success) {
