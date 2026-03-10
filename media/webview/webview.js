@@ -2596,6 +2596,13 @@ function startResize(event, columnIndex) {
     event.stopPropagation();
     event.preventDefault();
 
+    // Double-click on resize handle: auto-fit column width
+    if (event.detail === 2) {
+        autoFitColumn(columnIndex);
+        justResized = true;
+        return;
+    }
+
     isResizing = true;
     currentResizeColumn = columnIndex;
     startX = event.clientX;
@@ -2645,6 +2652,57 @@ function stopResize() {
     document.removeEventListener('mousemove', handleResize);
     document.removeEventListener('mouseup', stopResize);
     document.body.style.userSelect = '';
+}
+
+function autoFitColumn(columnIndex) {
+    const th = document.querySelector('th[data-col-index="' + columnIndex + '"]');
+    if (!th || !currentResults) return;
+
+    // Measure header text width using header font
+    const headerSpan = document.createElement('span');
+    headerSpan.style.visibility = 'hidden';
+    headerSpan.style.position = 'absolute';
+    headerSpan.style.whiteSpace = 'nowrap';
+    headerSpan.style.font = window.getComputedStyle(th).font;
+    document.body.appendChild(headerSpan);
+
+    const headerTextEl = th.querySelector('.header-text') || th;
+    headerSpan.textContent = headerTextEl.textContent;
+    let maxWidth = headerSpan.offsetWidth;
+    document.body.removeChild(headerSpan);
+
+    // Measure each cell in the column using cell font
+    const rows = document.querySelectorAll('.results-table tbody tr');
+    const cellSpan = document.createElement('span');
+    cellSpan.style.visibility = 'hidden';
+    cellSpan.style.position = 'absolute';
+    cellSpan.style.whiteSpace = 'nowrap';
+    // Use the font from the first data cell, falling back to body font
+    const firstDataCell = rows.length > 0 ? rows[0].children[columnIndex + 1] : null;
+    cellSpan.style.font = firstDataCell
+        ? window.getComputedStyle(firstDataCell).font
+        : window.getComputedStyle(document.body).font;
+    document.body.appendChild(cellSpan);
+
+    rows.forEach(row => {
+        const cell = row.children[columnIndex + 1]; // +1 for details button column
+        if (cell) {
+            cellSpan.textContent = cell.textContent;
+            if (cellSpan.offsetWidth > maxWidth) {
+                maxWidth = cellSpan.offsetWidth;
+            }
+        }
+    });
+
+    document.body.removeChild(cellSpan);
+
+    // Add small buffer for clean fit
+    const fitWidth = maxWidth + 2;
+    th.style.width = fitWidth + 'px';
+
+    if (currentResults.columns[columnIndex]) {
+        currentResults.columns[columnIndex].width = fitWidth + 'px';
+    }
 }
 
 // Column drag and drop functionality
