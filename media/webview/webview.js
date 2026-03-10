@@ -11,6 +11,8 @@ let currentlyResolvingColumn = null; // Track which column name is currently bei
 // Each entry holds the set of values that are **included** (checked).
 let columnFilters = new Map();
 let activeFilterDropdown = null; // Currently open filter dropdown column index
+let stickyFilters = false; // When true, filters persist across query re-runs (matched by column name)
+let savedFiltersByName = new Map(); // Map<columnName, { all, includedKeys }> — saved when sticky is on
 
 // GUID detection utilities
 const GUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -506,6 +508,12 @@ function displayResults(result, preserveDetailsPane = false) {
         fullData = result.data ? [...result.data] : null;
         columnFilters.clear();
         closeFilterDropdown();
+
+        // Restore sticky filters if enabled
+        if (stickyFilters && restoreStickyFilters()) {
+            applyFilters();
+            return; // applyFilters will call displayResults again with preserveDetailsPane=true
+        }
     }
 
     // Close details pane when new query results are displayed, unless preserving it
@@ -2469,6 +2477,9 @@ function applyFilters() {
     }
 
     updateFilterInfo();
+
+    // Save sticky filters whenever filters change
+    if (stickyFilters) { saveStickyFilters(); }
 }
 
 /**
@@ -2484,15 +2495,18 @@ function updateFilterInfo() {
         ? ' • ' + formatTimestamp(currentResults.timestamp) : '';
 
     const clearBtn = document.getElementById('clearFiltersBtn');
+    const invertBtn = document.getElementById('invertFiltersBtn');
 
     if (hasActiveFilters()) {
         const shown = currentResults.data.length;
         const total = fullData.length;
         resultsInfo.textContent = shown + ' of ' + total + ' records (filtered)' + executionTimeText + timestampText;
         if (clearBtn) { clearBtn.disabled = false; }
+        if (invertBtn) { invertBtn.disabled = false; }
     } else {
         resultsInfo.textContent = (currentResults.totalRecords || fullData.length) + ' records' + executionTimeText + timestampText;
         if (clearBtn) { clearBtn.disabled = true; }
+        if (invertBtn) { invertBtn.disabled = true; }
     }
 }
 
@@ -2504,6 +2518,94 @@ function clearAllFilters() {
     closeFilterDropdown();
     applyFilters();
     updateFilterHeaderIcons();
+}
+
+/**
+ * Invert all active column filters: checked ↔ unchecked for every column that has a filter.
+ */
+function invertAllFilters() {
+    if (!fullData || !currentResults) { return; }
+
+    for (const [colIdx, filter] of columnFilters) {
+        if (filter.all) { continue; } // Nothing to invert for "All"
+
+        // Get all possible values for this column
+        const allKeys = new Set();
+        for (const row of fullData) {
+            allKeys.add(filterValueKey(row[colIdx]));
+        }
+
+        // Invert: everything that was included becomes excluded and vice versa
+        const invertedKeys = new Set();
+        for (const key of allKeys) {
+            if (!filter.includedKeys.has(key)) {
+                invertedKeys.add(key);
+            }
+        }
+
+        if (invertedKeys.size === allKeys.size) {
+            // All values selected after invert → mark as "all"
+            columnFilters.set(colIdx, { all: true, includedKeys: new Set() });
+        } else {
+            columnFilters.set(colIdx, { all: false, includedKeys: invertedKeys });
+        }
+    }
+
+    closeFilterDropdown();
+    applyFilters();
+    updateFilterHeaderIcons();
+}
+
+/**
+ * Toggle sticky filters on/off.
+ */
+function toggleStickyFilters(enabled) {
+    stickyFilters = enabled;
+    if (stickyFilters) {
+        // Save current filters by column name
+        saveStickyFilters();
+    } else {
+        savedFiltersByName.clear();
+    }
+}
+
+/**
+ * Save current column filters keyed by column name for sticky restore.
+ */
+function saveStickyFilters() {
+    savedFiltersByName.clear();
+    if (!currentResults || !currentResults.columns) { return; }
+    for (const [colIdx, filter] of columnFilters) {
+        if (filter.all) { continue; }
+        const colName = currentResults.columns[colIdx]?.name;
+        if (colName) {
+            savedFiltersByName.set(colName, {
+                all: filter.all,
+                includedKeys: new Set(filter.includedKeys)
+            });
+        }
+    }
+}
+
+/**
+ * Restore saved sticky filters onto the current column layout.
+ * Matches by column name. Returns true if any filters were restored.
+ */
+function restoreStickyFilters() {
+    if (savedFiltersByName.size === 0 || !currentResults || !currentResults.columns) { return false; }
+
+    let restored = false;
+    currentResults.columns.forEach((col, index) => {
+        const saved = savedFiltersByName.get(col.name);
+        if (saved) {
+            columnFilters.set(index, {
+                all: saved.all,
+                includedKeys: new Set(saved.includedKeys)
+            });
+            restored = true;
+        }
+    });
+    return restored;
 }
 
 /**

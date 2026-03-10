@@ -839,6 +839,38 @@
             pointer-events: none;
         }
 
+        .footer-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: var(--vscode-menu-foreground, var(--vscode-foreground));
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .footer-checkbox .filter-checkbox {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+            pointer-events: none;
+        }
+
+        .footer-checkbox .filter-checkbox:checked + .filter-checkmark {
+            border-color: var(--vscode-foreground);
+        }
+
+        .footer-checkbox .filter-checkbox:checked + .filter-checkmark::after {
+            content: '';
+            display: block;
+            width: 3px;
+            height: 7px;
+            border: solid var(--vscode-foreground);
+            border-width: 0 1.5px 1.5px 0;
+            transform: rotate(45deg) translate(-0.5px, -0.5px);
+        }
+
         .results-table {
             width: 100%;
             min-width: max-content;
@@ -975,6 +1007,19 @@
             font-size: 13px;
             cursor: default;
             padding: 6px 0;
+            animation: dropdownIn 0.12s ease-out;
+            transform-origin: top left;
+        }
+
+        @keyframes dropdownIn {
+            from {
+                opacity: 0;
+                transform: translateY(-4px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .filter-search-row {
@@ -1669,10 +1714,16 @@
     </div>
 
     <div class="footer">
-        <div id="resultsInfo" class="results-info">No results yet. Run a query to see results here.</div>
+        <div id="resultsInfo" class="results-info">No records yet. Run a query to see records here.</div>
         <div class="footer-actions">
-            <button id="clearFiltersBtn" class="footer-btn" onclick="clearAllFilters()" disabled>Clear Filters</button>
-            <button id="exportBtn" class="footer-btn" onclick="exportToCsv()" style="display: none;">Export CSV</button>
+            <div class="footer-checkbox" title="Keep filter selections between queries, matched by column names" onclick="var cb = document.getElementById('stickyFiltersCheckbox'); cb.checked = !cb.checked; toggleStickyFilters(cb.checked);">
+                <input type="checkbox" id="stickyFiltersCheckbox" class="filter-checkbox">
+                <span class="filter-checkmark"></span>
+                <span>Sticky filters</span>
+            </div>
+            <button id="invertFiltersBtn" class="footer-btn" onclick="invertAllFilters()" title="Invert the selection of all active filters, note that this does not necessarily invert results" disabled>Invert Filters</button>
+            <button id="clearFiltersBtn" class="footer-btn" onclick="clearAllFilters()" title="Clear all active filters" disabled>Clear Filters</button>
+            <button id="exportBtn" class="footer-btn" onclick="exportToCsv()" title="Export the current results to a CSV file" style="display: none;">Export CSV</button>
         </div>
     </div>
 
