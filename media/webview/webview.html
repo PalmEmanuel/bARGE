@@ -920,11 +920,11 @@
             background-color: var(--vscode-list-hoverBackground);
         }
 
-        .results-table th.sorted-asc::after {
+        .results-table th.sorted-asc .header-text::after {
             content: ' ↑';
         }
 
-        .results-table th.sorted-desc::after {
+        .results-table th.sorted-desc .header-text::after {
             content: ' ↓';
         }
 
@@ -1037,7 +1037,7 @@
             border-color: var(--vscode-focusBorder);
         }
 
-        .filter-add-btn {
+        .filter-sort-btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -1052,66 +1052,18 @@
             transition: color 0.1s ease, border-color 0.1s ease;
         }
 
-        .filter-add-btn:hover {
+        .filter-sort-btn:hover {
             color: var(--vscode-foreground);
             border-color: var(--vscode-focusBorder);
         }
 
-        .filter-add-btn:disabled {
-            opacity: 0.4;
-            cursor: default;
-            pointer-events: none;
+        .filter-sort-btn.sort-active {
+            color: var(--vscode-notificationsInfoIcon-foreground, var(--vscode-focusBorder));
+            border-color: var(--vscode-notificationsInfoIcon-foreground, var(--vscode-focusBorder));
         }
 
         .filter-all-item {
             font-weight: 500;
-        }
-
-        .filter-patterns {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .filter-pattern-label {
-            font-style: italic;
-            color: var(--vscode-textLink-foreground);
-        }
-
-        .filter-pattern-remove {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            width: 20px;
-            height: 20px;
-            border: none;
-            border-radius: 3px;
-            background: none;
-            color: var(--vscode-foreground);
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: bold;
-            line-height: 1;
-            transition: color 0.1s ease;
-        }
-
-        .filter-pattern-remove:hover {
-            background-color: rgba(255, 255, 255, 0.15);
-            border-radius: 3px;
-        }
-
-        .filter-pattern-remove:active {
-            background-color: rgba(255, 255, 255, 0.3);
-            transform: scale(0.9);
-        }
-
-        @media (prefers-color-scheme: light) {
-            .filter-pattern-remove:hover {
-                background-color: rgba(0, 0, 0, 0.1);
-            }
-            .filter-pattern-remove:active {
-                background-color: rgba(0, 0, 0, 0.2);
-            }
         }
 
         .filter-separator {
@@ -1140,8 +1092,7 @@
         }
 
         .filter-item:hover .filter-label,
-        .filter-item:hover .filter-count,
-        .filter-item:hover .filter-pattern-label {
+        .filter-item:hover .filter-count {
             color: var(--vscode-menu-selectionForeground);
         }
 

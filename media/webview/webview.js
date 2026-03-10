@@ -2315,11 +2315,13 @@ function updateTableAfterSort(sortedData) {
     updateDetailsAfterSort();
 }
 
-function sortTable(columnIndex, keepDirection) {
+function sortTable(columnIndex, keepDirection, forceDirection) {
     if (!currentResults || !currentResults.data) return;
 
     let direction;
-    if (keepDirection && sortState.column === columnIndex && sortState.direction) {
+    if (forceDirection) {
+        direction = forceDirection;
+    } else if (keepDirection && sortState.column === columnIndex && sortState.direction) {
         direction = sortState.direction;
     } else {
         direction = 'asc';
@@ -2424,16 +2426,7 @@ function applyFilters() {
         if (filter.all) { continue; }
         filtered = filtered.filter(row => {
             const key = filterValueKey(row[colIdx]);
-            // Match if the value is explicitly checked
-            if (filter.includedKeys.size > 0 && filter.includedKeys.has(key)) { return true; }
-            // Match if any custom text pattern matches (case-insensitive contains)
-            if (filter.textPatterns.size > 0) {
-                const cellStr = String(row[colIdx] == null ? '' : row[colIdx]).toLowerCase();
-                for (const pattern of filter.textPatterns) {
-                    if (cellStr.includes(pattern.toLowerCase())) { return true; }
-                }
-            }
-            return false;
+            return filter.includedKeys.has(key);
         });
     }
 
@@ -2519,41 +2512,52 @@ function showFilterDropdown(columnIndex, headerElement) {
     const currentFilter = columnFilters.get(columnIndex);
     const isAllChecked = !currentFilter || currentFilter.all;
     const includedKeys = currentFilter ? currentFilter.includedKeys : new Set();
-    const textPatterns = currentFilter ? currentFilter.textPatterns : new Set();
 
     const dropdown = document.createElement('div');
     dropdown.className = 'filter-dropdown';
 
-    // ── Search box with add-pattern button ──────────────────
+    // ── Search box with sort buttons ───────────────────────
     const searchRow = document.createElement('div');
     searchRow.className = 'filter-search-row';
 
     const searchBox = document.createElement('input');
     searchBox.type = 'text';
     searchBox.className = 'filter-search';
-    searchBox.placeholder = 'Search or add filter...';
+    searchBox.placeholder = 'Search values...';
     searchBox.addEventListener('input', () => {
         const query = searchBox.value.toLowerCase();
         list.querySelectorAll('.filter-value-item').forEach(item => {
             const label = item.dataset.label.toLowerCase();
             item.style.display = label.includes(query) ? '' : 'none';
         });
-        addPatternBtn.disabled = !searchBox.value.trim();
     });
     searchBox.addEventListener('click', e => e.stopPropagation());
 
-    const addPatternBtn = document.createElement('button');
-    addPatternBtn.className = 'filter-add-btn';
-    addPatternBtn.title = 'Add as text filter';
-    addPatternBtn.disabled = true;
-    addPatternBtn.innerHTML = '<svg viewBox="0 0 16 16" width="12" height="12"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>';
-    addPatternBtn.addEventListener('click', (e) => {
+    const sortAscBtn = document.createElement('button');
+    sortAscBtn.className = 'filter-sort-btn' + (sortState.column === columnIndex && sortState.direction === 'asc' ? ' sort-active' : '');
+    sortAscBtn.title = 'Sort ascending';
+    sortAscBtn.innerHTML = '<svg viewBox="0 0 16 16" width="12" height="12"><path d="M8 3L3 9h10L8 3z" fill="currentColor"/></svg>';
+    sortAscBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        addTextPattern();
+        sortTable(columnIndex, false, 'asc');
+        sortAscBtn.classList.add('sort-active');
+        sortDescBtn.classList.remove('sort-active');
+    });
+
+    const sortDescBtn = document.createElement('button');
+    sortDescBtn.className = 'filter-sort-btn' + (sortState.column === columnIndex && sortState.direction === 'desc' ? ' sort-active' : '');
+    sortDescBtn.title = 'Sort descending';
+    sortDescBtn.innerHTML = '<svg viewBox="0 0 16 16" width="12" height="12"><path d="M8 13L3 7h10L8 13z" fill="currentColor"/></svg>';
+    sortDescBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sortTable(columnIndex, false, 'desc');
+        sortDescBtn.classList.add('sort-active');
+        sortAscBtn.classList.remove('sort-active');
     });
 
     searchRow.appendChild(searchBox);
-    searchRow.appendChild(addPatternBtn);
+    searchRow.appendChild(sortAscBtn);
+    searchRow.appendChild(sortDescBtn);
     dropdown.appendChild(searchRow);
 
     // ── "All" checkbox ──────────────────────────────────────
@@ -2580,90 +2584,13 @@ function showFilterDropdown(columnIndex, headerElement) {
         e.stopPropagation();
         allCheckbox.checked = !allCheckbox.checked;
         if (allCheckbox.checked) {
-            // Uncheck all individual values and remove text patterns
+            // Uncheck all individual values
             list.querySelectorAll('.filter-value-item .filter-checkbox').forEach(cb => { cb.checked = false; });
-            patternsContainer.querySelectorAll('.filter-pattern-checkbox').forEach(cb => { cb.checked = false; });
         }
     });
     dropdown.appendChild(allItem);
 
-    // ── Custom text pattern rows container ──────────────────
-    const patternsContainer = document.createElement('div');
-    patternsContainer.className = 'filter-patterns';
-
-    function addTextPattern() {
-        const text = searchBox.value.trim();
-        if (!text) { return; }
-        // Don't add duplicates
-        const existing = patternsContainer.querySelectorAll('.filter-pattern-item');
-        for (const el of existing) {
-            if (el.dataset.pattern === text) { return; }
-        }
-        createPatternRow(text, true);
-        searchBox.value = '';
-        addPatternBtn.disabled = true;
-        // Reset search filter on value list
-        list.querySelectorAll('.filter-value-item').forEach(item => { item.style.display = ''; });
-        // Uncheck "All" since we're adding a specific filter
-        allCheckbox.checked = false;
-    }
-
-    function createPatternRow(pattern, checked) {
-        const row = document.createElement('div');
-        row.className = 'filter-item filter-pattern-item';
-        row.dataset.pattern = pattern;
-
-        const cb = document.createElement('input');
-        cb.type = 'checkbox';
-        cb.className = 'filter-checkbox filter-pattern-checkbox';
-        cb.checked = checked;
-        cb.dataset.pattern = pattern;
-        cb.addEventListener('click', e => e.stopPropagation());
-
-        const cm = document.createElement('span');
-        cm.className = 'filter-checkmark';
-
-        const label = document.createElement('span');
-        label.className = 'filter-label filter-pattern-label';
-        label.textContent = '"' + pattern + '"';
-
-        const removeBtn = document.createElement('button');
-        removeBtn.className = 'filter-pattern-remove';
-        removeBtn.title = 'Remove filter';
-        removeBtn.textContent = '\u00d7';
-        removeBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            row.remove();
-        });
-
-        row.appendChild(cb);
-        row.appendChild(cm);
-        row.appendChild(label);
-        row.appendChild(removeBtn);
-        row.addEventListener('click', (e) => {
-            e.stopPropagation();
-            cb.checked = !cb.checked;
-            if (cb.checked) { allCheckbox.checked = false; }
-        });
-        patternsContainer.appendChild(row);
-    }
-
-    // Restore existing text patterns
-    for (const p of textPatterns) {
-        createPatternRow(p, true);
-    }
-
-    searchBox.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            e.stopPropagation();
-            addTextPattern();
-        }
-    });
-
-    dropdown.appendChild(patternsContainer);
-
-    // ── Separator between All/patterns and value list ───────
+    // ── Separator between All and value list ────────────────
     const sep = document.createElement('div');
     sep.className = 'filter-separator';
     dropdown.appendChild(sep);
@@ -2730,14 +2657,9 @@ function showFilterDropdown(columnIndex, headerElement) {
             list.querySelectorAll('.filter-value-item .filter-checkbox').forEach(cb => {
                 if (cb.checked) { newIncluded.add(cb.dataset.key); }
             });
-            const newPatterns = new Set();
-            patternsContainer.querySelectorAll('.filter-pattern-checkbox').forEach(cb => {
-                if (cb.checked) { newPatterns.add(cb.dataset.pattern); }
-            });
             columnFilters.set(columnIndex, {
                 all: false,
-                includedKeys: newIncluded,
-                textPatterns: newPatterns
+                includedKeys: newIncluded
             });
         }
         closeFilterDropdown();
@@ -3209,14 +3131,15 @@ function handleHeaderClick(event, columnIndex) {
         justResized = false;
         return;
     }
-    // Don't sort if clicking on the resize handle, filter button, or resolve button
+    // Don't handle if clicking on the resize handle, filter button, or resolve button
     if (event.target.classList.contains('resize-handle')
         || event.target.closest('.filter-btn')
         || event.target.closest('.filter-dropdown')
         || event.target.closest('.resolve-guid-btn')) {
         return;
     }
-    sortTable(columnIndex);
+    // Open the filter dropdown on header click
+    toggleFilterDropdown(event, columnIndex);
 }
 
 function handleDragStart(event, columnIndex) {
