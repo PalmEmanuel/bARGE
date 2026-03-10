@@ -869,7 +869,7 @@
             color: var(--vscode-descriptionForeground);
         }
 
-        .export-btn {
+        .footer-btn {
             background-color: var(--vscode-button-background);
             color: var(--vscode-button-foreground);
             border: none;
@@ -879,7 +879,7 @@
             font-size: 0.9em;
         }
 
-        .export-btn:hover {
+        .footer-btn:hover {
             background-color: var(--vscode-button-hoverBackground);
         }
 
@@ -986,7 +986,7 @@
         /* ── Filter dropdown ──────────────────────────────────── */
         .filter-dropdown {
             position: fixed;
-            min-width: 200px;
+            min-width: 220px;
             max-width: 320px;
             background: var(--vscode-menu-background, var(--vscode-editor-background));
             border: 1px solid var(--vscode-menu-border, var(--vscode-widget-border));
@@ -998,14 +998,20 @@
             font-weight: normal;
             font-size: 13px;
             cursor: default;
+            padding: 6px 0;
+        }
+
+        .filter-search-row {
+            display: flex;
+            align-items: center;
+            padding: 0 8px 6px;
+            gap: 4px;
         }
 
         .filter-search {
-            width: 100%;
+            flex: 1;
             box-sizing: border-box;
-            padding: 6px 10px;
-            margin: 6px 6px 0;
-            width: calc(100% - 12px);
+            padding: 4px 8px;
             border: 1px solid var(--vscode-input-border, var(--vscode-widget-border));
             border-radius: 2px;
             background: var(--vscode-input-background);
@@ -1023,46 +1029,101 @@
             border-color: var(--vscode-focusBorder);
         }
 
-        .filter-controls {
-            display: flex;
-            gap: 8px;
-            padding: 6px 10px 4px;
-            font-size: 12px;
-        }
-
-        .filter-control-btn {
-            padding: 0;
-            border: none;
-            background: none;
-            color: var(--vscode-textLink-foreground);
+        .filter-add-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            border: 1px solid var(--vscode-input-border, var(--vscode-widget-border));
+            border-radius: 2px;
+            background: var(--vscode-input-background);
+            color: var(--vscode-descriptionForeground);
             cursor: pointer;
-            font-size: 12px;
-            font-family: inherit;
+            transition: color 0.1s ease, border-color 0.1s ease;
         }
 
-        .filter-control-btn:hover {
-            color: var(--vscode-textLink-activeForeground);
-            text-decoration: underline;
+        .filter-add-btn:hover {
+            color: var(--vscode-foreground);
+            border-color: var(--vscode-focusBorder);
+        }
+
+        .filter-add-btn:disabled {
+            opacity: 0.4;
+            cursor: default;
+            pointer-events: none;
+        }
+
+        .filter-all-item {
+            font-weight: 500;
+        }
+
+        .filter-patterns {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-pattern-label {
+            font-style: italic;
+            color: var(--vscode-textLink-foreground);
+        }
+
+        .filter-pattern-remove {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            border: none;
+            border-radius: 3px;
+            background: none;
+            color: var(--vscode-foreground);
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            line-height: 1;
+            transition: color 0.1s ease;
+        }
+
+        .filter-pattern-remove:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 3px;
+        }
+
+        .filter-pattern-remove:active {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: scale(0.9);
+        }
+
+        @media (prefers-color-scheme: light) {
+            .filter-pattern-remove:hover {
+                background-color: rgba(0, 0, 0, 0.1);
+            }
+            .filter-pattern-remove:active {
+                background-color: rgba(0, 0, 0, 0.2);
+            }
         }
 
         .filter-separator {
             height: 1px;
             background: var(--vscode-menu-separatorBackground, var(--vscode-widget-border));
-            margin: 4px 0;
+            margin: 4px 8px;
         }
 
         .filter-list {
             max-height: 240px;
             overflow-y: auto;
-            padding: 2px 0;
         }
 
         .filter-item {
             display: flex;
             align-items: center;
-            padding: 2px 10px;
+            padding: 3px 10px;
             cursor: pointer;
             gap: 6px;
+            line-height: 20px;
         }
 
         .filter-item:hover {
@@ -1071,14 +1132,48 @@
         }
 
         .filter-item:hover .filter-label,
-        .filter-item:hover .filter-count {
+        .filter-item:hover .filter-count,
+        .filter-item:hover .filter-pattern-label {
             color: var(--vscode-menu-selectionForeground);
         }
 
         .filter-checkbox {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+            pointer-events: none;
+        }
+
+        .filter-checkmark {
             flex-shrink: 0;
-            margin: 0;
-            accent-color: var(--vscode-focusBorder);
+            width: 14px;
+            height: 14px;
+            border: 1px solid var(--vscode-checkbox-border, var(--vscode-widget-border));
+            border-radius: 3px;
+            background: var(--vscode-checkbox-background, transparent);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-color 0.1s ease;
+        }
+
+        .filter-checkbox:checked + .filter-checkmark {
+            border-color: var(--vscode-foreground);
+        }
+
+        .filter-checkbox:checked + .filter-checkmark::after {
+            content: '';
+            display: block;
+            width: 3px;
+            height: 7px;
+            border: solid var(--vscode-foreground);
+            border-width: 0 1.5px 1.5px 0;
+            transform: rotate(45deg) translate(-0.5px, -0.5px);
+        }
+
+        .filter-item:hover .filter-checkmark {
+            border-color: var(--vscode-foreground);
         }
 
         .filter-label {
@@ -1099,8 +1194,9 @@
         .filter-footer {
             display: flex;
             gap: 6px;
-            padding: 6px 10px;
+            padding: 6px 8px 2px;
             border-top: 1px solid var(--vscode-menu-separatorBackground, var(--vscode-widget-border));
+            margin-top: 4px;
             justify-content: flex-end;
         }
 
@@ -1619,8 +1715,8 @@
 
     <div class="footer">
         <div id="resultsInfo" class="results-info">No results yet. Run a query to see results here.</div>
-        <button id="clearFiltersBtn" class="export-btn" onclick="clearAllFilters()" style="display: none;">Clear Filters</button>
-        <button id="exportBtn" class="export-btn" onclick="exportToCsv()" style="display: none;">Export CSV</button>
+        <button id="clearFiltersBtn" class="footer-btn" onclick="clearAllFilters()" style="display: none;">Clear Filters</button>
+        <button id="exportBtn" class="footer-btn" onclick="exportToCsv()" style="display: none;">Export CSV</button>
     </div>
 
     <script nonce="{{NONCE}}">

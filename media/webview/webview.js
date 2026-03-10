@@ -587,7 +587,8 @@ function displayResults(result, preserveDetailsPane = false) {
             '<span class="header-text">' + col.name + '</span>';
 
         // Add filter button
-        const filterActive = columnFilters.has(index) && columnFilters.get(index).size < getDistinctColumnValues(index).length;
+        const colFilter = columnFilters.get(index);
+        const filterActive = colFilter && !colFilter.all;
         tableHtml += '<button class="filter-btn' + (filterActive ? ' filter-active' : '') + '" ' +
             'data-col-index="' + index + '" ' +
             'onclick="toggleFilterDropdown(event, ' + index + ')" ' +
@@ -2386,9 +2387,8 @@ function getDistinctColumnValues(columnIndex) {
  */
 function hasActiveFilters() {
     if (columnFilters.size === 0) { return false; }
-    for (const [colIdx, includedKeys] of columnFilters) {
-        const allValues = getDistinctColumnValues(colIdx);
-        if (includedKeys.size < allValues.length) { return true; }
+    for (const [colIdx, filter] of columnFilters) {
+        if (!filter.all) { return true; }
     }
     return false;
 }
@@ -2402,11 +2402,21 @@ function applyFilters() {
     let filtered = fullData;
 
     // Apply each column filter
-    for (const [colIdx, includedKeys] of columnFilters) {
-        const allValues = getDistinctColumnValues(colIdx);
-        // Skip if everything is included (no real filter)
-        if (includedKeys.size >= allValues.length) { continue; }
-        filtered = filtered.filter(row => includedKeys.has(filterValueKey(row[colIdx])));
+    for (const [colIdx, filter] of columnFilters) {
+        if (filter.all) { continue; }
+        filtered = filtered.filter(row => {
+            const key = filterValueKey(row[colIdx]);
+            // Match if the value is explicitly checked
+            if (filter.includedKeys.size > 0 && filter.includedKeys.has(key)) { return true; }
+            // Match if any custom text pattern matches (case-insensitive contains)
+            if (filter.textPatterns.size > 0) {
+                const cellStr = String(row[colIdx] == null ? '' : row[colIdx]).toLowerCase();
+                for (const pattern of filter.textPatterns) {
+                    if (cellStr.includes(pattern.toLowerCase())) { return true; }
+                }
+            }
+            return false;
+        });
     }
 
     // Update currentResults.data with the filtered set
@@ -2489,71 +2499,181 @@ function closeFilterDropdown() {
 function showFilterDropdown(columnIndex, headerElement) {
     const values = getDistinctColumnValues(columnIndex);
     const currentFilter = columnFilters.get(columnIndex);
-    // If no filter set yet, all values are included
-    const includedKeys = currentFilter || new Set(values.map(v => v.key));
+    const isAllChecked = !currentFilter || currentFilter.all;
+    const includedKeys = currentFilter ? currentFilter.includedKeys : new Set();
+    const textPatterns = currentFilter ? currentFilter.textPatterns : new Set();
 
     const dropdown = document.createElement('div');
     dropdown.className = 'filter-dropdown';
 
-    // Search box
+    // ── Search box with add-pattern button ──────────────────
+    const searchRow = document.createElement('div');
+    searchRow.className = 'filter-search-row';
+
     const searchBox = document.createElement('input');
     searchBox.type = 'text';
     searchBox.className = 'filter-search';
-    searchBox.placeholder = 'Search values...';
+    searchBox.placeholder = 'Search or add filter...';
     searchBox.addEventListener('input', () => {
         const query = searchBox.value.toLowerCase();
-        dropdown.querySelectorAll('.filter-item').forEach(item => {
+        list.querySelectorAll('.filter-value-item').forEach(item => {
             const label = item.dataset.label.toLowerCase();
             item.style.display = label.includes(query) ? '' : 'none';
         });
+        addPatternBtn.disabled = !searchBox.value.trim();
     });
     searchBox.addEventListener('click', e => e.stopPropagation());
-    dropdown.appendChild(searchBox);
 
-    // Select All / Clear All links
-    const controls = document.createElement('div');
-    controls.className = 'filter-controls';
-
-    const selectAllBtn = document.createElement('button');
-    selectAllBtn.textContent = 'Select all';
-    selectAllBtn.className = 'filter-control-btn';
-    selectAllBtn.addEventListener('click', (e) => {
+    const addPatternBtn = document.createElement('button');
+    addPatternBtn.className = 'filter-add-btn';
+    addPatternBtn.title = 'Add as text filter';
+    addPatternBtn.disabled = true;
+    addPatternBtn.innerHTML = '<svg viewBox="0 0 16 16" width="12" height="12"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>';
+    addPatternBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        dropdown.querySelectorAll('.filter-checkbox').forEach(cb => { cb.checked = true; });
+        addTextPattern();
     });
 
-    const clearAllBtn = document.createElement('button');
-    clearAllBtn.textContent = 'Clear all';
-    clearAllBtn.className = 'filter-control-btn';
-    clearAllBtn.addEventListener('click', (e) => {
+    searchRow.appendChild(searchBox);
+    searchRow.appendChild(addPatternBtn);
+    dropdown.appendChild(searchRow);
+
+    // ── "All" checkbox ──────────────────────────────────────
+    const allItem = document.createElement('div');
+    allItem.className = 'filter-item filter-all-item';
+
+    const allCheckbox = document.createElement('input');
+    allCheckbox.type = 'checkbox';
+    allCheckbox.className = 'filter-checkbox filter-all-checkbox';
+    allCheckbox.checked = isAllChecked;
+    allCheckbox.addEventListener('click', e => e.stopPropagation());
+
+    const allCheckmark = document.createElement('span');
+    allCheckmark.className = 'filter-checkmark';
+
+    const allLabel = document.createElement('span');
+    allLabel.className = 'filter-label';
+    allLabel.textContent = 'All';
+
+    allItem.appendChild(allCheckbox);
+    allItem.appendChild(allCheckmark);
+    allItem.appendChild(allLabel);
+    allItem.addEventListener('click', (e) => {
         e.stopPropagation();
-        dropdown.querySelectorAll('.filter-checkbox').forEach(cb => { cb.checked = false; });
+        allCheckbox.checked = !allCheckbox.checked;
+        if (allCheckbox.checked) {
+            // Uncheck all individual values and remove text patterns
+            list.querySelectorAll('.filter-value-item .filter-checkbox').forEach(cb => { cb.checked = false; });
+            patternsContainer.querySelectorAll('.filter-pattern-checkbox').forEach(cb => { cb.checked = false; });
+        }
+    });
+    dropdown.appendChild(allItem);
+
+    // ── Custom text pattern rows container ──────────────────
+    const patternsContainer = document.createElement('div');
+    patternsContainer.className = 'filter-patterns';
+
+    function addTextPattern() {
+        const text = searchBox.value.trim();
+        if (!text) { return; }
+        // Don't add duplicates
+        const existing = patternsContainer.querySelectorAll('.filter-pattern-item');
+        for (const el of existing) {
+            if (el.dataset.pattern === text) { return; }
+        }
+        createPatternRow(text, true);
+        searchBox.value = '';
+        addPatternBtn.disabled = true;
+        // Reset search filter on value list
+        list.querySelectorAll('.filter-value-item').forEach(item => { item.style.display = ''; });
+        // Uncheck "All" since we're adding a specific filter
+        allCheckbox.checked = false;
+    }
+
+    function createPatternRow(pattern, checked) {
+        const row = document.createElement('div');
+        row.className = 'filter-item filter-pattern-item';
+        row.dataset.pattern = pattern;
+
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.className = 'filter-checkbox filter-pattern-checkbox';
+        cb.checked = checked;
+        cb.dataset.pattern = pattern;
+        cb.addEventListener('click', e => e.stopPropagation());
+
+        const cm = document.createElement('span');
+        cm.className = 'filter-checkmark';
+
+        const label = document.createElement('span');
+        label.className = 'filter-label filter-pattern-label';
+        label.textContent = '"' + pattern + '"';
+
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'filter-pattern-remove';
+        removeBtn.title = 'Remove filter';
+        removeBtn.textContent = '\u00d7';
+        removeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            row.remove();
+        });
+
+        row.appendChild(cb);
+        row.appendChild(cm);
+        row.appendChild(label);
+        row.appendChild(removeBtn);
+        row.addEventListener('click', (e) => {
+            e.stopPropagation();
+            cb.checked = !cb.checked;
+            if (cb.checked) { allCheckbox.checked = false; }
+        });
+        patternsContainer.appendChild(row);
+    }
+
+    // Restore existing text patterns
+    for (const p of textPatterns) {
+        createPatternRow(p, true);
+    }
+
+    searchBox.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            e.stopPropagation();
+            addTextPattern();
+        }
     });
 
-    controls.appendChild(selectAllBtn);
-    controls.appendChild(clearAllBtn);
-    dropdown.appendChild(controls);
+    dropdown.appendChild(patternsContainer);
 
-    // Separator
+    // ── Separator between All/patterns and value list ───────
     const sep = document.createElement('div');
     sep.className = 'filter-separator';
     dropdown.appendChild(sep);
 
-    // Value list
+    // ── Value list ──────────────────────────────────────────
     const list = document.createElement('div');
     list.className = 'filter-list';
 
+    function onValueItemClick(checkbox) {
+        if (checkbox.checked) {
+            allCheckbox.checked = false;
+        }
+    }
+
     for (const v of values) {
-        const item = document.createElement('label');
-        item.className = 'filter-item';
+        const item = document.createElement('div');
+        item.className = 'filter-item filter-value-item';
         item.dataset.label = v.label;
 
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.className = 'filter-checkbox';
-        checkbox.checked = includedKeys.has(v.key);
+        checkbox.checked = !isAllChecked && includedKeys.has(v.key);
         checkbox.dataset.key = v.key;
         checkbox.addEventListener('click', e => e.stopPropagation());
+
+        const checkmark = document.createElement('span');
+        checkmark.className = 'filter-checkmark';
 
         const text = document.createElement('span');
         text.className = 'filter-label';
@@ -2564,13 +2684,19 @@ function showFilterDropdown(columnIndex, headerElement) {
         count.textContent = v.count;
 
         item.appendChild(checkbox);
+        item.appendChild(checkmark);
         item.appendChild(text);
         item.appendChild(count);
+        item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            checkbox.checked = !checkbox.checked;
+            onValueItemClick(checkbox);
+        });
         list.appendChild(item);
     }
     dropdown.appendChild(list);
 
-    // Apply / Cancel buttons
+    // ── Apply / Cancel ─────────────────────────────────────
     const footer = document.createElement('div');
     footer.className = 'filter-footer';
 
@@ -2579,15 +2705,22 @@ function showFilterDropdown(columnIndex, headerElement) {
     applyBtn.className = 'filter-apply-btn';
     applyBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const newIncluded = new Set();
-        dropdown.querySelectorAll('.filter-checkbox').forEach(cb => {
-            if (cb.checked) { newIncluded.add(cb.dataset.key); }
-        });
-        // If all values are selected, remove the filter entry entirely
-        if (newIncluded.size >= values.length) {
+        if (allCheckbox.checked) {
             columnFilters.delete(columnIndex);
         } else {
-            columnFilters.set(columnIndex, newIncluded);
+            const newIncluded = new Set();
+            list.querySelectorAll('.filter-value-item .filter-checkbox').forEach(cb => {
+                if (cb.checked) { newIncluded.add(cb.dataset.key); }
+            });
+            const newPatterns = new Set();
+            patternsContainer.querySelectorAll('.filter-pattern-checkbox').forEach(cb => {
+                if (cb.checked) { newPatterns.add(cb.dataset.pattern); }
+            });
+            columnFilters.set(columnIndex, {
+                all: false,
+                includedKeys: newIncluded,
+                textPatterns: newPatterns
+            });
         }
         closeFilterDropdown();
         applyFilters();
@@ -2647,8 +2780,7 @@ function updateFilterHeaderIcons() {
         const filterBtn = document.querySelector('.filter-btn[data-col-index="' + index + '"]');
         if (filterBtn) {
             const filter = columnFilters.get(index);
-            const allValues = getDistinctColumnValues(index);
-            const isActive = filter && filter.size < allValues.length;
+            const isActive = filter && !filter.all;
             filterBtn.classList.toggle('filter-active', !!isActive);
         }
     });
