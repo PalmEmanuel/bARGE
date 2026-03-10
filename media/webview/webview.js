@@ -2389,8 +2389,20 @@ function filterValueLabel(value) {
  */
 function getDistinctColumnValues(columnIndex) {
     if (!fullData) { return []; }
+
+    // Filter by all OTHER columns so values shown are only those possible
+    // given the current filters on other columns
+    let data = fullData;
+    for (const [colIdx, filter] of columnFilters) {
+        if (colIdx === columnIndex || filter.all) { continue; }
+        data = data.filter(row => {
+            const key = filterValueKey(row[colIdx]);
+            return filter.includedKeys.has(key);
+        });
+    }
+
     const counts = new Map();
-    for (const row of fullData) {
+    for (const row of data) {
         const key = filterValueKey(row[columnIndex]);
         if (!counts.has(key)) {
             counts.set(key, { key, label: filterValueLabel(row[columnIndex]), count: 0 });
@@ -2602,7 +2614,7 @@ function showFilterDropdown(columnIndex, headerElement) {
             allLabel.textContent = 'All';
             allCount.style.display = 'none';
             if (!preserveAllState) {
-                allCheckbox.checked = checkedCount === 0;
+                allCheckbox.checked = totalVisible > 0 && checkedCount === totalVisible;
             }
             if (allCheckbox.checked) {
                 allCheckmark.classList.remove('indeterminate');
@@ -2630,10 +2642,8 @@ function showFilterDropdown(columnIndex, headerElement) {
             allCheckbox.checked = !allVisible;
         } else {
             allCheckbox.checked = !allCheckbox.checked;
-            if (allCheckbox.checked) {
-                // Uncheck all individual values
-                list.querySelectorAll('.filter-value-item .filter-checkbox').forEach(cb => { cb.checked = false; });
-            }
+            // Check or uncheck all individual values to match
+            list.querySelectorAll('.filter-value-item .filter-checkbox').forEach(cb => { cb.checked = allCheckbox.checked; });
         }
         updateAllCheckboxState(true);
         onFilterChange();
@@ -2649,10 +2659,7 @@ function showFilterDropdown(columnIndex, headerElement) {
     const list = document.createElement('div');
     list.className = 'filter-list';
 
-    function onValueItemClick(checkbox) {
-        if (checkbox.checked) {
-            allCheckbox.checked = false;
-        }
+    function onValueItemClick() {
         updateAllCheckboxState();
     }
 
@@ -2664,7 +2671,7 @@ function showFilterDropdown(columnIndex, headerElement) {
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.className = 'filter-checkbox';
-        checkbox.checked = !isAllChecked && includedKeys.has(v.key);
+        checkbox.checked = isAllChecked || includedKeys.has(v.key);
         checkbox.dataset.key = v.key;
         checkbox.addEventListener('click', e => e.stopPropagation());
 
@@ -2686,7 +2693,7 @@ function showFilterDropdown(columnIndex, headerElement) {
         item.addEventListener('click', (e) => {
             e.stopPropagation();
             checkbox.checked = !checkbox.checked;
-            onValueItemClick(checkbox);
+            onValueItemClick();
             onFilterChange();
         });
         list.appendChild(item);
@@ -2697,21 +2704,31 @@ function showFilterDropdown(columnIndex, headerElement) {
     updateAllCheckboxState();
 
     // ── Commit filter state helper ────────────────────────
+    let suppressScroll = false;
+
     function commitFilters() {
-        if (allCheckbox.checked) {
+        const allValueCheckboxes = list.querySelectorAll('.filter-value-item .filter-checkbox');
+        const checkedCount = Array.from(allValueCheckboxes).filter(cb => cb.checked).length;
+        if (allCheckbox.checked || checkedCount === allValueCheckboxes.length) {
+            // All checked (or All toggled) = no filter
+            allCheckbox.checked = true;
             columnFilters.delete(columnIndex);
+            clearColBtn.disabled = true;
         } else {
             const newIncluded = new Set();
-            list.querySelectorAll('.filter-value-item .filter-checkbox').forEach(cb => {
+            allValueCheckboxes.forEach(cb => {
                 if (cb.checked) { newIncluded.add(cb.dataset.key); }
             });
             columnFilters.set(columnIndex, {
                 all: false,
                 includedKeys: newIncluded
             });
+            clearColBtn.disabled = false;
         }
+        suppressScroll = true;
         applyFilters();
         updateFilterHeaderIcons();
+        requestAnimationFrame(() => { suppressScroll = false; });
     }
 
     let autoApply = true;
@@ -2752,15 +2769,32 @@ function showFilterDropdown(columnIndex, headerElement) {
 
     const applyBtn = document.createElement('button');
     applyBtn.textContent = 'Apply';
-    applyBtn.className = 'filter-apply-btn';
+    applyBtn.className = 'filter-action-btn';
+    applyBtn.style.marginLeft = 'auto';
     applyBtn.disabled = true;
     applyBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         commitFilters();
     });
 
+    const clearColBtn = document.createElement('button');
+    clearColBtn.textContent = 'Clear';
+    clearColBtn.className = 'filter-action-btn';
+    clearColBtn.disabled = isAllChecked;
+    clearColBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        allCheckbox.checked = true;
+        list.querySelectorAll('.filter-value-item .filter-checkbox').forEach(cb => { cb.checked = true; });
+        searchBox.value = '';
+        list.querySelectorAll('.filter-value-item').forEach(item => { item.style.display = ''; });
+        updateAllCheckboxState();
+        onFilterChange();
+        clearColBtn.disabled = true;
+    });
+
     footer.appendChild(autoApplyItem);
     footer.appendChild(applyBtn);
+    footer.appendChild(clearColBtn);
     dropdown.appendChild(footer);
 
     // Position relative to the header cell using fixed positioning (sticky th can't be relatively positioned)
@@ -2780,6 +2814,7 @@ function showFilterDropdown(columnIndex, headerElement) {
         }
     }
     function scrollHandler() {
+        if (suppressScroll) { return; }
         cleanup();
     }
     function cleanup() {

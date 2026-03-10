@@ -1081,6 +1081,12 @@
             border-color: var(--vscode-notificationsInfoIcon-foreground, var(--vscode-focusBorder));
         }
 
+        .filter-sort-btn:disabled {
+            opacity: 0.3;
+            cursor: default;
+            pointer-events: none;
+        }
+
         .filter-all-item {
             font-weight: 500;
         }
@@ -1187,7 +1193,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            padding: 6px 8px 4px;
+            padding: 6px 10px 0px;
             border-top: 1px solid var(--vscode-menu-separatorBackground, var(--vscode-widget-border));
             margin-top: 4px;
         }
@@ -1207,9 +1213,8 @@
             cursor: pointer;
         }
 
-        .filter-apply-btn {
-            margin-left: auto;
-            padding: 4px 14px;
+        .filter-action-btn {
+            padding: 4px 8px;
             border: none;
             border-radius: 2px;
             background: var(--vscode-button-background);
@@ -1219,11 +1224,11 @@
             cursor: pointer;
         }
 
-        .filter-apply-btn:hover {
+        .filter-action-btn:hover {
             background: var(--vscode-button-hoverBackground);
         }
 
-        .filter-apply-btn:disabled {
+        .filter-action-btn:disabled {
             opacity: 0.4;
             cursor: default;
             pointer-events: none;
