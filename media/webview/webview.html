@@ -354,57 +354,41 @@
 
         /* Resolve GUID button styling */
         .resolve-guid-btn {
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            width: 20px !important;
-            height: 20px !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            background: none !important;
-            border: none !important;
-            cursor: pointer !important;
-            border-radius: 4px !important;
-            outline: none !important;
-            transition: background-color 0.2s ease !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--vscode-descriptionForeground);
+            opacity: 0.7;
+            padding: 2px;
+            border-radius: 3px;
+            transition: opacity 0.15s ease, color 0.1s ease, background-color 0.1s ease;
         }
 
         .resolve-guid-btn:hover:not([disabled]) {
-            background-color: var(--vscode-toolbar-hoverBackground, rgba(255, 255, 255, 0.1)) !important;
+            opacity: 1;
+            background-color: var(--vscode-toolbar-hoverBackground);
+            color: var(--vscode-foreground);
         }
 
         .resolve-guid-btn[disabled] {
-            cursor: not-allowed !important;
-            opacity: 0.3 !important;
+            cursor: not-allowed;
+            opacity: 0.3;
+            pointer-events: none;
         }
 
         .resolve-guid-btn .icon {
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            width: 100% !important;
-            height: 100% !important;
-            pointer-events: none !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
         }
 
         .resolve-guid-btn .icon .codicon {
-            color: var(--vscode-foreground) !important;
-            font-size: 14px !important;
-            font-weight: bold !important;
-            line-height: 1 !important;
-            transition: color 0.2s ease !important;
-        }
-
-        .resolve-guid-btn:hover:not([disabled]) .icon .codicon {
-            color: #ffffff !important;
-        }
-
-        .resolve-guid-btn:active:not([disabled]) .icon .codicon {
-            transform: scale(1.1) !important;
-        }
-
-        .resolve-guid-btn[disabled] .icon .codicon {
-            color: var(--vscode-disabledForeground, #666) !important;
+            font-size: 14px;
+            line-height: 1;
         }
 
         th.detail-button-cell.select-all-header:hover svg {
@@ -456,40 +440,6 @@
             outline: none !important;
             box-shadow: none !important;
             background-color: transparent !important;
-        }
-
-        /* Resolve GUID button styles */
-        .resolve-guid-btn {
-            background: none !important;
-            border: none !important;
-            cursor: pointer !important;
-            padding: 2px !important;
-            color: var(--vscode-descriptionForeground) !important;
-            opacity: 0.7 !important;
-            transition: all 0.2s ease !important;
-            border-radius: 2px !important;
-            pointer-events: auto !important;
-        }
-
-        .resolve-guid-btn:hover {
-            opacity: 1 !important;
-            color: var(--vscode-foreground) !important;
-        }
-
-        .resolve-guid-btn:active {
-            color: var(--vscode-foreground) !important;
-        }
-
-        /* Disabled state for resolve buttons */
-        .resolve-guid-btn[disabled] {
-            opacity: 0.3 !important;
-            cursor: not-allowed !important;
-            pointer-events: none !important;
-        }
-
-        .resolve-guid-btn[disabled]:hover {
-            opacity: 0.3 !important;
-            color: var(--vscode-descriptionForeground) !important;
         }
 
         /* Context menu for resolve options */
@@ -631,12 +581,6 @@
         .column-expanding {
             white-space: nowrap;
             overflow: hidden;
-        }
-
-        /* Resolve button hover effect */
-        .resolve-guid-btn:hover {
-            opacity: 1 !important;
-            background-color: var(--vscode-toolbar-hoverBackground) !important;
         }
 
         .json-viewer {
@@ -977,6 +921,15 @@
             flex-wrap: nowrap;
         }
 
+        /* ── Header actions group (resolve + filter buttons) ──── */
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
         /* ── Column filter button ─────────────────────────────── */
         .filter-btn {
             display: inline-flex;
@@ -988,7 +941,6 @@
             color: var(--vscode-descriptionForeground);
             opacity: 0;
             padding: 2px;
-            margin-left: auto;
             vertical-align: middle;
             border-radius: 3px;
             transition: opacity 0.15s ease, color 0.1s ease, background-color 0.1s ease;

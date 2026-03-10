@@ -592,9 +592,12 @@ function displayResults(result, preserveDetailsPane = false) {
             '<div class="header-content">' +
             '<span class="header-text">' + col.name + '</span>';
 
-        // Add filter button
+        // Add header actions group (filter button + resolve button, pushed right)
         const colFilter = columnFilters.get(index);
         const filterActive = colFilter && !colFilter.all;
+        tableHtml += '<div class="header-actions">';
+
+        // Add filter button
         tableHtml += '<button class="filter-btn' + (filterActive ? ' filter-active' : '') + '" ' +
             'data-col-index="' + index + '" ' +
             'onclick="toggleFilterDropdown(event, ' + index + ')" ' +
@@ -602,19 +605,20 @@ function displayResults(result, preserveDetailsPane = false) {
             '<svg viewBox="0 0 16 16" width="12" height="12">' +
             '<path d="M1 2h14l-5 6v5l-4 1V8L1 2z" fill="currentColor"/>' +
             '</svg>' +
-            '</button>' +
-            '</div>';
+            '</button>';
 
-        // Add resolve button if this is a GUID column (show disabled if another column is resolving)
+        // Add resolve button if this is a GUID column (rightmost, always visible)
         if (showResolveBtn) {
             const disabledAttr = isDisabled ? 'disabled="disabled"' : '';
             const clickHandler = isDisabled ? '' : 'onclick="showResolveMenu(event, ' + index + ', \'' + col.name + '\')"';
 
             tableHtml += '<button class="resolve-guid-btn" ' + disabledAttr + ' ' + clickHandler + ' title="' +
-                (isDisabled ? 'Another column is being resolved' : 'Resolve GUIDs in this column') + '" ' +
-                'style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%);">' +
+                (isDisabled ? 'Another column is being resolved' : 'Resolve GUIDs in this column') + '">' +
                 '<div class="icon"><i class="codicon codicon-search-sparkle"></i></div></button>';
         }
+
+        tableHtml += '</div>' +
+            '</div>';
 
         tableHtml += '<div class="resize-handle" onmousedown="startResize(event, ' + index + ')"></div>' +
             '</th>';
@@ -5525,3 +5529,6 @@ function updateResolvedColumn(resolvedColumnName, resolvedData, isPartial = fals
         displayResults(currentResults, true);
     }
 }
+
+// Signal to the extension host that the webview is ready to receive messages
+vscode.postMessage({ type: 'webviewReady' });
