@@ -2370,6 +2370,11 @@ function sortTable(columnIndex, keepDirection, forceDirection) {
  */
 function filterValueKey(value) {
     if (value == null) { return '<<null>>'; }
+    if (typeof value === 'string' && value.startsWith('__HTML__')) {
+        const tmp = document.createElement('div');
+        tmp.innerHTML = value.substring(8);
+        return tmp.textContent || '';
+    }
     if (typeof value === 'object') { return JSON.stringify(value); }
     return String(value);
 }
@@ -2379,6 +2384,13 @@ function filterValueKey(value) {
  */
 function filterValueLabel(value) {
     if (value == null || value === '') { return '(Blank)'; }
+    if (typeof value === 'string' && value.startsWith('__HTML__')) {
+        const tmp = document.createElement('div');
+        tmp.innerHTML = value.substring(8);
+        const text = tmp.textContent || '';
+        if (text === '') { return '(Blank)'; }
+        return text.length > 80 ? text.substring(0, 77) + '...' : text;
+    }
     if (typeof value === 'object') {
         const json = JSON.stringify(value);
         return json.length > 80 ? json.substring(0, 77) + '...' : json;
@@ -3270,6 +3282,30 @@ function autoFitColumn(columnIndex) {
 
     if (currentResults.columns[columnIndex]) {
         currentResults.columns[columnIndex].width = fitWidth + 'px';
+    }
+}
+
+function fitColumnToHeader(columnIndex) {
+    const th = document.querySelector('th[data-col-index="' + columnIndex + '"]');
+    if (!th) return;
+
+    const headerTextEl = th.querySelector('.header-text') || th;
+    const span = document.createElement('span');
+    span.style.visibility = 'hidden';
+    span.style.position = 'absolute';
+    span.style.whiteSpace = 'nowrap';
+    span.style.font = window.getComputedStyle(th).font;
+    span.textContent = headerTextEl.textContent;
+    document.body.appendChild(span);
+    const textWidth = span.offsetWidth;
+    document.body.removeChild(span);
+
+    // header text + sort arrow space + filter button + padding
+    const headerWidth = textWidth + 40;
+    th.style.width = headerWidth + 'px';
+
+    if (currentResults && currentResults.columns[columnIndex]) {
+        currentResults.columns[columnIndex].width = headerWidth + 'px';
     }
 }
 
@@ -4954,6 +4990,9 @@ function addResolvedColumn(originalColumnIndex, originalColumnName, resolveType)
     // Re-render table
     displayResults(currentResults, true);
 
+    // Size the new column to fit its header name
+    fitColumnToHeader(newColumnIndex);
+
     // Return the new column index
     return newColumnIndex;
 }
@@ -4990,6 +5029,9 @@ function addResolvedColumnForSingleCell(originalColumnIndex, originalColumnName,
 
     // Re-render table
     displayResults(currentResults, true);
+
+    // Size the new column to fit its header name
+    fitColumnToHeader(newColumnIndex);
 
     // Return the new column index
     return newColumnIndex;
