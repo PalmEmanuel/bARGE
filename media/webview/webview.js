@@ -1,10 +1,16 @@
 const vscode = acquireVsCodeApi();
 let currentResults = null;
+let fullData = null; // Unfiltered original data — filtering operates on this
 let sortState = { column: null, direction: null };
 let resolvedColumns = new Map(); // Store resolved identity data by resolved column name
 let resolvedCells = new Set(); // Store individually resolved cells as "row-col" strings
 let animatingCells = new Set(); // Track cells that are currently animating to avoid disruption
 let currentlyResolvingColumn = null; // Track which column name is currently being resolved to prevent conflicts
+
+// Column filter state: Map<columnIndex, Set<displayValue>>
+// Each entry holds the set of values that are **included** (checked).
+let columnFilters = new Map();
+let activeFilterDropdown = null; // Currently open filter dropdown column index
 
 // GUID detection utilities
 const GUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -495,6 +501,13 @@ function formatCellValue(cell) {
 function displayResults(result, preserveDetailsPane = false) {
     currentResults = result;
 
+    // When this is a fresh query (not a filter/sort refresh), store the full dataset and clear filters
+    if (!preserveDetailsPane) {
+        fullData = result.data ? [...result.data] : null;
+        columnFilters.clear();
+        closeFilterDropdown();
+    }
+
     // Close details pane when new query results are displayed, unless preserving it
     if (!preserveDetailsPane && selectedDetailRowIndices.length > 0) {
         closeDetails();
@@ -572,6 +585,17 @@ function displayResults(result, preserveDetailsPane = false) {
             'ondragend="handleDragEnd(event)"' +
             'title="' + col.name + '">' +
             '<span class="header-text">' + col.name + '</span>';
+
+        // Add filter button
+        const filterActive = columnFilters.has(index) && columnFilters.get(index).size < getDistinctColumnValues(index).length;
+        tableHtml += '<button class="filter-btn' + (filterActive ? ' filter-active' : '') + '" ' +
+            'data-col-index="' + index + '" ' +
+            'onclick="toggleFilterDropdown(event, ' + index + ')" ' +
+            'title="Filter this column">' +
+            '<svg viewBox="0 0 16 16" width="12" height="12">' +
+            '<path d="M1 2h14l-5 6v5l-4 1V8L1 2z" fill="currentColor"/>' +
+            '</svg>' +
+            '</button>';
 
         // Add resolve button if this is a GUID column (show disabled if another column is resolving)
         if (showResolveBtn) {
@@ -2272,12 +2296,17 @@ function updateTableAfterSort(sortedData) {
     updateDetailsAfterSort();
 }
 
-function sortTable(columnIndex) {
+function sortTable(columnIndex, keepDirection) {
     if (!currentResults || !currentResults.data) return;
 
-    let direction = 'asc';
-    if (sortState.column === columnIndex && sortState.direction === 'asc') {
-        direction = 'desc';
+    let direction;
+    if (keepDirection && sortState.column === columnIndex && sortState.direction) {
+        direction = sortState.direction;
+    } else {
+        direction = 'asc';
+        if (sortState.column === columnIndex && sortState.direction === 'asc') {
+            direction = 'desc';
+        }
     }
 
     sortState = { column: columnIndex, direction };
@@ -2307,6 +2336,322 @@ function sortTable(columnIndex) {
     });
 
     updateTableAfterSort(sortedData);
+}
+
+// ── Column Filtering ───────────────────────────────────────────────────
+
+/**
+ * Get a stable string key for a cell value (used for filter set membership).
+ */
+function filterValueKey(value) {
+    if (value == null) { return '<<null>>'; }
+    if (typeof value === 'object') { return JSON.stringify(value); }
+    return String(value);
+}
+
+/**
+ * Get a human-readable label for a cell value in the filter list.
+ */
+function filterValueLabel(value) {
+    if (value == null || value === '') { return '(Blank)'; }
+    if (typeof value === 'object') {
+        const json = JSON.stringify(value);
+        return json.length > 80 ? json.substring(0, 77) + '...' : json;
+    }
+    const str = String(value);
+    return str.length > 80 ? str.substring(0, 77) + '...' : str;
+}
+
+/**
+ * Collect distinct values for a column from the full (unfiltered) dataset.
+ * Returns an array of { key, label, count } sorted alphabetically by label.
+ */
+function getDistinctColumnValues(columnIndex) {
+    if (!fullData) { return []; }
+    const counts = new Map();
+    for (const row of fullData) {
+        const key = filterValueKey(row[columnIndex]);
+        if (!counts.has(key)) {
+            counts.set(key, { key, label: filterValueLabel(row[columnIndex]), count: 0 });
+        }
+        counts.get(key).count++;
+    }
+    const values = Array.from(counts.values());
+    values.sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: 'base' }));
+    return values;
+}
+
+/**
+ * Return true if any column has an active (non-full) filter.
+ */
+function hasActiveFilters() {
+    if (columnFilters.size === 0) { return false; }
+    for (const [colIdx, includedKeys] of columnFilters) {
+        const allValues = getDistinctColumnValues(colIdx);
+        if (includedKeys.size < allValues.length) { return true; }
+    }
+    return false;
+}
+
+/**
+ * Apply all active filters to fullData and update the displayed table.
+ */
+function applyFilters() {
+    if (!fullData || !currentResults) { return; }
+
+    let filtered = fullData;
+
+    // Apply each column filter
+    for (const [colIdx, includedKeys] of columnFilters) {
+        const allValues = getDistinctColumnValues(colIdx);
+        // Skip if everything is included (no real filter)
+        if (includedKeys.size >= allValues.length) { continue; }
+        filtered = filtered.filter(row => includedKeys.has(filterValueKey(row[colIdx])));
+    }
+
+    // Update currentResults.data with the filtered set
+    currentResults = { ...currentResults, data: filtered };
+
+    // Re-apply sort if active
+    if (sortState.column !== null) {
+        sortTable(sortState.column, true);
+    } else {
+        displayResults(currentResults, true);
+    }
+
+    updateFilterInfo();
+}
+
+/**
+ * Update the results info bar to show filter status.
+ */
+function updateFilterInfo() {
+    const resultsInfo = document.getElementById('resultsInfo');
+    if (!resultsInfo || !currentResults || !fullData) { return; }
+
+    const executionTimeText = currentResults.executionTimeMs
+        ? ' • ' + currentResults.executionTimeMs + 'ms' : '';
+    const timestampText = currentResults.timestamp
+        ? ' • ' + formatTimestamp(currentResults.timestamp) : '';
+
+    const clearBtn = document.getElementById('clearFiltersBtn');
+
+    if (hasActiveFilters()) {
+        const shown = currentResults.data.length;
+        const total = fullData.length;
+        resultsInfo.textContent = shown + ' of ' + total + ' results (filtered)' + executionTimeText + timestampText;
+        if (clearBtn) { clearBtn.style.display = ''; }
+    } else {
+        resultsInfo.textContent = (currentResults.totalRecords || fullData.length) + ' results' + executionTimeText + timestampText;
+        if (clearBtn) { clearBtn.style.display = 'none'; }
+    }
+}
+
+/**
+ * Clear all column filters and refresh.
+ */
+function clearAllFilters() {
+    columnFilters.clear();
+    closeFilterDropdown();
+    applyFilters();
+    updateFilterHeaderIcons();
+}
+
+/**
+ * Toggle the filter dropdown for a column.
+ */
+function toggleFilterDropdown(event, columnIndex) {
+    event.stopPropagation();
+    event.preventDefault();
+
+    if (activeFilterDropdown === columnIndex) {
+        closeFilterDropdown();
+        return;
+    }
+
+    closeFilterDropdown();
+    activeFilterDropdown = columnIndex;
+    showFilterDropdown(columnIndex, event.target.closest('th'));
+}
+
+/**
+ * Close any open filter dropdown.
+ */
+function closeFilterDropdown() {
+    const existing = document.querySelector('.filter-dropdown');
+    if (existing) { existing.remove(); }
+    activeFilterDropdown = null;
+}
+
+/**
+ * Build and show the filter dropdown for a column.
+ */
+function showFilterDropdown(columnIndex, headerElement) {
+    const values = getDistinctColumnValues(columnIndex);
+    const currentFilter = columnFilters.get(columnIndex);
+    // If no filter set yet, all values are included
+    const includedKeys = currentFilter || new Set(values.map(v => v.key));
+
+    const dropdown = document.createElement('div');
+    dropdown.className = 'filter-dropdown';
+
+    // Search box
+    const searchBox = document.createElement('input');
+    searchBox.type = 'text';
+    searchBox.className = 'filter-search';
+    searchBox.placeholder = 'Search values...';
+    searchBox.addEventListener('input', () => {
+        const query = searchBox.value.toLowerCase();
+        dropdown.querySelectorAll('.filter-item').forEach(item => {
+            const label = item.dataset.label.toLowerCase();
+            item.style.display = label.includes(query) ? '' : 'none';
+        });
+    });
+    searchBox.addEventListener('click', e => e.stopPropagation());
+    dropdown.appendChild(searchBox);
+
+    // Select All / Clear All links
+    const controls = document.createElement('div');
+    controls.className = 'filter-controls';
+
+    const selectAllBtn = document.createElement('button');
+    selectAllBtn.textContent = 'Select all';
+    selectAllBtn.className = 'filter-control-btn';
+    selectAllBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown.querySelectorAll('.filter-checkbox').forEach(cb => { cb.checked = true; });
+    });
+
+    const clearAllBtn = document.createElement('button');
+    clearAllBtn.textContent = 'Clear all';
+    clearAllBtn.className = 'filter-control-btn';
+    clearAllBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown.querySelectorAll('.filter-checkbox').forEach(cb => { cb.checked = false; });
+    });
+
+    controls.appendChild(selectAllBtn);
+    controls.appendChild(clearAllBtn);
+    dropdown.appendChild(controls);
+
+    // Separator
+    const sep = document.createElement('div');
+    sep.className = 'filter-separator';
+    dropdown.appendChild(sep);
+
+    // Value list
+    const list = document.createElement('div');
+    list.className = 'filter-list';
+
+    for (const v of values) {
+        const item = document.createElement('label');
+        item.className = 'filter-item';
+        item.dataset.label = v.label;
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.className = 'filter-checkbox';
+        checkbox.checked = includedKeys.has(v.key);
+        checkbox.dataset.key = v.key;
+        checkbox.addEventListener('click', e => e.stopPropagation());
+
+        const text = document.createElement('span');
+        text.className = 'filter-label';
+        text.textContent = v.label;
+
+        const count = document.createElement('span');
+        count.className = 'filter-count';
+        count.textContent = v.count;
+
+        item.appendChild(checkbox);
+        item.appendChild(text);
+        item.appendChild(count);
+        list.appendChild(item);
+    }
+    dropdown.appendChild(list);
+
+    // Apply / Cancel buttons
+    const footer = document.createElement('div');
+    footer.className = 'filter-footer';
+
+    const applyBtn = document.createElement('button');
+    applyBtn.textContent = 'Apply';
+    applyBtn.className = 'filter-apply-btn';
+    applyBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const newIncluded = new Set();
+        dropdown.querySelectorAll('.filter-checkbox').forEach(cb => {
+            if (cb.checked) { newIncluded.add(cb.dataset.key); }
+        });
+        // If all values are selected, remove the filter entry entirely
+        if (newIncluded.size >= values.length) {
+            columnFilters.delete(columnIndex);
+        } else {
+            columnFilters.set(columnIndex, newIncluded);
+        }
+        closeFilterDropdown();
+        applyFilters();
+        updateFilterHeaderIcons();
+    });
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.className = 'filter-cancel-btn';
+    cancelBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeFilterDropdown();
+    });
+
+    footer.appendChild(applyBtn);
+    footer.appendChild(cancelBtn);
+    dropdown.appendChild(footer);
+
+    // Position relative to the header cell using fixed positioning (sticky th can't be relatively positioned)
+    const rect = headerElement.getBoundingClientRect();
+    dropdown.style.position = 'fixed';
+    dropdown.style.top = rect.bottom + 'px';
+    dropdown.style.left = rect.left + 'px';
+    document.body.appendChild(dropdown);
+
+    // Focus the search box
+    setTimeout(() => searchBox.focus(), 0);
+
+    // Close on outside click or scroll
+    function outsideClickHandler(e) {
+        if (!dropdown.contains(e.target) && !e.target.closest('.filter-btn')) {
+            cleanup();
+        }
+    }
+    function scrollHandler() {
+        cleanup();
+    }
+    function cleanup() {
+        closeFilterDropdown();
+        document.removeEventListener('click', outsideClickHandler);
+        const tableContainer = document.querySelector('.table-container');
+        if (tableContainer) { tableContainer.removeEventListener('scroll', scrollHandler); }
+    }
+    setTimeout(() => {
+        document.addEventListener('click', outsideClickHandler);
+        const tableContainer = document.querySelector('.table-container');
+        if (tableContainer) { tableContainer.addEventListener('scroll', scrollHandler); }
+    }, 0);
+}
+
+/**
+ * Update filter icons in column headers to reflect active state.
+ */
+function updateFilterHeaderIcons() {
+    if (!currentResults || !currentResults.columns) { return; }
+    currentResults.columns.forEach((col, index) => {
+        const filterBtn = document.querySelector('.filter-btn[data-col-index="' + index + '"]');
+        if (filterBtn) {
+            const filter = columnFilters.get(index);
+            const allValues = getDistinctColumnValues(index);
+            const isActive = filter && filter.size < allValues.length;
+            filterBtn.classList.toggle('filter-active', !!isActive);
+        }
+    });
 }
 
 function exportToCsv() {
@@ -2649,10 +2994,14 @@ function stopResize() {
 let draggedColumn = null;
 
 function handleHeaderClick(event, columnIndex) {
-    // Only sort if we're not clicking on the resize handle
-    if (!event.target.classList.contains('resize-handle')) {
-        sortTable(columnIndex);
+    // Don't sort if clicking on the resize handle, filter button, or resolve button
+    if (event.target.classList.contains('resize-handle')
+        || event.target.closest('.filter-btn')
+        || event.target.closest('.filter-dropdown')
+        || event.target.closest('.resolve-guid-btn')) {
+        return;
     }
+    sortTable(columnIndex);
 }
 
 function handleDragStart(event, columnIndex) {
