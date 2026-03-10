@@ -2488,10 +2488,10 @@ function updateFilterInfo() {
     if (hasActiveFilters()) {
         const shown = currentResults.data.length;
         const total = fullData.length;
-        resultsInfo.textContent = shown + ' of ' + total + ' results (filtered)' + executionTimeText + timestampText;
+        resultsInfo.textContent = shown + ' of ' + total + ' records (filtered)' + executionTimeText + timestampText;
         if (clearBtn) { clearBtn.disabled = false; }
     } else {
-        resultsInfo.textContent = (currentResults.totalRecords || fullData.length) + ' results' + executionTimeText + timestampText;
+        resultsInfo.textContent = (currentResults.totalRecords || fullData.length) + ' records' + executionTimeText + timestampText;
         if (clearBtn) { clearBtn.disabled = true; }
     }
 }
