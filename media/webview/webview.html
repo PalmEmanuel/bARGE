@@ -869,6 +869,12 @@
             color: var(--vscode-descriptionForeground);
         }
 
+        .footer-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
         .footer-btn {
             background-color: var(--vscode-button-background);
             color: var(--vscode-button-foreground);
@@ -881,6 +887,12 @@
 
         .footer-btn:hover {
             background-color: var(--vscode-button-hoverBackground);
+        }
+
+        .footer-btn:disabled {
+            opacity: 0.4;
+            cursor: default;
+            pointer-events: none;
         }
 
         .results-table {
@@ -1049,6 +1061,8 @@
             background: var(--vscode-input-background);
             color: var(--vscode-descriptionForeground);
             cursor: pointer;
+            font: inherit;
+            font-weight: bold;
             transition: color 0.1s ease, border-color 0.1s ease;
         }
 
@@ -1152,20 +1166,36 @@
 
         .filter-footer {
             display: flex;
+            align-items: center;
             gap: 6px;
-            padding: 6px 8px 2px;
+            padding: 6px 8px 4px;
             border-top: 1px solid var(--vscode-menu-separatorBackground, var(--vscode-widget-border));
             margin-top: 4px;
-            justify-content: flex-end;
+        }
+
+        .filter-auto-apply {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: var(--vscode-descriptionForeground);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .filter-auto-apply input {
+            margin: 0;
+            cursor: pointer;
         }
 
         .filter-apply-btn {
+            margin-left: auto;
             padding: 4px 14px;
             border: none;
             border-radius: 2px;
             background: var(--vscode-button-background);
             color: var(--vscode-button-foreground);
-            font-size: 13px;
+            font-size: 0.9em;
             font-family: inherit;
             cursor: pointer;
         }
@@ -1174,19 +1204,10 @@
             background: var(--vscode-button-hoverBackground);
         }
 
-        .filter-cancel-btn {
-            padding: 4px 14px;
-            border: 1px solid var(--vscode-button-secondaryBorder, transparent);
-            border-radius: 2px;
-            background: var(--vscode-button-secondaryBackground);
-            color: var(--vscode-button-secondaryForeground);
-            font-size: 13px;
-            font-family: inherit;
-            cursor: pointer;
-        }
-
-        .filter-cancel-btn:hover {
-            background: var(--vscode-button-secondaryHoverBackground);
+        .filter-apply-btn:disabled {
+            opacity: 0.4;
+            cursor: default;
+            pointer-events: none;
         }
 
         .results-table td {
@@ -1674,8 +1695,10 @@
 
     <div class="footer">
         <div id="resultsInfo" class="results-info">No results yet. Run a query to see results here.</div>
-        <button id="clearFiltersBtn" class="footer-btn" onclick="clearAllFilters()" style="display: none;">Clear Filters</button>
-        <button id="exportBtn" class="footer-btn" onclick="exportToCsv()" style="display: none;">Export CSV</button>
+        <div class="footer-actions">
+            <button id="clearFiltersBtn" class="footer-btn" onclick="clearAllFilters()" disabled>Clear Filters</button>
+            <button id="exportBtn" class="footer-btn" onclick="exportToCsv()" style="display: none;">Export CSV</button>
+        </div>
     </div>
 
     <script nonce="{{NONCE}}">

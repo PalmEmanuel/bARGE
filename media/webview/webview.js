@@ -2461,10 +2461,10 @@ function updateFilterInfo() {
         const shown = currentResults.data.length;
         const total = fullData.length;
         resultsInfo.textContent = shown + ' of ' + total + ' results (filtered)' + executionTimeText + timestampText;
-        if (clearBtn) { clearBtn.style.display = ''; }
+        if (clearBtn) { clearBtn.disabled = false; }
     } else {
         resultsInfo.textContent = (currentResults.totalRecords || fullData.length) + ' results' + executionTimeText + timestampText;
-        if (clearBtn) { clearBtn.style.display = 'none'; }
+        if (clearBtn) { clearBtn.disabled = true; }
     }
 }
 
@@ -2536,7 +2536,7 @@ function showFilterDropdown(columnIndex, headerElement) {
     const sortAscBtn = document.createElement('button');
     sortAscBtn.className = 'filter-sort-btn' + (sortState.column === columnIndex && sortState.direction === 'asc' ? ' sort-active' : '');
     sortAscBtn.title = 'Sort ascending';
-    sortAscBtn.innerHTML = '<svg viewBox="0 0 16 16" width="12" height="12"><path d="M8 3L3 9h10L8 3z" fill="currentColor"/></svg>';
+    sortAscBtn.textContent = '↑';
     sortAscBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         sortTable(columnIndex, false, 'asc');
@@ -2547,7 +2547,7 @@ function showFilterDropdown(columnIndex, headerElement) {
     const sortDescBtn = document.createElement('button');
     sortDescBtn.className = 'filter-sort-btn' + (sortState.column === columnIndex && sortState.direction === 'desc' ? ' sort-active' : '');
     sortDescBtn.title = 'Sort descending';
-    sortDescBtn.innerHTML = '<svg viewBox="0 0 16 16" width="12" height="12"><path d="M8 13L3 7h10L8 13z" fill="currentColor"/></svg>';
+    sortDescBtn.textContent = '↓';
     sortDescBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         sortTable(columnIndex, false, 'desc');
@@ -2587,6 +2587,7 @@ function showFilterDropdown(columnIndex, headerElement) {
             // Uncheck all individual values
             list.querySelectorAll('.filter-value-item .filter-checkbox').forEach(cb => { cb.checked = false; });
         }
+        onFilterChange();
     });
     dropdown.appendChild(allItem);
 
@@ -2636,20 +2637,14 @@ function showFilterDropdown(columnIndex, headerElement) {
             e.stopPropagation();
             checkbox.checked = !checkbox.checked;
             onValueItemClick(checkbox);
+            onFilterChange();
         });
         list.appendChild(item);
     }
     dropdown.appendChild(list);
 
-    // ── Apply / Cancel ─────────────────────────────────────
-    const footer = document.createElement('div');
-    footer.className = 'filter-footer';
-
-    const applyBtn = document.createElement('button');
-    applyBtn.textContent = 'Apply';
-    applyBtn.className = 'filter-apply-btn';
-    applyBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
+    // ── Commit filter state helper ────────────────────────
+    function commitFilters() {
         if (allCheckbox.checked) {
             columnFilters.delete(columnIndex);
         } else {
@@ -2662,21 +2657,57 @@ function showFilterDropdown(columnIndex, headerElement) {
                 includedKeys: newIncluded
             });
         }
-        closeFilterDropdown();
         applyFilters();
         updateFilterHeaderIcons();
-    });
+    }
 
-    const cancelBtn = document.createElement('button');
-    cancelBtn.textContent = 'Cancel';
-    cancelBtn.className = 'filter-cancel-btn';
-    cancelBtn.addEventListener('click', (e) => {
+    let autoApply = true;
+
+    function onFilterChange() {
+        if (autoApply) { commitFilters(); }
+    }
+
+    // ── Apply / Auto-apply ─────────────────────────────────
+    const footer = document.createElement('div');
+    footer.className = 'filter-footer';
+
+    const autoApplyItem = document.createElement('div');
+    autoApplyItem.className = 'filter-auto-apply';
+
+    const autoApplyCheckbox = document.createElement('input');
+    autoApplyCheckbox.type = 'checkbox';
+    autoApplyCheckbox.className = 'filter-checkbox';
+    autoApplyCheckbox.checked = true;
+    autoApplyCheckbox.addEventListener('click', e => e.stopPropagation());
+
+    const autoApplyCheckmark = document.createElement('span');
+    autoApplyCheckmark.className = 'filter-checkmark';
+
+    const autoApplyText = document.createElement('span');
+    autoApplyText.textContent = 'Auto-apply';
+
+    autoApplyItem.appendChild(autoApplyCheckbox);
+    autoApplyItem.appendChild(autoApplyCheckmark);
+    autoApplyItem.appendChild(autoApplyText);
+    autoApplyItem.addEventListener('click', (e) => {
         e.stopPropagation();
-        closeFilterDropdown();
+        autoApplyCheckbox.checked = !autoApplyCheckbox.checked;
+        autoApply = autoApplyCheckbox.checked;
+        applyBtn.disabled = autoApply;
+        if (autoApply) { commitFilters(); }
     });
 
+    const applyBtn = document.createElement('button');
+    applyBtn.textContent = 'Apply';
+    applyBtn.className = 'filter-apply-btn';
+    applyBtn.disabled = true;
+    applyBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        commitFilters();
+    });
+
+    footer.appendChild(autoApplyItem);
     footer.appendChild(applyBtn);
-    footer.appendChild(cancelBtn);
     dropdown.appendChild(footer);
 
     // Position relative to the header cell using fixed positioning (sticky th can't be relatively positioned)
@@ -3002,6 +3033,21 @@ function selectAllCells() {
     });
 }
 
+function selectColumn(columnIndex) {
+    if (!currentResults || !currentResults.data) return;
+    clearSelection();
+    const rowCount = currentResults.data.length;
+    for (let r = 0; r < rowCount; r++) {
+        const cellElement = document.querySelector('td[data-row="' + r + '"][data-col="' + columnIndex + '"]');
+        if (cellElement) {
+            const cellKey = r + '-' + columnIndex;
+            selectedCells.add(cellKey);
+            cellElement.classList.add('selected');
+        }
+    }
+    selectionStart = { row: 0, col: columnIndex };
+}
+
 // Column resizing functionality
 let isResizing = false;
 let justResized = false;
@@ -3138,8 +3184,8 @@ function handleHeaderClick(event, columnIndex) {
         || event.target.closest('.resolve-guid-btn')) {
         return;
     }
-    // Open the filter dropdown on header click
-    toggleFilterDropdown(event, columnIndex);
+    // Select entire column
+    selectColumn(columnIndex);
 }
 
 function handleDragStart(event, columnIndex) {
