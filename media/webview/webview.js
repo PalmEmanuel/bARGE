@@ -530,10 +530,15 @@ function displayResults(result, preserveDetailsPane = false) {
     const exportBtn = document.getElementById('exportBtn');
 
     if (!result.columns || !result.data || result.data.length === 0) {
-        tableContainer.innerHTML = '<div class="no-results">No results found.</div>';
-        resultsInfo.textContent = 'No results.';
-        exportBtn.style.display = 'none';
-        return;
+        // If this is a filter/sort refresh, keep the table headers visible so filters can be adjusted
+        if (preserveDetailsPane && result.columns && result.columns.length > 0) {
+            // Fall through to render headers with empty body
+        } else {
+            tableContainer.innerHTML = '<div class="no-results">No results found.</div>';
+            resultsInfo.textContent = 'No results.';
+            exportBtn.style.display = 'none';
+            return;
+        }
     }
 
     const executionTimeText = result.executionTimeMs ?
@@ -584,6 +589,7 @@ function displayResults(result, preserveDetailsPane = false) {
             'ondrop="handleDrop(event, ' + index + ')"' +
             'ondragend="handleDragEnd(event)"' +
             'title="' + col.name + '">' +
+            '<div class="header-content">' +
             '<span class="header-text">' + col.name + '</span>';
 
         // Add filter button
@@ -596,7 +602,8 @@ function displayResults(result, preserveDetailsPane = false) {
             '<svg viewBox="0 0 16 16" width="12" height="12">' +
             '<path d="M1 2h14l-5 6v5l-4 1V8L1 2z" fill="currentColor"/>' +
             '</svg>' +
-            '</button>';
+            '</button>' +
+            '</div>';
 
         // Add resolve button if this is a GUID column (show disabled if another column is resolving)
         if (showResolveBtn) {
@@ -615,7 +622,7 @@ function displayResults(result, preserveDetailsPane = false) {
 
     tableHtml += '</tr></thead><tbody>';
 
-    result.data.forEach((row, rowIndex) => {
+    (result.data || []).forEach((row, rowIndex) => {
         tableHtml += '<tr>';
 
         // Add details button cell  
@@ -654,7 +661,18 @@ function displayResults(result, preserveDetailsPane = false) {
     });
 
     tableHtml += '</tbody></table>';
+
     tableContainer.innerHTML = tableHtml;
+
+    // Restore user-resized column widths after re-rendering
+    if (preserveDetailsPane && result.columns) {
+        result.columns.forEach((col, index) => {
+            if (col.width) {
+                const th = tableContainer.querySelector('th[data-col-index="' + index + '"]');
+                if (th) { th.style.width = col.width; }
+            }
+        });
+    }
 
     // Add context menu event listener to the table
     const table = tableContainer.querySelector('.results-table');

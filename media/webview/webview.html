@@ -952,6 +952,14 @@
             background-color: var(--vscode-focusBorder);
         }
 
+        /* ── Column header content wrapper ───────────────────── */
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            width: 100%;
+        }
+
         /* ── Column filter button ─────────────────────────────── */
         .filter-btn {
             display: inline-flex;
@@ -963,7 +971,7 @@
             color: var(--vscode-descriptionForeground);
             opacity: 0;
             padding: 2px;
-            margin-left: 2px;
+            margin-left: auto;
             vertical-align: middle;
             border-radius: 3px;
             transition: opacity 0.15s ease, color 0.1s ease, background-color 0.1s ease;
