@@ -529,7 +529,7 @@ function displayResults(result, preserveDetailsPane = false) {
 
     // When this is a fresh query (not a filter/sort refresh), store the full dataset and clear filters
     if (!preserveDetailsPane) {
-        fullData = result.data ? [...result.data] : null;
+        fullData = result.data || null;
         columnFilters.clear();
         sortState = { column: null, direction: null };
         closeFilterDropdown();
@@ -635,9 +635,7 @@ function displayResults(result, preserveDetailsPane = false) {
                 'data-col-index="' + index + '" ' +
                 'onclick="toggleFilterDropdown(event, ' + index + ')" ' +
                 'title="Filter this column">' +
-                '<svg viewBox="0 0 16 16" width="12" height="12">' +
-                '<path d="M1 2h14l-5 6v5l-4 1V8L1 2z" fill="currentColor"/>' +
-                '</svg>' +
+                '<i class="codicon ' + (filterActive ? 'codicon-filter-filled' : 'codicon-filter') + '"></i>' +
                 '</button>';
         }
 
@@ -2943,6 +2941,7 @@ function showFilterDropdown(columnIndex, headerElement) {
     searchBox.type = 'text';
     searchBox.className = 'filter-search';
     searchBox.placeholder = 'Search values...';
+    let searchDebounceTimer = null;
     searchBox.addEventListener('input', () => {
         const query = searchBox.value.toLowerCase();
         list.querySelectorAll('.filter-value-item').forEach(item => {
@@ -2950,6 +2949,17 @@ function showFilterDropdown(columnIndex, headerElement) {
             item.style.display = label.includes(query) ? '' : 'none';
         });
         updateAllCheckboxState();
+
+        // With auto-apply, immediately commit: check matching, uncheck non-matching
+        if (autoApply) {
+            const visibleItems = list.querySelectorAll('.filter-value-item:not([style*="display: none"])');
+            const hiddenItems = list.querySelectorAll('.filter-value-item[style*="display: none"]');
+            visibleItems.forEach(item => { const cb = item.querySelector('.filter-checkbox'); if (cb) { cb.checked = true; } });
+            hiddenItems.forEach(item => { const cb = item.querySelector('.filter-checkbox'); if (cb) { cb.checked = false; } });
+            allCheckbox.checked = visibleItems.length > 0;
+            updateAllCheckboxState(true);
+            commitFilters();
+        }
     });
     searchBox.addEventListener('click', e => e.stopPropagation());
 
@@ -3011,7 +3021,12 @@ function showFilterDropdown(columnIndex, headerElement) {
 
         if (hasSearch) {
             allLabel.textContent = 'All matching';
-            allCount.textContent = totalVisible;
+            // Sum the row counts of all visible (matching) values
+            const matchingRowCount = Array.from(visibleItems).reduce((sum, item) => {
+                const countEl = item.querySelector('.filter-count');
+                return sum + (countEl ? parseInt(countEl.textContent, 10) || 0 : 0);
+            }, 0);
+            allCount.textContent = matchingRowCount;
             allCount.style.display = '';
             if (!preserveAllState) {
                 allCheckbox.checked = totalVisible > 0 && checkedCount === totalVisible;
@@ -3019,7 +3034,13 @@ function showFilterDropdown(columnIndex, headerElement) {
             allCheckmark.classList.remove('indeterminate');
         } else {
             allLabel.textContent = 'All';
-            allCount.style.display = 'none';
+            // Sum the row counts of all values
+            const totalRowCount = Array.from(visibleItems).reduce((sum, item) => {
+                const countEl = item.querySelector('.filter-count');
+                return sum + (countEl ? parseInt(countEl.textContent, 10) || 0 : 0);
+            }, 0);
+            allCount.textContent = totalRowCount;
+            allCount.style.display = '';
             if (!preserveAllState) {
                 allCheckbox.checked = totalVisible > 0 && checkedCount === totalVisible;
             }
@@ -3041,7 +3062,7 @@ function showFilterDropdown(columnIndex, headerElement) {
         e.stopPropagation();
         const hasSearch = searchBox.value.length > 0;
         if (hasSearch) {
-            // Toggle only visible (matching) items
+            // Toggle only visible (matching) items — hidden items keep their state
             const visibleItems = list.querySelectorAll('.filter-value-item:not([style*="display: none"])');
             const visibleCheckboxes = Array.from(visibleItems).map(item => item.querySelector('.filter-checkbox'));
             const allVisible = visibleCheckboxes.length > 0 && visibleCheckboxes.every(cb => cb.checked);
@@ -3116,8 +3137,10 @@ function showFilterDropdown(columnIndex, headerElement) {
     function commitFilters() {
         const allValueCheckboxes = list.querySelectorAll('.filter-value-item .filter-checkbox');
         const checkedCount = Array.from(allValueCheckboxes).filter(cb => cb.checked).length;
-        if (allCheckbox.checked || checkedCount === allValueCheckboxes.length) {
-            // All checked (or All toggled) = no filter
+        const hasSearch = searchBox.value.length > 0;
+        const isNoFilter = (!hasSearch && allCheckbox.checked) || checkedCount === allValueCheckboxes.length;
+        if (isNoFilter) {
+            // All checked (or All toggled with no search) = no filter
             allCheckbox.checked = true;
             columnFilters.delete(columnIndex);
             clearColBtn.disabled = true;
@@ -3244,19 +3267,6 @@ function showFilterDropdown(columnIndex, headerElement) {
         cleanup();
     }
     function cleanup() {
-        // Before closing: uncheck hidden (non-matching) items and commit
-        if (searchBox.value.length > 0) {
-            list.querySelectorAll('.filter-value-item').forEach(item => {
-                if (item.style.display === 'none') {
-                    const cb = item.querySelector('.filter-checkbox');
-                    if (cb) { cb.checked = false; }
-                }
-            });
-            searchBox.value = '';
-            // Show all items again
-            list.querySelectorAll('.filter-value-item').forEach(item => { item.style.display = ''; });
-            commitFilters();
-        }
         closeFilterDropdown();
         document.removeEventListener('click', outsideClickHandler);
         const tableContainer = document.querySelector('.table-container');
@@ -3280,6 +3290,11 @@ function updateFilterHeaderIcons() {
             const filter = columnFilters.get(index);
             const isActive = filter && !filter.all;
             filterBtn.classList.toggle('filter-active', !!isActive);
+            const icon = filterBtn.querySelector('.codicon');
+            if (icon) {
+                icon.classList.toggle('codicon-filter', !isActive);
+                icon.classList.toggle('codicon-filter-filled', !!isActive);
+            }
         }
     });
 }

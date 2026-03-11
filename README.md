@@ -65,7 +65,7 @@ There are multiple ways to execute KQL queries against Azure Resource Graph usin
 - **From a .kql file**: Open the file and right click to run `bARGE: Run Query from Current File` or click `F5`
 - **From selected text**: Select KQL text and right click to run `bARGE: Run Selected Query text` or click `F8`
 
-All commands can displays results in a new tab to allow running multiple queries in parallel and comparing results.
+All commands can display results in a new tab to allow running multiple queries in parallel and comparing results.
 
 Query commands are also represented as buttons in the editor title area while in KQL files, and are also possible to execute from the command palette.
 
