@@ -590,6 +590,7 @@ function displayResults(result, preserveDetailsPane = false) {
         // Get column data for GUID detection
         const columnData = result.data.map(row => row[index]);
         const showResolveBtn = shouldShowResolveButton(col.name, columnData);
+        const isJson = isJsonColumn(columnData);
 
         // Add debugging for button visibility
         // Check if this column should be disabled due to any column being resolved
@@ -612,15 +613,17 @@ function displayResults(result, preserveDetailsPane = false) {
         const filterActive = colFilter && !colFilter.all;
         tableHtml += '<div class="header-actions">';
 
-        // Add filter button
-        tableHtml += '<button class="filter-btn' + (filterActive ? ' filter-active' : '') + '" ' +
-            'data-col-index="' + index + '" ' +
-            'onclick="toggleFilterDropdown(event, ' + index + ')" ' +
-            'title="Filter this column">' +
-            '<svg viewBox="0 0 16 16" width="12" height="12">' +
-            '<path d="M1 2h14l-5 6v5l-4 1V8L1 2z" fill="currentColor"/>' +
-            '</svg>' +
-            '</button>';
+        // Add filter button (skip for JSON columns)
+        if (!isJson) {
+            tableHtml += '<button class="filter-btn' + (filterActive ? ' filter-active' : '') + '" ' +
+                'data-col-index="' + index + '" ' +
+                'onclick="toggleFilterDropdown(event, ' + index + ')" ' +
+                'title="Filter this column">' +
+                '<svg viewBox="0 0 16 16" width="12" height="12">' +
+                '<path d="M1 2h14l-5 6v5l-4 1V8L1 2z" fill="currentColor"/>' +
+                '</svg>' +
+                '</button>';
+        }
 
         // Add resolve button if this is a GUID column (rightmost, always visible)
         if (showResolveBtn) {
@@ -1857,6 +1860,16 @@ function isJsonString(str) {
     }
 }
 
+/**
+ * Check if a column contains predominantly JSON/object data.
+ */
+function isJsonColumn(columnData) {
+    const nonNull = columnData.filter(v => v !== null && v !== undefined);
+    if (nonNull.length === 0) { return false; }
+    const objectCount = nonNull.filter(v => typeof v === 'object').length;
+    return objectCount / nonNull.length > 0.5;
+}
+
 // Copy selected text from details pane
 function copyDetailsSelection(text) {
     navigator.clipboard.writeText(text).then(() => {
@@ -2707,6 +2720,18 @@ function createChipElement(colName, active) {
         closeChipsPopup();
         navigateToColumnFilter(colName);
     });
+
+    if (active) {
+        const navBtn = document.createElement('button');
+        navBtn.className = 'filter-chip-nav';
+        navBtn.title = 'Go to column filter';
+        navBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeChipsPopup();
+            navigateToColumnFilter(colName);
+        });
+        chip.appendChild(navBtn);
+    }
 
     const label = document.createElement('span');
     label.className = 'filter-chip-label';
