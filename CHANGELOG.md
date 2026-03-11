@@ -4,6 +4,18 @@ All notable changes to the bARGE Visual Studio Code extension will be documented
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [v1.7.0] - 2026-03-11
+### New Features
+- [`bce4eee`](https://github.com/PalmEmanuel/bARGE/commit/bce4eeece401c71e51033deb3bc30aac23cf0c7e) - Results can now be filtered directly like in Excel, with extra filtering options and sticky filters to persist between queries *(PR [#231](https://github.com/PalmEmanuel/bARGE/pull/231) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
+  - *addresses issue [#216](https://github.com/PalmEmanuel/bARGE/issues/216) opened by [@PalmEmanuel](https://github.com/PalmEmanuel)*
+- [`366c46d`](https://github.com/PalmEmanuel/bARGE/commit/366c46dd57ad638c553e47cf11fd67e7072cb93c) - Add auto-fit functionality for column resizing on double-click *(PR [#230](https://github.com/PalmEmanuel/bARGE/pull/230) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
+  - *addresses issue [#228](https://github.com/PalmEmanuel/bARGE/issues/228) opened by [@gummigroda](https://github.com/gummigroda)*
+
+### Bug Fixes
+- [`4e62d26`](https://github.com/PalmEmanuel/bARGE/commit/4e62d26512fc0d760739f9d162e5ae2795e3aab9) - Resizing columns no longer unintentionally sorts them *(PR [#229](https://github.com/PalmEmanuel/bARGE/pull/229) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
+  - *fixes issue [#155](https://github.com/PalmEmanuel/bARGE/issues/155) opened by [@PalmEmanuel](https://github.com/PalmEmanuel)*
+
+
 ## [v1.6.0] - 2026-03-04
 ### New Features
 - [`f3326ab`](https://github.com/PalmEmanuel/bARGE/commit/f3326abca3445331873b13358260c16e9e381f63) - Queries can now be run in new tabs to retain results *(PR [#221](https://github.com/PalmEmanuel/bARGE/pull/221) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
@@ -220,3 +232,4 @@ Initial release of bARGE, supporting basic functionality for logging in using [D
 [v1.4.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.3.0...v1.4.0
 [v1.5.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.4.0...v1.5.0
 [v1.6.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.5.0...v1.6.0
+[v1.7.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.6.0...v1.7.0
