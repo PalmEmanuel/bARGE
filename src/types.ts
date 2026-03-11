@@ -36,7 +36,7 @@ export interface AuthScope {
 }
 
 export interface WebviewMessage {
-    type: 'runQuery' | 'exportCsv' | 'authenticate' | 'getSubscriptions' | 'runFileQuery' | 'resolveGuids' | 'showError' | 'showConfirmation';
+    type: 'runQuery' | 'exportCsv' | 'authenticate' | 'getSubscriptions' | 'runFileQuery' | 'resolveGuids' | 'showError' | 'showConfirmation' | 'webviewReady';
     payload?: any;
 }
 

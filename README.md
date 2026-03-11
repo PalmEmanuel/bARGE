@@ -11,6 +11,9 @@ bARGE is a Visual Studio Code extension that brings Azure Resource Graph queryin
 - **Run KQL Queries**: Execute Kusto Query Language (KQL) queries against Azure Resource Graph directly from VS Code.
 - **KQL Language Support**: Syntax highlighting, intellisense with completions and hover documentation with context and links.
 - **Results Panel**: View query results in a dedicated panel with sortable and resizable columns.
+- **Boosted Filtering**: Filter results by column values directly in the table, including sorting, text search and the option to invert all filters.
+- **Sticky Filters**: Persist filter selections across queries matched by column name, updating your query shouldn't ruin your insights.
+- **Multiple Tabs**: Run multiple queries in parallel and switch between results in different tabs.
 - **Resolve Identities against Entra ID**: Resolve GUIDs in query results against Entra ID for more details about identities.
 - **Comparison**: Select two or more rows for comparison to see differences in their properties.
 - **Copy & Export**: Easily copy selected cells as formatted text or for Excel, or export entire results to CSV for further analysis.
@@ -56,23 +59,27 @@ Running the `Sign In` command, either through the command palette or through the
 
 ### Running KQL Queries
 
-There are two main ways to execute KQL queries against Azure Resource Graph using bARGE:
+There are multiple ways to execute KQL queries against Azure Resource Graph using bARGE.
 
+- **In-line**: bARGE will automatically recognize queries in KQL files and display in-line CodeLens buttons to run the query.
 - **From a .kql file**: Open the file and right click to run `bARGE: Run Query from Current File` or click `F5`
 - **From selected text**: Select KQL text and right click to run `bARGE: Run Selected Query text` or click `F8`
 
-Both commands are represented as buttons in the editor title area while in KQL files, and are also possible to execute from the command palette.
+All commands can displays results in a new tab to allow running multiple queries in parallel and comparing results.
+
+Query commands are also represented as buttons in the editor title area while in KQL files, and are also possible to execute from the command palette.
 
 ![Query with Row Details](media/readme/gifs/query-details.gif)
 
 ### Interacting with Results
 
-bARGE supports functionality expected from modern tables and Azure Resource Graph Explorer in the Azure Portal:
+bARGE supports functionality expected from modern tables, and from Azure Resource Graph Explorer in the Azure Portal:
 
 - Resize and reorder columns by dragging headers
-- Select cells and copy data to Excel or other tools, with or without headers
-- Hover or right click JSON values in results, such as `properties`, to view or copy formatted content
-- Export results to CSV using the export button in the results panel
+- Filter values directly per column header like in Excel, with support for sorting and text search
+- Select cells and copy data to other tools, with or without headers
+- Hover or right click JSON values such as `properties`, to view or copy formatted content
+- Export results to CSV for further analysis or reporting
 - Select a row in the results table for details
 - Select multiple rows in the results table for comparison and quick overview of matching or differing properties
 
@@ -87,6 +94,17 @@ bARGE can resolve GUIDs in query results against Entra ID to find the names and 
 ![Resolve Identities](media/readme/gifs/resolve-ids.gif)
 
 This feature is particularly useful when exporting the results to CSV for reports or further analysis, as it can add context to otherwise cryptic GUIDs.
+
+### Filtering Results
+
+The results table supports Excel-style column filtering. Click the filter icon in column headers to open a dropdown where you can search for values, select or deselect individual items, and sort the column. JSON columns like `properties` are excluded from filtering since their values aren't practical to filter on.
+
+There are also additional features to make filtering easier and more powerful:
+
+- **Sticky Filters**: Filter selections can be saved as sticky filters that stay between queries. Saved filters will apply on the same result columns by name, while filters that don't match the current result columns are still saved in the filter list but are inactive.
+- **Filter List**: Active and saved filters show up in a list where you can remove individual filters quickly, or navigate to a column's active filter by clicking it in the list.
+- **Invert Filters**: Flips the selected values in all active column filters. Note that this does not necessarily select all unselected values, but rather inverts all current filter selections.
+- **Clear Filters**: Removes all active and saved filters.
 
 ## Configuration
 

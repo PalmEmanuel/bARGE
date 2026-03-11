@@ -22,6 +22,8 @@ export class BargePanel {
     private _sourceFileKey: string;
     private readonly _creationOrder: number;
     private _disposables: vscode.Disposable[] = [];
+    private _webviewReady = false;
+    private _pendingMessages: any[] = [];
 
     // ── public static API ──────────────────────────────────────────────
 
@@ -225,7 +227,28 @@ export class BargePanel {
         );
     }
 
+    private _postMessage(message: any) {
+        if (this._webviewReady) {
+            this._panel.webview.postMessage(message);
+        } else {
+            this._pendingMessages.push(message);
+        }
+    }
+
+    private _flushPendingMessages() {
+        for (const msg of this._pendingMessages) {
+            this._panel.webview.postMessage(msg);
+        }
+        this._pendingMessages = [];
+    }
+
     private async _handleMessage(message: WebviewMessage) {
+        if (message.type === 'webviewReady') {
+            this._webviewReady = true;
+            this._flushPendingMessages();
+            return;
+        }
+
         switch (message.type) {
             case 'exportCsv':
                 try {
@@ -339,7 +362,7 @@ export class BargePanel {
     public async runQuery(query: string, source: 'file' | 'selection', fileName?: string) {
         try {
             // Show loading indicator
-            this._panel.webview.postMessage({
+            this._postMessage({
                 type: 'queryStart'
             });
 
@@ -347,7 +370,7 @@ export class BargePanel {
 
             const result = await this._azureService.runQuery(query, undefined, (progress) => {
                 // Send pagination progress to webview overlay
-                this._panel.webview.postMessage({
+                this._postMessage({
                     type: 'queryProgress',
                     payload: progress
                 });
@@ -365,7 +388,7 @@ export class BargePanel {
                 data: result
             };
 
-            this._panel.webview.postMessage({
+            this._postMessage({
                 type: 'queryResult',
                 payload: response
             });
@@ -419,7 +442,7 @@ export class BargePanel {
                 rawError: rawError
             };
 
-            this._panel.webview.postMessage({
+            this._postMessage({
                 type: 'queryResult',
                 payload: response
             });
