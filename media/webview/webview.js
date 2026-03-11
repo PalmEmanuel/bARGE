@@ -252,6 +252,22 @@ function updateExportButtonState() {
         : 'Export results to CSV';
 }
 
+// Helper function to update Clear Filters, Invert Filters, and Sticky Filters button states
+function updateFilterButtonStates() {
+    const clearBtn = document.getElementById('clearFiltersBtn');
+    const invertBtn = document.getElementById('invertFiltersBtn');
+
+    if (_queryRunning) {
+        if (clearBtn) { clearBtn.disabled = true; }
+        if (invertBtn) { invertBtn.disabled = true; }
+    } else {
+        const active = hasActiveFilters();
+        const hasDormant = stickyFilters && savedFiltersByName.size > 0;
+        if (clearBtn) { clearBtn.disabled = !active && !hasDormant; }
+        if (invertBtn) { invertBtn.disabled = !active; }
+    }
+}
+
 // Helper function to check if a cell is an error that can be re-resolved
 function isCellResolutionError(cellValue) {
     return typeof cellValue === 'string' &&
@@ -2521,14 +2537,11 @@ function updateFilterInfo() {
         const shown = currentResults.data.length;
         const total = fullData.length;
         resultsInfo.textContent = shown + ' of ' + total + ' records (filtered)' + executionTimeText + timestampText;
-        if (clearBtn) { clearBtn.disabled = false; }
-        if (invertBtn) { invertBtn.disabled = false; }
     } else {
         resultsInfo.textContent = (currentResults.totalRecords || fullData.length) + ' records' + executionTimeText + timestampText;
-        if (clearBtn) { clearBtn.disabled = true; }
-        if (invertBtn) { invertBtn.disabled = true; }
     }
 
+    updateFilterButtonStates();
     renderFilterChips();
 }
 
@@ -4704,6 +4717,9 @@ window.addEventListener('message', event => {
         case 'queryStart':
             _queryRunning = true;
             updateExportButtonState();
+            updateFilterButtonStates();
+            closeChipsPopup();
+            closeFilterDropdown();
             showLoadingIndicator();
             hideContextMenu(); // Hide any open context menu when starting a new query
             break;
