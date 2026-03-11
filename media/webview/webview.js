@@ -635,9 +635,7 @@ function displayResults(result, preserveDetailsPane = false) {
                 'data-col-index="' + index + '" ' +
                 'onclick="toggleFilterDropdown(event, ' + index + ')" ' +
                 'title="Filter this column">' +
-                '<svg viewBox="0 0 16 16" width="12" height="12">' +
-                '<path d="M1 2h14l-5 6v5l-4 1V8L1 2z" fill="currentColor"/>' +
-                '</svg>' +
+                '<i class="codicon ' + (filterActive ? 'codicon-filter-filled' : 'codicon-filter') + '"></i>' +
                 '</button>';
         }
 
@@ -3292,6 +3290,11 @@ function updateFilterHeaderIcons() {
             const filter = columnFilters.get(index);
             const isActive = filter && !filter.all;
             filterBtn.classList.toggle('filter-active', !!isActive);
+            const icon = filterBtn.querySelector('.codicon');
+            if (icon) {
+                icon.classList.toggle('codicon-filter', !isActive);
+                icon.classList.toggle('codicon-filter-filled', !!isActive);
+            }
         }
     });
 }
