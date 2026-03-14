@@ -256,7 +256,7 @@
   },
   "devDependencies": {
     "@commitlint/cli": "^20.4.2",
-    "@commitlint/config-conventional": "^20.4.2",
+    "@commitlint/config-conventional": "^20.4.4",
     "@kusto/language-service-next": "^12.3.2",
     "@types/mocha": "^10.0.10",
     "@types/node": "^25.3.5",
