@@ -40,7 +40,7 @@ suite('Interactive Extension Integration Tests', () => {
 
 	suite('Extension Activation', () => {
 		test('extension should be present in the extension list', () => {
-			const ext = vscode.extensions.getExtension('PalmEmanuel.barge-vscode');
+			const ext = vscode.extensions.getExtension('palmemanuel.barge-vscode');
 			// In test environments, the extension may or may not be available
 			// but the import should work
 			assert.ok(true, 'Extension module is accessible');
@@ -48,7 +48,7 @@ suite('Interactive Extension Integration Tests', () => {
 
 		test('barge commands should be registered', async function () {
 			// Ensure the extension is activated before checking commands
-			const ext = vscode.extensions.getExtension('PalmEmanuel.barge-vscode');
+			const ext = vscode.extensions.getExtension('palmemanuel.barge-vscode');
 			if (ext && !ext.isActive) {
 				await ext.activate();
 			}
