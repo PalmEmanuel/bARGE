@@ -246,12 +246,13 @@ suite('Error Handling Tests', () => {
 
 // Helper function to simulate HTML escaping
 function escapeHtml(text: string): string {
-	const div = { innerHTML: '' } as any;
-	div.textContent = text;
-	return div.innerHTML || text
-		.replace(/&/g, '&amp;')
-		.replace(/</g, '&lt;')
-		.replace(/>/g, '&gt;')
-		.replace(/"/g, '&quot;')
-		.replace(/'/g, '&#39;');
+	// Use a single-pass character map to avoid incomplete multi-character sanitization
+	const escapeMap: Record<string, string> = {
+		'&': '&amp;',
+		'<': '&lt;',
+		'>': '&gt;',
+		'"': '&quot;',
+		"'": '&#39;',
+	};
+	return text.replace(/[&<>"']/g, (ch) => escapeMap[ch]);
 }

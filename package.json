@@ -251,6 +251,7 @@
     "test": "vscode-test",
     "test:webview": "tsc -p src/test/tsconfig.webview.json && mocha out/src/test/webview.interactive.test.js --ui tdd --timeout 30000",
     "test:webview:headed": "tsc -p src/test/tsconfig.webview.json && HEADED=1 mocha out/src/test/webview.interactive.test.js --ui tdd --timeout 300000",
+    "test:all": "npm test && npm run test:webview",
     "generate-schema": "node scripts/generate-arg-schema.js",
     "commit-lint": "commitlint --from=HEAD~1 --to=HEAD --verbose",
     "commit-lint-ci": "commitlint --from=origin/main --to=HEAD --verbose",
