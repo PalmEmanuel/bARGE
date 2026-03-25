@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
+import type { QueryResponse, QueryResult } from '../types';
 
 /**
  * Interactive / Integration tests for the bARGE extension.
@@ -279,8 +280,7 @@ suite('Interactive Extension Integration Tests', () => {
 
 	suite('Types Validation', () => {
 		test('QueryResponse structure should be valid for success', () => {
-			const { QueryResult, QueryResponse } = require('../types');
-			const response = {
+			const response: QueryResponse = {
 				success: true,
 				data: {
 					columns: [{ name: 'name', type: 'string' }],
@@ -298,7 +298,7 @@ suite('Interactive Extension Integration Tests', () => {
 		});
 
 		test('QueryResponse structure should be valid for error', () => {
-			const response = {
+			const response: QueryResponse = {
 				success: false,
 				error: 'Test error',
 				errorDetails: 'Detailed error info'
