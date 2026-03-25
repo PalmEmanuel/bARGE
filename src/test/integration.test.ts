@@ -123,62 +123,42 @@ suite('Interactive Extension Integration Tests', () => {
 	});
 
 	suite('Command Execution', () => {
-		test('barge.runQueryFromFile should show error for empty file', async () => {
+		test('barge.runQueryFromFile should not throw for empty file', async () => {
 			const filePath = path.join(tmpDir, 'empty-for-command.kql');
 			fs.writeFileSync(filePath, '');
 
 			const doc = await vscode.workspace.openTextDocument(filePath);
 			await vscode.window.showTextDocument(doc);
 
-			// Execute the command - should show error message for empty file
-			// (Without auth, this will either show "empty" or "not authenticated" error)
-			try {
-				await vscode.commands.executeCommand('barge.runQueryFromFile');
-			} catch {
-				// Expected - command may fail due to empty file or no auth
-			}
+			// Command shows an error message for empty file but should not throw
+			await assert.doesNotReject(
+				async () => { await vscode.commands.executeCommand('barge.runQueryFromFile'); },
+				'runQueryFromFile should handle empty file gracefully'
+			);
 		});
 
-		test('barge.runQueryFromSelection should handle no active editor', async () => {
-			// Close all editors first
+		test('barge.runQueryFromSelection should not throw with no active editor', async () => {
 			await vscode.commands.executeCommand('workbench.action.closeAllEditors');
-
-			// Wait a moment for editors to close
 			await new Promise(resolve => setTimeout(resolve, 100));
 
-			// This should handle gracefully (show error or no-op)
-			try {
-				await vscode.commands.executeCommand('barge.runQueryFromSelection');
-			} catch {
-				// Expected - no active editor
-			}
+			// Command shows an error message but should not throw
+			await assert.doesNotReject(
+				async () => { await vscode.commands.executeCommand('barge.runQueryFromSelection'); },
+				'runQueryFromSelection should handle missing editor gracefully'
+			);
 		});
 
-		test('barge.openResults should execute without fatal error', async () => {
-			try {
-				await vscode.commands.executeCommand('barge.openResults');
-				// If it gets here, the command executed (panel was created)
-			} catch {
-				// May fail without auth, but should not crash
-			}
-		});
+		test('barge.openResults should create a webview panel', async () => {
+			await vscode.commands.executeCommand('barge.openResults');
 
-		test('barge.authenticate should execute without fatal error', async function () {
-			this.timeout(5000);
-			// This will open the auth picker but we can't interact with it in tests
-			// Just verify the command is callable
-			try {
-				// Use a timeout to prevent hanging on interactive auth
-				const timeout = new Promise<void>((_, reject) =>
-					setTimeout(() => reject(new Error('timeout')), 1000)
-				);
-				await Promise.race([
-					vscode.commands.executeCommand('barge.authenticate'),
-					timeout
-				]);
-			} catch {
-				// Expected - auth will fail or timeout in test environment
-			}
+			// Allow the panel to be created and registered
+			await new Promise(resolve => setTimeout(resolve, 200));
+
+			// Verify a barge results panel was created by checking for a tab with bARGE in the label
+			const bargeTab = vscode.window.tabGroups.all
+				.flatMap(g => g.tabs)
+				.find(t => t.label.includes('bARGE'));
+			assert.ok(bargeTab, 'Should have created a bARGE results panel tab');
 		});
 	});
 
