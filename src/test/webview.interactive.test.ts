@@ -129,9 +129,11 @@ function buildTestHtml(): string {
 		'<script>window.webviewConfig = {};</script>',
 	);
 
-	// Remove external script tags — we inline the JS instead
-	html = html.replace(/<script[^>]*src="{{WEBVIEW_BUNDLE_URI}}"[^>]*><\/script>/g, '');
-	html = html.replace(/<script[^>]*src="{{WEBVIEW_URI}}\/webview\.js"[^>]*><\/script>/, '');
+	// Remove external script tags that load the webview bundle — we inline the JS instead
+	html = html.replace(
+		/<script[^>]*src="[^"]*(?:{{WEBVIEW_BUNDLE_URI}}|{{WEBVIEW_URI}}\/webview\.js)"[^>]*><\/script>/gi,
+		'',
+	);
 
 	// Inject VS Code dark-theme CSS variable defaults so the webview looks
 	// correct when running outside VS Code (headed mode).
