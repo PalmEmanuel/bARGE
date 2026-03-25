@@ -131,7 +131,7 @@ function buildTestHtml(): string {
 
 	// Remove external script tags that load the webview bundle — we inline the JS instead
 	html = html.replace(
-		/<script[^>]*src="[^"]*(?:{{WEBVIEW_BUNDLE_URI}}|{{WEBVIEW_URI}}\/webview\.js)"[^>]*><\/script>/gi,
+		/<script\b[^>]*\bsrc="[^"]*(?:{{WEBVIEW_BUNDLE_URI}}|{{WEBVIEW_URI}}\/webview\.js)"[^>]*>[^<]*<\/script>/gi,
 		'',
 	);
 
