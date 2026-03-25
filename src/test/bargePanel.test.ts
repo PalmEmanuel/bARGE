@@ -39,13 +39,13 @@ suite('BargePanel Tests', () => {
 	});
 
 	suite('static panel management', () => {
-		test('getTargetForFile should return undefined for non-existent file key', () => {
-			const target = BargePanel.getTargetForFile('nonexistent.kql');
-			// May or may not be undefined depending on state, but should not throw
-			assert.ok(target === undefined || target !== undefined, 'Should not throw');
+		test('getTargetForFile should not throw for non-existent file key', () => {
+			BargePanel.getTargetForFile('nonexistent.kql');
 		});
 
 		test('setActiveFileKey should not throw', () => {
+			// Should not throw for any input
+			BargePanel.setActiveFileKey('test.kql');
 			// Should not throw for any input
 			BargePanel.setActiveFileKey('test.kql');
 			BargePanel.setActiveFileKey(undefined);
