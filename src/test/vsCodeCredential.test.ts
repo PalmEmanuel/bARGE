@@ -56,7 +56,7 @@ suite('VSCodeCredential Tests', () => {
 			// Create a mock JWT with exp claim
 			const futureExp = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
 			const payload = JSON.stringify({ exp: futureExp, sub: 'test' });
-			const encodedPayload = Buffer.from(payload).toString('base64');
+			const encodedPayload = Buffer.from(payload).toString('base64url');
 			const mockJwt = `header.${encodedPayload}.signature`;
 
 			const mockSession = createMockSession(mockJwt);
