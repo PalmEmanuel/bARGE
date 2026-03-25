@@ -140,6 +140,12 @@ function buildTestHtml(): string {
 		/<script\b[^>]*\bsrc="[^"]*(?:{{WEBVIEW_BUNDLE_URI}}|{{WEBVIEW_URI}}\/webview\.js)"[^>]*>[\s\S]*?<\/script>/gi,
 		'',
 	);
+	// Final cleanup: if any script tags with these placeholder src values still remain due to
+	// unexpected formatting, strip them as well to ensure no such scripts are left.
+	html = html.replace(
+		/<script\b[^>]*\bsrc="[^"]*(?:{{WEBVIEW_BUNDLE_URI}}|{{WEBVIEW_URI}}\/webview\.js)".*?<\/script>/gi,
+		'',
+	);
 
 	// Inject VS Code dark-theme CSS variable defaults so the webview looks
 	// correct when running outside VS Code (headed mode).
