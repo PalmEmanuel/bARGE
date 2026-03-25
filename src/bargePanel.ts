@@ -35,7 +35,9 @@ export class BargePanel {
         if (!fileName || fileName === '' || fileName.startsWith('Untitled')) {
             return 'untitled';
         }
-        return path.basename(fileName);
+        // Handle both Unix (/) and Windows (\) path separators
+        const lastSep = Math.max(fileName.lastIndexOf('/'), fileName.lastIndexOf('\\'));
+        return lastSep === -1 ? fileName : fileName.substring(lastSep + 1);
     }
 
     /**

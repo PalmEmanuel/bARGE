@@ -1,0 +1,12 @@
+{
+	"extends": "../../tsconfig.json",
+	"compilerOptions": {
+		"rootDir": "../..",
+		"outDir": "../../out",
+		"lib": ["ES2022", "DOM"]
+	},
+	"include": [
+		"webview.interactive.test.ts"
+	],
+	"exclude": []
+}

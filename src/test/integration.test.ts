@@ -46,7 +46,13 @@ suite('Interactive Extension Integration Tests', () => {
 			assert.ok(true, 'Extension module is accessible');
 		});
 
-		test('barge commands should be registered', async () => {
+		test('barge commands should be registered', async function () {
+			// Ensure the extension is activated before checking commands
+			const ext = vscode.extensions.getExtension('PalmEmanuel.barge-vscode');
+			if (ext && !ext.isActive) {
+				await ext.activate();
+			}
+
 			const commands = await vscode.commands.getCommands(true);
 			const bargeCommands = commands.filter(cmd => cmd.startsWith('barge.'));
 
@@ -157,13 +163,14 @@ suite('Interactive Extension Integration Tests', () => {
 			}
 		});
 
-		test('barge.authenticate should execute without fatal error', async () => {
+		test('barge.authenticate should execute without fatal error', async function () {
+			this.timeout(5000);
 			// This will open the auth picker but we can't interact with it in tests
 			// Just verify the command is callable
 			try {
 				// Use a timeout to prevent hanging on interactive auth
 				const timeout = new Promise<void>((_, reject) =>
-					setTimeout(() => reject(new Error('timeout')), 2000)
+					setTimeout(() => reject(new Error('timeout')), 1000)
 				);
 				await Promise.race([
 					vscode.commands.executeCommand('barge.authenticate'),
@@ -281,7 +288,8 @@ suite('Interactive Extension Integration Tests', () => {
 
 			try {
 				await config.update('enableRunQueryCodeLens', false, vscode.ConfigurationTarget.Global);
-				const updated = config.get<boolean>('enableRunQueryCodeLens');
+				// Must re-read configuration to get fresh values after update
+				const updated = vscode.workspace.getConfiguration('barge').get<boolean>('enableRunQueryCodeLens');
 				assert.strictEqual(updated, false, 'Should update configuration');
 			} finally {
 				await config.update('enableRunQueryCodeLens', original, vscode.ConfigurationTarget.Global);
