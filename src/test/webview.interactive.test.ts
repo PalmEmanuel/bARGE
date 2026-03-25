@@ -130,7 +130,7 @@ function buildTestHtml(): string {
 	);
 
 	// Remove external script tags — we inline the JS instead
-	html = html.replace(/<script[^>]*src="{{WEBVIEW_BUNDLE_URI}}"[^>]*><\/script>/, '');
+	html = html.replace(/<script[^>]*src="{{WEBVIEW_BUNDLE_URI}}"[^>]*><\/script>/g, '');
 	html = html.replace(/<script[^>]*src="{{WEBVIEW_URI}}\/webview\.js"[^>]*><\/script>/, '');
 
 	// Inject VS Code dark-theme CSS variable defaults so the webview looks
