@@ -163,7 +163,7 @@ suite('Interactive Extension Integration Tests', () => {
 			try {
 				// Use a timeout to prevent hanging on interactive auth
 				const timeout = new Promise<void>((_, reject) =>
-					setTimeout(() => reject(new Error('timeout')), 500)
+					setTimeout(() => reject(new Error('timeout')), 2000)
 				);
 				await Promise.race([
 					vscode.commands.executeCommand('barge.authenticate'),

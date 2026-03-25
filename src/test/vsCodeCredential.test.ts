@@ -67,6 +67,22 @@ suite('VSCodeCredential Tests', () => {
 			assert.strictEqual(result!.expiresOnTimestamp, futureExp * 1000, 'Should parse exp from JWT');
 		});
 
+		test('should handle malformed base64 in JWT gracefully', async () => {
+			// Token with invalid base64 in payload section
+			const mockSession = createMockSession('header.!!!invalid-base64!!!.signature');
+			const credential = new VSCodeCredential(mockSession);
+
+			const result = await credential.getToken();
+			assert.ok(result, 'Should still return a token result');
+			assert.strictEqual(result!.token, 'header.!!!invalid-base64!!!.signature');
+			// Should fall back to default expiration
+			const oneHourFromNow = Date.now() + (60 * 60 * 1000);
+			assert.ok(
+				Math.abs(result!.expiresOnTimestamp - oneHourFromNow) < 5000,
+				'Should fall back to default expiration on malformed JWT'
+			);
+		});
+
 		test('should handle scopes parameter', async () => {
 			const mockSession = createMockSession('test-token');
 			const credential = new VSCodeCredential(mockSession);

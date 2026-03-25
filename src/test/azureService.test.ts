@@ -10,10 +10,9 @@ suite('AzureService Tests', () => {
 		});
 
 		test('should create service with auth status callback', () => {
-			let authCallbackCalled = false;
 			const service = new AzureService(
-				(authenticated, accountName) => {
-					authCallbackCalled = true;
+				(_authenticated, _accountName) => {
+					// Callback will be invoked when auth state changes
 				}
 			);
 			assert.ok(service, 'Should create service with callback');

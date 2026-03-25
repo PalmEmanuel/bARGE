@@ -40,13 +40,13 @@ suite('GUID Utilities Tests', () => {
 		});
 
 		test('should return false for GUID with invalid version digit', () => {
-			// Version digit (position 13) must be 1-5
+			// Version nibble (first char of third group) must be 1-5
 			assert.strictEqual(isGuid('550e8400-e29b-01d4-a716-446655440000'), false);
 			assert.strictEqual(isGuid('550e8400-e29b-61d4-a716-446655440000'), false);
 		});
 
 		test('should return false for GUID with invalid variant digit', () => {
-			// Variant digit (position 17) must be 8, 9, a, or b
+			// Variant nibble (first char of fourth group) must be 8, 9, a, or b
 			assert.strictEqual(isGuid('550e8400-e29b-41d4-0716-446655440000'), false);
 			assert.strictEqual(isGuid('550e8400-e29b-41d4-c716-446655440000'), false);
 		});
