@@ -203,7 +203,10 @@ suite('AzureService Tests', () => {
 
 		test('should return null for invalid token', async () => {
 			const method = (service as any).extractAccountFromToken.bind(service);
-			const result = await method('invalid-token');
+			// Use valid base64 that decodes to invalid JSON to exercise the catch path
+			// without triggering alarming InvalidCharacterError from atob
+			const invalidPayload = Buffer.from('not-json').toString('base64');
+			const result = await method(`header.${invalidPayload}.signature`);
 			assert.strictEqual(result, null);
 		});
 
