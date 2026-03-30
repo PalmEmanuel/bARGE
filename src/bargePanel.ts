@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
 import { AzureService } from './azure/azureService';
-import { WebviewMessage, QueryResponse, ResolveGuidRequest, ResolveGuidResponse, IdentityInfo } from './types';
+import { WebviewMessage, QueryResponse, QueryResult, PanelInfo, ResolveGuidRequest, ResolveGuidResponse, IdentityInfo } from './types';
 
 export class BargePanel {
     /** All live panels. */
@@ -24,6 +24,21 @@ export class BargePanel {
     private _disposables: vscode.Disposable[] = [];
     private _webviewReady = false;
     private _pendingMessages: any[] = [];
+    private _lastResult: QueryResult | undefined;
+    private _viewData: any[][] | undefined;
+
+    private _getEffectiveResult(): QueryResult | undefined {
+        if (!this._lastResult) {
+            return undefined;
+        }
+        if (!this._viewData) {
+            return this._lastResult;
+        }
+        return {
+            ...this._lastResult,
+            data: this._viewData
+        };
+    }
 
     // ── public static API ──────────────────────────────────────────────
 
@@ -75,6 +90,151 @@ export class BargePanel {
      */
     public static getTargetForFile(fileKey: string): BargePanel | undefined {
         return BargePanel._targetPanels.get(fileKey);
+    }
+
+    /**
+     * Return info about all open panels, suitable for MCP tool responses.
+     * The currently selected table is the target panel for the active file.
+     */
+    public static getAllPanelsInfo(): PanelInfo[] {
+        const result: PanelInfo[] = [];
+        for (const panel of BargePanel._panels) {
+            const isTarget = BargePanel._targetPanels.get(panel._sourceFileKey) === panel;
+            const isActiveFile = BargePanel._activeFileKey === panel._sourceFileKey;
+            result.push({
+                tableId: panel._getPanelId(),
+                sourceFile: panel._sourceFileKey,
+                isCurrentTarget: isTarget && isActiveFile,
+                hasData: panel._lastResult !== undefined,
+                query: panel._lastResult?.query,
+                timestamp: panel._lastResult?.timestamp,
+                rowCount: panel._getEffectiveResult()?.data?.length,
+                columnCount: panel._lastResult?.columns?.length,
+                columns: panel._lastResult?.columns,
+                executionTimeMs: panel._lastResult?.executionTimeMs,
+                totalRecords: panel._lastResult?.totalRecords
+            });
+        }
+        // Sort so the current target appears first, then by creation order
+        const getCreationIndex = (tableId: string): number => {
+            const parts = tableId.split(':');
+            const lastPart = parts[parts.length - 1];
+            const parsed = Number.parseInt(lastPart, 10);
+            return Number.isNaN(parsed) ? Number.MAX_SAFE_INTEGER : parsed;
+        };
+        result.sort((a, b) => {
+            if (a.isCurrentTarget && !b.isCurrentTarget) { return -1; }
+            if (!a.isCurrentTarget && b.isCurrentTarget) { return 1; }
+            const aIndex = getCreationIndex(a.tableId);
+            const bIndex = getCreationIndex(b.tableId);
+            if (aIndex !== bIndex) {
+                return aIndex - bIndex;
+            }
+            return a.tableId.localeCompare(b.tableId);
+        });
+        return result;
+    }
+
+    /**
+     * Return the last query result for the panel identified by `tableId`, or undefined if not found.
+     */
+    public static getPanelResult(tableId: string): QueryResult | undefined {
+        for (const panel of BargePanel._panels) {
+            if (panel._getPanelId() === tableId) {
+                return panel._getEffectiveResult();
+            }
+        }
+        return undefined;
+    }
+
+    /**
+     * Return the raw last query result for the panel identified by `tableId`,
+     * ignoring visual table state such as active filters or sort order.
+     */
+    public static getPanelRawResult(tableId: string): QueryResult | undefined {
+        for (const panel of BargePanel._panels) {
+            if (panel._getPanelId() === tableId) {
+                return panel._lastResult;
+            }
+        }
+        return undefined;
+    }
+
+    /**
+     * Return the panel instance identified by `tableId`, or undefined if not found.
+     * Used by MCP tools that need to call instance methods (e.g. runQuery).
+     */
+    public static getTargetByTableId(tableId: string): BargePanel | undefined {
+        for (const panel of BargePanel._panels) {
+            if (panel._getPanelId() === tableId) {
+                return panel;
+            }
+        }
+        return undefined;
+    }
+
+    /**
+     * Select (highlight) specific rows in a panel's result table.
+     * The panel is revealed and a message is posted to the webview to
+     * perform the selection using the existing row-selection system.
+     * @returns true if the panel was found and the message was posted.
+     */
+    public static selectRows(tableId: string, rowIndices: number[]): boolean {
+        for (const panel of BargePanel._panels) {
+            if (panel._getPanelId() === tableId) {
+                panel._panel.reveal(undefined, /* preserveFocus */ true);
+                panel._postMessage({ type: 'selectRows', payload: { rowIndices } });
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Select (highlight) specific cells in a panel's result table.
+     * Each cell is identified by a { row, column } pair (0-based indices).
+     * @returns true if the panel was found and the message was posted.
+     */
+    public static selectCells(tableId: string, cells: { row: number; column: number }[]): boolean {
+        for (const panel of BargePanel._panels) {
+            if (panel._getPanelId() === tableId) {
+                panel._panel.reveal(undefined, /* preserveFocus */ true);
+                panel._postMessage({ type: 'selectCells', payload: { cells } });
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Sort a panel's result table by the given column name.
+     * @returns true if the panel was found and the message was posted.
+     */
+    public static sortTable(tableId: string, column: string, direction: 'asc' | 'desc'): boolean {
+        for (const panel of BargePanel._panels) {
+            if (panel._getPanelId() === tableId) {
+                panel._panel.reveal(undefined, /* preserveFocus */ true);
+                panel._postMessage({ type: 'sortTable', payload: { column, direction } });
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Apply column filters on a panel's result table.
+     * Each filter specifies a column name and an array of values to include.
+     * @returns true if the panel was found and the message was posted.
+     */
+    public static filterTable(tableId: string, filters: { column: string; values: string[] }[]): boolean {
+        for (const panel of BargePanel._panels) {
+            if (panel._getPanelId() === tableId) {
+                panel._panel.reveal(undefined, /* preserveFocus */ true);
+                panel._postMessage({ type: 'filterTable', payload: { filters } });
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -229,6 +389,28 @@ export class BargePanel {
         );
     }
 
+    /**
+     * Returns the identifier for this panel within its current source file key,
+     * matching the {@link PanelInfo.tableId} format.
+     *
+     * Note: this identifier is derived from the current `_sourceFileKey` and
+     * `_creationOrder`, so it will change if the underlying file key changes
+     * (for example, after a file rename).
+     */
+    private _getPanelId(): string {
+        return `${this._sourceFileKey}:${this._creationOrder}`;
+    }
+
+    /**
+     * Public accessor for the panel's identifier (used by MCP tools).
+     *
+     * The returned value is stable for the lifetime of the current source file key
+     * and creation order, but is not guaranteed to remain the same across file renames.
+     */
+    public getPanelId(): string {
+        return this._getPanelId();
+    }
+
     private _postMessage(message: any) {
         if (this._webviewReady) {
             this._panel.webview.postMessage(message);
@@ -358,10 +540,15 @@ export class BargePanel {
                     });
                 }
                 break;
+            case 'tableViewSnapshot':
+                if (Array.isArray(message.payload?.data)) {
+                    this._viewData = message.payload.data;
+                }
+                break;
         }
     }
 
-    public async runQuery(query: string, source: 'file' | 'selection', fileName?: string) {
+    public async runQuery(query: string, source: 'file' | 'selection', fileName?: string): Promise<boolean> {
         try {
             // Show loading indicator
             this._postMessage({
@@ -369,6 +556,9 @@ export class BargePanel {
             });
 
             this._panel.reveal();
+
+            // New query invalidates any previous visual view snapshot.
+            this._viewData = undefined;
 
             const result = await this._azureService.runQuery(query, undefined, (progress) => {
                 // Send pagination progress to webview overlay
@@ -385,6 +575,8 @@ export class BargePanel {
                 }));
             }
 
+            this._lastResult = result;
+
             const response: QueryResponse = {
                 success: true,
                 data: result
@@ -395,6 +587,7 @@ export class BargePanel {
                 payload: response
             });
 
+            return true;
         } catch (error) {
             let errorMessage = 'Unknown error occurred';
             let errorDetails = '';
@@ -448,6 +641,11 @@ export class BargePanel {
                 type: 'queryResult',
                 payload: response
             });
+
+            // Clear stale visual data when query fails.
+            this._viewData = undefined;
+
+            return false;
         }
     }
 
