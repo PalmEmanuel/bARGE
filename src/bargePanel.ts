@@ -102,9 +102,20 @@ export class BargePanel {
             });
         }
         // Sort so the current target appears first, then by creation order
+        const getCreationIndex = (tableId: string): number => {
+            const parts = tableId.split(':');
+            const lastPart = parts[parts.length - 1];
+            const parsed = Number.parseInt(lastPart, 10);
+            return Number.isNaN(parsed) ? Number.MAX_SAFE_INTEGER : parsed;
+        };
         result.sort((a, b) => {
             if (a.isCurrentTarget && !b.isCurrentTarget) { return -1; }
             if (!a.isCurrentTarget && b.isCurrentTarget) { return 1; }
+            const aIndex = getCreationIndex(a.tableId);
+            const bIndex = getCreationIndex(b.tableId);
+            if (aIndex !== bIndex) {
+                return aIndex - bIndex;
+            }
             return a.tableId.localeCompare(b.tableId);
         });
         return result;
@@ -351,12 +362,24 @@ export class BargePanel {
         );
     }
 
-    /** Returns the stable unique identifier for this panel, matching the {@link PanelInfo.tableId} format. */
+    /**
+     * Returns the identifier for this panel within its current source file key,
+     * matching the {@link PanelInfo.tableId} format.
+     *
+     * Note: this identifier is derived from the current `_sourceFileKey` and
+     * `_creationOrder`, so it will change if the underlying file key changes
+     * (for example, after a file rename).
+     */
     private _getPanelId(): string {
         return `${this._sourceFileKey}:${this._creationOrder}`;
     }
 
-    /** Public accessor for the panel's stable unique identifier (used by MCP tools). */
+    /**
+     * Public accessor for the panel's identifier (used by MCP tools).
+     *
+     * The returned value is stable for the lifetime of the current source file key
+     * and creation order, but is not guaranteed to remain the same across file renames.
+     */
     public getPanelId(): string {
         return this._getPanelId();
     }
@@ -493,7 +516,7 @@ export class BargePanel {
         }
     }
 
-    public async runQuery(query: string, source: 'file' | 'selection', fileName?: string) {
+    public async runQuery(query: string, source: 'file' | 'selection', fileName?: string): Promise<boolean> {
         try {
             // Show loading indicator
             this._postMessage({
@@ -529,6 +552,7 @@ export class BargePanel {
                 payload: response
             });
 
+            return true;
         } catch (error) {
             let errorMessage = 'Unknown error occurred';
             let errorDetails = '';
@@ -582,6 +606,8 @@ export class BargePanel {
                 type: 'queryResult',
                 payload: response
             });
+
+            return false;
         }
     }
 

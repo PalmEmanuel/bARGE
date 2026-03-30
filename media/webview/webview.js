@@ -4835,7 +4835,7 @@ window.addEventListener('message', event => {
                 clearSelection();
                 var firstSelected = null;
                 message.payload.cells.forEach(function(cell) {
-                    if (currentResults && currentResults.columns &&
+                    if (currentResults && currentResults.data && currentResults.columns &&
                         cell.row >= 0 && cell.row < currentResults.data.length &&
                         cell.column >= 0 && cell.column < currentResults.columns.length) {
                         var cellElement = document.querySelector('td[data-row="' + cell.row + '"][data-col="' + cell.column + '"]');

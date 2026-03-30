@@ -44,7 +44,7 @@ export interface WebviewMessage {
  * Summary info about a single bARGE result panel, used by the MCP tools.
  */
 export interface PanelInfo {
-    /** Stable unique identifier: "<sourceFile>:<creationOrder>" */
+    /** Unique identifier: "<sourceFile>:<creationOrder>". Stable within the current session but may change if the source file is renamed. */
     tableId: string;
     /** File name key (basename) the panel is associated with, e.g. "storage.kql" or "untitled" */
     sourceFile: string;

@@ -68,7 +68,8 @@ export function registerMcpTools(
                     ]);
                 }
 
-                const limit = typeof maxRows === 'number' && maxRows > 0 ? maxRows : result.data.length;
+                const DEFAULT_MAX_ROWS = 500;
+                const limit = typeof maxRows === 'number' && maxRows > 0 ? maxRows : DEFAULT_MAX_ROWS;
                 const truncated = result.data.length > limit;
                 const output = {
                     tableId,
@@ -164,13 +165,29 @@ export function registerMcpTools(
                         panel = BargePanel.getOrCreateForFile(context.extensionUri, azureService, fileKey);
                     }
 
-                    await panel.runQuery(query, 'selection');
+                    const success = await panel.runQuery(query, 'selection');
+
+                    if (!success) {
+                        return new vscode.LanguageModelToolResult([
+                            new vscode.LanguageModelTextPart(
+                                JSON.stringify({ success: false, tableId: panel.getPanelId(), message: 'Query execution failed. Check the bARGE results panel for details.' })
+                            )
+                        ]);
+                    }
 
                     const result = BargePanel.getPanelResult(panel.getPanelId());
                     if (!result) {
                         return new vscode.LanguageModelToolResult([
                             new vscode.LanguageModelTextPart(
-                                JSON.stringify({ success: true, tableId: panel.getPanelId(), message: 'Query executed but no result data was stored.' })
+                                JSON.stringify({ success: false, tableId: panel.getPanelId(), message: 'Query execution did not produce any stored result.' })
+                            )
+                        ]);
+                    }
+
+                    if (result.query !== query) {
+                        return new vscode.LanguageModelToolResult([
+                            new vscode.LanguageModelTextPart(
+                                JSON.stringify({ success: false, tableId: panel.getPanelId(), message: 'No fresh result found for the requested query. The panel may contain results from a previous query.' })
                             )
                         ]);
                     }
@@ -189,9 +206,13 @@ export function registerMcpTools(
                     ]);
                 } catch (error) {
                     const message = error instanceof Error ? error.message : String(error);
+                    const prefix = 'Query execution failed:';
+                    const errorMessage = message.trimStart().startsWith(prefix)
+                        ? message
+                        : `${prefix} ${message}`;
                     return new vscode.LanguageModelToolResult([
                         new vscode.LanguageModelTextPart(
-                            JSON.stringify({ error: `Query execution failed: ${message}` })
+                            JSON.stringify({ error: errorMessage })
                         )
                     ]);
                 }
