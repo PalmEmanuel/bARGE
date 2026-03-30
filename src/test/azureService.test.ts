@@ -136,6 +136,14 @@ suite('AzureService Tests', () => {
 		});
 	});
 
+	suite('concurrent authentication state', () => {
+		test('should start with generation 0 and zero active calls', () => {
+			const service = new AzureService();
+			assert.strictEqual((service as any).authGeneration, 0, 'Initial authGeneration should be 0');
+			assert.strictEqual((service as any).activeAuthenticateCalls, 0, 'Initial activeAuthenticateCalls should be 0');
+		});
+	});
+
 	suite('verifyAuthentication', () => {
 		test('should return false when no credential is set', async () => {
 			const service = new AzureService();

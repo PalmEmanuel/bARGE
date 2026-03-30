@@ -45,7 +45,7 @@ export class StatusBarManager {
 
     public updateStatusLoading(message: string): void {
         this.statusBarItem.text = `$(loading~spin) ${message}`;
-        this.statusBarItem.tooltip = `bARGE: ${message}`;
+        this.statusBarItem.tooltip = `bARGE: ${message}. Click to change account`;
         this.statusBarItem.backgroundColor = undefined; // Clear any error background
     }
 
