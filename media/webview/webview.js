@@ -2359,6 +2359,21 @@ function updateTableAfterSort(sortedData) {
 
     // Update details panel if it's open
     updateDetailsAfterSort();
+
+    notifyTableViewSnapshot();
+}
+
+function notifyTableViewSnapshot() {
+    if (!currentResults || !Array.isArray(currentResults.data)) {
+        return;
+    }
+
+    vscode.postMessage({
+        type: 'tableViewSnapshot',
+        payload: {
+            data: currentResults.data
+        }
+    });
 }
 
 function sortTable(columnIndex, keepDirection, forceDirection) {
@@ -2514,6 +2529,8 @@ function applyFilters() {
 
     // Save sticky filters whenever filters change
     if (stickyFilters) { saveStickyFilters(); }
+
+    notifyTableViewSnapshot();
 }
 
 /**
@@ -4808,6 +4825,132 @@ window.addEventListener('message', event => {
                 currentlyResolvingColumn = null;
                 updateResolveButtonStates();
                 updateExportButtonState();
+            }
+            break;
+        case 'selectRows':
+            if (message.payload && Array.isArray(message.payload.rowIndices)) {
+                clearSelection();
+                selectedDetailRowIndices = [];
+                message.payload.rowIndices.forEach(function(rowIndex) {
+                    if (currentResults && currentResults.data && rowIndex >= 0 && rowIndex < currentResults.data.length) {
+                        selectEntireRow(rowIndex);
+                        selectedDetailRowIndices.push(rowIndex);
+                    }
+                });
+                updateDetailButtonStates();
+                updateDetailsNavigation();
+
+                if (selectedDetailRowIndices.length === 0) {
+                    closeDetails();
+                } else {
+                    // Keep detail state aligned with interactive row selection.
+                    currentDetailRowIndex = selectedDetailRowIndices[0];
+                    currentDetailRowData = currentResults && currentResults.data
+                        ? currentResults.data[currentDetailRowIndex]
+                        : null;
+
+                    const detailsSection = document.getElementById('detailsSection');
+                    const resizeHandle = document.getElementById('resizeHandle');
+                    const tableSection = document.getElementById('tableSection');
+
+                    detectAndSetLayout();
+
+                    const isDetailsAlreadyOpen = detailsSection && detailsSection.style.display === 'flex';
+
+                    if (detailsSection) detailsSection.style.display = 'flex';
+                    if (resizeHandle) resizeHandle.style.display = 'block';
+
+                    if (!isDetailsAlreadyOpen && tableSection && detailsSection) {
+                        tableSection.style.flex = '2 1 0';
+                        detailsSection.style.flex = '1 1 0';
+                    }
+
+                    if (!isDetailsAlreadyOpen) {
+                        setTimeout(() => {
+                            const resizeHandle = document.getElementById('resizeHandle');
+                            if (resizeHandle) {
+                                if (currentLayout === 'horizontal') {
+                                    resizeHandle.style.left = '66.666%';
+                                    resizeHandle.style.top = '2.5%';
+                                } else {
+                                    resizeHandle.style.top = 'calc(66.666% - 3px)';
+                                    resizeHandle.style.left = '2.5%';
+                                }
+                            }
+                        }, 0);
+                    }
+
+                    initializeResizing();
+                    updateDetailsAfterSort();
+
+                    // Scroll the first selected row into view
+                    var firstCell = document.querySelector('td[data-row="' + selectedDetailRowIndices[0] + '"]');
+                    if (firstCell) {
+                        firstCell.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                    }
+                }
+            }
+            break;
+        case 'selectCells':
+            if (message.payload && Array.isArray(message.payload.cells)) {
+                clearSelection();
+                var firstSelected = null;
+                message.payload.cells.forEach(function(cell) {
+                    if (currentResults && currentResults.data && currentResults.columns &&
+                        cell.row >= 0 && cell.row < currentResults.data.length &&
+                        cell.column >= 0 && cell.column < currentResults.columns.length) {
+                        var cellElement = document.querySelector('td[data-row="' + cell.row + '"][data-col="' + cell.column + '"]');
+                        if (cellElement) {
+                            var cellKey = cell.row + '-' + cell.column;
+                            selectedCells.add(cellKey);
+                            cellElement.classList.add('selected');
+                            if (!firstSelected) {
+                                firstSelected = cellElement;
+                            }
+                        }
+                    }
+                });
+                if (firstSelected) {
+                    firstSelected.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                }
+            }
+            break;
+        case 'sortTable':
+            if (message.payload && currentResults && currentResults.columns) {
+                var colName = message.payload.column;
+                var sortDir = message.payload.direction || 'asc';
+                var colIdx = currentResults.columns.findIndex(function(c) { return c.name === colName; });
+                if (colIdx !== -1) {
+                    sortTable(colIdx, /* keepDirection */ false, sortDir);
+                }
+            }
+            break;
+        case 'filterTable':
+            if (message.payload && Array.isArray(message.payload.filters) && currentResults && currentResults.columns && fullData) {
+                // Clear existing filters first
+                columnFilters.clear();
+
+                message.payload.filters.forEach(function(f) {
+                    var colIdx = currentResults.columns.findIndex(function(c) { return c.name === f.column; });
+                    if (colIdx === -1) { return; }
+
+                    // Build a Set of included filter keys from the requested display values
+                    var includedKeys = new Set();
+                    var requestedValues = new Set(f.values.map(function(v) { return String(v); }));
+
+                    for (var i = 0; i < fullData.length; i++) {
+                        var key = filterValueKey(fullData[i][colIdx]);
+                        var label = filterValueLabel(fullData[i][colIdx]);
+                        if (requestedValues.has(label) || requestedValues.has(key)) {
+                            includedKeys.add(key);
+                        }
+                    }
+
+                    columnFilters.set(colIdx, { all: false, includedKeys: includedKeys });
+                });
+
+                applyFilters();
+                updateFilterHeaderIcons();
             }
             break;
     }

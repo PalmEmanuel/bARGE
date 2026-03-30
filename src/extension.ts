@@ -4,6 +4,7 @@ import { BargePanel } from './bargePanel';
 import { StatusBarManager } from './statusBar';
 import { KustoLanguageServiceProvider } from './kustoLanguageService';
 import { BargeCodeLensProvider } from './codeLensProvider';
+import { registerMcpTools } from './mcpTools';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -480,6 +481,9 @@ export function activate(context: vscode.ExtensionContext) {
 	updateImplicitDecoration(vscode.window.activeTextEditor);
 
 	context.subscriptions.push(implicitQueryDecoration!, selListener, activeListener, docListener, themeListener);
+
+	// Register MCP / Language Model tools for GitHub Copilot integration
+	registerMcpTools(context, azureService);
 
 	// Auto-authenticate if configured
 	const config = vscode.workspace.getConfiguration('barge');
