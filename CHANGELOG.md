@@ -4,6 +4,12 @@ All notable changes to the bARGE Visual Studio Code extension will be documented
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [v1.8.0] - 2026-03-30
+### New Features
+- [`39023fe`](https://github.com/PalmEmanuel/bARGE/commit/39023fe7c304d2fd64a4801b5816f8f396b379a7) - Add language model tools for Copilot integration *(PR [#255](https://github.com/PalmEmanuel/bARGE/pull/255) by [@Copilot](https://github.com/apps/copilot-swe-agent))*
+  - *addresses issue [#254](https://github.com/PalmEmanuel/bARGE/issues/254) opened by [@PalmEmanuel](https://github.com/PalmEmanuel)*
+
+
 ## [v1.7.0] - 2026-03-11
 ### New Features
 - [`bce4eee`](https://github.com/PalmEmanuel/bARGE/commit/bce4eeece401c71e51033deb3bc30aac23cf0c7e) - Results can now be filtered directly like in Excel, with extra filtering options and sticky filters to persist between queries *(PR [#231](https://github.com/PalmEmanuel/bARGE/pull/231) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
@@ -233,3 +239,4 @@ Initial release of bARGE, supporting basic functionality for logging in using [D
 [v1.5.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.4.0...v1.5.0
 [v1.6.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.5.0...v1.6.0
 [v1.7.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.6.0...v1.7.0
+[v1.8.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.7.0...v1.8.0
