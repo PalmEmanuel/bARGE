@@ -277,7 +277,7 @@
     "uuid": "^13.0.0"
   },
   "dependencies": {
-    "@azure/identity": "^4.13.0",
+    "@azure/identity": "^4.13.1",
     "@azure/msal-node": "^5.1.1",
     "@vscode/codicons": "^0.0.45",
     "lottie-web": "^5.13.0"
