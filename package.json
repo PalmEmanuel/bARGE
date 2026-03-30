@@ -37,7 +37,15 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onLanguage:kql",
+    "onCommand:barge.openResults",
+    "onCommand:barge.runQueryFromFile",
+    "onCommand:barge.runQueryFromSelection",
+    "onCommand:barge.setScope",
+    "onCommand:barge.authenticate",
+    "onLanguageModel"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
@@ -236,9 +244,11 @@
     },
     "languageModelTools": [
       {
-        "name": "barge_list_tables",
+        "name": "list_barge_tables",
+        "canBeReferencedInPrompt": true,
+        "toolReferenceName": "ListBargeTables",
         "displayName": "List bARGE Result Tables",
-        "modelDescription": "Returns a list of all bARGE result panels currently open in VS Code. Each entry describes one result table: its unique tableId, the source KQL file it belongs to, whether it is the currently selected table (isCurrentTarget=true — the one marked with the blue dot, i.e. the panel that the next 'Run Query' action would target), and metadata about its last query result (columns, row count, timestamp, etc.). Use this tool to discover which tables are available before calling barge_get_table_data.",
+        "modelDescription": "Returns a list of all bARGE result panels currently open in VS Code. Each entry describes one result table: its unique tableId, the source KQL file it belongs to, whether it is the currently selected table (isCurrentTarget=true — the one marked with the blue dot, i.e. the panel that the next 'Run Query' action would target), and metadata about its last query result (columns, row count, timestamp, etc.). Use this tool to discover which tables are available before calling get_barge_table_data.",
         "tags": [
           "barge",
           "azure",
@@ -250,9 +260,11 @@
         }
       },
       {
-        "name": "barge_get_table_data",
+        "name": "get_barge_table_data",
+        "canBeReferencedInPrompt": true,
+        "toolReferenceName": "GetBargeTableData",
         "displayName": "Get bARGE Table Data",
-        "modelDescription": "Returns the full query result data for a specific bARGE result panel identified by tableId (obtained from barge_list_tables). The response includes column definitions and data rows. Use the optional maxRows parameter to limit the number of rows returned; the response will indicate whether the result was truncated.",
+        "modelDescription": "Returns the full query result data for a specific bARGE result panel identified by tableId (obtained from list_barge_tables). The response includes column definitions and data rows. Use the optional maxRows parameter to limit the number of rows returned; the response will indicate whether the result was truncated.",
         "tags": [
           "barge",
           "azure",
@@ -263,7 +275,7 @@
           "properties": {
             "tableId": {
               "type": "string",
-              "description": "The unique identifier of the result table to retrieve, in the format '<sourceFile>:<creationOrder>' (e.g. 'storage.kql:1'). Obtain valid tableIds from the barge_list_tables tool."
+              "description": "The unique identifier of the result table to retrieve, in the format '<sourceFile>:<creationOrder>' (e.g. 'storage.kql:1'). Obtain valid tableIds from the list_barge_tables tool."
             },
             "maxRows": {
               "type": "number",
@@ -276,9 +288,11 @@
         }
       },
       {
-        "name": "barge_select_rows",
+        "name": "select_barge_rows",
+        "canBeReferencedInPrompt": true,
+        "toolReferenceName": "SelectBargeRows",
         "displayName": "Select Rows in bARGE Table",
-        "modelDescription": "Selects (highlights) specific rows in a bARGE result table. The selected rows are visually highlighted in the webview and opened in the detail/comparison panel. Use 0-based row indices from the data returned by barge_get_table_data. This is useful for drawing the user's attention to specific rows, e.g. outliers or rows matching certain criteria.",
+        "modelDescription": "Selects (highlights) specific rows in a bARGE result table. The selected rows are visually highlighted in the webview and opened in the detail/comparison panel. Use 0-based row indices from the data returned by get_barge_table_data. This is useful for drawing the user's attention to specific rows, e.g. outliers or rows matching certain criteria.",
         "tags": [
           "barge",
           "azure",
@@ -289,7 +303,7 @@
           "properties": {
             "tableId": {
               "type": "string",
-              "description": "The unique identifier of the result table (e.g. 'storage.kql:1'). Obtain valid tableIds from barge_list_tables."
+              "description": "The unique identifier of the result table (e.g. 'storage.kql:1'). Obtain valid tableIds from list_barge_tables."
             },
             "rowIndices": {
               "type": "array",
@@ -306,7 +320,9 @@
         }
       },
       {
-        "name": "barge_select_cells",
+        "name": "select_barge_cells",
+        "canBeReferencedInPrompt": true,
+        "toolReferenceName": "SelectBargeCells",
         "displayName": "Select Cells in bARGE Table",
         "modelDescription": "Selects (highlights) specific individual cells in a bARGE result table. Each cell is identified by a 0-based row and column index. Use this to pinpoint exact values of interest, e.g. highlighting a cell that contains an unusual SKU or a specific property value. The cells are visually highlighted in the table.",
         "tags": [
@@ -319,7 +335,7 @@
           "properties": {
             "tableId": {
               "type": "string",
-              "description": "The unique identifier of the result table (e.g. 'storage.kql:1'). Obtain valid tableIds from barge_list_tables."
+              "description": "The unique identifier of the result table (e.g. 'storage.kql:1'). Obtain valid tableIds from list_barge_tables."
             },
             "cells": {
               "type": "array",
@@ -350,9 +366,11 @@
         }
       },
       {
-        "name": "barge_run_query",
+        "name": "run_barge_query",
+        "canBeReferencedInPrompt": true,
+        "toolReferenceName": "RunBargeQuery",
         "displayName": "Run Azure Resource Graph Query",
-        "modelDescription": "Executes a KQL query against Azure Resource Graph and displays the results in a bARGE panel. The user must be authenticated first (use the bARGE: Sign In command). Returns metadata about the result (columns, row count, execution time) — use barge_get_table_data to retrieve the actual data rows afterwards. Optionally specify an existing tableId to reuse that panel; otherwise a new panel is created.",
+        "modelDescription": "Executes a KQL query against Azure Resource Graph and displays the results in a bARGE panel. The user must be authenticated first (use the bARGE: Sign In command). Returns metadata about the result (columns, row count, execution time) — use get_barge_table_data to retrieve the actual data rows afterwards. Optionally specify an existing tableId to reuse that panel; otherwise a new panel is created.",
         "tags": [
           "barge",
           "azure",
@@ -367,7 +385,7 @@
             },
             "tableId": {
               "type": "string",
-              "description": "Optional. The tableId of an existing bARGE panel to run the query in. If omitted, a new panel is created. Obtain valid tableIds from barge_list_tables."
+              "description": "Optional. The tableId of an existing bARGE panel to run the query in. If omitted, a new panel is created. Obtain valid tableIds from list_barge_tables."
             }
           },
           "required": [
@@ -376,9 +394,11 @@
         }
       },
       {
-        "name": "barge_sort_table",
+        "name": "sort_barge_table",
+        "canBeReferencedInPrompt": true,
+        "toolReferenceName": "SortBargeTable",
         "displayName": "Sort bARGE Table",
-        "modelDescription": "Sorts a bARGE result table by a specified column name in ascending or descending order. The sort is applied visually in the webview table. Use column names as returned by barge_list_tables or barge_get_table_data.",
+        "modelDescription": "Sorts a bARGE result table by a specified column name in ascending or descending order. The sort is applied visually in the webview table. Use column names as returned by list_barge_tables or get_barge_table_data.",
         "tags": [
           "barge",
           "azure",
@@ -389,7 +409,7 @@
           "properties": {
             "tableId": {
               "type": "string",
-              "description": "The unique identifier of the result table (e.g. 'storage.kql:1'). Obtain valid tableIds from barge_list_tables."
+              "description": "The unique identifier of the result table (e.g. 'storage.kql:1'). Obtain valid tableIds from list_barge_tables."
             },
             "column": {
               "type": "string",
@@ -408,7 +428,9 @@
         }
       },
       {
-        "name": "barge_filter_table",
+        "name": "filter_barge_table",
+        "canBeReferencedInPrompt": true,
+        "toolReferenceName": "FilterBargeTable",
         "displayName": "Filter bARGE Table",
         "modelDescription": "Applies column filters to a bARGE result table to show only rows where specified columns match given values. Replaces any existing filters. Each filter specifies a column name and an array of string values to include (matching is based on the display text of each cell). Use this to narrow down results, e.g. show only resources in 'eastus' or only 'Premium' SKUs.",
         "tags": [
@@ -421,7 +443,7 @@
           "properties": {
             "tableId": {
               "type": "string",
-              "description": "The unique identifier of the result table (e.g. 'storage.kql:1'). Obtain valid tableIds from barge_list_tables."
+              "description": "The unique identifier of the result table (e.g. 'storage.kql:1'). Obtain valid tableIds from list_barge_tables."
             },
             "filters": {
               "type": "array",

@@ -47,7 +47,7 @@ export function registerMcpTools(
     azureService: AzureService
 ): void {
     context.subscriptions.push(
-        vscode.lm.registerTool<ListTablesInput>('barge_list_tables', {
+        vscode.lm.registerTool<ListTablesInput>('list_barge_tables', {
             invoke(_options, _token) {
                 const tables = BargePanel.getAllPanelsInfo();
                 return new vscode.LanguageModelToolResult([
@@ -56,7 +56,7 @@ export function registerMcpTools(
             }
         }),
 
-        vscode.lm.registerTool<GetTableDataInput>('barge_get_table_data', {
+        vscode.lm.registerTool<GetTableDataInput>('get_barge_table_data', {
             invoke(options, _token) {
                 const { tableId, maxRows } = options.input;
                 const result = BargePanel.getPanelResult(tableId);
@@ -89,7 +89,7 @@ export function registerMcpTools(
             }
         }),
 
-        vscode.lm.registerTool<SelectRowsInput>('barge_select_rows', {
+        vscode.lm.registerTool<SelectRowsInput>('select_barge_rows', {
             invoke(options, _token) {
                 const { tableId, rowIndices } = options.input;
                 const found = BargePanel.selectRows(tableId, rowIndices);
@@ -108,7 +108,7 @@ export function registerMcpTools(
             }
         }),
 
-        vscode.lm.registerTool<SelectCellsInput>('barge_select_cells', {
+        vscode.lm.registerTool<SelectCellsInput>('select_barge_cells', {
             invoke(options, _token) {
                 const { tableId, cells } = options.input;
                 const found = BargePanel.selectCells(tableId, cells);
@@ -127,7 +127,7 @@ export function registerMcpTools(
             }
         }),
 
-        vscode.lm.registerTool<RunQueryInput>('barge_run_query', {
+        vscode.lm.registerTool<RunQueryInput>('run_barge_query', {
             async invoke(options, _token) {
                 const { query, tableId } = options.input;
 
@@ -219,7 +219,7 @@ export function registerMcpTools(
             }
         }),
 
-        vscode.lm.registerTool<SortTableInput>('barge_sort_table', {
+        vscode.lm.registerTool<SortTableInput>('sort_barge_table', {
             invoke(options, _token) {
                 const { tableId, column, direction } = options.input;
                 const result = BargePanel.getPanelResult(tableId);
@@ -259,7 +259,7 @@ export function registerMcpTools(
             }
         }),
 
-        vscode.lm.registerTool<FilterTableInput>('barge_filter_table', {
+        vscode.lm.registerTool<FilterTableInput>('filter_barge_table', {
             invoke(options, _token) {
                 const { tableId, filters } = options.input;
                 const result = BargePanel.getPanelResult(tableId);
