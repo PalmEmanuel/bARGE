@@ -110,10 +110,14 @@ There are also additional features to make filtering easier and more powerful:
 
 The extension supports the following configuration options in VS Code settings:
 
-- `barge.autoAuthenticate`: Automatically authenticate with Azure on extension activation (default: true)
-- `barge.hideLoginMessages`: Hide login notifications and messages, except errors (default: false)
-- `barge.enableHoverTooltips`: Enable IntelliSense hover tooltips for Azure Resource Graph elements and KQL syntax like keywords, operators, functions, and tables (default: true)
-- `barge.enableCompletions`: Enable IntelliSense completions for Azure Resource Graph elements and KQL syntax like keywords, operators, functions, and tables (default: true)
+| Setting | Description | Default |
+|---|---|---|
+| `barge.autoAuthenticate` | Automatically authenticate to Azure using DefaultAzureCredential on extension activation | `true` |
+| `barge.hideLoginMessages` | Hide login notifications and messages, except errors | `false` |
+| `barge.enableHoverTooltips` | Enable IntelliSense hover tooltips for KQL syntax | `true` |
+| `barge.enableCompletions` | Enable IntelliSense completions for KQL syntax | `true` |
+| `barge.enableRunQueryCodeLens` | Show **Run Query** buttons above query blocks in KQL files | `true` |
+| `barge.queryPageSize` | Number of records to fetch per Azure Resource Graph API call (min: 1, max: 1000). Low values may result in rate limiting. | `1000` |
 
 The default keybindings for executing queries are also possible to change.
 
