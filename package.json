@@ -239,7 +239,11 @@
         "name": "barge_list_tables",
         "displayName": "List bARGE Result Tables",
         "modelDescription": "Returns a list of all bARGE result panels currently open in VS Code. Each entry describes one result table: its unique tableId, the source KQL file it belongs to, whether it is the currently selected table (isCurrentTarget=true — the one marked with the blue dot, i.e. the panel that the next 'Run Query' action would target), and metadata about its last query result (columns, row count, timestamp, etc.). Use this tool to discover which tables are available before calling barge_get_table_data.",
-        "tags": ["barge", "azure", "resource-graph"],
+        "tags": [
+          "barge",
+          "azure",
+          "resource-graph"
+        ],
         "inputSchema": {
           "type": "object",
           "properties": {}
@@ -249,7 +253,11 @@
         "name": "barge_get_table_data",
         "displayName": "Get bARGE Table Data",
         "modelDescription": "Returns the full query result data for a specific bARGE result panel identified by tableId (obtained from barge_list_tables). The response includes column definitions and data rows. Use the optional maxRows parameter to limit the number of rows returned; the response will indicate whether the result was truncated.",
-        "tags": ["barge", "azure", "resource-graph"],
+        "tags": [
+          "barge",
+          "azure",
+          "resource-graph"
+        ],
         "inputSchema": {
           "type": "object",
           "properties": {
@@ -262,7 +270,83 @@
               "description": "Maximum number of data rows to return. Omit or set to 0 to return all rows. Use this to avoid very large responses when working with large result sets."
             }
           },
-          "required": ["tableId"]
+          "required": [
+            "tableId"
+          ]
+        }
+      },
+      {
+        "name": "barge_select_rows",
+        "displayName": "Select Rows in bARGE Table",
+        "modelDescription": "Selects (highlights) specific rows in a bARGE result table. The selected rows are visually highlighted in the webview and opened in the detail/comparison panel. Use 0-based row indices from the data returned by barge_get_table_data. This is useful for drawing the user's attention to specific rows, e.g. outliers or rows matching certain criteria.",
+        "tags": [
+          "barge",
+          "azure",
+          "resource-graph"
+        ],
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "tableId": {
+              "type": "string",
+              "description": "The unique identifier of the result table (e.g. 'storage.kql:1'). Obtain valid tableIds from barge_list_tables."
+            },
+            "rowIndices": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "description": "Array of 0-based row indices to select. The rows will be highlighted and shown in the comparison/detail pane."
+            }
+          },
+          "required": [
+            "tableId",
+            "rowIndices"
+          ]
+        }
+      },
+      {
+        "name": "barge_select_cells",
+        "displayName": "Select Cells in bARGE Table",
+        "modelDescription": "Selects (highlights) specific individual cells in a bARGE result table. Each cell is identified by a 0-based row and column index. Use this to pinpoint exact values of interest, e.g. highlighting a cell that contains an unusual SKU or a specific property value. The cells are visually highlighted in the table.",
+        "tags": [
+          "barge",
+          "azure",
+          "resource-graph"
+        ],
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "tableId": {
+              "type": "string",
+              "description": "The unique identifier of the result table (e.g. 'storage.kql:1'). Obtain valid tableIds from barge_list_tables."
+            },
+            "cells": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "row": {
+                    "type": "number",
+                    "description": "0-based row index."
+                  },
+                  "column": {
+                    "type": "number",
+                    "description": "0-based column index."
+                  }
+                },
+                "required": [
+                  "row",
+                  "column"
+                ]
+              },
+              "description": "Array of cells to select, each with a row and column index (0-based)."
+            }
+          },
+          "required": [
+            "tableId",
+            "cells"
+          ]
         }
       }
     ]

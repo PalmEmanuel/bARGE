@@ -4810,6 +4810,50 @@ window.addEventListener('message', event => {
                 updateExportButtonState();
             }
             break;
+        case 'selectRows':
+            if (message.payload && Array.isArray(message.payload.rowIndices)) {
+                clearSelection();
+                selectedDetailRowIndices = [];
+                message.payload.rowIndices.forEach(function(rowIndex) {
+                    if (currentResults && currentResults.data && rowIndex >= 0 && rowIndex < currentResults.data.length) {
+                        selectEntireRow(rowIndex);
+                        selectedDetailRowIndices.push(rowIndex);
+                    }
+                });
+                updateDetailButtonStates();
+                if (selectedDetailRowIndices.length > 0) {
+                    // Scroll the first selected row into view
+                    var firstCell = document.querySelector('td[data-row="' + selectedDetailRowIndices[0] + '"]');
+                    if (firstCell) {
+                        firstCell.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                    }
+                }
+            }
+            break;
+        case 'selectCells':
+            if (message.payload && Array.isArray(message.payload.cells)) {
+                clearSelection();
+                var firstSelected = null;
+                message.payload.cells.forEach(function(cell) {
+                    if (currentResults && currentResults.columns &&
+                        cell.row >= 0 && cell.row < currentResults.data.length &&
+                        cell.column >= 0 && cell.column < currentResults.columns.length) {
+                        var cellElement = document.querySelector('td[data-row="' + cell.row + '"][data-col="' + cell.column + '"]');
+                        if (cellElement) {
+                            var cellKey = cell.row + '-' + cell.column;
+                            selectedCells.add(cellKey);
+                            cellElement.classList.add('selected');
+                            if (!firstSelected) {
+                                firstSelected = cellElement;
+                            }
+                        }
+                    }
+                });
+                if (firstSelected) {
+                    firstSelected.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                }
+            }
+            break;
     }
 });
 

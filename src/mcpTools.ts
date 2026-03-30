@@ -10,6 +10,16 @@ interface GetTableDataInput {
     maxRows?: number;
 }
 
+interface SelectRowsInput {
+    tableId: string;
+    rowIndices: number[];
+}
+
+interface SelectCellsInput {
+    tableId: string;
+    cells: { row: number; column: number }[];
+}
+
 /**
  * Register bARGE Language Model Tools so that GitHub Copilot can query
  * the tables that are currently open in result panels.
@@ -53,6 +63,44 @@ export function registerMcpTools(context: vscode.ExtensionContext): void {
                 };
                 return new vscode.LanguageModelToolResult([
                     new vscode.LanguageModelTextPart(JSON.stringify(output, null, 2))
+                ]);
+            }
+        }),
+
+        vscode.lm.registerTool<SelectRowsInput>('barge_select_rows', {
+            invoke(options, _token) {
+                const { tableId, rowIndices } = options.input;
+                const found = BargePanel.selectRows(tableId, rowIndices);
+                if (!found) {
+                    return new vscode.LanguageModelToolResult([
+                        new vscode.LanguageModelTextPart(
+                            JSON.stringify({ error: `No result table found with id: ${tableId}` })
+                        )
+                    ]);
+                }
+                return new vscode.LanguageModelToolResult([
+                    new vscode.LanguageModelTextPart(
+                        JSON.stringify({ success: true, tableId, selectedRows: rowIndices.length })
+                    )
+                ]);
+            }
+        }),
+
+        vscode.lm.registerTool<SelectCellsInput>('barge_select_cells', {
+            invoke(options, _token) {
+                const { tableId, cells } = options.input;
+                const found = BargePanel.selectCells(tableId, cells);
+                if (!found) {
+                    return new vscode.LanguageModelToolResult([
+                        new vscode.LanguageModelTextPart(
+                            JSON.stringify({ error: `No result table found with id: ${tableId}` })
+                        )
+                    ]);
+                }
+                return new vscode.LanguageModelToolResult([
+                    new vscode.LanguageModelTextPart(
+                        JSON.stringify({ success: true, tableId, selectedCells: cells.length })
+                    )
                 ]);
             }
         })

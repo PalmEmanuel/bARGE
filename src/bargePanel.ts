@@ -123,6 +123,39 @@ export class BargePanel {
     }
 
     /**
+     * Select (highlight) specific rows in a panel's result table.
+     * The panel is revealed and a message is posted to the webview to
+     * perform the selection using the existing row-selection system.
+     * @returns true if the panel was found and the message was posted.
+     */
+    public static selectRows(tableId: string, rowIndices: number[]): boolean {
+        for (const panel of BargePanel._panels) {
+            if (panel._getPanelId() === tableId) {
+                panel._panel.reveal(undefined, /* preserveFocus */ true);
+                panel._postMessage({ type: 'selectRows', payload: { rowIndices } });
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Select (highlight) specific cells in a panel's result table.
+     * Each cell is identified by a { row, column } pair (0-based indices).
+     * @returns true if the panel was found and the message was posted.
+     */
+    public static selectCells(tableId: string, cells: { row: number; column: number }[]): boolean {
+        for (const panel of BargePanel._panels) {
+            if (panel._getPanelId() === tableId) {
+                panel._panel.reveal(undefined, /* preserveFocus */ true);
+                panel._postMessage({ type: 'selectCells', payload: { cells } });
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Re-key all panels associated with `oldKey` to `newKey`.
      * Called when a source file is renamed.
      */
