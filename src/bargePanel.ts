@@ -25,6 +25,20 @@ export class BargePanel {
     private _webviewReady = false;
     private _pendingMessages: any[] = [];
     private _lastResult: QueryResult | undefined;
+    private _viewData: any[][] | undefined;
+
+    private _getEffectiveResult(): QueryResult | undefined {
+        if (!this._lastResult) {
+            return undefined;
+        }
+        if (!this._viewData) {
+            return this._lastResult;
+        }
+        return {
+            ...this._lastResult,
+            data: this._viewData
+        };
+    }
 
     // ── public static API ──────────────────────────────────────────────
 
@@ -94,7 +108,7 @@ export class BargePanel {
                 hasData: panel._lastResult !== undefined,
                 query: panel._lastResult?.query,
                 timestamp: panel._lastResult?.timestamp,
-                rowCount: panel._lastResult?.data?.length,
+                rowCount: panel._getEffectiveResult()?.data?.length,
                 columnCount: panel._lastResult?.columns?.length,
                 columns: panel._lastResult?.columns,
                 executionTimeMs: panel._lastResult?.executionTimeMs,
@@ -125,6 +139,19 @@ export class BargePanel {
      * Return the last query result for the panel identified by `tableId`, or undefined if not found.
      */
     public static getPanelResult(tableId: string): QueryResult | undefined {
+        for (const panel of BargePanel._panels) {
+            if (panel._getPanelId() === tableId) {
+                return panel._getEffectiveResult();
+            }
+        }
+        return undefined;
+    }
+
+    /**
+     * Return the raw last query result for the panel identified by `tableId`,
+     * ignoring visual table state such as active filters or sort order.
+     */
+    public static getPanelRawResult(tableId: string): QueryResult | undefined {
         for (const panel of BargePanel._panels) {
             if (panel._getPanelId() === tableId) {
                 return panel._lastResult;
@@ -513,6 +540,11 @@ export class BargePanel {
                     });
                 }
                 break;
+            case 'tableViewSnapshot':
+                if (Array.isArray(message.payload?.data)) {
+                    this._viewData = message.payload.data;
+                }
+                break;
         }
     }
 
@@ -524,6 +556,9 @@ export class BargePanel {
             });
 
             this._panel.reveal();
+
+            // New query invalidates any previous visual view snapshot.
+            this._viewData = undefined;
 
             const result = await this._azureService.runQuery(query, undefined, (progress) => {
                 // Send pagination progress to webview overlay
@@ -606,6 +641,9 @@ export class BargePanel {
                 type: 'queryResult',
                 payload: response
             });
+
+            // Clear stale visual data when query fails.
+            this._viewData = undefined;
 
             return false;
         }

@@ -9,6 +9,7 @@ interface ListTablesInput {
 interface GetTableDataInput {
     tableId: string;
     maxRows?: number;
+    ignoreFilters?: boolean;
 }
 
 interface SelectRowsInput {
@@ -46,20 +47,40 @@ export function registerMcpTools(
     context: vscode.ExtensionContext,
     azureService: AzureService
 ): void {
+    
+    // Default maximum number of rows to return when fetching table data via get_barge_table_data tool
+    const DEFAULT_MAX_ROWS = 100;
+
     context.subscriptions.push(
         vscode.lm.registerTool<ListTablesInput>('list_barge_tables', {
+            prepareInvocation(_options, _token) {
+                return {
+                    invocationMessage: new vscode.MarkdownString(`**Listing** bARGE tables (tabs)...`)
+                };
+            },
             invoke(_options, _token) {
                 const tables = BargePanel.getAllPanelsInfo();
                 return new vscode.LanguageModelToolResult([
+                    vscode.LanguageModelDataPart.text(
+                        `**Listed** ${tables.length} bARGE table${tables.length !== 1 ? 's' : ''}.`,
+                        'text/markdown'
+                    ),
                     new vscode.LanguageModelTextPart(JSON.stringify(tables, null, 2))
                 ]);
             }
         }),
 
         vscode.lm.registerTool<GetTableDataInput>('get_barge_table_data', {
+            prepareInvocation(options, _token) {
+                return {
+                    invocationMessage: new vscode.MarkdownString(`**Reading** bARGE table data (max ${options.input.maxRows ?? DEFAULT_MAX_ROWS} rows)${options.input.ignoreFilters ? ', ignoring active filters' : ''}...`)
+                };
+            },
             invoke(options, _token) {
-                const { tableId, maxRows } = options.input;
-                const result = BargePanel.getPanelResult(tableId);
+                const { tableId, maxRows, ignoreFilters } = options.input;
+                const result = ignoreFilters
+                    ? BargePanel.getPanelRawResult(tableId)
+                    : BargePanel.getPanelResult(tableId);
                 if (!result) {
                     return new vscode.LanguageModelToolResult([
                         new vscode.LanguageModelTextPart(
@@ -68,7 +89,6 @@ export function registerMcpTools(
                     ]);
                 }
 
-                const DEFAULT_MAX_ROWS = 500;
                 const limit = typeof maxRows === 'number' && maxRows > 0 ? maxRows : DEFAULT_MAX_ROWS;
                 const truncated = result.data.length > limit;
                 const output = {
@@ -78,20 +98,31 @@ export function registerMcpTools(
                     executionTimeMs: result.executionTimeMs,
                     totalRecords: result.totalRecords,
                     columns: result.columns,
+                    ignoreFilters: !!ignoreFilters,
                     rowCount: result.data.length,
                     returnedRows: Math.min(limit, result.data.length),
                     truncated,
                     data: result.data.slice(0, limit)
                 };
                 return new vscode.LanguageModelToolResult([
+                    vscode.LanguageModelDataPart.text(
+                        `**Read** ${output.returnedRows} row${output.returnedRows !== 1 ? 's' : ''} of bARGE table data${ignoreFilters ? ', ignoring' : ' with'} active filters.`,
+                        'text/markdown'
+                    ),
                     new vscode.LanguageModelTextPart(JSON.stringify(output, null, 2))
                 ]);
             }
         }),
 
         vscode.lm.registerTool<SelectRowsInput>('select_barge_rows', {
+            prepareInvocation(options, _token) {
+                return {
+                    invocationMessage: new vscode.MarkdownString(`**Selecting** ${options.input.rowIndices.length} row${options.input.rowIndices.length !== 1 ? 's' : ''} in the table...`)
+                };
+            },
             invoke(options, _token) {
                 const { tableId, rowIndices } = options.input;
+                // This posts a selectRows message to the webview, which triggers the same logic as a user click (comparison view, etc.)
                 const found = BargePanel.selectRows(tableId, rowIndices);
                 if (!found) {
                     return new vscode.LanguageModelToolResult([
@@ -101,6 +132,10 @@ export function registerMcpTools(
                     ]);
                 }
                 return new vscode.LanguageModelToolResult([
+                    vscode.LanguageModelDataPart.text(
+                        `**Selected** ${rowIndices.length} row${rowIndices.length !== 1 ? 's' : ''} in the table.`,
+                        'text/markdown'
+                    ),
                     new vscode.LanguageModelTextPart(
                         JSON.stringify({ success: true, tableId, selectedRows: rowIndices.length })
                     )
@@ -109,6 +144,11 @@ export function registerMcpTools(
         }),
 
         vscode.lm.registerTool<SelectCellsInput>('select_barge_cells', {
+            prepareInvocation(options, _token) {
+                return {
+                    invocationMessage: new vscode.MarkdownString(`**Selecting** ${options.input.cells.length} cell${options.input.cells.length !== 1 ? 's' : ''} in the table...`)
+                };
+            },
             invoke(options, _token) {
                 const { tableId, cells } = options.input;
                 const found = BargePanel.selectCells(tableId, cells);
@@ -120,6 +160,10 @@ export function registerMcpTools(
                     ]);
                 }
                 return new vscode.LanguageModelToolResult([
+                    vscode.LanguageModelDataPart.text(
+                        `**Selected** ${cells.length} cell${cells.length !== 1 ? 's' : ''} in the table.`,
+                        'text/markdown'
+                    ),
                     new vscode.LanguageModelTextPart(
                         JSON.stringify({ success: true, tableId, selectedCells: cells.length })
                     )
@@ -128,6 +172,11 @@ export function registerMcpTools(
         }),
 
         vscode.lm.registerTool<RunQueryInput>('run_barge_query', {
+            prepareInvocation(options, _token) {
+                return {
+                    invocationMessage: new vscode.MarkdownString(`**Querying** ARG using bARGE:\n\n\`\`\`\n${options.input.query}\n\`\`\``)
+                };
+            },
             async invoke(options, _token) {
                 const { query, tableId } = options.input;
 
@@ -170,7 +219,12 @@ export function registerMcpTools(
                     if (!success) {
                         return new vscode.LanguageModelToolResult([
                             new vscode.LanguageModelTextPart(
-                                JSON.stringify({ success: false, tableId: panel.getPanelId(), message: 'Query execution failed. Check the bARGE results panel for details.' })
+                                JSON.stringify({
+                                    success: false,
+                                    tableId: panel.getPanelId(),
+                                    requestedQuery: query,
+                                    message: 'Query execution failed. Check the bARGE results panel for details.'
+                                })
                             )
                         ]);
                     }
@@ -179,7 +233,12 @@ export function registerMcpTools(
                     if (!result) {
                         return new vscode.LanguageModelToolResult([
                             new vscode.LanguageModelTextPart(
-                                JSON.stringify({ success: false, tableId: panel.getPanelId(), message: 'Query execution did not produce any stored result.' })
+                                JSON.stringify({
+                                    success: false,
+                                    tableId: panel.getPanelId(),
+                                    requestedQuery: query,
+                                    message: 'Query execution did not produce any stored result.'
+                                })
                             )
                         ]);
                     }
@@ -187,16 +246,26 @@ export function registerMcpTools(
                     if (result.query !== query) {
                         return new vscode.LanguageModelToolResult([
                             new vscode.LanguageModelTextPart(
-                                JSON.stringify({ success: false, tableId: panel.getPanelId(), message: 'No fresh result found for the requested query. The panel may contain results from a previous query.' })
+                                JSON.stringify({
+                                    success: false,
+                                    tableId: panel.getPanelId(),
+                                    requestedQuery: query,
+                                    message: 'No fresh result found for the requested query. The panel may contain results from a previous query.'
+                                })
                             )
                         ]);
                     }
 
                     return new vscode.LanguageModelToolResult([
+                        vscode.LanguageModelDataPart.text(
+                            `**Queried** ARG using bARGE\n\n\`\`\`\n${options.input.query}\n\`\`\``,
+                            'text/markdown'
+                        ),
                         new vscode.LanguageModelTextPart(JSON.stringify({
                             success: true,
                             tableId: panel.getPanelId(),
-                            query: result.query,
+                            requestedQuery: query,
+                            executedQuery: result.query,
                             timestamp: result.timestamp,
                             executionTimeMs: result.executionTimeMs,
                             totalRecords: result.totalRecords,
@@ -220,6 +289,11 @@ export function registerMcpTools(
         }),
 
         vscode.lm.registerTool<SortTableInput>('sort_barge_table', {
+            prepareInvocation(options, _token) {
+                return {
+                    invocationMessage: new vscode.MarkdownString(`**Sorting** column '${options.input.column}' in ${options.input.direction} order...`)
+                };
+            },
             invoke(options, _token) {
                 const { tableId, column, direction } = options.input;
                 const result = BargePanel.getPanelResult(tableId);
@@ -252,6 +326,10 @@ export function registerMcpTools(
                     ]);
                 }
                 return new vscode.LanguageModelToolResult([
+                    vscode.LanguageModelDataPart.text(
+                        `**Sorted** column '${column}' ${sortDir}.`,
+                        'text/markdown'
+                    ),
                     new vscode.LanguageModelTextPart(
                         JSON.stringify({ success: true, tableId, column, direction: sortDir })
                     )
@@ -260,6 +338,11 @@ export function registerMcpTools(
         }),
 
         vscode.lm.registerTool<FilterTableInput>('filter_barge_table', {
+            prepareInvocation(options, _token) {
+                return {
+                    invocationMessage: new vscode.MarkdownString(`**Filtering** table on ${options.input.filters.map(f => f.column).join(', ')}...`)
+                };
+            },
             invoke(options, _token) {
                 const { tableId, filters } = options.input;
                 const result = BargePanel.getPanelResult(tableId);
@@ -271,14 +354,24 @@ export function registerMcpTools(
                     ]);
                 }
 
-                // Validate all column names exist
-                const columnNames = result.columns.map(c => c.name);
+                // Validate all column names exist and are not object/array types
+                const columnMap = new Map(result.columns.map(c => [c.name, c.type]));
                 for (const filter of filters) {
-                    if (!columnNames.includes(filter.column)) {
+                    const colType = columnMap.get(filter.column);
+                    if (!colType) {
                         return new vscode.LanguageModelToolResult([
                             new vscode.LanguageModelTextPart(
                                 JSON.stringify({
-                                    error: `Column '${filter.column}' not found. Available columns: ${columnNames.join(', ')}`
+                                    error: `Column '${filter.column}' not found. Available columns: ${Array.from(columnMap.keys()).join(', ')}`
+                                })
+                            )
+                        ]);
+                    }
+                    if (colType === 'object' || colType === 'array') {
+                        return new vscode.LanguageModelToolResult([
+                            new vscode.LanguageModelTextPart(
+                                JSON.stringify({
+                                    error: `Filtering on column '${filter.column}' of type '${colType}' is not supported. Only primitive columns can be filtered.`
                                 })
                             )
                         ]);
@@ -294,6 +387,10 @@ export function registerMcpTools(
                     ]);
                 }
                 return new vscode.LanguageModelToolResult([
+                    vscode.LanguageModelDataPart.text(
+                        `**Filtered** table\n\n${options.input.filters.map(f => f.column).join(', ')}.`,
+                        'text/markdown'
+                    ),
                     new vscode.LanguageModelTextPart(
                         JSON.stringify({
                             success: true,

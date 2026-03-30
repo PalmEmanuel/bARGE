@@ -2359,6 +2359,21 @@ function updateTableAfterSort(sortedData) {
 
     // Update details panel if it's open
     updateDetailsAfterSort();
+
+    notifyTableViewSnapshot();
+}
+
+function notifyTableViewSnapshot() {
+    if (!currentResults || !Array.isArray(currentResults.data)) {
+        return;
+    }
+
+    vscode.postMessage({
+        type: 'tableViewSnapshot',
+        payload: {
+            data: currentResults.data
+        }
+    });
 }
 
 function sortTable(columnIndex, keepDirection, forceDirection) {
@@ -2514,6 +2529,8 @@ function applyFilters() {
 
     // Save sticky filters whenever filters change
     if (stickyFilters) { saveStickyFilters(); }
+
+    notifyTableViewSnapshot();
 }
 
 /**
@@ -4821,7 +4838,51 @@ window.addEventListener('message', event => {
                     }
                 });
                 updateDetailButtonStates();
-                if (selectedDetailRowIndices.length > 0) {
+                updateDetailsNavigation();
+
+                if (selectedDetailRowIndices.length === 0) {
+                    closeDetails();
+                } else {
+                    // Keep detail state aligned with interactive row selection.
+                    currentDetailRowIndex = selectedDetailRowIndices[0];
+                    currentDetailRowData = currentResults && currentResults.data
+                        ? currentResults.data[currentDetailRowIndex]
+                        : null;
+
+                    const detailsSection = document.getElementById('detailsSection');
+                    const resizeHandle = document.getElementById('resizeHandle');
+                    const tableSection = document.getElementById('tableSection');
+
+                    detectAndSetLayout();
+
+                    const isDetailsAlreadyOpen = detailsSection && detailsSection.style.display === 'flex';
+
+                    if (detailsSection) detailsSection.style.display = 'flex';
+                    if (resizeHandle) resizeHandle.style.display = 'block';
+
+                    if (!isDetailsAlreadyOpen && tableSection && detailsSection) {
+                        tableSection.style.flex = '2 1 0';
+                        detailsSection.style.flex = '1 1 0';
+                    }
+
+                    if (!isDetailsAlreadyOpen) {
+                        setTimeout(() => {
+                            const resizeHandle = document.getElementById('resizeHandle');
+                            if (resizeHandle) {
+                                if (currentLayout === 'horizontal') {
+                                    resizeHandle.style.left = '66.666%';
+                                    resizeHandle.style.top = '2.5%';
+                                } else {
+                                    resizeHandle.style.top = 'calc(66.666% - 3px)';
+                                    resizeHandle.style.left = '2.5%';
+                                }
+                            }
+                        }, 0);
+                    }
+
+                    initializeResizing();
+                    updateDetailsAfterSort();
+
                     // Scroll the first selected row into view
                     var firstCell = document.querySelector('td[data-row="' + selectedDetailRowIndices[0] + '"]');
                     if (firstCell) {

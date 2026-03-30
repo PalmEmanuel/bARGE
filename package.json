@@ -38,12 +38,6 @@
     "Other"
   ],
   "activationEvents": [
-    "onLanguage:kql",
-    "onCommand:barge.openResults",
-    "onCommand:barge.runQueryFromFile",
-    "onCommand:barge.runQueryFromSelection",
-    "onCommand:barge.setScope",
-    "onCommand:barge.authenticate",
     "onLanguageModel"
   ],
   "main": "./dist/extension.js",
@@ -264,7 +258,7 @@
         "canBeReferencedInPrompt": true,
         "toolReferenceName": "GetBargeTableData",
         "displayName": "Get bARGE Table Data",
-        "modelDescription": "Returns the full query result data for a specific bARGE result panel identified by tableId (obtained from list_barge_tables). The response includes column definitions and data rows. Use the optional maxRows parameter to limit the number of rows returned; the response will indicate whether the result was truncated.",
+        "modelDescription": "Returns table data for a specific bARGE result panel identified by tableId (obtained from list_barge_tables). By default, rows come from the current visual table state, including active filters and sort order if applied. Set ignoreFilters=true to return the raw query result rows instead. The response includes column definitions and data rows. Use the optional maxRows parameter to limit the number of rows returned; the response will indicate whether the result was truncated.",
         "tags": [
           "barge",
           "azure",
@@ -280,6 +274,10 @@
             "maxRows": {
               "type": "number",
               "description": "Maximum number of data rows to return. Omit or set to 0 to return all rows. Use this to avoid very large responses when working with large result sets."
+            },
+            "ignoreFilters": {
+              "type": "boolean",
+              "description": "Optional. When true, returns raw query result rows and ignores visual filters/sort state. When false or omitted, returns rows from the current visual table state."
             }
           },
           "required": [
@@ -370,7 +368,7 @@
         "canBeReferencedInPrompt": true,
         "toolReferenceName": "RunBargeQuery",
         "displayName": "Run Azure Resource Graph Query",
-        "modelDescription": "Executes a KQL query against Azure Resource Graph and displays the results in a bARGE panel. The user must be authenticated first (use the bARGE: Sign In command). Returns metadata about the result (columns, row count, execution time) — use get_barge_table_data to retrieve the actual data rows afterwards. Optionally specify an existing tableId to reuse that panel; otherwise a new panel is created.",
+        "modelDescription": "Executes a KQL query against Azure Resource Graph and displays the results in a bARGE panel. The user must be authenticated first (use the bARGE: Sign In command). Returns metadata about the result (columns, row count, execution time). Use get_barge_table_data to retrieve the actual data rows afterwards. Optionally specify an existing tableId to reuse that panel; otherwise a new panel is created.",
         "tags": [
           "barge",
           "azure",
@@ -432,7 +430,7 @@
         "canBeReferencedInPrompt": true,
         "toolReferenceName": "FilterBargeTable",
         "displayName": "Filter bARGE Table",
-        "modelDescription": "Applies column filters to a bARGE result table to show only rows where specified columns match given values. Replaces any existing filters. Each filter specifies a column name and an array of string values to include (matching is based on the display text of each cell). Use this to narrow down results, e.g. show only resources in 'eastus' or only 'Premium' SKUs.",
+        "modelDescription": "Applies column filters to a bARGE result table to show only rows where specified columns match given values. Replaces any existing filters. Each filter specifies a column name and an array of string values to include (matching is based on the display text of each cell). Only primitive columns are filterable (for example string, number, boolean); object and array columns are not supported. Use this to narrow down results, e.g. show only resources in 'eastus' or only 'Premium' SKUs.",
         "tags": [
           "barge",
           "azure",
@@ -452,7 +450,7 @@
                 "properties": {
                   "column": {
                     "type": "string",
-                    "description": "The name of the column to filter on (e.g. 'location', 'sku')."
+                    "description": "The name of a primitive column to filter on (e.g. 'location', 'sku'). Columns of type object or array are not supported."
                   },
                   "values": {
                     "type": "array",
