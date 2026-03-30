@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
 import { AzureService } from './azure/azureService';
-import { WebviewMessage, QueryResponse, ResolveGuidRequest, ResolveGuidResponse, IdentityInfo } from './types';
+import { WebviewMessage, QueryResponse, QueryResult, PanelInfo, ResolveGuidRequest, ResolveGuidResponse, IdentityInfo } from './types';
 
 export class BargePanel {
     /** All live panels. */
@@ -24,6 +24,7 @@ export class BargePanel {
     private _disposables: vscode.Disposable[] = [];
     private _webviewReady = false;
     private _pendingMessages: any[] = [];
+    private _lastResult: QueryResult | undefined;
 
     // ── public static API ──────────────────────────────────────────────
 
@@ -75,6 +76,50 @@ export class BargePanel {
      */
     public static getTargetForFile(fileKey: string): BargePanel | undefined {
         return BargePanel._targetPanels.get(fileKey);
+    }
+
+    /**
+     * Return info about all open panels, suitable for MCP tool responses.
+     * The currently selected table is the target panel for the active file.
+     */
+    public static getAllPanelsInfo(): PanelInfo[] {
+        const result: PanelInfo[] = [];
+        for (const panel of BargePanel._panels) {
+            const isTarget = BargePanel._targetPanels.get(panel._sourceFileKey) === panel;
+            const isActiveFile = BargePanel._activeFileKey === panel._sourceFileKey;
+            result.push({
+                tableId: panel._getPanelId(),
+                sourceFile: panel._sourceFileKey,
+                isCurrentTarget: isTarget && isActiveFile,
+                hasData: panel._lastResult !== undefined,
+                query: panel._lastResult?.query,
+                timestamp: panel._lastResult?.timestamp,
+                rowCount: panel._lastResult?.data?.length,
+                columnCount: panel._lastResult?.columns?.length,
+                columns: panel._lastResult?.columns,
+                executionTimeMs: panel._lastResult?.executionTimeMs,
+                totalRecords: panel._lastResult?.totalRecords
+            });
+        }
+        // Sort so the current target appears first, then by creation order
+        result.sort((a, b) => {
+            if (a.isCurrentTarget && !b.isCurrentTarget) { return -1; }
+            if (!a.isCurrentTarget && b.isCurrentTarget) { return 1; }
+            return a.tableId.localeCompare(b.tableId);
+        });
+        return result;
+    }
+
+    /**
+     * Return the last query result for the panel identified by `tableId`, or undefined if not found.
+     */
+    public static getPanelResult(tableId: string): QueryResult | undefined {
+        for (const panel of BargePanel._panels) {
+            if (panel._getPanelId() === tableId) {
+                return panel._lastResult;
+            }
+        }
+        return undefined;
     }
 
     /**
@@ -227,6 +272,11 @@ export class BargePanel {
             null,
             this._disposables
         );
+    }
+
+    /** Returns the stable unique identifier for this panel, matching the {@link PanelInfo.tableId} format. */
+    private _getPanelId(): string {
+        return `${this._sourceFileKey}:${this._creationOrder}`;
     }
 
     private _postMessage(message: any) {
@@ -384,6 +434,8 @@ export class BargePanel {
                     name: col.name.split(' (')[0]
                 }));
             }
+
+            this._lastResult = result;
 
             const response: QueryResponse = {
                 success: true,

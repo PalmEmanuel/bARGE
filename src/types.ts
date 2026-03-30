@@ -41,6 +41,37 @@ export interface WebviewMessage {
 }
 
 /**
+ * Summary info about a single bARGE result panel, used by the MCP tools.
+ */
+export interface PanelInfo {
+    /** Stable unique identifier: "<sourceFile>:<creationOrder>" */
+    tableId: string;
+    /** File name key (basename) the panel is associated with, e.g. "storage.kql" or "untitled" */
+    sourceFile: string;
+    /**
+     * True when this is the panel that the next "Run Query" action would target,
+     * i.e. the panel marked with the blue dot in the tab bar.
+     */
+    isCurrentTarget: boolean;
+    /** Whether the panel has at least one completed query result stored. */
+    hasData: boolean;
+    /** The KQL query text from the last successful run. */
+    query?: string;
+    /** ISO-8601 timestamp of the last successful run. */
+    timestamp?: string;
+    /** Number of data rows returned. */
+    rowCount?: number;
+    /** Number of columns in the result. */
+    columnCount?: number;
+    /** Column definitions from the last result. */
+    columns?: ColumnDefinition[];
+    /** Total record count as reported by Azure Resource Graph. */
+    totalRecords?: number;
+    /** Wall-clock query execution time in milliseconds. */
+    executionTimeMs?: number;
+}
+
+/**
  * Types for GUID resolution functionality
  */
 export interface IdentityInfo {
