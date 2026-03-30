@@ -348,6 +348,111 @@
             "cells"
           ]
         }
+      },
+      {
+        "name": "barge_run_query",
+        "displayName": "Run Azure Resource Graph Query",
+        "modelDescription": "Executes a KQL query against Azure Resource Graph and displays the results in a bARGE panel. The user must be authenticated first (use the bARGE: Sign In command). Returns metadata about the result (columns, row count, execution time) — use barge_get_table_data to retrieve the actual data rows afterwards. Optionally specify an existing tableId to reuse that panel; otherwise a new panel is created.",
+        "tags": [
+          "barge",
+          "azure",
+          "resource-graph"
+        ],
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "The KQL query to execute against Azure Resource Graph (e.g. 'Resources | where type == \"microsoft.compute/virtualmachines\" | project name, location, resourceGroup | limit 50')."
+            },
+            "tableId": {
+              "type": "string",
+              "description": "Optional. The tableId of an existing bARGE panel to run the query in. If omitted, a new panel is created. Obtain valid tableIds from barge_list_tables."
+            }
+          },
+          "required": [
+            "query"
+          ]
+        }
+      },
+      {
+        "name": "barge_sort_table",
+        "displayName": "Sort bARGE Table",
+        "modelDescription": "Sorts a bARGE result table by a specified column name in ascending or descending order. The sort is applied visually in the webview table. Use column names as returned by barge_list_tables or barge_get_table_data.",
+        "tags": [
+          "barge",
+          "azure",
+          "resource-graph"
+        ],
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "tableId": {
+              "type": "string",
+              "description": "The unique identifier of the result table (e.g. 'storage.kql:1'). Obtain valid tableIds from barge_list_tables."
+            },
+            "column": {
+              "type": "string",
+              "description": "The name of the column to sort by (e.g. 'name', 'location'). Must match a column name from the result set."
+            },
+            "direction": {
+              "type": "string",
+              "enum": ["asc", "desc"],
+              "description": "Sort direction: 'asc' for ascending (default) or 'desc' for descending."
+            }
+          },
+          "required": [
+            "tableId",
+            "column"
+          ]
+        }
+      },
+      {
+        "name": "barge_filter_table",
+        "displayName": "Filter bARGE Table",
+        "modelDescription": "Applies column filters to a bARGE result table to show only rows where specified columns match given values. Replaces any existing filters. Each filter specifies a column name and an array of string values to include (matching is based on the display text of each cell). Use this to narrow down results, e.g. show only resources in 'eastus' or only 'Premium' SKUs.",
+        "tags": [
+          "barge",
+          "azure",
+          "resource-graph"
+        ],
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "tableId": {
+              "type": "string",
+              "description": "The unique identifier of the result table (e.g. 'storage.kql:1'). Obtain valid tableIds from barge_list_tables."
+            },
+            "filters": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "column": {
+                    "type": "string",
+                    "description": "The name of the column to filter on (e.g. 'location', 'sku')."
+                  },
+                  "values": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Array of string values to include. Only rows where the column value matches one of these values will be shown."
+                  }
+                },
+                "required": [
+                  "column",
+                  "values"
+                ]
+              },
+              "description": "Array of column filters to apply. Multiple filters are combined with AND logic (all must match)."
+            }
+          },
+          "required": [
+            "tableId",
+            "filters"
+          ]
+        }
       }
     ]
   },

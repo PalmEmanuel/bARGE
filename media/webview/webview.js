@@ -4854,6 +4854,44 @@ window.addEventListener('message', event => {
                 }
             }
             break;
+        case 'sortTable':
+            if (message.payload && currentResults && currentResults.columns) {
+                var colName = message.payload.column;
+                var sortDir = message.payload.direction || 'asc';
+                var colIdx = currentResults.columns.findIndex(function(c) { return c.name === colName; });
+                if (colIdx !== -1) {
+                    sortTable(colIdx, false, sortDir);
+                }
+            }
+            break;
+        case 'filterTable':
+            if (message.payload && Array.isArray(message.payload.filters) && currentResults && currentResults.columns && fullData) {
+                // Clear existing filters first
+                columnFilters.clear();
+
+                message.payload.filters.forEach(function(f) {
+                    var colIdx = currentResults.columns.findIndex(function(c) { return c.name === f.column; });
+                    if (colIdx === -1) { return; }
+
+                    // Build a Set of included filter keys from the requested display values
+                    var includedKeys = new Set();
+                    var requestedValues = new Set(f.values.map(function(v) { return String(v); }));
+
+                    for (var i = 0; i < fullData.length; i++) {
+                        var key = filterValueKey(fullData[i][colIdx]);
+                        var label = filterValueLabel(fullData[i][colIdx]);
+                        if (requestedValues.has(label) || requestedValues.has(key)) {
+                            includedKeys.add(key);
+                        }
+                    }
+
+                    columnFilters.set(colIdx, { all: false, includedKeys: includedKeys });
+                });
+
+                applyFilters();
+                updateFilterHeaderIcons();
+            }
+            break;
     }
 });
 

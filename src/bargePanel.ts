@@ -123,6 +123,19 @@ export class BargePanel {
     }
 
     /**
+     * Return the panel instance identified by `tableId`, or undefined if not found.
+     * Used by MCP tools that need to call instance methods (e.g. runQuery).
+     */
+    public static getTargetByTableId(tableId: string): BargePanel | undefined {
+        for (const panel of BargePanel._panels) {
+            if (panel._getPanelId() === tableId) {
+                return panel;
+            }
+        }
+        return undefined;
+    }
+
+    /**
      * Select (highlight) specific rows in a panel's result table.
      * The panel is revealed and a message is posted to the webview to
      * perform the selection using the existing row-selection system.
@@ -149,6 +162,37 @@ export class BargePanel {
             if (panel._getPanelId() === tableId) {
                 panel._panel.reveal(undefined, /* preserveFocus */ true);
                 panel._postMessage({ type: 'selectCells', payload: { cells } });
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Sort a panel's result table by the given column name.
+     * @returns true if the panel was found and the message was posted.
+     */
+    public static sortTable(tableId: string, column: string, direction: 'asc' | 'desc'): boolean {
+        for (const panel of BargePanel._panels) {
+            if (panel._getPanelId() === tableId) {
+                panel._panel.reveal(undefined, /* preserveFocus */ true);
+                panel._postMessage({ type: 'sortTable', payload: { column, direction } });
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Apply column filters on a panel's result table.
+     * Each filter specifies a column name and an array of values to include.
+     * @returns true if the panel was found and the message was posted.
+     */
+    public static filterTable(tableId: string, filters: { column: string; values: string[] }[]): boolean {
+        for (const panel of BargePanel._panels) {
+            if (panel._getPanelId() === tableId) {
+                panel._panel.reveal(undefined, /* preserveFocus */ true);
+                panel._postMessage({ type: 'filterTable', payload: { filters } });
                 return true;
             }
         }
@@ -310,6 +354,11 @@ export class BargePanel {
     /** Returns the stable unique identifier for this panel, matching the {@link PanelInfo.tableId} format. */
     private _getPanelId(): string {
         return `${this._sourceFileKey}:${this._creationOrder}`;
+    }
+
+    /** Public accessor for the panel's stable unique identifier (used by MCP tools). */
+    public getPanelId(): string {
+        return this._getPanelId();
     }
 
     private _postMessage(message: any) {

@@ -483,7 +483,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(implicitQueryDecoration!, selListener, activeListener, docListener, themeListener);
 
 	// Register MCP / Language Model tools for GitHub Copilot integration
-	registerMcpTools(context);
+	registerMcpTools(context, azureService);
 
 	// Auto-authenticate if configured
 	const config = vscode.workspace.getConfiguration('barge');
