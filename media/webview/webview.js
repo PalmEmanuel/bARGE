@@ -4860,7 +4860,7 @@ window.addEventListener('message', event => {
                 var sortDir = message.payload.direction || 'asc';
                 var colIdx = currentResults.columns.findIndex(function(c) { return c.name === colName; });
                 if (colIdx !== -1) {
-                    sortTable(colIdx, false, sortDir);
+                    sortTable(colIdx, /* keepDirection */ false, sortDir);
                 }
             }
             break;
