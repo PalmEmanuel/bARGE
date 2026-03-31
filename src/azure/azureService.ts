@@ -160,14 +160,13 @@ export class AzureService {
     }
 
     async authenticate(): Promise<boolean> {
-        this.activeAuthenticateCalls++;
-        this.notifyLoadingStatusChanged(true, AzureService.SIGNING_IN_MESSAGE);
-
         // isStillCurrent is set only after the user selects an option, so that any
         // earlier in-flight auth attempt is automatically superseded.
         let isStillCurrent: (() => boolean) | undefined;
 
         try {
+            this.activeAuthenticateCalls++;
+            this.notifyLoadingStatusChanged(true, AzureService.SIGNING_IN_MESSAGE);
             // Messages here use codicons - https://microsoft.github.io/vscode-codicons/dist/codicon.html
             // Always build picker items starting with DefaultAzureCredential option
             const defaultCredentialOption = '$(azure) Use DefaultAzureCredential';
