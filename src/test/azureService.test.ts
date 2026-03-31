@@ -1,4 +1,5 @@
 import * as assert from 'assert';
+import * as vscode from 'vscode';
 import { AzureService } from '../azure/azureService';
 
 suite('AzureService Tests', () => {
@@ -141,6 +142,86 @@ suite('AzureService Tests', () => {
 			const service = new AzureService();
 			assert.strictEqual((service as any).authGeneration, 0, 'Initial authGeneration should be 0');
 			assert.strictEqual((service as any).activeAuthenticateCalls, 0, 'Initial activeAuthenticateCalls should be 0');
+		});
+
+		test('loading spinner clears only after all concurrent authenticate() calls complete', async () => {
+			let isLoading = false;
+			const service = new AzureService(undefined, (loading) => { isLoading = loading; });
+
+			const origGetAccounts = (vscode.authentication as any).getAccounts;
+			const origShowQuickPick = (vscode.window as any).showQuickPick;
+			try {
+				(vscode.authentication as any).getAccounts = async () => [];
+				(vscode.window as any).showQuickPick = async () => undefined; // both callers dismiss
+
+				await Promise.all([service.authenticate(), service.authenticate()]);
+
+				assert.strictEqual(isLoading, false, 'Loading spinner should be cleared after all calls complete');
+				assert.strictEqual((service as any).activeAuthenticateCalls, 0, 'activeAuthenticateCalls should be 0');
+			} finally {
+				(vscode.authentication as any).getAccounts = origGetAccounts;
+				(vscode.window as any).showQuickPick = origShowQuickPick;
+			}
+		});
+
+		test('authGeneration advances once per selection and resets cleanly', async () => {
+			const service = new AzureService();
+
+			const origGetAccounts = (vscode.authentication as any).getAccounts;
+			const origShowQuickPick = (vscode.window as any).showQuickPick;
+			try {
+				(vscode.authentication as any).getAccounts = async () => [];
+				// Both calls dismiss — no selection is made, so authGeneration stays at 0.
+				(vscode.window as any).showQuickPick = async () => undefined;
+
+				await Promise.all([service.authenticate(), service.authenticate()]);
+
+				assert.strictEqual((service as any).authGeneration, 0, 'authGeneration unchanged when no selection is made');
+				assert.strictEqual((service as any).activeAuthenticateCalls, 0);
+			} finally {
+				(vscode.authentication as any).getAccounts = origGetAccounts;
+				(vscode.window as any).showQuickPick = origShowQuickPick;
+			}
+		});
+
+		test('second selection supersedes first: isStillCurrent returns false for earlier generation', () => {
+			const service = new AzureService();
+
+			// Simulate the first call claiming generation 1.
+			(service as any).authGeneration = 1;
+			const firstIsStillCurrent = () => (service as any).authGeneration === 1;
+
+			// Simulate the second call advancing generation to 2.
+			(service as any).authGeneration = 2;
+			const secondIsStillCurrent = () => (service as any).authGeneration === 2;
+
+			assert.strictEqual(firstIsStillCurrent(), false, 'First selection is no longer current after second selection');
+			assert.strictEqual(secondIsStillCurrent(), true, 'Second selection is still current');
+
+			// A third call advances generation to 3 — second is now stale too.
+			(service as any).authGeneration = 3;
+			assert.strictEqual(secondIsStillCurrent(), false, 'Second selection becomes stale after a third selection');
+		});
+
+		test('two concurrent calls that both dismiss leave service unauthenticated and clean', async () => {
+			let authCallbackCount = 0;
+			const service = new AzureService(() => { authCallbackCount++; });
+
+			const origGetAccounts = (vscode.authentication as any).getAccounts;
+			const origShowQuickPick = (vscode.window as any).showQuickPick;
+			try {
+				(vscode.authentication as any).getAccounts = async () => [];
+				(vscode.window as any).showQuickPick = async () => undefined;
+
+				await Promise.all([service.authenticate(), service.authenticate()]);
+
+				assert.strictEqual(service.isAuthenticated(), false, 'Service should not be authenticated');
+				assert.strictEqual(service.getCurrentAccount(), null, 'No account should be set');
+				assert.strictEqual(authCallbackCount, 0, 'Auth status callback should not fire on dismiss');
+			} finally {
+				(vscode.authentication as any).getAccounts = origGetAccounts;
+				(vscode.window as any).showQuickPick = origShowQuickPick;
+			}
 		});
 	});
 

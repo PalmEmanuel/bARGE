@@ -291,9 +291,9 @@ export class AzureService {
 
         try {
             // Fall back to DefaultAzureCredential (Azure CLI, managed identity, etc.)
-            this.credential = new DefaultAzureCredential();
+            const credential = new DefaultAzureCredential();
             // Get token to verify authentication and get identity
-            const token = await this.credential.getToken([AzureService.ARM_RESOURCE_DEFAULT_SCOPE]);
+            const token = await credential.getToken([AzureService.ARM_RESOURCE_DEFAULT_SCOPE]);
 
             // Bail out if a newer auth selection has been made while we were waiting.
             if (isStillCurrent && !isStillCurrent()) {
@@ -302,18 +302,21 @@ export class AzureService {
             }
 
             if (token) {
-                // Set authenticated state before testing with getSubscriptions
-                this.authenticated = true;
-                this.currentAccount = await this.extractAccountFromToken(token.token);
-
-                // Get available subscriptions for account
-                this.currentSubscriptions = await this.getSubscriptions();
+                // Fetch derived values into locals before touching shared state.
+                const account = await this.extractAccountFromToken(token.token);
+                const subscriptions = await this.fetchSubscriptionsUsingCredential(credential);
 
                 // Bail out if superseded while fetching subscriptions.
                 if (isStillCurrent && !isStillCurrent()) {
                     console.log('bARGE: DefaultAzureCredential auth superseded after fetching subscriptions, exiting early.');
                     return false;
                 }
+
+                // Atomically commit all state now that we are confirmed still current.
+                this.credential = credential;
+                this.authenticated = true;
+                this.currentAccount = account;
+                this.currentSubscriptions = subscriptions;
 
                 if (manageLoading) { this.notifyLoadingStatusChanged(false); }
                 this.notifyAuthStatusChanged();
@@ -389,21 +392,21 @@ export class AzureService {
                 return false;
             }
 
-            // Set up our service clients with the VS Code credential
-            this.credential = new VSCodeCredential(session);
-
-            // Set authenticated state before testing with getSubscriptions
-            this.authenticated = true;
-            this.currentAccount = session.account.label;
-
-            // Get available subscriptions for account
-            this.currentSubscriptions = await this.getSubscriptions();
+            // Fetch derived values into locals before touching shared state.
+            const credential = new VSCodeCredential(session);
+            const subscriptions = await this.fetchSubscriptionsUsingCredential(credential);
 
             // Bail out if superseded while fetching subscriptions.
             if (isStillCurrent && !isStillCurrent()) {
                 console.log('bARGE: VS Code auth superseded after fetching subscriptions, exiting early.');
                 return false;
             }
+
+            // Atomically commit all state now that we are confirmed still current.
+            this.credential = credential;
+            this.authenticated = true;
+            this.currentAccount = session.account.label;
+            this.currentSubscriptions = subscriptions;
 
             if (manageLoading) { this.notifyLoadingStatusChanged(false); }
             this.notifyAuthStatusChanged();
@@ -429,9 +432,12 @@ export class AzureService {
 
     async getSubscriptions(): Promise<AzureSubscription[]> {
         this.validateAuthentication();
+        return this.fetchSubscriptionsUsingCredential(this.credential!);
+    }
 
+    private async fetchSubscriptionsUsingCredential(credential: TokenCredential): Promise<AzureSubscription[]> {
         try {
-            const tokenResponse = await this.credential!.getToken(AzureService.ARM_RESOURCE_DEFAULT_SCOPE);
+            const tokenResponse = await credential.getToken(AzureService.ARM_RESOURCE_DEFAULT_SCOPE);
             if (!tokenResponse) {
                 throw new Error('Failed to get access token');
             }
