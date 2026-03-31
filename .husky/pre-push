@@ -1,10 +1,18 @@
 #!/bin/sh
 
 # Validate commits being pushed, excluding bot commits
-echo "Validating commits from origin/main to HEAD..."
+# Use the remote branch as base when it exists so we only validate new commits;
+# fall back to origin/main for brand-new branches.
+current_branch=$(git rev-parse --abbrev-ref HEAD)
+if git rev-parse --verify "origin/$current_branch" >/dev/null 2>&1; then
+    base_ref="origin/$current_branch"
+else
+    base_ref="origin/main"
+fi
+echo "Validating new commits from $base_ref to HEAD..."
 
 # Get all commit hashes in the range
-commit_hashes=$(git log --format="%H" origin/main..HEAD)
+commit_hashes=$(git log --format="%H" "${base_ref}..HEAD")
 total_commits=0
 skipped_commits=0
 validated_commits=0
