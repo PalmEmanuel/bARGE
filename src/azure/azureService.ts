@@ -240,14 +240,14 @@ export class AzureService {
             if (selected.label === defaultCredentialOption) {
                 // User selected DefaultAzureCredential
                 return await this.authenticateWithDefaultCredential(isStillCurrent);
+            } else if (selected.label === vsCodeOtherOption || selected.label === vsCodeOption) {
+                // User selected VS Code authentication without a specific account
+                return await this.authenticateWithVSCode(undefined, isStillCurrent);
             } else if (selected.label.startsWith('$(vscode)')) {
-                // User selected VS Code authentication
+                // User selected a specific VS Code account
                 const trimmedLabel = selected.label.replace('$(vscode) ', '');
                 const selectedAccount = accounts.find(acc => trimmedLabel === acc.label);
                 return await this.authenticateWithVSCode(selectedAccount, isStillCurrent);
-            } else if (selected.label === vsCodeOtherOption) {
-                // User selected VS Code authentication without an account
-                return await this.authenticateWithVSCode(undefined, isStillCurrent);
             } else {
                 return false;
             }
