@@ -3,7 +3,8 @@
 	"compilerOptions": {
 		"rootDir": "../..",
 		"outDir": "../../out",
-		"lib": ["ES2022", "DOM"]
+		"lib": ["ES2022", "DOM", "ESNext.Disposable"],
+		"types": ["node", "mocha"]
 	},
 	"include": [
 		"webview.interactive.test.ts"
