@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# query-comparison.sh — Record the "Run query and compare rows" scenario:
-# Opens a KQL file, runs the query, selects two rows for comparison.
+# query-comparison.sh — Record the "Run query and view results" scenario:
+# Opens a KQL file and runs the query, showing the results panel.
 #
 # This script is sourced by record.sh.
 
@@ -25,12 +25,12 @@ code \
     > /dev/null 2>&1 &
 VSCODE_PID=$!
 
-sleep 5
+wait_for_vscode_window
 
 # Run the query via the command palette
 xdotool search --onlyvisible --name "Visual Studio Code" key --clearmodifiers ctrl+shift+p
 sleep 1
-xdotool type --clearmodifiers --delay 50 "bARGE: Run Query from Current File"
+xdotool type --clearmodifiers --delay 50 "bARGE: Run Query from File"
 sleep 0.5
 xdotool key Return
 sleep 5
@@ -38,5 +38,4 @@ sleep 5
 # Allow results to render
 sleep 3
 
-kill "${VSCODE_PID}" 2>/dev/null || true
-wait "${VSCODE_PID}" 2>/dev/null || true
+close_vscode

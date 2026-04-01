@@ -7,7 +7,7 @@
 #
 # If [scenario] is omitted, all scenarios in the scenarios/ directory are run.
 #
-# Dependencies: Xvfb, xdotool, ffmpeg, code (VS Code), jq
+# Dependencies: Xvfb, xdotool, ffmpeg, code (VS Code)
 #
 # Output: media/readme/gifs/<scenario>.gif
 
@@ -28,6 +28,10 @@ VSCODE_USER_DATA_DIR="/tmp/barge-gif-recording/user-data"
 VSCODE_EXTENSIONS_DIR="/tmp/barge-gif-recording/extensions"
 
 cleanup() {
+    if [[ -n "${FFMPEG_PID:-}" ]]; then
+        kill -INT "${FFMPEG_PID}" 2>/dev/null || true
+        wait "${FFMPEG_PID}" 2>/dev/null || true
+    fi
     if [[ -n "${XVFB_PID:-}" ]]; then
         kill "${XVFB_PID}" 2>/dev/null || true
     fi
@@ -35,6 +39,7 @@ cleanup() {
         kill "${VSCODE_PID}" 2>/dev/null || true
     fi
     rm -f "/tmp/barge-recording-$$.mkv"
+    rm -f "/tmp/barge-palette-$$.png"
 }
 
 trap cleanup EXIT
@@ -68,6 +73,34 @@ stop_recording() {
     fi
 }
 
+wait_for_vscode_window() {
+    local timeout=30
+    local elapsed=0
+    until xdotool search --onlyvisible --name "Visual Studio Code" >/dev/null 2>&1; do
+        if [[ $elapsed -ge $timeout ]]; then
+            echo "Timed out waiting for VS Code window after ${timeout}s" >&2
+            return 1
+        fi
+        sleep 1
+        ((elapsed++))
+    done
+}
+
+close_vscode() {
+    xdotool search --onlyvisible --name "Visual Studio Code" key --clearmodifiers ctrl+q 2>/dev/null || true
+    local elapsed=0
+    while xdotool search --onlyvisible --name "Visual Studio Code" >/dev/null 2>&1; do
+        if [[ $elapsed -ge 10 ]]; then
+            kill "${VSCODE_PID:-}" 2>/dev/null || true
+            break
+        fi
+        sleep 1
+        ((elapsed++))
+    done
+    wait "${VSCODE_PID:-}" 2>/dev/null || true
+    unset VSCODE_PID
+}
+
 convert_to_gif() {
     local input_file="$1"
     local output_file="$2"
@@ -97,7 +130,7 @@ install_extension() {
         | sort -rn | head -1 | cut -d' ' -f2-)"
 
     if [[ -z "${vsix_path}" ]]; then
-        echo "No .vsix found in repo root. Run 'npm run package' first." >&2
+        echo "No .vsix found in repo root. Create one with 'vsce package --no-yarn' from the repo root, then re-run this script." >&2
         exit 1
     fi
 

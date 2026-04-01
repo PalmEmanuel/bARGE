@@ -101,6 +101,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No GIF changes to commit."
           else
-            git commit -m "chore(dev): Update README GIFs [skip ci]"
+            git commit -m "chore(dev): Update README GIFs"
             git push
           fi

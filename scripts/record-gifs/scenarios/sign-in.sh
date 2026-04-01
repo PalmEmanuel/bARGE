@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # sign-in.sh — Record the Sign In scenario:
-# Shows the bARGE status bar, opens the account selector, and picks an account.
+# Opens VS Code, opens the command palette and runs the bARGE: Sign In command.
 #
 # This script is sourced by record.sh, which sets up DISPLAY and installs the
 # extension beforehand. Variables from record.sh are available here.
@@ -18,11 +18,9 @@ code \
     > /dev/null 2>&1 &
 VSCODE_PID=$!
 
-# Allow VS Code to load
-sleep 5
+wait_for_vscode_window
 
-# Click the bARGE status bar item to open the account picker
-# The status bar is at the bottom of the window; use xdotool to find and click it
+# Open the command palette and run the sign-in command
 xdotool search --onlyvisible --name "Visual Studio Code" key --clearmodifiers ctrl+shift+p
 sleep 1
 xdotool type --clearmodifiers --delay 50 "bARGE: Sign In"
@@ -33,5 +31,4 @@ sleep 4
 # Let the sign-in picker animation settle
 sleep 2
 
-kill "${VSCODE_PID}" 2>/dev/null || true
-wait "${VSCODE_PID}" 2>/dev/null || true
+close_vscode
