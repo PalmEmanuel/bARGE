@@ -13,6 +13,7 @@ code \
     --user-data-dir "${VSCODE_USER_DATA_DIR}" \
     --extensions-dir "${VSCODE_EXTENSIONS_DIR}" \
     --disable-gpu \
+    --no-sandbox \
     --disable-telemetry \
     "${FIXTURE_WORKSPACE}" \
     > /dev/null 2>&1 &

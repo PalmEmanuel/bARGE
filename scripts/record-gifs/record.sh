@@ -139,6 +139,7 @@ install_extension() {
     code \
         --user-data-dir "${VSCODE_USER_DATA_DIR}" \
         --extensions-dir "${VSCODE_EXTENSIONS_DIR}" \
+        --no-sandbox \
         --install-extension "${vsix_path}" \
         --force \
         > /dev/null 2>&1
