@@ -113,17 +113,17 @@ convert_to_gif() {
     local output_file="$2"
     local palette_file="/tmp/barge-palette-$$.png"
 
-    # Skip the first 1.5s (VS Code boot/splash) so the GIF starts with
-    # a fully-rendered window. Two-pass encoding for best colour quality.
+    # Skip the first 3s (VS Code boot/splash + extension host init) so the
+    # GIF starts with a fully-rendered window. Two-pass encoding for best colour quality.
     ffmpeg -y \
-        -ss 1.5 \
+        -ss 3 \
         -i "${input_file}" \
         -vf "fps=${GIF_FPS},scale=${GIF_WIDTH}:-1:flags=lanczos,palettegen=stats_mode=diff" \
         "${palette_file}" \
         > /dev/null 2>&1
 
     ffmpeg -y \
-        -ss 1.5 \
+        -ss 3 \
         -i "${input_file}" \
         -i "${palette_file}" \
         -lavfi "fps=${GIF_FPS},scale=${GIF_WIDTH}:-1:flags=lanczos [x]; [x][1:v] paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle" \
