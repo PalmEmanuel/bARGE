@@ -90,17 +90,17 @@ wait_for_vscode_window() {
         xdotool windowmove "${wid}" 0 0
         xdotool windowsize "${wid}" "${DISPLAY_WIDTH}" "${DISPLAY_HEIGHT}"
     fi
-    # Wait until VS Code has painted content. Capture a single frame and
-    # compute its stddev with ImageMagick: pure black = 0, any UI content > 0.
+    # Capture VS Code's specific window (by wid) to check if it has painted.
+    # Capturing by window ID avoids reading the root window background (black).
     local render_timeout=30
     local render_elapsed=0
     local frame_file="/tmp/barge-render-check-$$.png"
     until [[ $render_elapsed -ge $render_timeout ]]; do
-        # Use import (not ffmpeg x11grab) to avoid conflicting with the recording
-        DISPLAY=":${DISPLAY_NUM}" import -window root -silent "${frame_file}" 2>/dev/null || true
+        DISPLAY=":${DISPLAY_NUM}" import -window "${wid}" -silent "${frame_file}" 2>/dev/null || true
         local stddev
         stddev=$(convert "${frame_file}" -colorspace gray \
             -format "%[fx:standard_deviation]" info: 2>/dev/null || echo "0")
+        echo "Render check: stddev=${stddev} (elapsed=${render_elapsed}x0.5s)"
         # stddev is 0–1 in ImageMagick fx; anything above 0.01 means real content
         if awk "BEGIN{exit !(${stddev:-0} > 0.01)}"; then
             echo "VS Code rendered (stddev=${stddev}, elapsed=${render_elapsed}x0.5s)"
