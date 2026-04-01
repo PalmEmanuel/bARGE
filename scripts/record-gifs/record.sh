@@ -162,6 +162,10 @@ EOF
         > /dev/null 2>&1
 }
 
+begin_recording() {
+    start_recording "${raw_recording}"
+}
+
 run_scenario() {
     local scenario_name="$1"
     local scenario_script="${SCENARIOS_DIR}/${scenario_name}.sh"
@@ -171,12 +175,10 @@ run_scenario() {
         exit 1
     fi
 
-    local raw_recording="/tmp/barge-recording-$$.mkv"
+    raw_recording="/tmp/barge-recording-$$.mkv"
     local gif_output="${GIF_OUTPUT_DIR}/${scenario_name}.gif"
 
     echo "Recording scenario: ${scenario_name}"
-
-    start_recording "${raw_recording}"
 
     # shellcheck source=/dev/null
     source "${scenario_script}"
