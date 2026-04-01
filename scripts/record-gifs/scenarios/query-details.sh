@@ -15,13 +15,14 @@ Resources
 | limit 5
 EOF
 
-# Open VS Code with the KQL fixture file
+# Open VS Code with the KQL fixture file in the workspace folder
 code \
     --user-data-dir "${VSCODE_USER_DATA_DIR}" \
     --extensions-dir "${VSCODE_EXTENSIONS_DIR}" \
     --disable-gpu \
     --no-sandbox \
     --disable-telemetry \
+    "${FIXTURE_WORKSPACE}" \
     "${FIXTURE_KQL}" \
     > /dev/null 2>&1 &
 VSCODE_PID=$!
