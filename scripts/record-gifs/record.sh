@@ -82,7 +82,7 @@ wait_for_vscode_window() {
             return 1
         fi
         sleep 1
-        ((elapsed++))
+        elapsed=$((elapsed + 1))
     done
 }
 
@@ -91,11 +91,11 @@ close_vscode() {
     local elapsed=0
     while xdotool search --onlyvisible --name "Visual Studio Code" >/dev/null 2>&1; do
         if [[ $elapsed -ge 10 ]]; then
-            kill "${VSCODE_PID:-}" 2>/dev/null || true
+            ${VSCODE_PID:+kill "${VSCODE_PID}"} 2>/dev/null || true
             break
         fi
         sleep 1
-        ((elapsed++))
+        elapsed=$((elapsed + 1))
     done
     wait "${VSCODE_PID:-}" 2>/dev/null || true
     unset VSCODE_PID
