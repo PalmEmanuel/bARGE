@@ -234,6 +234,7 @@ install_extension() {
     "workbench.startupEditor": "none",
     "workbench.sideBar.location": "right",
     "workbench.activityBar.location": "hidden",
+    "workbench.secondarySideBar.defaultVisibility": "hidden",
     "update.mode": "none",
     "extensions.autoUpdate": false,
     "telemetry.telemetryLevel": "off",

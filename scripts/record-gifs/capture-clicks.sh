@@ -52,6 +52,7 @@ cat > "${CAPTURE_USER_DATA}/User/settings.json" << 'EOF'
     "workbench.startupEditor": "none",
     "workbench.sideBar.location": "right",
     "workbench.activityBar.location": "hidden",
+    "workbench.secondarySideBar.defaultVisibility": "hidden",
     "update.mode": "none",
     "extensions.autoUpdate": false,
     "telemetry.telemetryLevel": "off",
@@ -85,6 +86,7 @@ code \
     --user-data-dir "${CAPTURE_USER_DATA}" \
     --extensions-dir "${CAPTURE_EXTENSIONS}" \
     --disable-telemetry \
+    --disable-extension github.copilot-chat \
     "${FIXTURE_WORKSPACE}" "${FIXTURE_KQL}" &
 VSCODE_PID=$!
 
@@ -137,11 +139,15 @@ tell application "System Events"
 end tell
 APPLESCRIPT
 sleep 0.5
+# Wait for Copilot Chat to finish loading before closing it,
+# otherwise it reopens after we dismiss it.
+sleep 4
 # Close secondary sidebar (Chat): Cmd+Alt+B on macOS
+osascript -e 'tell application "System Events" to tell process "Code" to set frontmost to true' 2>/dev/null || true
 osascript -e 'tell application "System Events" to tell process "Code" to keystroke "b" using {option down, command down}' 2>/dev/null || true
 # Open Explorer: Cmd+Shift+E
 osascript -e 'tell application "System Events" to tell process "Code" to keystroke "e" using {shift down, command down}' 2>/dev/null || true
-sleep 1
+sleep 0.5
 
 # Re-fetch bounds — pick the largest Code window by area
 WIN_BOUNDS=$(osascript << 'APPLESCRIPT' 2>/dev/null || true
@@ -230,7 +236,7 @@ def write_scenario():
         'code \\',
         '    --user-data-dir "${VSCODE_USER_DATA_DIR}" \\',
         '    --extensions-dir "${VSCODE_EXTENSIONS_DIR}" \\',
-        '    --disable-gpu --use-gl=swiftshader --no-sandbox --disable-telemetry \\',
+        '    --disable-gpu --use-gl=swiftshader --no-sandbox --disable-telemetry --disable-extension github.copilot-chat \\',
         '    "${FIXTURE_WORKSPACE}" "${FIXTURE_KQL}" \\',
         '    > /dev/null 2>&1 &',
         'VSCODE_PID=$!',
