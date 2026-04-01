@@ -53,6 +53,7 @@ start_display() {
 
 start_recording() {
     local output_file="$1"
+    RECORDING_START_MS=$(date +%s%3N)
     ffmpeg -y \
         -f x11grab \
         -video_size "${DISPLAY_WIDTH}x${DISPLAY_HEIGHT}" \
@@ -90,32 +91,14 @@ wait_for_vscode_window() {
         xdotool windowmove "${wid}" 0 0
         xdotool windowsize "${wid}" "${DISPLAY_WIDTH}" "${DISPLAY_HEIGHT}"
     fi
-    # Capture VS Code's specific window (by wid) to check if it has painted.
-    # Capturing by window ID avoids reading the root window background (black).
-    local render_timeout=30
-    local render_elapsed=0
-    local frame_file="/tmp/barge-render-check-$$.png"
-    until [[ $render_elapsed -ge $render_timeout ]]; do
-        DISPLAY=":${DISPLAY_NUM}" import -window "${wid}" -silent "${frame_file}" 2>/dev/null || true
-        local stddev
-        stddev=$(convert "${frame_file}" -colorspace gray \
-            -format "%[fx:standard_deviation]" info: 2>/dev/null || echo "0")
-        echo "Render check: stddev=${stddev} (elapsed=${render_elapsed}x0.5s)"
-        # stddev is 0–1 in ImageMagick fx; anything above 0.01 means real content
-        if awk "BEGIN{exit !(${stddev:-0} > 0.01)}"; then
-            echo "VS Code rendered (stddev=${stddev}, elapsed=${render_elapsed}x0.5s)"
-            rm -f "${frame_file}"
-            # Export the boot duration so convert_to_gif can trim it.
-            # Add 0.5s buffer to ensure the first GIF frame is fully rendered.
-            VSCODE_BOOT_SECONDS=$(awk "BEGIN{printf \"%.1f\", ${render_elapsed} * 0.5 + 0.5}")
-            return 0
-        fi
-        rm -f "${frame_file}"
-        sleep 0.5
-        render_elapsed=$((render_elapsed + 1))
-    done
-    echo "Warning: VS Code did not render within ${render_timeout}s, proceeding anyway" >&2
-    VSCODE_BOOT_SECONDS=5
+    # Give VS Code time to paint its UI after the window is visible.
+    sleep 4
+    # Calculate how long since recording started so convert_to_gif can trim
+    # exactly to this point, ensuring the GIF begins with VS Code fully loaded.
+    local now_ms
+    now_ms=$(date +%s%3N)
+    VSCODE_BOOT_SECONDS=$(awk "BEGIN{printf \"%.1f\", (${now_ms} - ${RECORDING_START_MS:-0}) / 1000.0}")
+    echo "VS Code ready after ${VSCODE_BOOT_SECONDS}s (will trim GIF to this point)"
 }
 
 close_vscode() {
