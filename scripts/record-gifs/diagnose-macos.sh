@@ -23,7 +23,7 @@ DIAG_WORKSPACE="/tmp/barge-diag/workspace"
 
 cleanup() {
     echo "Cleaning up..."
-    osascript -e 'tell application "Code" to quit' 2>/dev/null || true
+    osascript -e 'tell application "Visual Studio Code" to quit' 2>/dev/null || true
     sleep 1
 }
 trap cleanup EXIT
@@ -32,7 +32,7 @@ trap cleanup EXIT
 VSIX=$(find "${REPO_ROOT}" -maxdepth 1 -name "*.vsix" | sort | tail -1)
 if [[ -z "${VSIX}" ]]; then
     echo "No VSIX found, building..."
-    cd "${REPO_ROOT}" && npm run package > /dev/null 2>&1
+    cd "${REPO_ROOT}" && vsce package --no-yarn > /dev/null 2>&1
     VSIX=$(find "${REPO_ROOT}" -maxdepth 1 -name "*.vsix" | sort | tail -1)
 fi
 echo "Using VSIX: ${VSIX}"
@@ -70,31 +70,40 @@ code \
     "${DIAG_WORKSPACE}" &
 VSCODE_PID=$!
 
-# Wait for VS Code window
+# Wait for VS Code main window (AXWindow role, width > 800)
 echo "Waiting for VS Code window..."
+BOUNDS=""
 for i in $(seq 1 30); do
-    if osascript -e 'tell application "Code" to return (count of windows)' 2>/dev/null | grep -q "^[1-9]"; then
+    BOUNDS=$(osascript << 'APPLESCRIPT' 2>/dev/null || true
+tell application "System Events"
+    tell process "Code"
+        if (count of windows) > 0 then
+            set pos to position of window 1
+            set sz to size of window 1
+            return ((item 1 of pos) as text) & "," & ((item 2 of pos) as text) & "," & ((item 1 of sz) as text) & "," & ((item 2 of sz) as text)
+        end if
+    end tell
+end tell
+APPLESCRIPT
+    )
+    if [[ -n "${BOUNDS}" && "${BOUNDS}" != *"error"* ]]; then
         break
     fi
     sleep 1
 done
-sleep 4  # Let UI fully render
 
-# --- Get window bounds ---
-BOUNDS=$(osascript << 'APPLESCRIPT'
-tell application "Code"
-    activate
-    set b to bounds of front window
-    return (item 1 of b) & "," & (item 2 of b) & "," & (item 3 of b) & "," & (item 4 of b)
-end tell
-APPLESCRIPT
-)
+if [[ -z "${BOUNDS}" ]]; then
+    echo "Error: could not find VS Code window after 30s" >&2
+    exit 1
+fi
+
+sleep 2  # Let UI fully render
 WIN_LEFT=$(echo "$BOUNDS" | cut -d',' -f1 | tr -d ' ')
 WIN_TOP=$(echo "$BOUNDS" | cut -d',' -f2 | tr -d ' ')
-WIN_RIGHT=$(echo "$BOUNDS" | cut -d',' -f3 | tr -d ' ')
-WIN_BOTTOM=$(echo "$BOUNDS" | cut -d',' -f4 | tr -d ' ')
-WIN_WIDTH=$((WIN_RIGHT - WIN_LEFT))
-WIN_HEIGHT=$((WIN_BOTTOM - WIN_TOP))
+WIN_WIDTH=$(echo "$BOUNDS" | cut -d',' -f3 | tr -d ' ')
+WIN_HEIGHT=$(echo "$BOUNDS" | cut -d',' -f4 | tr -d ' ')
+WIN_RIGHT=$((WIN_LEFT + WIN_WIDTH))
+WIN_BOTTOM=$((WIN_TOP + WIN_HEIGHT))
 
 echo "VS Code window: ${WIN_LEFT},${WIN_TOP} → ${WIN_RIGHT},${WIN_BOTTOM} (${WIN_WIDTH}×${WIN_HEIGHT})"
 
@@ -109,12 +118,15 @@ screen_changed() {
     stddev=$(convert "$before" "$after" -compose Difference -composite \
         -colorspace gray -format "%[fx:standard_deviation]" info: 2>/dev/null || echo "0")
     echo "  diff stddev=${stddev}"
-    awk "BEGIN{exit !(${stddev:-0} > ${threshold})}"
+    awk "BEGIN{exit !(${stddev:-0} > ${threshold})}" || return 1
+    return 0
 }
 
 osa_click() {
     local x="$1" y="$2"
-    osascript -e "tell application \"System Events\" to click at {${x}, ${y}}" 2>/dev/null || true
+    osascript -e 'tell application "System Events" to tell process "Code" to set frontmost to true' 2>/dev/null || true
+    sleep 0.2
+    osascript -e "tell application \"System Events\" to click at {${x}, ${y}}" > /dev/null 2>&1 || true
 }
 
 osa_escape() {
@@ -126,20 +138,30 @@ STEP=40
 FOUND_X=""
 FOUND_OFFSET=""
 
+# Activate VS Code once and keep it focused throughout the scan
+osascript -e 'tell application "System Events" to tell process "Code" to set frontmost to true' 2>/dev/null || true
+sleep 0.5
+
 for offset in $(seq 50 $STEP 500); do
     x=$((WIN_RIGHT - offset))
     before="/tmp/barge-diag-before-${offset}.png"
     after="/tmp/barge-diag-after-${offset}.png"
 
+    # Crop to just the status bar strip (bottom 22px) to avoid background window noise
+    local_before="/tmp/barge-diag-sb-before-${offset}.png"
+    local_after="/tmp/barge-diag-sb-after-${offset}.png"
+
     screencapture -x -R "${WIN_LEFT},${WIN_TOP},${WIN_WIDTH},${WIN_HEIGHT}" "$before" 2>/dev/null
+    convert "$before" -gravity South -crop "${WIN_WIDTH}x22+0+0" +repage "$local_before" 2>/dev/null
 
     echo "Clicking x=${x} (offset ${offset}px from right)..."
-    osa_click "$x" "$STATUS_Y"
-    sleep 0.6
+    osa_click "$x" "$STATUS_Y" 2>/dev/null
+    sleep 0.8
 
     screencapture -x -R "${WIN_LEFT},${WIN_TOP},${WIN_WIDTH},${WIN_HEIGHT}" "$after" 2>/dev/null
+    convert "$after" -gravity South -crop "${WIN_WIDTH}x22+0+0" +repage "$local_after" 2>/dev/null
 
-    if screen_changed "$before" "$after"; then
+    if screen_changed "$local_before" "$local_after" "0.01"; then
         echo ""
         echo "✅ bARGE status bar item found!"
         echo "   Screen x:      ${x}"
