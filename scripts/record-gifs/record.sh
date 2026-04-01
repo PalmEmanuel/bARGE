@@ -20,7 +20,7 @@ GIF_OUTPUT_DIR="${REPO_ROOT}/media/readme/gifs"
 
 DISPLAY_NUM="${DISPLAY_NUM:-99}"
 DISPLAY_WIDTH="${DISPLAY_WIDTH:-1280}"
-DISPLAY_HEIGHT="${DISPLAY_HEIGHT:-800}"
+DISPLAY_HEIGHT="${DISPLAY_HEIGHT:-720}"
 GIF_FPS="${GIF_FPS:-10}"
 GIF_WIDTH="${GIF_WIDTH:-800}"
 
@@ -84,6 +84,8 @@ wait_for_vscode_window() {
         sleep 1
         elapsed=$((elapsed + 1))
     done
+    xdotool search --onlyvisible --name "Visual Studio Code" windowmaximize
+    sleep 0.5
 }
 
 close_vscode() {
