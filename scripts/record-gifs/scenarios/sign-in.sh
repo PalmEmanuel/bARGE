@@ -20,7 +20,6 @@ code \
 VSCODE_PID=$!
 
 wait_for_vscode_window
-begin_recording
 
 # Open the command palette and run the sign-in command
 xdotool search --onlyvisible --name "Visual Studio Code" key --clearmodifiers ctrl+shift+p

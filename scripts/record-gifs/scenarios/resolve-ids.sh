@@ -28,7 +28,6 @@ code \
 VSCODE_PID=$!
 
 wait_for_vscode_window
-begin_recording
 
 # Run the query
 xdotool search --onlyvisible --name "Visual Studio Code" key --clearmodifiers ctrl+shift+p

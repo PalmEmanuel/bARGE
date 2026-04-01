@@ -22,7 +22,7 @@ DISPLAY_NUM="${DISPLAY_NUM:-99}"
 DISPLAY_WIDTH="${DISPLAY_WIDTH:-1280}"
 DISPLAY_HEIGHT="${DISPLAY_HEIGHT:-720}"
 GIF_FPS="${GIF_FPS:-10}"
-GIF_WIDTH="${GIF_WIDTH:-800}"
+GIF_WIDTH="${GIF_WIDTH:-1280}"
 
 VSCODE_USER_DATA_DIR="/tmp/barge-gif-recording/user-data"
 VSCODE_EXTENSIONS_DIR="/tmp/barge-gif-recording/extensions"
@@ -90,8 +90,7 @@ wait_for_vscode_window() {
         xdotool windowmove "${wid}" 0 0
         xdotool windowsize "${wid}" "${DISPLAY_WIDTH}" "${DISPLAY_HEIGHT}"
     fi
-    # Wait for VS Code to finish rendering after window resize
-    sleep 5
+    sleep 0.5
 }
 
 close_vscode() {
@@ -114,14 +113,17 @@ convert_to_gif() {
     local output_file="$2"
     local palette_file="/tmp/barge-palette-$$.png"
 
-    # Two-pass GIF encoding for best quality
+    # Skip the first 1.5s (VS Code boot/splash) so the GIF starts with
+    # a fully-rendered window. Two-pass encoding for best colour quality.
     ffmpeg -y \
+        -ss 1.5 \
         -i "${input_file}" \
         -vf "fps=${GIF_FPS},scale=${GIF_WIDTH}:-1:flags=lanczos,palettegen=stats_mode=diff" \
         "${palette_file}" \
         > /dev/null 2>&1
 
     ffmpeg -y \
+        -ss 1.5 \
         -i "${input_file}" \
         -i "${palette_file}" \
         -lavfi "fps=${GIF_FPS},scale=${GIF_WIDTH}:-1:flags=lanczos [x]; [x][1:v] paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle" \
@@ -163,10 +165,6 @@ EOF
         > /dev/null 2>&1
 }
 
-begin_recording() {
-    start_recording "${raw_recording}"
-}
-
 run_scenario() {
     local scenario_name="$1"
     local scenario_script="${SCENARIOS_DIR}/${scenario_name}.sh"
@@ -176,10 +174,12 @@ run_scenario() {
         exit 1
     fi
 
-    raw_recording="/tmp/barge-recording-$$.mkv"
+    local raw_recording="/tmp/barge-recording-$$.mkv"
     local gif_output="${GIF_OUTPUT_DIR}/${scenario_name}.gif"
 
     echo "Recording scenario: ${scenario_name}"
+
+    start_recording "${raw_recording}"
 
     # shellcheck source=/dev/null
     source "${scenario_script}"
