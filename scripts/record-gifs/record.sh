@@ -90,7 +90,30 @@ wait_for_vscode_window() {
         xdotool windowmove "${wid}" 0 0
         xdotool windowsize "${wid}" "${DISPLAY_WIDTH}" "${DISPLAY_HEIGHT}"
     fi
-    sleep 0.5
+
+    # Wait until VS Code has actually rendered content (non-black pixels on screen)
+    local render_timeout=20
+    local render_elapsed=0
+    echo "Waiting for VS Code to render content..."
+    while [[ $render_elapsed -lt $render_timeout ]]; do
+        local avg_brightness
+        avg_brightness=$(ffmpeg -loglevel error \
+            -f x11grab \
+            -video_size "${DISPLAY_WIDTH}x${DISPLAY_HEIGHT}" \
+            -vframes 1 \
+            -i ":${DISPLAY_NUM}" \
+            -vf "signalstats" \
+            -f null /dev/null 2>&1 | grep -o "YAVG:[0-9.]*" | tail -1 | cut -d: -f2)
+        local avg_int="${avg_brightness%%.*}"
+        if [[ -n "${avg_int}" ]] && [[ "${avg_int}" -gt 3 ]]; then
+            echo "VS Code rendered (avg brightness: ${avg_brightness})"
+            sleep 0.5
+            return 0
+        fi
+        sleep 0.5
+        render_elapsed=$((render_elapsed + 1))
+    done
+    echo "Warning: VS Code content did not appear within ${render_timeout}s, proceeding anyway" >&2
 }
 
 close_vscode() {
