@@ -1,9 +1,9 @@
 name: Generate README GIFs
 
 on:
-  pull_request:
+  push:
     branches:
-      - main
+      - copilot/explore-auto-generated-gifs
   workflow_dispatch:
     inputs:
       scenario:
