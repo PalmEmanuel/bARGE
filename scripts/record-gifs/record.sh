@@ -96,12 +96,8 @@ wait_for_vscode_window() {
     local render_elapsed=0
     local frame_file="/tmp/barge-render-check-$$.png"
     until [[ $render_elapsed -ge $render_timeout ]]; do
-        ffmpeg -f x11grab \
-            -video_size "${DISPLAY_WIDTH}x${DISPLAY_HEIGHT}" \
-            -vframes 1 \
-            -i ":${DISPLAY_NUM}" \
-            -y "${frame_file}" \
-            -loglevel quiet 2>/dev/null || true
+        # Use import (not ffmpeg x11grab) to avoid conflicting with the recording
+        DISPLAY=":${DISPLAY_NUM}" import -window root -silent "${frame_file}" 2>/dev/null || true
         local stddev
         stddev=$(convert "${frame_file}" -colorspace gray \
             -format "%[fx:standard_deviation]" info: 2>/dev/null || echo "0")
