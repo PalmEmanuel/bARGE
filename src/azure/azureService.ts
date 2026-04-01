@@ -152,7 +152,7 @@ export class AzureService {
 
             // Try different identity claims in order of preference
             // These are the same claims used in authenticateWithDefaultCredential
-            return payload.upn || payload.unique_name || payload.email || payload.name || payload.oid || null;
+            return payload.upn || payload.unique_name || payload.email || payload.name || payload.app_displayname || payload.oid || null;
         } catch (error) {
             console.warn('Could not parse account from JWT token:', error);
             return null;
