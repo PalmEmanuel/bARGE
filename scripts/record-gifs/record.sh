@@ -110,7 +110,7 @@ click_and_verify() {
 click_status_bar() {
     local y=$((DISPLAY_HEIGHT - 11))
     local x
-    for x in 1870 1830 1790 1750 1710 1670 1630 1590 1550 1510; do
+    for x in 1870 1830 1790 1750 1710 1670 1630 1590 1550 1510 1470 1430 1390 1350 1310 1270 1230 1190 1150 1100; do
         echo "Trying status bar click at x=${x}, y=${y}..."
         if click_and_verify "$x" "$y"; then
             echo "Status bar click confirmed at x=${x}"
