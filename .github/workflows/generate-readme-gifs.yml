@@ -16,7 +16,7 @@ on:
       gif_width:
         description: 'GIF output width in pixels'
         required: false
-        default: '1280'
+        default: '1920'
         type: string
 
 env:

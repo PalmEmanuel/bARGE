@@ -19,10 +19,10 @@ SCENARIOS_DIR="${SCRIPT_DIR}/scenarios"
 GIF_OUTPUT_DIR="${REPO_ROOT}/media/readme/gifs"
 
 DISPLAY_NUM="${DISPLAY_NUM:-99}"
-DISPLAY_WIDTH="${DISPLAY_WIDTH:-1280}"
-DISPLAY_HEIGHT="${DISPLAY_HEIGHT:-720}"
+DISPLAY_WIDTH="${DISPLAY_WIDTH:-1920}"
+DISPLAY_HEIGHT="${DISPLAY_HEIGHT:-1080}"
 GIF_FPS="${GIF_FPS:-10}"
-GIF_WIDTH="${GIF_WIDTH:-1280}"
+GIF_WIDTH="${GIF_WIDTH:-1920}"
 
 VSCODE_USER_DATA_DIR="/tmp/barge-gif-recording/user-data"
 VSCODE_EXTENSIONS_DIR="/tmp/barge-gif-recording/extensions"
@@ -93,12 +93,18 @@ wait_for_vscode_window() {
     fi
     # Give VS Code time to paint its UI after the window is visible.
     sleep 4
+    # Open the Explorer sidebar so it's visible on the right from the first frame.
+    xdotool key --clearmodifiers ctrl+shift+e 2>/dev/null || true
+    sleep 0.5
     # Calculate how long since recording started so convert_to_gif can trim
     # exactly to this point, ensuring the GIF begins with VS Code fully loaded.
     local now_ms
     now_ms=$(date +%s%3N)
     VSCODE_BOOT_SECONDS=$(awk "BEGIN{printf \"%.1f\", (${now_ms} - ${RECORDING_START_MS:-0}) / 1000.0}")
     echo "VS Code ready after ${VSCODE_BOOT_SECONDS}s (will trim GIF to this point)"
+    # Pause 0.5s after the trim point before scenario actions begin,
+    # so the GIF opens with a brief moment of VS Code idle/loaded.
+    sleep 0.5
 }
 
 close_vscode() {
@@ -160,10 +166,14 @@ install_extension() {
 {
     "security.workspace.trust.enabled": false,
     "workbench.startupEditor": "none",
+    "workbench.sideBar.location": "right",
+    "workbench.activityBar.location": "hidden",
     "update.mode": "none",
     "extensions.autoUpdate": false,
     "telemetry.telemetryLevel": "off",
-    "barge.hideLoginMessages": true
+    "barge.hideLoginMessages": true,
+    "git.openRepositoryInParentFolders": "never",
+    "git.autoRepositoryDetection": false
 }
 EOF
     code \
