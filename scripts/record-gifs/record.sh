@@ -74,6 +74,70 @@ stop_recording() {
     fi
 }
 
+# Returns 0 if the screen changed significantly between two screenshot files.
+# Usage: screen_changed before.png after.png [threshold]
+screen_changed() {
+    local before="$1" after="$2" threshold="${3:-0.005}"
+    local stddev
+    stddev=$(convert "$before" "$after" -compose Difference -composite \
+        -colorspace gray -format "%[fx:standard_deviation]" info: 2>/dev/null || echo "0")
+    awk "BEGIN{exit !(${stddev:-0} > ${threshold})}"
+}
+
+# Clicks at (x,y) and verifies the screen changed within 0.5s.
+# Returns 0 on confirmed change, 1 if nothing changed.
+# Usage: click_and_verify x y [threshold]
+click_and_verify() {
+    local x="$1" y="$2" threshold="${3:-0.005}"
+    local before="/tmp/barge-click-before-$$.png"
+    local after="/tmp/barge-click-after-$$.png"
+    DISPLAY=":${DISPLAY_NUM}" import -window root -silent "$before" 2>/dev/null || true
+    xdotool mousemove "$x" "$y"
+    xdotool click 1
+    sleep 0.5
+    DISPLAY=":${DISPLAY_NUM}" import -window root -silent "$after" 2>/dev/null || true
+    if screen_changed "$before" "$after" "$threshold"; then
+        rm -f "$before" "$after"
+        return 0
+    fi
+    rm -f "$before" "$after"
+    return 1
+}
+
+# Scans the status bar right-to-left to find and click the bARGE status bar item.
+# Verifies screen changes after each attempt; retries with next x on failure.
+# On success, exports BARGE_STATUS_BAR_X with the confirmed x coordinate.
+click_status_bar() {
+    local y=$((DISPLAY_HEIGHT - 11))
+    local x
+    for x in 1870 1830 1790 1750 1710 1670 1630 1590 1550 1510; do
+        echo "Trying status bar click at x=${x}, y=${y}..."
+        if click_and_verify "$x" "$y"; then
+            echo "Status bar click confirmed at x=${x}"
+            BARGE_STATUS_BAR_X=$x
+            return 0
+        fi
+        xdotool key --clearmodifiers Escape 2>/dev/null || true
+        sleep 0.3
+    done
+    echo "Error: could not find bARGE status bar item" >&2
+    return 1
+}
+
+# Moves the mouse smoothly from (x1,y1) to (x2,y2) over duration_ms milliseconds.
+# Usage: move_mouse_smooth x1 y1 x2 y2 [duration_ms]
+move_mouse_smooth() {
+    local x1="$1" y1="$2" x2="$3" y2="$4" duration_ms="${5:-1000}"
+    local steps=10
+    local i cx cy
+    for i in $(seq 1 $steps); do
+        cx=$(awk "BEGIN{printf \"%d\", ${x1} + (${x2} - ${x1}) * ${i} / ${steps}}")
+        cy=$(awk "BEGIN{printf \"%d\", ${y1} + (${y2} - ${y1}) * ${i} / ${steps}}")
+        xdotool mousemove "$cx" "$cy"
+        sleep "$(awk "BEGIN{printf \"%.3f\", ${duration_ms} / 1000.0 / ${steps}}")"
+    done
+}
+
 wait_for_vscode_window() {
     local timeout=30
     local elapsed=0

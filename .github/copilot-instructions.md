@@ -258,7 +258,91 @@ npm run package
 - Build and linting work correctly in CI
 - VSIX packaging requires alignment between `engines.vscode` and `@types/vscode` versions
 
-## Troubleshooting
+## GIF Recording Scenarios
+
+Scenarios are Bash scripts in `scripts/record-gifs/scenarios/`. They are sourced by `record.sh` inside a running recording session — all helpers from `record.sh` are available.
+
+### How a Scenario Works
+
+```
+record.sh starts Xvfb → installs extension → calls run_scenario:
+  start_recording()        ← ffmpeg begins capturing
+  source scenario.sh       ← your script runs here
+  stop_recording()
+  convert_to_gif()         ← trims boot frames, encodes GIF
+```
+
+The GIF is trimmed to `VSCODE_BOOT_SECONDS` — the wall-clock elapsed from recording start until `wait_for_vscode_window` returns. Everything before that is cut; the GIF starts with VS Code fully loaded.
+
+### Scenario Template
+
+```bash
+#!/usr/bin/env bash
+FIXTURE_WORKSPACE="${SCRIPT_DIR}/fixtures/workspace"
+mkdir -p "${FIXTURE_WORKSPACE}"
+
+code \
+    --user-data-dir "${VSCODE_USER_DATA_DIR}" \
+    --extensions-dir "${VSCODE_EXTENSIONS_DIR}" \
+    --disable-gpu --use-gl=swiftshader --no-sandbox --disable-telemetry \
+    "${FIXTURE_WORKSPACE}" \
+    > /dev/null 2>&1 &
+VSCODE_PID=$!
+
+# Sets up layout (sidebar right, Explorer open, Chat closed) and pauses 0.5s.
+wait_for_vscode_window
+
+# --- actions ---
+
+close_vscode
+```
+
+### Available Helpers
+
+| Helper | Description |
+|---|---|
+| `wait_for_vscode_window` | Waits for window, sizes it, opens Explorer, closes Chat, sleeps 0.5s |
+| `click_and_verify x y [threshold]` | Clicks at (x,y), screenshots before/after, returns 0 if screen changed |
+| `click_status_bar` | Scans status bar right-to-left to find bARGE item; exports `BARGE_STATUS_BAR_X`; returns 1 on failure |
+| `move_mouse_smooth x1 y1 x2 y2 [ms]` | Moves mouse in 10 steps over `ms` milliseconds (default 1000) |
+| `close_vscode` | Sends Ctrl+Q, waits for process exit |
+| `screen_changed before.png after.png [threshold]` | Returns 0 if ImageMagick diff stddev exceeds threshold |
+
+### Click Verification Pattern
+
+Always use `click_and_verify` (or `click_status_bar`) for clicks that should trigger a visible UI change. If the screen does not change, the script fails before GIF conversion — no silent bad GIFs.
+
+```bash
+# Good: verified click
+click_status_bar || { echo "Error: status bar item not found" >&2; close_vscode; exit 1; }
+
+# Also good: direct verified click
+click_and_verify 960 400 || { echo "Error: click had no effect" >&2; close_vscode; exit 1; }
+```
+
+### Known Coordinates at 1920×1080
+
+All scenarios run at a fixed `1920×1080` Xvfb display with VS Code at `0,0`. Coordinates are deterministic.
+
+| Element | x | y | Notes |
+|---|---|---|---|
+| Status bar (center) | varies | `DISPLAY_HEIGHT - 11` = 1069 | `click_status_bar` scans 1870→1510 |
+| Quick pick center | 960 | — | VS Code centers quick pick at half screen width |
+| Quick pick item 1 | 960 | ~123 | First non-separator item |
+| Quick pick item 2 | 960 | ~176 | Second item (after divider at ~157) |
+| Quick pick item height | — | ~35px | Add 35 per additional item |
+
+If quick pick positions feel off, add `sleep 0.2` before interacting to let the animation settle, then adjust y values by ±10.
+
+### Adding a New Scenario
+
+1. Create `scripts/record-gifs/scenarios/<name>.sh`
+2. Follow the template above
+3. Use `click_and_verify` / `click_status_bar` for all meaningful clicks
+4. Run locally with `./scripts/record-gifs/record.sh <name>` (Linux/Xvfb required) or trigger CI
+5. The scenario name becomes the GIF filename: `media/readme/gifs/<name>.gif`
+
+
 
 ### Build Issues
 - Ensure Node.js version compatibility (works with v20.19.4)
