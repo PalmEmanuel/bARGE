@@ -4,7 +4,7 @@
     "features": {
         "ghcr.io/devcontainers/features/azure-cli:1": {}
     },
-    "postCreateCommand": "npm install",
+    "postCreateCommand": "npm ci",
     "customizations": {
         "vscode": {
             "extensions": [
