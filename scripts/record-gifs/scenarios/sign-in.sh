@@ -16,6 +16,7 @@ code \
     --use-gl=swiftshader \
     --no-sandbox \
     --disable-telemetry \
+    --disable-extension github.copilot-chat \
     "${FIXTURE_WORKSPACE}" \
     > /dev/null 2>&1 &
 VSCODE_PID=$!
