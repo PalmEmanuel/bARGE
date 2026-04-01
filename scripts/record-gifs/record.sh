@@ -135,7 +135,17 @@ install_extension() {
     fi
 
     echo "Installing extension from: ${vsix_path}"
-    mkdir -p "${VSCODE_USER_DATA_DIR}" "${VSCODE_EXTENSIONS_DIR}"
+    mkdir -p "${VSCODE_USER_DATA_DIR}/User" "${VSCODE_EXTENSIONS_DIR}"
+    # Disable workspace trust prompt and other distracting UI
+    cat > "${VSCODE_USER_DATA_DIR}/User/settings.json" << 'EOF'
+{
+    "security.workspace.trust.enabled": false,
+    "workbench.startupEditor": "none",
+    "update.mode": "none",
+    "extensions.autoUpdate": false,
+    "telemetry.telemetryLevel": "off"
+}
+EOF
     code \
         --user-data-dir "${VSCODE_USER_DATA_DIR}" \
         --extensions-dir "${VSCODE_EXTENSIONS_DIR}" \
