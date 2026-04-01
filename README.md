@@ -124,8 +124,6 @@ The available tools are:
 
 Copilot can combine these tools to, for example, run a query, inspect the results, filter by a specific value, and explain what it found — all from a single chat prompt.
 
-![GitHub Copilot Integration](media/readme/gifs/copilot-integration.gif)
-
 ## Configuration
 
 The extension supports the following configuration options in VS Code settings:
