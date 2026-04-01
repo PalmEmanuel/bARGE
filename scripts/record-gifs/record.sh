@@ -84,7 +84,12 @@ wait_for_vscode_window() {
         sleep 1
         elapsed=$((elapsed + 1))
     done
-    xdotool search --onlyvisible --name "Visual Studio Code" | head -1 | xargs -r xdotool windowmaximize
+    local wid
+    wid=$(xdotool search --onlyvisible --name "Visual Studio Code" | head -1)
+    if [[ -n "${wid}" ]]; then
+        xdotool windowmove "${wid}" 0 0
+        xdotool windowsize "${wid}" "${DISPLAY_WIDTH}" "${DISPLAY_HEIGHT}"
+    fi
     sleep 0.5
 }
 
