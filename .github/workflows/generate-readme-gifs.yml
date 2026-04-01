@@ -1,6 +1,9 @@
 name: Generate README GIFs
 
 on:
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       scenario:
