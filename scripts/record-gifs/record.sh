@@ -94,22 +94,28 @@ wait_for_vscode_window() {
     # Wait until VS Code has actually rendered content (non-black pixels on screen)
     local render_timeout=20
     local render_elapsed=0
+    local frame_file="/tmp/barge-check-$$.png"
     echo "Waiting for VS Code to render content..."
     while [[ $render_elapsed -lt $render_timeout ]]; do
-        local avg_brightness
-        avg_brightness=$(ffmpeg -loglevel error \
-            -f x11grab \
+        # Grab a single frame — a pure-black screen compresses to <3KB PNG;
+        # VS Code dark theme produces >10KB due to text/icons/colors.
+        ffmpeg -f x11grab \
             -video_size "${DISPLAY_WIDTH}x${DISPLAY_HEIGHT}" \
             -vframes 1 \
             -i ":${DISPLAY_NUM}" \
-            -vf "signalstats" \
-            -f null /dev/null 2>&1 | grep -o "YAVG:[0-9.]*" | tail -1 | cut -d: -f2)
-        local avg_int="${avg_brightness%%.*}"
-        if [[ -n "${avg_int}" ]] && [[ "${avg_int}" -gt 3 ]]; then
-            echo "VS Code rendered (avg brightness: ${avg_brightness})"
+            -y "${frame_file}" \
+            -loglevel quiet 2>/dev/null || true
+        local frame_size=0
+        if [[ -f "${frame_file}" ]]; then
+            frame_size=$(wc -c < "${frame_file}")
+        fi
+        if [[ "${frame_size}" -gt 8000 ]]; then
+            echo "VS Code rendered (frame size: ${frame_size} bytes)"
+            rm -f "${frame_file}"
             sleep 0.5
             return 0
         fi
+        rm -f "${frame_file}"
         sleep 0.5
         render_elapsed=$((render_elapsed + 1))
     done
