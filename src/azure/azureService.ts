@@ -14,6 +14,12 @@ export class AzureService {
 
     private static readonly SIGNING_IN_MESSAGE = 'Signing in...';
 
+    /** Incremented each time the user selects an authentication option, so that
+     *  superseded in-flight auth attempts can detect they are no longer relevant. */
+    private authGeneration = 0;
+    /** Number of currently-active authenticate() call frames (for loading state). */
+    private activeAuthenticateCalls = 0;
+
     private onAuthStatusChanged?: (authenticated: boolean, accountName: string | null) => void;
     private onLoadingStatusChanged?: (isLoading: boolean, message?: string) => void;
 
@@ -154,9 +160,13 @@ export class AzureService {
     }
 
     async authenticate(): Promise<boolean> {
-        this.notifyLoadingStatusChanged(true, AzureService.SIGNING_IN_MESSAGE);
+        // isStillCurrent is set only after the user selects an option, so that any
+        // earlier in-flight auth attempt is automatically superseded.
+        let isStillCurrent: (() => boolean) | undefined;
 
         try {
+            this.activeAuthenticateCalls++;
+            this.notifyLoadingStatusChanged(true, AzureService.SIGNING_IN_MESSAGE);
             // Messages here use codicons - https://microsoft.github.io/vscode-codicons/dist/codicon.html
             // Always build picker items starting with DefaultAzureCredential option
             const defaultCredentialOption = '$(azure) Use DefaultAzureCredential';
@@ -216,53 +226,98 @@ export class AzureService {
             });
 
             if (!selected) {
-                this.notifyLoadingStatusChanged(false);
+                // User dismissed the picker without selecting – stop loading only if
+                // no other authenticate() call is still running.
                 return false;
             }
 
+            // The user made a selection: claim the current authentication slot so that
+            // any other concurrent authenticate() call that has already selected an
+            // option will detect it has been superseded.
+            const myGeneration = ++this.authGeneration;
+            isStillCurrent = () => myGeneration === this.authGeneration;
+
             if (selected.label === defaultCredentialOption) {
                 // User selected DefaultAzureCredential
-                return await this.authenticateWithDefaultCredential();
+                return await this.authenticateWithDefaultCredential(isStillCurrent);
+            } else if (selected.label === vsCodeOtherOption || selected.label === vsCodeOption) {
+                // User selected VS Code authentication without a specific account
+                return await this.authenticateWithVSCode(undefined, isStillCurrent);
             } else if (selected.label.startsWith('$(vscode)')) {
-                // User selected VS Code authentication
+                // User selected a specific VS Code account
                 const trimmedLabel = selected.label.replace('$(vscode) ', '');
                 const selectedAccount = accounts.find(acc => trimmedLabel === acc.label);
-                return await this.authenticateWithVSCode(selectedAccount);
-            } else if (selected.label === vsCodeOtherOption) {
-                // User selected VS Code authentication without an account
-                return await this.authenticateWithVSCode(undefined);
+                return await this.authenticateWithVSCode(selectedAccount, isStillCurrent);
             } else {
-                this.notifyLoadingStatusChanged(false);
                 return false;
             }
 
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : String(error);
-            vscode.window.showErrorMessage(`Failed to authenticate: ${errorMessage}`);
-            console.error('Authentication failed:', error);
-            this.notifyLoadingStatusChanged(false);
+            if (!isStillCurrent || isStillCurrent()) {
+                const errorMessage = error instanceof Error ? error.message : String(error);
+                vscode.window.showErrorMessage(`Failed to authenticate: ${errorMessage}`);
+                console.error('Authentication failed:', error);
+            }
             return false;
+        } finally {
+            this.activeAuthenticateCalls--;
+            // Stop loading only when the last active authenticate() call exits, so that
+            // dismissing a concurrent picker does not prematurely hide the spinner.
+            if (this.activeAuthenticateCalls === 0) {
+                this.notifyLoadingStatusChanged(false);
+            }
         }
     }
 
-    async authenticateWithDefaultCredential(): Promise<boolean> {
-        this.notifyLoadingStatusChanged(true, AzureService.SIGNING_IN_MESSAGE);
+    /**
+     * Authenticate using DefaultAzureCredential (Azure CLI, managed identity, etc.).
+     *
+     * @param isStillCurrent - Optional predicate supplied by `authenticate()` when this
+     *   method is called as part of a picker-driven flow.  After each significant async
+     *   step the method tests whether a newer account selection has superseded this one;
+     *   if so it exits silently without updating any shared state.  When omitted (direct
+     *   call for auto-auth or setScope) the method manages its own loading state and
+     *   never exits early.
+     */
+    async authenticateWithDefaultCredential(isStillCurrent?: () => boolean): Promise<boolean> {
+        // When called from authenticate(), loading is already set and managed by that frame.
+        // When called directly (auto-auth, setScope), manage loading here.
+        const manageLoading = !isStillCurrent;
+
+        if (manageLoading) {
+            this.notifyLoadingStatusChanged(true, AzureService.SIGNING_IN_MESSAGE);
+        }
 
         try {
             // Fall back to DefaultAzureCredential (Azure CLI, managed identity, etc.)
-            this.credential = new DefaultAzureCredential();
+            const credential = new DefaultAzureCredential();
             // Get token to verify authentication and get identity
-            const token = await this.credential.getToken([AzureService.ARM_RESOURCE_DEFAULT_SCOPE]);
+            const token = await credential.getToken([AzureService.ARM_RESOURCE_DEFAULT_SCOPE]);
+
+            // Bail out if a newer auth selection has been made while we were waiting.
+            if (isStillCurrent && !isStillCurrent()) {
+                console.log('bARGE: DefaultAzureCredential auth superseded by a newer selection, exiting early.');
+                return false;
+            }
 
             if (token) {
-                // Set authenticated state before testing with getSubscriptions
+                // Fetch derived values into locals before touching shared state.
+                const account = await this.extractAccountFromToken(token.token);
+                const subscriptions = await this.fetchSubscriptionsUsingCredential(credential);
+
+                // Bail out if superseded while fetching subscriptions.
+                if (isStillCurrent && !isStillCurrent()) {
+                    console.log('bARGE: DefaultAzureCredential auth superseded after fetching subscriptions, exiting early.');
+                    return false;
+                }
+
+                // Atomically commit all state now that we are confirmed still current.
+                this.credential = credential;
                 this.authenticated = true;
-                this.currentAccount = await this.extractAccountFromToken(token.token);
+                this.currentAccount = account;
+                this.currentSubscriptions = subscriptions;
 
-                // Get available subscriptions for account
-                this.currentSubscriptions = await this.getSubscriptions();
-
-                this.notifyLoadingStatusChanged(false);
+                if (manageLoading) { this.notifyLoadingStatusChanged(false); }
                 this.notifyAuthStatusChanged();
 
                 // Check if login popups should be hidden
@@ -275,22 +330,43 @@ export class AzureService {
                 return true;
             }
         } catch (error) {
-            console.error('DefaultAzureCredential authentication error:', error);
-            this.clearAuthentication();
-            this.notifyLoadingStatusChanged(false);
-            vscode.window.showErrorMessage('Failed to authenticate! Try logging into Azure CLI, or to VS Code with a Microsoft account.');
+            if (!isStillCurrent || isStillCurrent()) {
+                console.error('DefaultAzureCredential authentication error:', error);
+                this.clearAuthentication();
+                if (manageLoading) { this.notifyLoadingStatusChanged(false); }
+                vscode.window.showErrorMessage('Failed to authenticate! Try logging into Azure CLI, or to VS Code with a Microsoft account.');
+            }
             return false;
         }
 
         // If we reach here, authentication failed
-        this.clearAuthentication();
-        this.notifyLoadingStatusChanged(false);
-        vscode.window.showErrorMessage('Failed to authenticate! Try logging into Azure CLI, or to VS Code with a Microsoft account.');
+        if (!isStillCurrent || isStillCurrent()) {
+            this.clearAuthentication();
+            if (manageLoading) { this.notifyLoadingStatusChanged(false); }
+            vscode.window.showErrorMessage('Failed to authenticate! Try logging into Azure CLI, or to VS Code with a Microsoft account.');
+        }
         return false;
     }
 
-    private async authenticateWithVSCode(account: vscode.AuthenticationSessionAccountInformation | undefined): Promise<boolean> {
-        this.notifyLoadingStatusChanged(true, AzureService.SIGNING_IN_MESSAGE);
+    /**
+     * Authenticate using a VS Code Microsoft account session.
+     *
+     * @param account - The specific VS Code account to authenticate with, or `undefined`
+     *   to let VS Code prompt for or create a new session.
+     * @param isStillCurrent - Optional predicate supplied by `authenticate()` when this
+     *   method is called as part of a picker-driven flow.  After each significant async
+     *   step the method tests whether a newer account selection has superseded this one;
+     *   if so it exits silently without updating any shared state.  When omitted (direct
+     *   call) the method manages its own loading state and never exits early.
+     */
+    private async authenticateWithVSCode(account: vscode.AuthenticationSessionAccountInformation | undefined, isStillCurrent?: () => boolean): Promise<boolean> {
+        // When called from authenticate(), loading is already set and managed by that frame.
+        // When called directly, manage loading here.
+        const manageLoading = !isStillCurrent;
+
+        if (manageLoading) {
+            this.notifyLoadingStatusChanged(true, AzureService.SIGNING_IN_MESSAGE);
+        }
 
         try {
             const session = await vscode.authentication.getSession(
@@ -303,23 +379,35 @@ export class AzureService {
                 }
             );
 
-            if (!session) {
-                vscode.window.showErrorMessage(`Failed to authenticate with VS Code!`);
-                this.notifyLoadingStatusChanged(false);
+            // Bail out if a newer auth selection has been made while we were waiting.
+            if (isStillCurrent && !isStillCurrent()) {
+                console.log('bARGE: VS Code auth superseded by a newer selection, exiting early.');
                 return false;
             }
 
-            // Set up our service clients with the VS Code credential
-            this.credential = new VSCodeCredential(session);
+            if (!session) {
+                vscode.window.showErrorMessage(`Failed to authenticate with VS Code!`);
+                if (manageLoading) { this.notifyLoadingStatusChanged(false); }
+                return false;
+            }
 
-            // Set authenticated state before testing with getSubscriptions
+            // Fetch derived values into locals before touching shared state.
+            const credential = new VSCodeCredential(session);
+            const subscriptions = await this.fetchSubscriptionsUsingCredential(credential);
+
+            // Bail out if superseded while fetching subscriptions.
+            if (isStillCurrent && !isStillCurrent()) {
+                console.log('bARGE: VS Code auth superseded after fetching subscriptions, exiting early.');
+                return false;
+            }
+
+            // Atomically commit all state now that we are confirmed still current.
+            this.credential = credential;
             this.authenticated = true;
             this.currentAccount = session.account.label;
+            this.currentSubscriptions = subscriptions;
 
-            // Get available subscriptions for account
-            this.currentSubscriptions = await this.getSubscriptions();
-
-            this.notifyLoadingStatusChanged(false);
+            if (manageLoading) { this.notifyLoadingStatusChanged(false); }
             this.notifyAuthStatusChanged();
 
             // Check if login popups should be hidden
@@ -331,19 +419,24 @@ export class AzureService {
             }
             return true;
         } catch (error) {
-            console.error('VS Code authentication error:', error);
-            this.clearAuthentication();
-            this.notifyLoadingStatusChanged(false);
-            vscode.window.showErrorMessage(`Failed to authenticate with VS Code: ${error}`);
+            if (!isStillCurrent || isStillCurrent()) {
+                console.error('VS Code authentication error:', error);
+                this.clearAuthentication();
+                if (manageLoading) { this.notifyLoadingStatusChanged(false); }
+                vscode.window.showErrorMessage(`Failed to authenticate with VS Code: ${error}`);
+            }
             return false;
         }
     }
 
     async getSubscriptions(): Promise<AzureSubscription[]> {
         this.validateAuthentication();
+        return this.fetchSubscriptionsUsingCredential(this.credential!);
+    }
 
+    private async fetchSubscriptionsUsingCredential(credential: TokenCredential): Promise<AzureSubscription[]> {
         try {
-            const tokenResponse = await this.credential!.getToken(AzureService.ARM_RESOURCE_DEFAULT_SCOPE);
+            const tokenResponse = await credential.getToken(AzureService.ARM_RESOURCE_DEFAULT_SCOPE);
             if (!tokenResponse) {
                 throw new Error('Failed to get access token');
             }
