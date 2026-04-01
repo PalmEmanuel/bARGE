@@ -93,7 +93,9 @@ wait_for_vscode_window() {
     fi
     # Give VS Code time to paint its UI after the window is visible.
     sleep 4
-    # Open the Explorer sidebar so it's visible on the right from the first frame.
+    # Close the secondary sidebar (Chat panel on the left) and ensure Explorer
+    # is open in the primary sidebar on the right.
+    xdotool key --clearmodifiers ctrl+alt+b 2>/dev/null || true
     xdotool key --clearmodifiers ctrl+shift+e 2>/dev/null || true
     sleep 0.5
     # Calculate how long since recording started so convert_to_gif can trim
