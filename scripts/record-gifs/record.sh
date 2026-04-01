@@ -239,7 +239,8 @@ install_extension() {
     "telemetry.telemetryLevel": "off",
     "barge.hideLoginMessages": true,
     "git.openRepositoryInParentFolders": "never",
-    "git.autoRepositoryDetection": false
+    "git.autoRepositoryDetection": false,
+    "editor.minimap.enabled": false
 }
 EOF
     code \

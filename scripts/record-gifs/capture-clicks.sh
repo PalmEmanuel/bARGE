@@ -57,7 +57,8 @@ cat > "${CAPTURE_USER_DATA}/User/settings.json" << 'EOF'
     "telemetry.telemetryLevel": "off",
     "barge.hideLoginMessages": true,
     "git.openRepositoryInParentFolders": "never",
-    "git.autoRepositoryDetection": false
+    "git.autoRepositoryDetection": false,
+    "editor.minimap.enabled": false
 }
 EOF
 
@@ -87,38 +88,91 @@ code \
     "${FIXTURE_WORKSPACE}" "${FIXTURE_KQL}" &
 VSCODE_PID=$!
 
-# --- Wait for main window ---
-echo "Waiting for VS Code window..."
-WIN_BOUNDS=""
-for i in $(seq 1 30); do
-    WIN_BOUNDS=$(osascript << 'APPLESCRIPT' 2>/dev/null || true
+# --- Wait for VS Code to fully open ---
+echo "Waiting for VS Code to load (8s)..."
+sleep 8
+
+# Find the largest Code window (main window, not helper popups)
+WIN_BOUNDS=$(osascript << 'APPLESCRIPT' 2>/dev/null || true
 tell application "System Events"
-    tell process "Code"
-        if (count of windows) > 0 then
-            set pos to position of window 1
-            set sz to size of window 1
-            return ((item 1 of pos) as text) & "," & ((item 2 of pos) as text) & "," & ((item 1 of sz) as text) & "," & ((item 2 of sz) as text)
-        end if
-    end tell
+    set bestBounds to ""
+    set bestArea to 0
+    repeat with proc in (every process whose name is "Code")
+        try
+            repeat with w in (windows of proc)
+                try
+                    set pos to position of w
+                    set sz to size of w
+                    set area to (item 1 of sz) * (item 2 of sz)
+                    if area > bestArea and (item 1 of sz) > 800 then
+                        set bestArea to area
+                        set bestBounds to ((item 1 of pos) as text) & "," & ((item 2 of pos) as text) & "," & ((item 1 of sz) as text) & "," & ((item 2 of sz) as text)
+                    end if
+                end try
+            end repeat
+        end try
+    end repeat
+    return bestBounds
 end tell
 APPLESCRIPT
-    )
-    if [[ -n "${WIN_BOUNDS}" && "${WIN_BOUNDS}" != *"error"* ]]; then
-        break
-    fi
-    sleep 1
-done
+)
 
 if [[ -z "${WIN_BOUNDS}" ]]; then
     echo "Error: VS Code window not found" >&2
     exit 1
 fi
 
+# Maximize VS Code and close the secondary sidebar (Chat), then re-fetch bounds
+osascript << 'APPLESCRIPT' 2>/dev/null || true
+tell application "System Events"
+    tell process "Code"
+        set frontmost to true
+        -- Zoom (maximize) the main window
+        if (count of windows) > 0 then
+            tell window 1 to if value of attribute "AXZoomed" is false then
+                perform action "AXZoom"
+            end if
+        end if
+    end tell
+end tell
+APPLESCRIPT
+sleep 0.5
+# Close secondary sidebar (Chat): Cmd+Alt+B on macOS
+osascript -e 'tell application "System Events" to tell process "Code" to keystroke "b" using {option down, command down}' 2>/dev/null || true
+# Open Explorer: Cmd+Shift+E
+osascript -e 'tell application "System Events" to tell process "Code" to keystroke "e" using {shift down, command down}' 2>/dev/null || true
+sleep 1
+
+# Re-fetch bounds — pick the largest Code window by area
+WIN_BOUNDS=$(osascript << 'APPLESCRIPT' 2>/dev/null || true
+tell application "System Events"
+    set bestBounds to ""
+    set bestArea to 0
+    repeat with proc in (every process whose name is "Code")
+        try
+            repeat with w in (windows of proc)
+                try
+                    set pos to position of w
+                    set sz to size of w
+                    set area to (item 1 of sz) * (item 2 of sz)
+                    if area > bestArea then
+                        set bestArea to area
+                        set bestBounds to ((item 1 of pos) as text) & "," & ((item 2 of pos) as text) & "," & ((item 1 of sz) as text) & "," & ((item 2 of sz) as text)
+                    end if
+                end try
+            end repeat
+        end try
+    end repeat
+    return bestBounds
+end tell
+APPLESCRIPT
+)
+
 WIN_X=$(echo "${WIN_BOUNDS}" | cut -d',' -f1 | tr -d ' ')
 WIN_Y=$(echo "${WIN_BOUNDS}" | cut -d',' -f2 | tr -d ' ')
 WIN_W=$(echo "${WIN_BOUNDS}" | cut -d',' -f3 | tr -d ' ')
 WIN_H=$(echo "${WIN_BOUNDS}" | cut -d',' -f4 | tr -d ' ')
-echo "VS Code window: ${WIN_X},${WIN_Y}  ${WIN_W}x${WIN_H}"
+echo "VS Code window (maximized): ${WIN_X},${WIN_Y}  ${WIN_W}x${WIN_H}"
 echo ""
 echo "======================================"
 echo " Click through your scenario actions."
