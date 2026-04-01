@@ -58,9 +58,9 @@ jobs:
             xvfb \
             xdotool \
             ffmpeg \
-            libasound2 \
+            libasound2t64 \
             libgbm1 \
-            libgtk-3-0 \
+            libgtk-3-0t64 \
             libnss3 \
             libxss1 \
             libxtst6
