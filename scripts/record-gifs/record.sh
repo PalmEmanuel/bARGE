@@ -92,13 +92,16 @@ convert_to_gif() {
 
 install_extension() {
     local vsix_path
-    vsix_path="$(find "${REPO_ROOT}" -maxdepth 1 -name "*.vsix" | sort -V | tail -1)"
+    # Find the most recently modified VSIX in the repo root
+    vsix_path="$(find "${REPO_ROOT}" -maxdepth 1 -name "*.vsix" -printf '%T@ %p\n' \
+        | sort -rn | head -1 | cut -d' ' -f2-)"
 
     if [[ -z "${vsix_path}" ]]; then
         echo "No .vsix found in repo root. Run 'npm run package' first." >&2
         exit 1
     fi
 
+    echo "Installing extension from: ${vsix_path}"
     mkdir -p "${VSCODE_USER_DATA_DIR}" "${VSCODE_EXTENSIONS_DIR}"
     code \
         --user-data-dir "${VSCODE_USER_DATA_DIR}" \
