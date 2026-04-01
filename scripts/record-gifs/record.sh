@@ -84,7 +84,7 @@ wait_for_vscode_window() {
         sleep 1
         elapsed=$((elapsed + 1))
     done
-    xdotool search --onlyvisible --name "Visual Studio Code" windowmaximize
+    xdotool search --onlyvisible --name "Visual Studio Code" | head -1 | xargs -r xdotool windowmaximize
     sleep 0.5
 }
 
