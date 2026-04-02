@@ -88,12 +88,12 @@ sleep 0.3
 natural_type "resources"
 xdotool key Return
 sleep 0.2
-natural_type "| where type"
+natural_type "where type"
 sleep 0.8  # Let IntelliSense show briefly
 natural_type ' == "microsoft.keyvault/vaults" and name contains "bARGE"'
 xdotool key Return
 sleep 0.2
-natural_type "take 5"
+natural_type "| take 5"
 sleep 0.5
 
 # Dismiss any open autocomplete popup, then scroll back to top so CodeLens positions are valid
