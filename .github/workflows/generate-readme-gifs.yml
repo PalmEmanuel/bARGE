@@ -19,6 +19,10 @@ on:
         default: '1920'
         type: string
 
+concurrency:
+  group: generate-gifs
+  cancel-in-progress: true
+
 env:
   NODE_VERSION: '22'
 
@@ -50,31 +54,51 @@ jobs:
           vsce package --no-yarn
 
       - name: Install system dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends \
-            xvfb \
-            xdotool \
-            ffmpeg \
-            imagemagick \
-            x11-apps \
-            libasound2t64 \
-            libgbm1 \
-            libgtk-3-0t64 \
-            libnss3 \
-            libxss1 \
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: >-
+            xvfb
+            xdotool
+            ffmpeg
+            imagemagick
+            x11-apps
+            libasound2t64
+            libgbm1
+            libgtk-3-0t64
+            libnss3
+            libxss1
             libxtst6
-          # Install Posy Improved cursor theme from GitHub
+
+      - name: Cache Posy cursor theme
+        uses: actions/cache@v4
+        id: cursor-cache
+        with:
+          path: /usr/share/icons/Posy_Cursor
+          key: posy-cursor-v1
+
+      - name: Install Posy cursor theme
+        if: steps.cursor-cache.outputs.cache-hit != 'true'
+        run: |
           curl -sL "https://github.com/simtrami/posy-improved-cursor-linux/archive/refs/heads/main.tar.gz" \
             | tar -xz -C /tmp
           sudo mkdir -p /usr/share/icons
           sudo cp -r "/tmp/posy-improved-cursor-linux-main/Posy_Cursor" /usr/share/icons/Posy_Cursor
 
-      - name: Install VS Code
+      - name: Cache VS Code
+        uses: actions/cache@v4
+        id: vscode-cache
+        with:
+          path: /tmp/vscode.deb
+          key: vscode-stable-deb-v1
+
+      - name: Download VS Code
+        if: steps.vscode-cache.outputs.cache-hit != 'true'
         run: |
           wget -q "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64" \
             -O /tmp/vscode.deb
-          sudo dpkg -i /tmp/vscode.deb || sudo apt-get install -f -y
+
+      - name: Install VS Code
+        run: sudo dpkg -i /tmp/vscode.deb || sudo apt-get install -f -y
 
       - name: Azure login
         uses: azure/login@v2
