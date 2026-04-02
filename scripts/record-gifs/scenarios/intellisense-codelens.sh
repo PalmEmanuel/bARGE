@@ -103,7 +103,7 @@ sleep 0.5
 
 # -- Step 4: Run key vaults query in new tab via "► Run (New Tab)" --
 move_mouse_smooth $WHERE_X $WHERE_Y $CL2_NEWTAB_X $CL2_NEWTAB_Y 800
-click_and_verify $CL2_NEWTAB_X $CL2_NEWTAB_Y "0.003" "1920x1000+0+0" \
+click_and_verify $CL2_NEWTAB_X $CL2_NEWTAB_Y "0.002" "1920x1000+0+0" \
     || { echo "Error: CodeLens 2 New Tab click produced no change" >&2; close_vscode; exit 1; }
 
 sleep 1.5
