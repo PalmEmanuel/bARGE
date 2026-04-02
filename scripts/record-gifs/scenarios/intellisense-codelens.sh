@@ -93,11 +93,13 @@ sleep 0.8  # Let IntelliSense show briefly
 natural_type ' == "microsoft.keyvault/vaults" and name contains "bARGE"'
 xdotool key Return
 sleep 0.2
-natural_type "| take 5"
+natural_type "take 5"
 sleep 0.5
 
-# Dismiss any open autocomplete popup before hovering
+# Dismiss any open autocomplete popup, then scroll back to top so CodeLens positions are valid
 xdotool key Escape
+sleep 0.3
+xdotool key ctrl+Home
 sleep 0.3
 
 mkdir -p /tmp/barge-debug
