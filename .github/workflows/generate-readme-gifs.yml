@@ -64,14 +64,11 @@ jobs:
             libnss3 \
             libxss1 \
             libxtst6
-          # Install Quintom Snow cursor theme from GitLab
-          curl -sL "https://gitlab.com/Burning_Cube/quintom-cursor-theme/-/archive/master/quintom-cursor-theme-master.tar.gz" \
+          # Install Posy Improved cursor theme from GitHub
+          curl -sL "https://github.com/simtrami/posy-improved-cursor-linux/archive/refs/heads/main.tar.gz" \
             | tar -xz -C /tmp
           sudo mkdir -p /usr/share/icons
-          sudo cp -r "/tmp/quintom-cursor-theme-master/Quintom_Snow Cursors/Quintom_Snow" /usr/share/icons/Quintom_Snow
-          # Create index.theme so GTK/XCursor can find the theme
-          printf '[Icon Theme]\nName=Quintom_Snow\nComment=Quintom Snow cursor theme\nInherits=Quintom_Snow\n' \
-            | sudo tee /usr/share/icons/Quintom_Snow/index.theme > /dev/null
+          sudo cp -r "/tmp/posy-improved-cursor-linux-main/Posy_Cursor" /usr/share/icons/Posy_Cursor
 
       - name: Install VS Code
         run: |

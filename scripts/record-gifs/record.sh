@@ -49,16 +49,16 @@ start_display() {
     XVFB_PID=$!
     export DISPLAY=":${DISPLAY_NUM}"
     sleep 1
-    # Use Quintom Snow cursor theme so pointer looks like a standard desktop cursor
-    export XCURSOR_THEME="Quintom_Snow"
+    # Use Posy Improved cursor theme so pointer looks like a standard desktop cursor
+    export XCURSOR_THEME="Posy_Cursor"
     export XCURSOR_SIZE=24
-    xrdb -merge <<< "Xcursor.theme: Quintom_Snow
+    xrdb -merge <<< "Xcursor.theme: Posy_Cursor
 Xcursor.size: 24" 2>/dev/null || true
     # GTK settings so VS Code / Electron also picks up the cursor theme
     mkdir -p "${HOME}/.config/gtk-3.0"
     cat > "${HOME}/.config/gtk-3.0/settings.ini" <<'EOF'
 [Settings]
-gtk-cursor-theme-name=Quintom_Snow
+gtk-cursor-theme-name=Posy_Cursor
 gtk-cursor-theme-size=24
 EOF
 }
