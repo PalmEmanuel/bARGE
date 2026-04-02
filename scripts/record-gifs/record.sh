@@ -49,10 +49,10 @@ start_display() {
     XVFB_PID=$!
     export DISPLAY=":${DISPLAY_NUM}"
     sleep 1
-    # Use white cursor theme so pointer looks like a standard desktop cursor
-    export XCURSOR_THEME="DMZ-White"
+    # Use Quintom Snow cursor theme so pointer looks like a standard desktop cursor
+    export XCURSOR_THEME="Quintom_Snow"
     export XCURSOR_SIZE=24
-    xrdb -merge <<< "Xcursor.theme: DMZ-White
+    xrdb -merge <<< "Xcursor.theme: Quintom_Snow
 Xcursor.size: 24" 2>/dev/null || true
 }
 

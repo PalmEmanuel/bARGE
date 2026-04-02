@@ -58,13 +58,17 @@ jobs:
             ffmpeg \
             imagemagick \
             x11-apps \
-            dmz-cursor-theme \
             libasound2t64 \
             libgbm1 \
             libgtk-3-0t64 \
             libnss3 \
             libxss1 \
             libxtst6
+          # Install Quintom Snow cursor theme from GitLab
+          curl -sL "https://gitlab.com/Burning_Cube/quintom-cursor-theme/-/archive/master/quintom-cursor-theme-master.tar.gz" \
+            | tar -xz -C /tmp
+          sudo mkdir -p /usr/share/icons
+          sudo cp -r "/tmp/quintom-cursor-theme-master/Quintom_Snow Cursors" /usr/share/icons/Quintom_Snow
 
       - name: Install VS Code
         run: |
