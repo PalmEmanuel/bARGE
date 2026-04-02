@@ -54,6 +54,13 @@ start_display() {
     export XCURSOR_SIZE=24
     xrdb -merge <<< "Xcursor.theme: Quintom_Snow
 Xcursor.size: 24" 2>/dev/null || true
+    # GTK settings so VS Code / Electron also picks up the cursor theme
+    mkdir -p "${HOME}/.config/gtk-3.0"
+    cat > "${HOME}/.config/gtk-3.0/settings.ini" <<'EOF'
+[Settings]
+gtk-cursor-theme-name=Quintom_Snow
+gtk-cursor-theme-size=24
+EOF
 }
 
 start_recording() {
