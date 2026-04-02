@@ -50,7 +50,7 @@ export class StatusBarManager {
 
     public updateStatusLoading(message: string): void {
         this.statusBarItem.text = `$(loading~spin) ${message}`;
-        this.statusBarItem.tooltip = `bARGE: ${message}`;
+        this.statusBarItem.tooltip = '';
         this.statusBarItem.backgroundColor = undefined;
     }
 
