@@ -70,12 +70,8 @@ jobs:
           sudo mkdir -p /usr/share/icons
           sudo cp -r "/tmp/quintom-cursor-theme-master/Quintom_Snow Cursors/Quintom_Snow" /usr/share/icons/Quintom_Snow
           # Create index.theme so GTK/XCursor can find the theme
-          sudo tee /usr/share/icons/Quintom_Snow/index.theme > /dev/null <<'EOF'
-[Icon Theme]
-Name=Quintom_Snow
-Comment=Quintom Snow cursor theme
-Inherits=Quintom_Snow
-EOF
+          printf '[Icon Theme]\nName=Quintom_Snow\nComment=Quintom Snow cursor theme\nInherits=Quintom_Snow\n' \
+            | sudo tee /usr/share/icons/Quintom_Snow/index.theme > /dev/null
 
       - name: Install VS Code
         run: |
