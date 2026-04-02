@@ -141,6 +141,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Register VS Code authentication command
 	const authenticateCommand = vscode.commands.registerCommand('barge.authenticate', async () => {
+		statusBar.hideTooltip();
 		await azureService.authenticate();
 	});
 

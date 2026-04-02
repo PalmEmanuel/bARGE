@@ -54,8 +54,8 @@ move_mouse_smooth $BARGE_STATUS_BAR_X $SB_Y $QP_X $QP_ITEM1_Y 700
 sleep 0.3
 
 # Hover slowly between the two options to show the picker contents
-move_mouse_smooth $QP_X $QP_ITEM1_Y $QP_X $QP_ITEM2_Y 1200
-move_mouse_smooth $QP_X $QP_ITEM2_Y $QP_X $QP_ITEM1_Y 1200
+move_mouse_smooth $QP_X $QP_ITEM1_Y $((QP_X + 15)) $QP_ITEM2_Y 700
+move_mouse_smooth $((QP_X + 15)) $QP_ITEM2_Y $QP_X $QP_ITEM1_Y 700
 
 # Click DefaultAzureCredential (top option)
 xdotool click 1

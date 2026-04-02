@@ -34,19 +34,24 @@ export class StatusBarManager {
     public updateStatusAuthenticated(accountName: string): void {
         this.statusBarItem.text = `$(compass-active) ${accountName}`;
         this.statusBarItem.tooltip = `bARGE: Authenticated as ${accountName}. Click to switch account`;
-        this.statusBarItem.backgroundColor = undefined; // Clear any error background
+        this.statusBarItem.backgroundColor = undefined;
     }
 
     public updateStatusNotAuthenticated(): void {
         this.statusBarItem.text = `$(compass) Not signed in`;
         this.statusBarItem.tooltip = 'bARGE: Click to sign in';
-        this.statusBarItem.backgroundColor = undefined; // Clear any error background
+        this.statusBarItem.backgroundColor = undefined;
+    }
+
+    /** Temporarily hide the tooltip (e.g. while a quick pick is open) */
+    public hideTooltip(): void {
+        this.statusBarItem.tooltip = '';
     }
 
     public updateStatusLoading(message: string): void {
         this.statusBarItem.text = `$(loading~spin) ${message}`;
         this.statusBarItem.tooltip = `bARGE: ${message}`;
-        this.statusBarItem.backgroundColor = undefined; // Clear any error background
+        this.statusBarItem.backgroundColor = undefined;
     }
 
     public updateStatusError(message: string): void {
