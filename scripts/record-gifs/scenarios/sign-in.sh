@@ -35,7 +35,7 @@ wait_for_vscode_window
 # --- Scenario actions ---
 
 # Click the bARGE status bar item (confirmed at CI x=1370 from capture-clicks.sh).
-click_and_verify 1370 1063 || { echo "Error: bARGE status bar click had no effect" >&2; close_vscode; exit 1; }
+click_status_bar || { echo "Error: bARGE status bar item not found" >&2; close_vscode; exit 1; }
 
 sleep 1
 

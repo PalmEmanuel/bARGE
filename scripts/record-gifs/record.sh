@@ -91,11 +91,13 @@ click_and_verify() {
     local x="$1" y="$2" threshold="${3:-0.005}"
     local before="/tmp/barge-click-before-$$.png"
     local after="/tmp/barge-click-after-$$.png"
-    DISPLAY=":${DISPLAY_NUM}" import -window root -silent "$before" 2>/dev/null || true
+    ffmpeg -f x11grab -video_size "${DISPLAY_WIDTH}x${DISPLAY_HEIGHT}" \
+        -i ":${DISPLAY_NUM}" -vframes 1 -y "$before" -loglevel quiet 2>/dev/null || true
     xdotool mousemove "$x" "$y"
     xdotool click 1
     sleep 0.5
-    DISPLAY=":${DISPLAY_NUM}" import -window root -silent "$after" 2>/dev/null || true
+    ffmpeg -f x11grab -video_size "${DISPLAY_WIDTH}x${DISPLAY_HEIGHT}" \
+        -i ":${DISPLAY_NUM}" -vframes 1 -y "$after" -loglevel quiet 2>/dev/null || true
     if screen_changed "$before" "$after" "$threshold"; then
         rm -f "$before" "$after"
         return 0
