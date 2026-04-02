@@ -48,11 +48,14 @@ SB_Y=$((DISPLAY_HEIGHT - 11))
 xdotool mousemove 960 500
 sleep 0.3
 
-# Smoothly drag down to the status bar where the bARGE item lives
-move_mouse_smooth 960 500 1550 $SB_Y 800
+# Silently find the bARGE status bar item position before animating toward it
+find_status_bar_x || { echo "Error: bARGE status bar item not found" >&2; close_vscode; exit 1; }
 
-# Click the bARGE status bar item, scanning nearby if not exact
-click_status_bar || { echo "Error: bARGE status bar item not found" >&2; close_vscode; exit 1; }
+# Smoothly drag down to the confirmed bARGE status bar position
+move_mouse_smooth 960 500 $BARGE_STATUS_BAR_X $SB_Y 800
+
+# Click the bARGE status bar item at the known position
+click_and_verify $BARGE_STATUS_BAR_X $SB_Y || { echo "Error: click had no effect" >&2; close_vscode; exit 1; }
 
 sleep 0.5
 

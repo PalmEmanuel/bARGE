@@ -137,6 +137,28 @@ click_status_bar() {
     return 1
 }
 
+# Finds the bARGE status bar item x position without leaving it open.
+# Clicks each candidate, dismisses with Escape, and exports BARGE_STATUS_BAR_X.
+# Returns 0 on success, 1 if not found.
+find_status_bar_x() {
+    local y=$((DISPLAY_HEIGHT - 11))
+    local x
+    for x in 1300 1340 1380 1260 1420 1220 1460 1180 1500 1550 1600 1650; do
+        echo "Probing status bar at x=${x}, y=${y}..."
+        if click_and_verify "$x" "$y"; then
+            echo "Status bar found at x=${x}"
+            BARGE_STATUS_BAR_X=$x
+            xdotool key --clearmodifiers Escape 2>/dev/null || true
+            sleep 0.3
+            return 0
+        fi
+        xdotool key --clearmodifiers Escape 2>/dev/null || true
+        sleep 0.3
+    done
+    echo "Error: could not find bARGE status bar item" >&2
+    return 1
+}
+
 # Moves the mouse smoothly from (x1,y1) to (x2,y2) over duration_ms milliseconds.
 # Usage: move_mouse_smooth x1 y1 x2 y2 [duration_ms]
 move_mouse_smooth() {
