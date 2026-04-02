@@ -180,7 +180,7 @@ export class AzureService {
                 {
                     label: defaultCredentialOption,
                     description: 'Use existing credentials',
-                    detail: 'Azure CLI and PowerShell, environment vars, VS Code, and more...'
+                    detail: 'Azure CLI and PowerShell, environment vars, and more...'
                 }
             ];
 
