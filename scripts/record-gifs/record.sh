@@ -210,6 +210,8 @@ natural_type() {
         sleep "$(awk "BEGIN{printf \"%.3f\", ${delay_ms}/1000}")"
     done
 }
+
+wait_for_vscode_window() {
     local timeout=30
     local elapsed=0
     until xdotool search --onlyvisible --name "Visual Studio Code" >/dev/null 2>&1; do
