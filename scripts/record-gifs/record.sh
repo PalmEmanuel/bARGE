@@ -117,6 +117,9 @@ click_and_verify() {
         convert "$after"  -crop "$crop_region" +repage "$after_crop"  2>/dev/null || cp "$after"  "$after_crop"
         local result=1
         screen_changed "$before_crop" "$after_crop" "$threshold" && result=0
+        # Keep crops for debugging (uploaded as artifacts)
+        cp "$before_crop" "/tmp/debug-before-x${x}.png" 2>/dev/null || true
+        cp "$after_crop"  "/tmp/debug-after-x${x}.png"  2>/dev/null || true
         rm -f "$before" "$after" "$before_crop" "$after_crop"
         return $result
     fi
