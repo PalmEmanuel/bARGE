@@ -68,20 +68,20 @@ sleep 1  # Ensure CodeLens has rendered
 
 # Save debug screenshot to see what's at y=53 before clicking
 mkdir -p /tmp/barge-debug
-DISPLAY=":${DISPLAY_NUM}" xwd -root -silent 2>/dev/null | magick xwd:- /tmp/barge-debug/before-codelens1.png 2>/dev/null || true
+DISPLAY=":${DISPLAY_NUM}" xwd -root -silent 2>/dev/null | convert xwd:- /tmp/barge-debug/before-codelens1.png 2>/dev/null || true
 
 move_mouse_smooth $EDITOR_X $EDITOR_Y $CL1_RUN_X $CL1_RUN_Y 800
 click_and_verify $CL1_RUN_X $CL1_RUN_Y "0.003" "1920x1000+0+0" \
     || { echo "Error: CodeLens 1 click produced no visible change" >&2; close_vscode; exit 1; }
 
 # Save debug screenshot after click
-DISPLAY=":${DISPLAY_NUM}" xwd -root -silent 2>/dev/null | magick xwd:- /tmp/barge-debug/after-codelens1.png 2>/dev/null || true
+DISPLAY=":${DISPLAY_NUM}" xwd -root -silent 2>/dev/null | convert xwd:- /tmp/barge-debug/after-codelens1.png 2>/dev/null || true
 
 sleep 1.5
 
 # -- Step 2: Show autocomplete in key vaults 'where' clause --
 move_mouse_smooth $CL1_RUN_X $CL1_RUN_Y $WHERE_X $WHERE_Y 900
-DISPLAY=":${DISPLAY_NUM}" xwd -root -silent 2>/dev/null | magick xwd:- /tmp/barge-debug/at-where.png 2>/dev/null || true
+DISPLAY=":${DISPLAY_NUM}" xwd -root -silent 2>/dev/null | convert xwd:- /tmp/barge-debug/at-where.png 2>/dev/null || true
 xdotool click 1
 sleep 0.3
 xdotool key ctrl+space
@@ -95,7 +95,7 @@ sleep 1.5
 
 # Scroll down slowly through hover popup examples
 for i in {1..6}; do
-    xdotool click --button 5
+    xdotool click 5
     sleep 0.4
 done
 
