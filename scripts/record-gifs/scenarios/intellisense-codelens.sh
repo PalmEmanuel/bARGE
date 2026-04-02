@@ -15,8 +15,8 @@ mkdir -p "${FIXTURE_WORKSPACE}"
 
 add_setting "barge.autoAuthenticate" "true"
 # Disable auto-closing pairs so xdotool type produces clean output
-add_setting "editor.autoClosingQuotes" "never"
-add_setting "editor.autoClosingBrackets" "never"
+add_setting "editor.autoClosingQuotes" '"never"'
+add_setting "editor.autoClosingBrackets" '"never"'
 
 code \
     --user-data-dir "${VSCODE_USER_DATA_DIR}" \
