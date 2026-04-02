@@ -151,17 +151,44 @@ click_status_bar() {
     return 1
 }
 
-# Moves the mouse smoothly from (x1,y1) to (x2,y2) over duration_ms milliseconds.
+# Moves the mouse naturally from (x1,y1) to (x2,y2) over duration_ms milliseconds.
+# Uses a quadratic Bézier curve with ease-in/ease-out and micro-jitter for realism.
 # Usage: move_mouse_smooth x1 y1 x2 y2 [duration_ms]
 move_mouse_smooth() {
     local x1="$1" y1="$2" x2="$3" y2="$4" duration_ms="${5:-1000}"
-    local steps=10
-    local i cx cy
-    for i in $(seq 1 $steps); do
-        cx=$(awk "BEGIN{printf \"%d\", ${x1} + (${x2} - ${x1}) * ${i} / ${steps}}")
-        cy=$(awk "BEGIN{printf \"%d\", ${y1} + (${y2} - ${y1}) * ${i} / ${steps}}")
-        xdotool mousemove "$cx" "$cy"
-        sleep "$(awk "BEGIN{printf \"%.3f\", ${duration_ms} / 1000.0 / ${steps}}")"
+    python3 -c "
+import math, random
+x1,y1,x2,y2,dur = ${x1},${y1},${x2},${y2},${duration_ms}
+dist = math.hypot(x2-x1, y2-y1)
+steps = max(15, min(40, int(dist / 25)))
+
+# Perpendicular Bézier control point (5-15% of distance, random side)
+mid_x, mid_y = (x1+x2)/2, (y1+y2)/2
+dx, dy = x2-x1, y2-y1
+length = math.hypot(dx, dy) or 1
+nx, ny = -dy/length, dx/length
+offset = random.uniform(0.05, 0.15) * dist * random.choice([-1, 1])
+cx, cy = mid_x + nx*offset, mid_y + ny*offset
+
+for i in range(1, steps+1):
+    # Cubic ease-in/ease-out
+    t = i / steps
+    t = 3*t*t - 2*t*t*t
+
+    # Quadratic Bézier
+    bx = (1-t)**2*x1 + 2*(1-t)*t*cx + t**2*x2
+    by = (1-t)**2*y1 + 2*(1-t)*t*cy + t**2*y2
+
+    # Micro-jitter (skip on final step to land exactly on target)
+    if i < steps:
+        bx += random.uniform(-1.5, 1.5)
+        by += random.uniform(-1.5, 1.5)
+
+    sleep_s = dur / 1000.0 / steps
+    print(f'{int(bx)} {int(by)} {sleep_s:.4f}')
+" | while read px py sl; do
+        xdotool mousemove "$px" "$py"
+        sleep "$sl"
     done
 }
 

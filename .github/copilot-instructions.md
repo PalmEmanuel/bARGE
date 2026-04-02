@@ -314,7 +314,7 @@ close_vscode
 | `wait_for_vscode_window` | Waits for window, sizes it, opens Explorer, closes Chat, sleeps 0.5s |
 | `click_and_verify x y [threshold] [crop_region]` | Clicks at (x,y), screenshots before/after cropped region, returns 0 if screen changed |
 | `click_status_bar` | Scans outward from x=1480 to find bARGE item; validates by checking top 300px changed (auth picker opened); exports `BARGE_STATUS_BAR_X`; returns 1 on failure |
-| `move_mouse_smooth x1 y1 x2 y2 [ms]` | Moves mouse in 10 steps over `ms` milliseconds (default 1000) |
+| `move_mouse_smooth x1 y1 x2 y2 [ms]` | Moves mouse naturally via quadratic Bézier curve with ease-in/ease-out and micro-jitter over `ms` milliseconds (default 1000). Lands exactly on target. |
 | `add_setting key value` | Injects a JSON key/value into VS Code settings.json before launch (call before `code`) |
 | `close_vscode` | Sends Ctrl+Q, waits for process exit |
 | `screen_changed before.png after.png [threshold]` | Returns 0 if ImageMagick diff stddev exceeds threshold |
