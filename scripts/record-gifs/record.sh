@@ -99,16 +99,27 @@ screen_changed() {
 
 # Clicks at (x,y) and verifies the screen changed within 0.5s.
 # Returns 0 on confirmed change, 1 if nothing changed.
-# Usage: click_and_verify x y [threshold]
+# Usage: click_and_verify x y [threshold] [crop_region]
+# crop_region: ImageMagick geometry to limit comparison (e.g. "1920x300+0+0" for top strip)
 click_and_verify() {
-    local x="$1" y="$2" threshold="${3:-0.005}"
+    local x="$1" y="$2" threshold="${3:-0.005}" crop_region="${4:-}"
     local before="/tmp/barge-click-before-$$.png"
     local after="/tmp/barge-click-after-$$.png"
+    local before_crop="/tmp/barge-click-before-crop-$$.png"
+    local after_crop="/tmp/barge-click-after-crop-$$.png"
     DISPLAY=":${DISPLAY_NUM}" xwd -root -silent 2>/dev/null | convert xwd:- "$before" 2>/dev/null || true
     xdotool mousemove "$x" "$y"
     xdotool click 1
     sleep 0.5
     DISPLAY=":${DISPLAY_NUM}" xwd -root -silent 2>/dev/null | convert xwd:- "$after" 2>/dev/null || true
+    if [[ -n "$crop_region" ]]; then
+        convert "$before" -crop "$crop_region" +repage "$before_crop" 2>/dev/null || cp "$before" "$before_crop"
+        convert "$after"  -crop "$crop_region" +repage "$after_crop"  2>/dev/null || cp "$after"  "$after_crop"
+        local result=1
+        screen_changed "$before_crop" "$after_crop" "$threshold" && result=0
+        rm -f "$before" "$after" "$before_crop" "$after_crop"
+        return $result
+    fi
     if screen_changed "$before" "$after" "$threshold"; then
         rm -f "$before" "$after"
         return 0
@@ -117,39 +128,20 @@ click_and_verify() {
     return 1
 }
 
-# Scans the status bar right-to-left to find and click the bARGE status bar item.
-# Verifies screen changes after each attempt; retries with next x on failure.
+# Scans the status bar to find and click the bARGE status bar item.
+# Confirms by checking the quick-pick area at the top of the screen changed,
+# which proves the auth picker opened (not just a tooltip or hover state).
 # On success, exports BARGE_STATUS_BAR_X with the confirmed x coordinate.
 click_status_bar() {
     local y=$((DISPLAY_HEIGHT - 11))
+    # Only consider the top 300px where the quick pick appears
+    local qp_region="${DISPLAY_WIDTH}x300+0+0"
     local x
     for x in 1380 1420 1340 1460 1300 1500 1260 1540 1580 1620 1660 1220; do
         echo "Trying status bar click at x=${x}, y=${y}..."
-        if click_and_verify "$x" "$y"; then
+        if click_and_verify "$x" "$y" "0.005" "$qp_region"; then
             echo "Status bar click confirmed at x=${x}"
             BARGE_STATUS_BAR_X=$x
-            return 0
-        fi
-        xdotool key --clearmodifiers Escape 2>/dev/null || true
-        sleep 0.3
-    done
-    echo "Error: could not find bARGE status bar item" >&2
-    return 1
-}
-
-# Finds the bARGE status bar item x position without leaving it open.
-# Clicks each candidate, dismisses with Escape, and exports BARGE_STATUS_BAR_X.
-# Returns 0 on success, 1 if not found.
-find_status_bar_x() {
-    local y=$((DISPLAY_HEIGHT - 11))
-    local x
-    for x in 1300 1340 1380 1260 1420 1220 1460 1180 1500 1550 1600 1650; do
-        echo "Probing status bar at x=${x}, y=${y}..."
-        if click_and_verify "$x" "$y"; then
-            echo "Status bar found at x=${x}"
-            BARGE_STATUS_BAR_X=$x
-            xdotool key --clearmodifiers Escape 2>/dev/null || true
-            sleep 0.3
             return 0
         fi
         xdotool key --clearmodifiers Escape 2>/dev/null || true
