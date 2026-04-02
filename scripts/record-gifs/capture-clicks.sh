@@ -265,6 +265,7 @@ def on_done(sig, frame):
     sys.exit(0)
 
 signal.signal(signal.SIGINT, on_done)
+signal.signal(signal.SIGTERM, on_done)
 print(" Listening (Ctrl+C to finish)...\n")
 with mouse.Listener(on_click=on_click) as listener:
     listener.join()
