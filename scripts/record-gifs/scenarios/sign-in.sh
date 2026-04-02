@@ -35,24 +35,32 @@ wait_for_vscode_window
 
 # --- Scenario actions ---
 
-# Click the bARGE status bar item (confirmed at CI x=1370 from capture-clicks.sh).
-click_status_bar || { echo "Error: bARGE status bar item not found" >&2; close_vscode; exit 1; }
-
-sleep 1
-
-# Quick pick items at 1920x1080 (captured on 1440x900 macOS, normalized to CI):
-#   Item 1: DefaultAzureCredential  x=917, y=89
-#   Item 2: Sign in with VS Code    x=917, y=~139  (+50px)
 QP_X=917
 QP_ITEM1_Y=89
 QP_ITEM2_Y=139
+SB_Y=$((DISPLAY_HEIGHT - 11))
 
-# Hover slowly from item 1 down to item 2 and back, ~1s total.
-move_mouse_smooth "$QP_X" "$QP_ITEM1_Y" "$QP_X" "$QP_ITEM2_Y" 500
-move_mouse_smooth "$QP_X" "$QP_ITEM2_Y" "$QP_X" "$QP_ITEM1_Y" 500
+# Start mouse in the editor area (natural resting position)
+xdotool mousemove 960 500
+sleep 0.3
 
-# Click DefaultAzureCredential (top option).
-xdotool mousemove "$QP_X" "$QP_ITEM1_Y"
+# Smoothly drag down to the status bar where the bARGE item lives
+move_mouse_smooth 960 500 1300 $SB_Y 800
+
+# Click the bARGE status bar item, scanning nearby if not exact
+click_status_bar || { echo "Error: bARGE status bar item not found" >&2; close_vscode; exit 1; }
+
+sleep 0.5
+
+# Smoothly drag from the status bar up to the quick pick
+move_mouse_smooth $BARGE_STATUS_BAR_X $SB_Y $QP_X $QP_ITEM1_Y 700
+sleep 0.3
+
+# Hover slowly between the two options to show the picker contents
+move_mouse_smooth $QP_X $QP_ITEM1_Y $QP_X $QP_ITEM2_Y 600
+move_mouse_smooth $QP_X $QP_ITEM2_Y $QP_X $QP_ITEM1_Y 600
+
+# Click DefaultAzureCredential (top option)
 xdotool click 1
 
 sleep 2
