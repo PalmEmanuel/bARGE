@@ -270,6 +270,23 @@ EOF
         > /dev/null 2>&1
 }
 
+# add_setting KEY VALUE — adds or updates one key in the VS Code settings.json.
+# Scenarios can call this before launching VS Code to inject scenario-specific settings.
+# VALUE must be a valid JSON value (string: '"value"', bool: 'true'/'false', number: '42').
+add_setting() {
+    local key="$1"
+    local value="$2"
+    local settings_file="${VSCODE_USER_DATA_DIR}/User/settings.json"
+    python3 -c "
+import json, sys
+with open('${settings_file}') as f:
+    s = json.load(f)
+s['${key}'] = json.loads('${value}')
+with open('${settings_file}', 'w') as f:
+    json.dump(s, f, indent=4)
+"
+}
+
 run_scenario() {
     local scenario_name="$1"
     local scenario_script="${SCENARIOS_DIR}/${scenario_name}.sh"

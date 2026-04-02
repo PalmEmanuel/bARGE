@@ -17,6 +17,10 @@ Resources
 | limit 10
 EOF
 
+# Scenario-specific settings: show sign-in notification, disable auto-authenticate
+add_setting "barge.autoAuthenticate" "false"
+add_setting "barge.hideLoginMessages" "false"
+
 code \
     --user-data-dir "${VSCODE_USER_DATA_DIR}" \
     --extensions-dir "${VSCODE_EXTENSIONS_DIR}" \
