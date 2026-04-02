@@ -62,4 +62,5 @@ xdotool click 1
 
 sleep 5
 
+stop_recording
 close_vscode
