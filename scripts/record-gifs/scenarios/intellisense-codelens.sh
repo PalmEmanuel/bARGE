@@ -100,6 +100,8 @@ sleep 0.5
 xdotool key Escape
 sleep 0.3
 
+DISPLAY=":${DISPLAY_NUM}" xwd -root -silent 2>/dev/null | convert xwd:- /tmp/barge-debug/after-typing.png 2>/dev/null || true
+
 # -- Step 3: Hover "contains" for operator documentation --
 move_mouse_smooth $EDITOR_X $EDITOR_Y $CONTAINS_X $CONTAINS_Y 700
 sleep 1.5
@@ -113,6 +115,8 @@ done
 sleep 0.5
 
 # -- Step 4: Run key vault query in new tab via "► Run (New Tab)" --
+mkdir -p /tmp/barge-debug
+DISPLAY=":${DISPLAY_NUM}" xwd -root -silent 2>/dev/null | convert xwd:- /tmp/barge-debug/before-cl2.png 2>/dev/null || true
 move_mouse_smooth $CONTAINS_X $CONTAINS_Y $CL2_NEWTAB_X $CL2_NEWTAB_Y 700
 click_and_verify $CL2_NEWTAB_X $CL2_NEWTAB_Y "0.002" "1920x1000+0+0" \
     || { echo "Error: CodeLens 2 New Tab click produced no change" >&2; close_vscode; exit 1; }
