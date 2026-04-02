@@ -81,6 +81,7 @@ screen_changed() {
     local stddev
     stddev=$(convert "$before" "$after" -compose Difference -composite \
         -colorspace gray -format "%[fx:standard_deviation]" info: 2>/dev/null || echo "0")
+    echo "  screen diff stddev=${stddev} (threshold=${threshold})"
     awk "BEGIN{exit !(${stddev:-0} > ${threshold})}"
 }
 

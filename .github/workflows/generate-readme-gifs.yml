@@ -56,6 +56,8 @@ jobs:
             xvfb \
             xdotool \
             ffmpeg \
+            imagemagick \
+            x11-apps \
             libasound2t64 \
             libgbm1 \
             libgtk-3-0t64 \
