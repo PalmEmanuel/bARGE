@@ -1,7 +1,3 @@
 resources
 | where type == "microsoft.storage/storageaccounts" and name contains "bARGE"
 | take 5
-
-resources
-| where type == "microsoft.keyvault/vaults" and name contains "bARGE"
-| take 5
