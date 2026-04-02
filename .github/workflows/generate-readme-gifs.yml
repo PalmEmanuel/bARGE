@@ -58,6 +58,7 @@ jobs:
             ffmpeg \
             imagemagick \
             x11-apps \
+            dmz-cursor-theme \
             libasound2t64 \
             libgbm1 \
             libgtk-3-0t64 \

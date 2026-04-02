@@ -49,6 +49,11 @@ start_display() {
     XVFB_PID=$!
     export DISPLAY=":${DISPLAY_NUM}"
     sleep 1
+    # Use white cursor theme so pointer looks like a standard desktop cursor
+    export XCURSOR_THEME="DMZ-White"
+    export XCURSOR_SIZE=24
+    xrdb -merge <<< "Xcursor.theme: DMZ-White
+Xcursor.size: 24" 2>/dev/null || true
 }
 
 start_recording() {
