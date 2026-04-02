@@ -117,5 +117,6 @@ jobs:
             echo "No GIF changes to commit."
           else
             git commit -m "chore(dev): Update README GIFs"
+            git pull --rebase
             git push
           fi
