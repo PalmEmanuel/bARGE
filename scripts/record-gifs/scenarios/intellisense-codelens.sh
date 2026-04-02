@@ -85,14 +85,17 @@ xdotool key Return
 sleep 0.3
 
 # Type the key vault query with natural variable-speed typing
+# Showcase IntelliSense: type partial resource type then accept with Tab
 natural_type "resources"
 xdotool key Escape  # dismiss autocomplete before Enter to avoid snippet insertion
 sleep 0.1
 xdotool key Return
 sleep 0.2
-natural_type "where type"
-sleep 0.8  # Let IntelliSense show briefly
-natural_type ' == "microsoft.keyvault/vaults" and name contains "bARGE"'
+natural_type '| where type == "keyvault'
+sleep 1.2  # Let IntelliSense show matching resource type completions
+xdotool key Tab  # Accept first completion ("microsoft.keyvault/vaults")
+sleep 0.3
+natural_type ' and name contains "bARGE"'
 xdotool key Escape  # dismiss before Enter
 sleep 0.1
 xdotool key Return
