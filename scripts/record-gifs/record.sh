@@ -137,7 +137,7 @@ click_status_bar() {
     # Only consider the top 300px where the quick pick appears
     local qp_region="${DISPLAY_WIDTH}x300+0+0"
     local x
-    for x in 1380 1420 1340 1460 1300 1500 1260 1540 1580 1620 1660 1220; do
+    for x in 1480 1520 1440 1560 1400 1600 1360 1640 1300 1680 1260 1220; do
         echo "Trying status bar click at x=${x}, y=${y}..."
         if click_and_verify "$x" "$y" "0.005" "$qp_region"; then
             echo "Status bar click confirmed at x=${x}"
