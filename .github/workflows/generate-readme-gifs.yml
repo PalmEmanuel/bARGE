@@ -107,15 +107,6 @@ jobs:
           path: media/readme/gifs/*.gif
           retention-days: 30
 
-      - name: Upload debug screenshots as artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: debug-screenshots
-          path: /tmp/barge-debug/
-          retention-days: 3
-          if-no-files-found: ignore
-
       - name: Commit updated GIFs
         if: github.event_name == 'workflow_dispatch'
         run: |
