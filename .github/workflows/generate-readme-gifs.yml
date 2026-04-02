@@ -112,7 +112,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: debug-screenshots
-          path: /tmp/debug-*.png
+          path: /tmp/barge-debug/
           retention-days: 3
           if-no-files-found: ignore
 
