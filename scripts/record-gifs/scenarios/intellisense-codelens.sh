@@ -48,16 +48,16 @@ wait_for_vscode_window
 EDITOR_X=500
 EDITOR_Y=300
 
-CL1_RUN_X=55
-CL1_RUN_Y=53
+CL1_RUN_X=95
+CL1_RUN_Y=100
 
-CL2_RUN_X=55
-CL2_RUN_Y=159
-CL2_NEWTAB_X=130
-CL2_NEWTAB_Y=159
+CL2_RUN_X=95
+CL2_RUN_Y=206
+CL2_NEWTAB_X=145
+CL2_NEWTAB_Y=206
 
 WHERE_X=80
-WHERE_Y=201
+WHERE_Y=268
 
 # Start mouse in editor area
 xdotool mousemove $EDITOR_X $EDITOR_Y
@@ -68,19 +68,20 @@ sleep 1  # Ensure CodeLens has rendered
 
 # Save debug screenshot to see what's at y=53 before clicking
 mkdir -p /tmp/barge-debug
-DISPLAY=":${DISPLAY_NUM}" xwd -root -silent 2>/dev/null | convert xwd:- /tmp/barge-debug/before-codelens1.png 2>/dev/null || true
+DISPLAY=":${DISPLAY_NUM}" xwd -root -silent 2>/dev/null | magick xwd:- /tmp/barge-debug/before-codelens1.png 2>/dev/null || true
 
 move_mouse_smooth $EDITOR_X $EDITOR_Y $CL1_RUN_X $CL1_RUN_Y 800
 click_and_verify $CL1_RUN_X $CL1_RUN_Y "0.003" "1920x1000+0+0" \
     || { echo "Error: CodeLens 1 click produced no visible change" >&2; close_vscode; exit 1; }
 
 # Save debug screenshot after click
-DISPLAY=":${DISPLAY_NUM}" xwd -root -silent 2>/dev/null | convert xwd:- /tmp/barge-debug/after-codelens1.png 2>/dev/null || true
+DISPLAY=":${DISPLAY_NUM}" xwd -root -silent 2>/dev/null | magick xwd:- /tmp/barge-debug/after-codelens1.png 2>/dev/null || true
 
 sleep 1.5
 
 # -- Step 2: Show autocomplete in key vaults 'where' clause --
 move_mouse_smooth $CL1_RUN_X $CL1_RUN_Y $WHERE_X $WHERE_Y 900
+DISPLAY=":${DISPLAY_NUM}" xwd -root -silent 2>/dev/null | magick xwd:- /tmp/barge-debug/at-where.png 2>/dev/null || true
 xdotool click 1
 sleep 0.3
 xdotool key ctrl+space
