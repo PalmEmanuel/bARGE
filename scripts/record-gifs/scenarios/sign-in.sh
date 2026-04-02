@@ -7,15 +7,8 @@
 # Sourced by record.sh after start_recording. All record.sh helpers are available.
 
 FIXTURE_WORKSPACE="${SCRIPT_DIR}/fixtures/workspace"
-FIXTURE_KQL="${FIXTURE_WORKSPACE}/example.kql"
+FIXTURE_KQL="${REPO_ROOT}/test/fixtures/queries.kql"
 mkdir -p "${FIXTURE_WORKSPACE}"
-
-cat > "${FIXTURE_KQL}" << 'EOF'
-Resources
-| where type == 'microsoft.compute/virtualmachines'
-| project name, location, resourceGroup
-| limit 10
-EOF
 
 # Scenario-specific settings: show sign-in notification, disable auto-authenticate
 add_setting "barge.autoAuthenticate" "false"
@@ -67,6 +60,6 @@ move_mouse_smooth $QP_X $QP_ITEM2_Y $QP_X $QP_ITEM1_Y 1200
 # Click DefaultAzureCredential (top option)
 xdotool click 1
 
-sleep 2
+sleep 5
 
 close_vscode
