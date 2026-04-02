@@ -49,7 +49,7 @@ xdotool mousemove 960 500
 sleep 0.3
 
 # Smoothly drag down to the status bar where the bARGE item lives
-move_mouse_smooth 960 500 1300 $SB_Y 800
+move_mouse_smooth 960 500 1450 $SB_Y 800
 
 # Click the bARGE status bar item, scanning nearby if not exact
 click_status_bar || { echo "Error: bARGE status bar item not found" >&2; close_vscode; exit 1; }
@@ -61,8 +61,8 @@ move_mouse_smooth $BARGE_STATUS_BAR_X $SB_Y $QP_X $QP_ITEM1_Y 700
 sleep 0.3
 
 # Hover slowly between the two options to show the picker contents
-move_mouse_smooth $QP_X $QP_ITEM1_Y $QP_X $QP_ITEM2_Y 600
-move_mouse_smooth $QP_X $QP_ITEM2_Y $QP_X $QP_ITEM1_Y 600
+move_mouse_smooth $QP_X $QP_ITEM1_Y $QP_X $QP_ITEM2_Y 1200
+move_mouse_smooth $QP_X $QP_ITEM2_Y $QP_X $QP_ITEM1_Y 1200
 
 # Click DefaultAzureCredential (top option)
 xdotool click 1
