@@ -318,12 +318,18 @@ add_setting() {
     local key="$1"
     local value="$2"
     local settings_file="${VSCODE_USER_DATA_DIR}/User/settings.json"
+    mkdir -p "$(dirname "${settings_file}")"
     python3 -c "
-import json, sys
-with open('${settings_file}') as f:
-    s = json.load(f)
+import json, os
+path = '${settings_file}'
+try:
+    with open(path) as f:
+        content = f.read().strip()
+    s = json.loads(content) if content else {}
+except (FileNotFoundError, json.JSONDecodeError):
+    s = {}
 s['${key}'] = json.loads('${value}')
-with open('${settings_file}', 'w') as f:
+with open(path, 'w') as f:
     json.dump(s, f, indent=4)
 "
 }
