@@ -54,19 +54,19 @@ jobs:
           vsce package --no-yarn
 
       - name: Install system dependencies
-        uses: awalsh128/cache-apt-pkgs-action@latest
-        with:
-          packages: >-
-            xvfb
-            xdotool
-            ffmpeg
-            imagemagick
-            x11-apps
-            libasound2t64
-            libgbm1
-            libgtk-3-0t64
-            libnss3
-            libxss1
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            xvfb \
+            xdotool \
+            ffmpeg \
+            imagemagick \
+            x11-apps \
+            libasound2t64 \
+            libgbm1 \
+            libgtk-3-0t64 \
+            libnss3 \
+            libxss1 \
             libxtst6
 
       - name: Cache Posy cursor theme
