@@ -86,11 +86,15 @@ sleep 0.3
 
 # Type the key vault query with natural variable-speed typing
 natural_type "resources"
+xdotool key Escape  # dismiss autocomplete before Enter to avoid snippet insertion
+sleep 0.1
 xdotool key Return
 sleep 0.2
 natural_type "where type"
 sleep 0.8  # Let IntelliSense show briefly
 natural_type ' == "microsoft.keyvault/vaults" and name contains "bARGE"'
+xdotool key Escape  # dismiss before Enter
+sleep 0.1
 xdotool key Return
 sleep 0.2
 natural_type "| take 5"
