@@ -3,7 +3,8 @@ import * as vscode from 'vscode';
 export class StatusBarManager {
     private statusBarItem: vscode.StatusBarItem;
     private sessionChangeListener: vscode.Disposable;
-    private tooltipSuppressTimer: ReturnType<typeof setTimeout> | undefined;
+    private tooltipSuppressed = false;
+    private lastTextBeforeSuppress: string | undefined;
 
     constructor(onAuthSessionChange?: () => Promise<void>) {
         // Create status bar item with compass icon on the right side
@@ -33,25 +34,27 @@ export class StatusBarManager {
     }
 
     private setTooltip(value: string): void {
-        if (this.tooltipSuppressTimer) {
-            return;
+        if (this.tooltipSuppressed) {
+            // Lift suppression once the status bar text changes from what it
+            // was when suppression started (i.e. the auth state transitioned).
+            if (this.statusBarItem.text !== this.lastTextBeforeSuppress) {
+                this.tooltipSuppressed = false;
+            } else {
+                return;
+            }
         }
         this.statusBarItem.tooltip = value;
     }
 
     /**
-     * Suppress tooltip updates for a period (e.g. while a quick pick is open
-     * and during the subsequent auth flow). Prevents the tooltip from flashing
-     * when the status bar item still has focus after the picker closes.
+     * Suppress tooltip updates until the status bar text changes, preventing
+     * the tooltip from flashing when the item still has focus after a quick
+     * pick closes.
      */
-    public suppressTooltip(durationMs: number = 10000): void {
+    public suppressTooltip(): void {
         this.statusBarItem.tooltip = '';
-        if (this.tooltipSuppressTimer) {
-            clearTimeout(this.tooltipSuppressTimer);
-        }
-        this.tooltipSuppressTimer = setTimeout(() => {
-            this.tooltipSuppressTimer = undefined;
-        }, durationMs);
+        this.tooltipSuppressed = true;
+        this.lastTextBeforeSuppress = this.statusBarItem.text;
     }
 
     public updateStatusAuthenticated(accountName: string): void {
@@ -79,9 +82,6 @@ export class StatusBarManager {
     }
 
     public dispose(): void {
-        if (this.tooltipSuppressTimer) {
-            clearTimeout(this.tooltipSuppressTimer);
-        }
         this.statusBarItem.dispose();
         this.sessionChangeListener.dispose();
     }

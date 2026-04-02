@@ -60,7 +60,7 @@ move_mouse_smooth $((QP_X + 15)) $QP_ITEM2_Y $QP_X $QP_ITEM1_Y 700
 # Click DefaultAzureCredential (top option)
 xdotool click 1
 
-sleep 5
+sleep 1.5
 
 stop_recording
 close_vscode
