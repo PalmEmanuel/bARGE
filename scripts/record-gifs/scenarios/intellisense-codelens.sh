@@ -73,8 +73,8 @@ click_and_verify $CL1_RUN_X $CL1_RUN_Y "0.003" "1920x1000+0+0" \
 
 sleep 1.5
 
-# -- Step 2: Click in editor, go to end of file, type key vault query live --
-xdotool mousemove $EDITOR_X $EDITOR_Y
+# -- Step 2: Smooth move back to editor, go to end of file, type key vault query live --
+move_mouse_smooth $CL1_RUN_X $CL1_RUN_Y $EDITOR_X $EDITOR_Y 600
 xdotool click 1
 sleep 0.3
 xdotool key ctrl+End
@@ -84,22 +84,23 @@ sleep 0.3
 xdotool key Return
 sleep 0.3
 
-# Type the key vault query naturally — autocomplete will appear as we type
-xdotool type --clearmodifiers --delay 80 "resources"
+# Type the key vault query with natural variable-speed typing
+natural_type "resources"
 xdotool key Return
 sleep 0.2
-xdotool type --clearmodifiers --delay 80 "| where type"
+natural_type "| where type"
 sleep 0.8  # Let IntelliSense show briefly
-xdotool type --clearmodifiers --delay 80 ' == "microsoft.keyvault/vaults" and name contains "bARGE"'
+natural_type ' == "microsoft.keyvault/vaults" and name contains "bARGE"'
 xdotool key Return
 sleep 0.2
-xdotool type --clearmodifiers --delay 80 "| take 5"
+natural_type "| take 5"
 sleep 0.5
 
 # Dismiss any open autocomplete popup before hovering
 xdotool key Escape
 sleep 0.3
 
+mkdir -p /tmp/barge-debug
 DISPLAY=":${DISPLAY_NUM}" xwd -root -silent 2>/dev/null | convert xwd:- /tmp/barge-debug/after-typing.png 2>/dev/null || true
 
 # -- Step 3: Hover "contains" for operator documentation --
@@ -115,7 +116,6 @@ done
 sleep 0.5
 
 # -- Step 4: Run key vault query in new tab via "► Run (New Tab)" --
-mkdir -p /tmp/barge-debug
 DISPLAY=":${DISPLAY_NUM}" xwd -root -silent 2>/dev/null | convert xwd:- /tmp/barge-debug/before-cl2.png 2>/dev/null || true
 move_mouse_smooth $CONTAINS_X $CONTAINS_Y $CL2_NEWTAB_X $CL2_NEWTAB_Y 700
 click_and_verify $CL2_NEWTAB_X $CL2_NEWTAB_Y "0.002" "1920x1000+0+0" \

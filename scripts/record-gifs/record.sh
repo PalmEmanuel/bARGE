@@ -192,7 +192,24 @@ for i in range(1, steps+1):
     done
 }
 
-wait_for_vscode_window() {
+# natural_type TEXT [BASE_MS]
+# Types text character by character with deterministic variable delays,
+# simulating realistic human typing. BASE_MS is the average delay (default: 110ms).
+# Delays vary ±40% using a seeded LCG so output is deterministic across runs.
+natural_type() {
+    local text="$1"
+    local base_ms="${2:-110}"
+    local n=${#text}
+    local seed=1337
+    for (( i=0; i<n; i++ )); do
+        local char="${text:$i:1}"
+        xdotool type --clearmodifiers -- "${char}"
+        seed=$(( (seed * 1103515245 + 12345) & 0x7fffffff ))
+        local jitter=$(( seed % (base_ms * 4 / 5 + 1) ))
+        local delay_ms=$(( base_ms * 3 / 5 + jitter ))
+        sleep "$(awk "BEGIN{printf \"%.3f\", ${delay_ms}/1000}")"
+    done
+}
     local timeout=30
     local elapsed=0
     until xdotool search --onlyvisible --name "Visual Studio Code" >/dev/null 2>&1; do
