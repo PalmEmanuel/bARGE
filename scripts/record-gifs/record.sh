@@ -245,7 +245,8 @@ install_extension() {
     "barge.hideLoginMessages": true,
     "git.openRepositoryInParentFolders": "never",
     "git.autoRepositoryDetection": false,
-    "editor.minimap.enabled": false
+    "editor.minimap.enabled": false,
+    "workbench.auxiliaryBar.hidden": true
 }
 EOF
     code \
