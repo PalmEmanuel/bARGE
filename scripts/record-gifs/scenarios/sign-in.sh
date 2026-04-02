@@ -7,7 +7,7 @@
 # Sourced by record.sh after start_recording. All record.sh helpers are available.
 
 FIXTURE_WORKSPACE="${SCRIPT_DIR}/fixtures/workspace"
-FIXTURE_KQL="${REPO_ROOT}/test/fixtures/queries.kql"
+FIXTURE_KQL="${REPO_ROOT}/src/test/fixtures/queries.kql"
 mkdir -p "${FIXTURE_WORKSPACE}"
 
 # Scenario-specific settings: show sign-in notification, disable auto-authenticate
