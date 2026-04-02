@@ -111,7 +111,7 @@ click_and_verify() {
 click_status_bar() {
     local y=$((DISPLAY_HEIGHT - 11))
     local x
-    for x in 1870 1830 1790 1750 1710 1670 1630 1590 1550 1510 1470 1430 1390 1350 1310 1270 1230 1190 1150 1100; do
+    for x in 1100 1150 1190 1230 1270 1310 1350 1390 1430 1470 1510 1550 1590 1630; do
         echo "Trying status bar click at x=${x}, y=${y}..."
         if click_and_verify "$x" "$y"; then
             echo "Status bar click confirmed at x=${x}"
@@ -158,10 +158,13 @@ wait_for_vscode_window() {
     fi
     # Give VS Code time to paint its UI after the window is visible.
     sleep 4
-    # Close the secondary sidebar (Chat panel on the left) and ensure Explorer
-    # is open in the primary sidebar on the right.
-    xdotool key --clearmodifiers ctrl+alt+b 2>/dev/null || true
+    # Open Explorer in the primary sidebar (right) and close secondary sidebar
+    # (Chat panel on the left). Sent twice with a delay to prevent Copilot
+    # from re-opening the panel after extension activation.
     xdotool key --clearmodifiers ctrl+shift+e 2>/dev/null || true
+    xdotool key --clearmodifiers ctrl+alt+b 2>/dev/null || true
+    sleep 2
+    xdotool key --clearmodifiers ctrl+alt+b 2>/dev/null || true
     sleep 0.5
     # Calculate how long since recording started so convert_to_gif can trim
     # exactly to this point, ensuring the GIF begins with VS Code fully loaded.

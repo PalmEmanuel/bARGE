@@ -24,6 +24,7 @@ code \
     --use-gl=swiftshader \
     --no-sandbox \
     --disable-telemetry \
+    --disable-extension github.copilot \
     --disable-extension github.copilot-chat \
     "${FIXTURE_WORKSPACE}" "${FIXTURE_KQL}" \
     > /dev/null 2>&1 &
