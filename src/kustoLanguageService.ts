@@ -992,8 +992,7 @@ export class KustoLanguageServiceProvider implements
                 const description = data.description || 'Azure Resource Graph table';
                 item.detail = `Table - ${description}`;
 
-                // Add newline, pipe, and space after table name for easier operator chaining
-                item.insertText = new vscode.SnippetString(`${tableName}\n| `);
+                item.insertText = tableName;
 
                 // Use getKQLDocumentation for consistent documentation formatting
                 const documentation = this.getKQLDocumentation(tableName);
