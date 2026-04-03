@@ -1,0 +1,152 @@
+name: Generate README GIFs
+
+on:
+  workflow_dispatch:
+    inputs:
+      scenario:
+        description: 'Scenario to record (leave empty to record all)'
+        required: false
+        default: ''
+        type: string
+      gif_fps:
+        description: 'GIF frames per second'
+        required: false
+        default: '10'
+        type: string
+      gif_width:
+        description: 'GIF output width in pixels'
+        required: false
+        default: '1920'
+        type: string
+
+concurrency:
+  group: generate-gifs
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  record-gifs:
+    name: Record GIFs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build and package extension
+        run: |
+          npm run package
+          npm install -g @vscode/vsce
+          vsce package --no-yarn
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            xvfb \
+            xdotool \
+            ffmpeg \
+            imagemagick \
+            x11-apps \
+            libasound2t64 \
+            libgbm1 \
+            libgtk-3-0t64 \
+            libnss3 \
+            libxss1 \
+            libxtst6
+
+      - name: Cache Posy cursor theme
+        uses: actions/cache@v4
+        id: cursor-cache
+        with:
+          path: /usr/share/icons/Posy_Cursor
+          key: posy-cursor-v1
+
+      - name: Install Posy cursor theme
+        if: steps.cursor-cache.outputs.cache-hit != 'true'
+        run: |
+          curl -sL "https://github.com/simtrami/posy-improved-cursor-linux/archive/refs/heads/main.tar.gz" \
+            | tar -xz -C /tmp
+          sudo mkdir -p /usr/share/icons
+          sudo cp -r "/tmp/posy-improved-cursor-linux-main/Posy_Cursor" /usr/share/icons/Posy_Cursor
+
+      - name: Cache VS Code
+        uses: actions/cache@v4
+        id: vscode-cache
+        with:
+          path: /tmp/vscode.deb
+          key: vscode-stable-deb-v1
+
+      - name: Download VS Code
+        if: steps.vscode-cache.outputs.cache-hit != 'true'
+        run: |
+          wget -q "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64" \
+            -O /tmp/vscode.deb
+
+      - name: Install VS Code
+        run: sudo dpkg -i /tmp/vscode.deb || sudo apt-get install -f -y
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.ARM_ACCESS_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+
+      - name: Make recording script executable
+        run: chmod +x scripts/record-gifs/record.sh
+
+      - name: Record GIFs
+        env:
+          GIF_FPS: ${{ inputs.gif_fps }}
+          GIF_WIDTH: ${{ inputs.gif_width }}
+        run: |
+          if [[ -n "${{ inputs.scenario }}" ]]; then
+            ./scripts/record-gifs/record.sh "${{ inputs.scenario }}"
+          else
+            ./scripts/record-gifs/record.sh
+          fi
+
+      - name: Upload GIFs as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: readme-gifs
+          path: media/readme/gifs/*.gif
+          retention-days: 30
+
+      - name: Upload debug screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-screenshots
+          path: /tmp/barge-debug/
+          retention-days: 3
+          if-no-files-found: ignore
+
+      - name: Commit updated GIFs
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add media/readme/gifs/*.gif
+          if git diff --cached --quiet; then
+            echo "No GIF changes to commit."
+          else
+            git commit -m "chore(dev): Update README GIFs"
+            git pull --rebase
+            git push
+          fi

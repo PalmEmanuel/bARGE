@@ -106,6 +106,24 @@ There are also additional features to make filtering easier and more powerful:
 - **Invert Filters**: Flips the selected values in all active column filters. Note that this does not necessarily select all unselected values, but rather inverts all current filter selections.
 - **Clear Filters**: Removes all active and saved filters.
 
+### GitHub Copilot Integration
+
+bARGE registers [Language Model Tools](https://code.visualstudio.com/api/extension-guides/language-model#language-model-tools) that GitHub Copilot can use to interact with open result panels. This makes it possible to chat with Copilot about your Azure Resource Graph query results directly in VS Code.
+
+The available tools are:
+
+| Tool | Description |
+|---|---|
+| `list_barge_tables` | Lists all currently open bARGE result panels with their IDs, queries and metadata |
+| `get_barge_table_data` | Retrieves row data from a result panel, with an optional row limit and the option to ignore active filters |
+| `run_barge_query` | Runs a KQL query against Azure Resource Graph and returns results in a new or existing panel |
+| `select_barge_rows` | Highlights specific rows in a result panel |
+| `select_barge_cells` | Highlights specific cells in a result panel |
+| `sort_barge_table` | Sorts a result panel by a named column, ascending or descending |
+| `filter_barge_table` | Applies column filters to a result panel |
+
+Copilot can combine these tools to, for example, run a query, inspect the results, filter by a specific value, and explain what it found — all from a single chat prompt.
+
 ## Configuration
 
 The extension supports the following configuration options in VS Code settings:
