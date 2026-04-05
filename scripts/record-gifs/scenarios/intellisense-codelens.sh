@@ -143,7 +143,7 @@ move_mouse_smooth $CONTAINS_X $CONTAINS_Y $CL2_NEWTAB_X $CL2_NEWTAB_Y 700
 click_and_verify $CL2_NEWTAB_X $CL2_NEWTAB_Y "0.002" "1920x1000+0+0" \
     || { echo "Error: CodeLens 2 New Tab click produced no change" >&2; close_vscode; exit 1; }
 
-sleep 1.5
+sleep 4  # Wait for keyvault query to return and new tab to open
 
 stop_recording
 close_vscode
