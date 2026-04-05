@@ -48,8 +48,8 @@ CL1_RUN_Y=100
 
 CL2_RUN_X=95
 CL2_RUN_Y=186
-CL2_NEWTAB_X=145
-CL2_NEWTAB_Y=186
+CL2_NEWTAB_X=565
+CL2_NEWTAB_Y=359
 
 # x position of the word "contains" on line 6
 # "| where type == "microsoft.keyvault/vaults" and name " = ~52 chars
