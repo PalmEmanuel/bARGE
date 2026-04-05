@@ -48,8 +48,8 @@ CL1_RUN_Y=100
 
 CL2_RUN_X=95
 CL2_RUN_Y=186
-CL2_NEWTAB_X=565
-CL2_NEWTAB_Y=359
+CL2_NEWTAB_X=145
+CL2_NEWTAB_Y=186
 
 # x position of the word "contains" on line 6
 # "| where type == "microsoft.keyvault/vaults" and name " = ~52 chars
@@ -84,26 +84,33 @@ sleep 0.3
 xdotool key Return
 sleep 0.3
 
-# Type partial table name, accept completion with Enter — snippet inserts newline + "| " for free
+# Show IntelliSense for table name (visual), Escape to avoid wrong completion
+# (resourcechanges sorts before resources — don't accept)
 natural_type "resou"
-sleep 0.8  # Let autocomplete show "resources"
-xdotool key Return  # Accept completion; bARGE snippet inserts "resources\n| "
-sleep 0.4
-
-# Cursor is now after "| " on the new line — type partial resource type, accept with Enter
-natural_type 'where type == "/vaults'
-sleep 1.2  # Let IntelliSense show "microsoft.keyvault/vaults"
-xdotool key Return  # Accept resource type completion
-sleep 0.3
-natural_type ' and name cont'
+sleep 0.8
 xdotool key Escape
 sleep 0.1
-natural_type ' "bARGE"'
+natural_type "rces"   # finish "resources" without snippet
+xdotool key Return
+sleep 0.3
+
+# Type | where manually, accept resource type completion with Enter
+natural_type '| where type == "keyvault'
+sleep 1.2  # Let IntelliSense show microsoft.keyvault/vaults
+xdotool key Return  # Accept completion
+sleep 0.3
+natural_type ' and name contains "bARGE"'
+xdotool key Escape
+sleep 0.1
 xdotool key Return
 sleep 0.2
 natural_type "| take 5"
 sleep 0.5
 xdotool key Escape
+sleep 0.3
+
+# Scroll to top so CodeLens positions match calibrated coordinates
+xdotool key ctrl+Home
 sleep 0.3
 
 mkdir -p /tmp/barge-debug
@@ -122,6 +129,11 @@ done
 sleep 0.5
 
 # -- Step 4: Run key vault query in new tab via "► Run (New Tab)" --
+# Re-scroll to top after hover scrolling moved the view
+xdotool key Escape
+sleep 0.1
+xdotool key ctrl+Home
+sleep 0.3
 DISPLAY=":${DISPLAY_NUM}" xwd -root -silent 2>/dev/null | convert xwd:- /tmp/barge-debug/before-cl2.png 2>/dev/null || true
 move_mouse_smooth $CONTAINS_X $CONTAINS_Y $CL2_NEWTAB_X $CL2_NEWTAB_Y 700
 click_and_verify $CL2_NEWTAB_X $CL2_NEWTAB_Y "0.002" "1920x1000+0+0" \
