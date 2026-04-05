@@ -54,8 +54,8 @@ CL2_NEWTAB_Y=137
 # x position of the word "contains" on line 6
 # "| where type == "microsoft.keyvault/vaults" and name " = ~51 chars
 # At ~7px/char + ~50px gutter ≈ 407px
-CONTAINS_X=407
-CONTAINS_Y=153
+CONTAINS_X=380
+CONTAINS_Y=173
 
 # A safe click target in the editor body (avoid panel/status bar)
 EDITOR_X=400
@@ -95,7 +95,7 @@ xdotool key Return
 sleep 0.3
 
 # Type | where manually, accept resource type completion with Enter
-natural_type '| where type == "microsoft.keyvault'
+natural_type '| where type == "microsoft.keyvault/v'
 sleep 1.2  # Let IntelliSense show microsoft.keyvault/vaults
 xdotool key Return  # Accept completion
 sleep 0.3
