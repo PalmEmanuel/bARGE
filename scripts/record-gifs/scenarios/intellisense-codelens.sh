@@ -91,22 +91,19 @@ xdotool key Return  # Accept completion; bARGE snippet inserts "resources\n| "
 sleep 0.4
 
 # Cursor is now after "| " on the new line — type partial resource type, accept with Enter
-natural_type 'where type == "keyvaul'
+natural_type 'where type == "/vaults'
 sleep 1.2  # Let IntelliSense show "microsoft.keyvault/vaults"
 xdotool key Return  # Accept resource type completion
 sleep 0.3
-natural_type ' and name contains "bARGE"'
+natural_type ' and name cont'
 xdotool key Escape
 sleep 0.1
+natural_type ' "bARGE"'
 xdotool key Return
 sleep 0.2
 natural_type "| take 5"
 sleep 0.5
-
-# Dismiss any open autocomplete popup, then scroll back to top so CodeLens positions are valid
 xdotool key Escape
-sleep 0.3
-xdotool key ctrl+Home
 sleep 0.3
 
 mkdir -p /tmp/barge-debug
