@@ -360,11 +360,23 @@ run_scenario() {
     echo "Recording scenario: ${scenario_name}"
 
     start_recording "${raw_recording}"
+    sleep 1  # Allow ffmpeg to initialize x11grab before VS Code launches
 
     # shellcheck source=/dev/null
     source "${scenario_script}"
 
     stop_recording
+
+    # Extract raw frames at 1fps for the first 5s after the GIF trim point
+    # to verify whether x11grab captured live content or a frozen frame.
+    mkdir -p /tmp/barge-debug
+    ffmpeg -y \
+        -ss "${VSCODE_BOOT_SECONDS}" \
+        -i "${raw_recording}" \
+        -vf "fps=1" \
+        -frames:v 5 \
+        /tmp/barge-debug/raw-frame-%02d.png \
+        > /dev/null 2>&1 || true
 
     echo "Converting to GIF: ${gif_output}"
     mkdir -p "${GIF_OUTPUT_DIR}"
