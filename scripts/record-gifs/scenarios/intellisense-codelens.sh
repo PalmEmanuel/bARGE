@@ -43,19 +43,19 @@ wait_for_vscode_window
 #   line 7: | take 5
 #
 # Adjust these to match your display:
-CL1_RUN_X=95
-CL1_RUN_Y=100
+CL1_RUN_X=70
+CL1_RUN_Y=75
 
-CL2_RUN_X=95
-CL2_RUN_Y=186
-CL2_NEWTAB_X=145
-CL2_NEWTAB_Y=186
+CL2_RUN_X=70
+CL2_RUN_Y=137
+CL2_NEWTAB_X=115
+CL2_NEWTAB_Y=137
 
 # x position of the word "contains" on line 6
-# "| where type == "microsoft.keyvault/vaults" and name " = ~52 chars
-# At ~8.4px/char + ~50px gutter ≈ 490px
-CONTAINS_X=490
-CONTAINS_Y=268
+# "| where type == "microsoft.keyvault/vaults" and name " = ~51 chars
+# At ~7px/char + ~50px gutter ≈ 407px
+CONTAINS_X=407
+CONTAINS_Y=153
 
 # A safe click target in the editor body (avoid panel/status bar)
 EDITOR_X=400
@@ -95,7 +95,7 @@ xdotool key Return
 sleep 0.3
 
 # Type | where manually, accept resource type completion with Enter
-natural_type '| where type == "keyvault'
+natural_type '| where type == "microsoft.keyvault'
 sleep 1.2  # Let IntelliSense show microsoft.keyvault/vaults
 xdotool key Return  # Accept completion
 sleep 0.3
