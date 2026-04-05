@@ -65,7 +65,7 @@ xdotool mousemove $EDITOR_X $EDITOR_Y
 sleep 0.5
 
 # -- Step 1: Run storage accounts query via "► Run" --
-sleep 1
+sleep 4  # Wait for CodeLens to render after file loads
 
 move_mouse_smooth $EDITOR_X $EDITOR_Y $CL1_RUN_X $CL1_RUN_Y 800
 click_and_verify $CL1_RUN_X $CL1_RUN_Y "0.003" "1920x1000+0+0" \
