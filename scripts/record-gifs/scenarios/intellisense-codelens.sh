@@ -100,6 +100,7 @@ natural_type '| where type == "/vaults'
 sleep 1.2  # Let IntelliSense show microsoft.keyvault/vaults
 xdotool key Return  # Accept completion
 sleep 0.5  # Longer wait after completion inserts text
+natural_type '"'  # Completion doesn't add closing quote; add it manually
 natural_type ' and name contains "bARGE"'
 sleep 0.2
 xdotool key Escape
