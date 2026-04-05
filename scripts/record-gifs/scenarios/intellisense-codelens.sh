@@ -44,22 +44,20 @@ wait_for_vscode_window
 #
 # Adjust these to match your display:
 CL1_RUN_X=70
-CL1_RUN_Y=75
+CL1_RUN_Y=100
 
 CL2_RUN_X=70
-CL2_RUN_Y=137
-CL2_NEWTAB_X=115
-CL2_NEWTAB_Y=137
+CL2_RUN_Y=192
+CL2_NEWTAB_X=130
+CL2_NEWTAB_Y=192
 
-# x position of the word "contains" on line 6
-# "| where type == "microsoft.keyvault/vaults" and name " = ~51 chars
-# At ~7px/char + ~50px gutter ≈ 407px
-CONTAINS_X=380
-CONTAINS_Y=173
+# x position of the word "contains" on line 6, measured via pixel scan
+CONTAINS_X=450
+CONTAINS_Y=227
 
-# A safe click target in the editor body (avoid panel/status bar)
+# A safe click target in the editor body (avoid CodeLens rows)
 EDITOR_X=400
-EDITOR_Y=200
+EDITOR_Y=300
 
 xdotool mousemove $EDITOR_X $EDITOR_Y
 sleep 0.5
