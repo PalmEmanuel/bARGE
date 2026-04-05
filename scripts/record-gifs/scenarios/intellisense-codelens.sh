@@ -52,7 +52,7 @@ CL2_NEWTAB_X=130
 CL2_NEWTAB_Y=192
 
 # x position of the word "contains" on line 6, measured via pixel scan
-CONTAINS_X=450
+CONTAINS_X=542
 CONTAINS_Y=227
 
 # A safe click target in the editor body (avoid CodeLens rows)
