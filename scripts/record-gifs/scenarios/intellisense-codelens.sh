@@ -89,21 +89,27 @@ sleep 0.3
 natural_type "resou"
 sleep 0.8
 xdotool key Escape
-sleep 0.1
+sleep 0.3
 natural_type "rces"   # finish "resources" without snippet
+sleep 0.3  # wait for re-appeared completion
+xdotool key Escape   # second Escape so Return is a plain newline
+sleep 0.2
 xdotool key Return
 sleep 0.3
 
 # Type | where manually, accept resource type completion with Enter
-natural_type '| where type == "microsoft.keyvault/v'
+natural_type '| where type == "/vaults'
 sleep 1.2  # Let IntelliSense show microsoft.keyvault/vaults
 xdotool key Return  # Accept completion
-sleep 0.3
+sleep 0.5  # Longer wait after completion inserts text
 natural_type ' and name contains "bARGE"'
-xdotool key Escape
-sleep 0.1
-xdotool key Return
 sleep 0.2
+xdotool key Escape
+sleep 0.3  # Longer wait
+xdotool key Escape   # second Escape
+sleep 0.2
+xdotool key Return
+sleep 0.3
 natural_type "| take 5"
 sleep 0.5
 xdotool key Escape
