@@ -53,7 +53,7 @@ DISPLAY=":${DISPLAY_NUM}" xwd -root -silent 2>/dev/null \
 # These coordinates assume no prior chat history (empty chat state).
 # Tune CHAT_INPUT_X / CHAT_INPUT_Y after the first CI run if needed.
 CHAT_INPUT_X=1670
-CHAT_INPUT_Y=998
+CHAT_INPUT_Y=968
 
 PROMPT="Get all keyvaults using bARGE, filter the table to only show the ones in Sweden, select the first two rows."
 
