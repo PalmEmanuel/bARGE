@@ -73,18 +73,23 @@ sleep 0.5
 # Submit
 xdotool key --clearmodifiers Return
 
-# If a browser window opened (Copilot "Finish setup" flow), close it and
+# If a browser window opened (Copilot "Finish Setup" flow), dismiss it and
 # refocus VS Code so the chat response remains visible in the recording.
+# Chrome's WM class is "Google-chrome"; search by class is more reliable
+# than by window title (which varies by page, e.g. "Sign in to Chrome").
 sleep 4
-CHROME_WID=$(xdotool search --onlyvisible --name "Google Chrome" 2>/dev/null | head -1 || true)
+CHROME_WID=$(xdotool search --onlyvisible --classname "google-chrome" 2>/dev/null | head -1 \
+    || xdotool search --onlyvisible --class "Google-chrome" 2>/dev/null | head -1 \
+    || true)
 if [[ -n "${CHROME_WID}" ]]; then
-    echo "Browser window detected — closing and refocusing VS Code" >&2
-    xdotool windowfocus "${CHROME_WID}"
+    echo "Browser window detected (wid=${CHROME_WID}) — dismissing and refocusing VS Code" >&2
+    # Bring Chrome to front and send Alt+F4 to close it entirely
+    xdotool windowfocus --sync "${CHROME_WID}" 2>/dev/null || true
     sleep 0.3
     xdotool key --clearmodifiers alt+F4
-    sleep 0.5
+    sleep 1
 fi
-# Refocus VS Code
+# Refocus VS Code main window
 xdotool search --onlyvisible --class "code" | head -1 | xargs -I{} xdotool windowfocus {} 2>/dev/null || true
 sleep 0.5
 
