@@ -72,4 +72,9 @@ xdotool key --clearmodifiers Return
 # The tool calls (run_query → filter_table → select_rows) take ~20–30s in total.
 sleep 35
 
+# Save a debug screenshot so we can verify auth and response content
+mkdir -p /tmp/barge-debug
+DISPLAY=":${DISPLAY_NUM}" xwd -root -silent 2>/dev/null \
+    | convert xwd:- /tmp/barge-debug/copilot-chat-response.png 2>/dev/null || true
+
 close_vscode

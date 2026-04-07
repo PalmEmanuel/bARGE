@@ -315,6 +315,21 @@ install_extension() {
 
     echo "Installing extension from: ${vsix_path}"
     mkdir -p "${VSCODE_USER_DATA_DIR}/User" "${VSCODE_EXTENSIONS_DIR}"
+    write_base_settings
+    code \
+        --user-data-dir "${VSCODE_USER_DATA_DIR}" \
+        --extensions-dir "${VSCODE_EXTENSIONS_DIR}" \
+        --no-sandbox \
+        --install-extension "${vsix_path}" \
+        --force \
+        > /dev/null 2>&1
+}
+
+# write_base_settings — writes the base VS Code settings.json shared by all
+# scenarios. Called once by install_extension and again at the start of each
+# run_scenario to reset any overrides applied by the previous scenario.
+write_base_settings() {
+    mkdir -p "${VSCODE_USER_DATA_DIR}/User"
     # Disable workspace trust prompt, distracting UI, and bARGE login notifications
     cat > "${VSCODE_USER_DATA_DIR}/User/settings.json" << 'EOF'
 {
@@ -334,13 +349,6 @@ install_extension() {
     "workbench.auxiliaryBar.hidden": true
 }
 EOF
-    code \
-        --user-data-dir "${VSCODE_USER_DATA_DIR}" \
-        --extensions-dir "${VSCODE_EXTENSIONS_DIR}" \
-        --no-sandbox \
-        --install-extension "${vsix_path}" \
-        --force \
-        > /dev/null 2>&1
 }
 
 # add_setting KEY VALUE — adds or updates one key in the VS Code settings.json.
@@ -369,6 +377,11 @@ run_scenario() {
     local raw_recording="/tmp/barge-recording-$$.mkv"
     local gif_output="${GIF_OUTPUT_DIR}/${scenario_name}.gif"
     VSCODE_BOOT_SECONDS=3  # reset; wait_for_vscode_window will update this
+
+    # Reset base settings and any scenario-specific variables so that overrides
+    # from a previous scenario don't bleed into this one.
+    write_base_settings
+    unset KEEP_SECONDARY_SIDEBAR
 
     echo "Recording scenario: ${scenario_name}"
 
