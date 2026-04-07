@@ -24,6 +24,8 @@ python3 "${SCRIPT_DIR}/setup-copilot-auth.py"
 # ── VS Code settings ──────────────────────────────────────────────────────────
 add_setting "barge.autoAuthenticate" "true"
 add_setting "breadcrumbs.enabled" "false"
+# sideBar on left → primary sidebar (Explorer) on left, auxiliary bar (Chat) on right
+add_setting "workbench.sideBar.location" '"left"'
 
 # Tell wait_for_vscode_window to open Copilot Chat (ctrl+alt+i) instead of
 # closing the secondary sidebar, so Chat is already visible at the trim point.

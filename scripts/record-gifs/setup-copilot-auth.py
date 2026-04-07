@@ -96,31 +96,6 @@ db.execute(
     ),
 )
 
-# Place Copilot Chat in the primary sidebar (right side).
-# workbench.panel.chatSidebar.copilot is the view container ID for Chat
-# when pinned in the primary sidebar activity bar.
-# workbench.panel.chat (auxiliary bar) is left hidden so ctrl+alt+i opens
-# the primary sidebar Chat rather than the auxiliary bar one.
-db.execute(
-    "INSERT OR REPLACE INTO ItemTable VALUES (?, ?)",
-    (
-        "workbench.activity.pinnedViewlets2",
-        json.dumps([
-            {"id": "workbench.view.explorer", "pinned": True, "visible": True, "order": 0},
-            {"id": "workbench.panel.chatSidebar.copilot", "pinned": True, "visible": True, "order": 1},
-        ]),
-    ),
-)
-db.execute(
-    "INSERT OR REPLACE INTO ItemTable VALUES (?, ?)",
-    (
-        "workbench.auxiliarybar.pinnedPanels",
-        json.dumps([
-            {"id": "workbench.panel.chat", "pinned": True, "visible": False, "order": 1},
-        ]),
-    ),
-)
-
 db.commit()
 db.close()
 print("VS Code auth session written to state.vscdb")
