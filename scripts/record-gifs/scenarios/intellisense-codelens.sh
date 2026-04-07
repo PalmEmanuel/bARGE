@@ -29,7 +29,7 @@ code \
 VSCODE_PID=$!
 
 # A safe click target in the editor body (avoid CodeLens rows)
-EDITOR_X=400
+EDITOR_X=600
 EDITOR_Y=300
 
 xdotool mousemove $EDITOR_X $EDITOR_Y
@@ -56,10 +56,10 @@ CL2_RUN_Y=192
 CL2_NEWTAB_X=130
 CL2_NEWTAB_Y=192
 
-BARGE_TAB1_X=190
-BARGE_TAB1_Y=650
-BARGE_TAB2_X=190
-BARGE_TAB2_Y=650
+BARGE_TAB1_X=170
+BARGE_TAB1_Y=590
+BARGE_TAB2_X=230
+BARGE_TAB2_Y=590
 
 # x position of the word "contains" on line 6, measured via pixel scan
 CONTAINS_X=542
@@ -73,8 +73,6 @@ sleep 0.5  # Wait for CodeLens to render after file loads
 move_mouse_smooth $EDITOR_X $EDITOR_Y $CL1_RUN_X $CL1_RUN_Y 800
 click_and_verify $CL1_RUN_X $CL1_RUN_Y "0.003" "1920x1000+0+0" \
     || { echo "Error: CodeLens 1 click produced no visible change" >&2; close_vscode; exit 1; }
-
-sleep 0.5
 
 # -- Step 2: Smooth move back to editor, go to end of file, type key vault query live --
 move_mouse_smooth $CL1_RUN_X $CL1_RUN_Y $EDITOR_X $EDITOR_Y 600
@@ -143,7 +141,7 @@ sleep 0.5  # Wait for keyvault query to return and new tab to open
 
 move_mouse_smooth $CL2_NEWTAB_X $CL2_NEWTAB_Y $BARGE_TAB1_X $BARGE_TAB1_Y 500
 click_and_verify $BARGE_TAB1_X $BARGE_TAB1_Y "0.002" "1920x1000+0+0" \
-    || { echo "Error: CodeLens 2 New Tab click produced no change" >&2; close_vscode; exit 1; }
+    || { echo "Error: Clicking bARGE Tab 1 produced no change" >&2; close_vscode; exit 1; }
 
 sleep 2
 
