@@ -62,6 +62,9 @@ jobs:
           version: 1
           execute_install_scripts: true
 
+      - name: Refresh dynamic linker cache
+        run: sudo ldconfig
+
       - name: Cache Posy cursor theme
         uses: actions/cache@v4
         id: cursor-cache
