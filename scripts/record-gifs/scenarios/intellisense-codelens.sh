@@ -62,10 +62,8 @@ CONTAINS_Y=227
 CONTAINS_HOVER_X=562
 CONTAINS_HOVER_Y=247
 
-sleep 0.5
-
 # -- Step 1: Run storage accounts query via "► Run" --
-sleep 1  # Wait for CodeLens to render after file loads
+sleep 0.5  # Wait for CodeLens to render after file loads
 
 move_mouse_smooth $EDITOR_X $EDITOR_Y $CL1_RUN_X $CL1_RUN_Y 800
 click_and_verify $CL1_RUN_X $CL1_RUN_Y "0.003" "1920x1000+0+0" \
@@ -86,14 +84,9 @@ sleep 0.3
 
 # Show IntelliSense for table name (visual), Escape to avoid wrong completion
 # (resourcechanges sorts before resources — don't accept)
-natural_type "resou"
-sleep 0.6
-xdotool key Escape
-sleep 0.3
-natural_type "rces"   # finish "resources" without snippet
+natural_type "resources"
 sleep 0.3  # wait for re-appeared completion
 xdotool key Escape   # second Escape so Return is a plain newline
-sleep 0.2
 xdotool key Return
 sleep 0.3
 
@@ -101,7 +94,7 @@ sleep 0.3
 natural_type '| where type == "/vaults'
 sleep 0.3  # Let IntelliSense show microsoft.keyvault/vaults
 xdotool key Return  # Accept completion
-sleep 0.5  # Longer wait after completion inserts text
+sleep 0.4  # Longer wait after completion inserts text
 natural_type '" and name contains "bARGE"'
 sleep 0.3
 xdotool key Escape
@@ -120,7 +113,7 @@ DISPLAY=":${DISPLAY_NUM}" xwd -root -silent 2>/dev/null | convert xwd:- /tmp/bar
 # -- Step 3: Hover "contains" for operator documentation --
 move_mouse_smooth $EDITOR_X $EDITOR_Y $CONTAINS_X $CONTAINS_Y 700
 sleep 0.5
-move_mouse_smooth $EDITOR_X $EDITOR_Y $CONTAINS_HOVER_X $CONTAINS_HOVER_Y 300
+move_mouse_smooth $CONTAINS_X $CONTAINS_Y $CONTAINS_HOVER_X $CONTAINS_HOVER_Y 300
 
 # Scroll through hover content
 for i in {1..4}; do
