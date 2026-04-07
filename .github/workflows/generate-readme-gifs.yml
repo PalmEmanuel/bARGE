@@ -44,7 +44,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install npm dependencies
         run: npm ci
 
       - name: Build and package extension
@@ -53,7 +53,7 @@ jobs:
           npm install -g @vscode/vsce
           vsce package --no-yarn
 
-      - name: Install system dependencies
+      - name: Install and cache system dependencies
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
           packages: >-

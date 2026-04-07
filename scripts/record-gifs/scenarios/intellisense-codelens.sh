@@ -30,7 +30,7 @@ VSCODE_PID=$!
 
 # A safe click target in the editor body (avoid CodeLens rows)
 EDITOR_X=900
-EDITOR_Y=400
+EDITOR_Y=250
 
 xdotool mousemove $EDITOR_X $EDITOR_Y
 
@@ -58,7 +58,7 @@ CL2_NEWTAB_Y=192
 
 BARGE_TAB1_X=170
 BARGE_TAB1_Y=570
-BARGE_TAB2_X=230
+BARGE_TAB2_X=300
 BARGE_TAB2_Y=570
 
 # x position of the word "contains" on line 6, measured via pixel scan
@@ -118,6 +118,8 @@ move_mouse_smooth $EDITOR_X $EDITOR_Y $CONTAINS_X $CONTAINS_Y 700
 sleep 0.3
 move_mouse_smooth $CONTAINS_X $CONTAINS_Y $CONTAINS_HOVER_X $CONTAINS_HOVER_Y 300
 
+sleep 0.5
+
 # Scroll through hover content
 for i in {1..4}; do
     xdotool click 5
@@ -141,15 +143,16 @@ sleep 0.5  # Wait for keyvault query to return and new tab to open
 
 # -- Step 5: Click the first tab again to show tab switching
 move_mouse_smooth $CL2_NEWTAB_X $CL2_NEWTAB_Y $BARGE_TAB1_X $BARGE_TAB1_Y 500
+sleep 1
 click_and_verify $BARGE_TAB1_X $BARGE_TAB1_Y "0.002" "1920x1000+0+0" \
     || { echo "Error: Clicking bARGE Tab 1 produced no change" >&2; close_vscode; exit 1; }
 
 sleep 1
 
 # # -- Step 6: Click the second tab again
-# move_mouse_smooth $BARGE_TAB1_X $BARGE_TAB1_Y $BARGE_TAB2_X $BARGE_TAB2_Y 500
-# click_and_verify $BARGE_TAB2_X $BARGE_TAB2_Y "0.002" "1920x1000+0+0" \
-#     || { echo "Error: Clicking bARGE Tab 2 produced no change" >&2; close_vscode; exit 1; }
+move_mouse_smooth $BARGE_TAB1_X $BARGE_TAB1_Y $BARGE_TAB2_X $BARGE_TAB2_Y 500
+click_and_verify $BARGE_TAB2_X $BARGE_TAB2_Y "0.002" "1920x1000+0+0" \
+    || { echo "Error: Clicking bARGE Tab 2 produced no change" >&2; close_vscode; exit 1; }
 
 sleep 2
 
