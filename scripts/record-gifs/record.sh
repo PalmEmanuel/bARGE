@@ -237,7 +237,7 @@ wait_for_vscode_window() {
     xdotool key --clearmodifiers ctrl+alt+b 2>/dev/null || true
     sleep 2
     xdotool key --clearmodifiers ctrl+alt+b 2>/dev/null || true
-    sleep 3
+    sleep 5
     # Calculate how long since recording started so convert_to_gif can trim
     # exactly to this point, ensuring the GIF begins with VS Code fully loaded.
     local now_ms
