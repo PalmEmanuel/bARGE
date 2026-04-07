@@ -86,4 +86,22 @@ if [[ -d "${VSCODE_USER_DATA_DIR}/logs" ]]; then
     cp -r "${VSCODE_USER_DATA_DIR}/logs" /tmp/barge-debug/vscode-logs 2>/dev/null || true
 fi
 
+# Dump state.vscdb structure so we can verify what VS Code actually stores
+python3 - <<'PYEOF' > /tmp/barge-debug/state-vscdb-dump.txt 2>&1
+import os, sqlite3
+db_path = os.path.join(os.environ.get("VSCODE_USER_DATA_DIR", ""), "User", "globalStorage", "state.vscdb")
+db = sqlite3.connect(db_path)
+tables = [r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
+print("Tables:", tables)
+for table in tables:
+    print(f"\n--- {table} ---")
+    for row in db.execute(f"SELECT key FROM {table}").fetchall():
+        key = row[0]
+        if "github" in key.lower() or "secret" in key.lower() or "auth" in key.lower() or "copilot" in key.lower():
+            print(f"  MATCH: {key[:120]}")
+        else:
+            print(f"  {key[:80]}")
+db.close()
+PYEOF
+
 close_vscode
