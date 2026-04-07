@@ -72,6 +72,18 @@ db.execute(
         stored_value,
     ),
 )
+
+# Reset the gnome-libsecret migration flag so VS Code re-runs its migration on
+# next startup. During migration VS Code reads every secret:// key from
+# state.vscdb (decrypting via EncryptionMainService — which handles the
+# "encryption-not-available-" prefix), then writes the plain value into
+# gnome-libsecret. After migration the flag is set back to true and all
+# SecretStorage reads go to gnome-libsecret where our session now lives.
+db.execute(
+    "INSERT OR REPLACE INTO ItemTable VALUES (?, ?)",
+    ("encryption.migratedToGnomeLibsecret", "false"),
+)
+
 db.commit()
 db.close()
 print("VS Code auth session written to state.vscdb")
