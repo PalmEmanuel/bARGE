@@ -68,8 +68,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends \
             xvfb xdotool ffmpeg imagemagick x11-apps \
-            libasound2t64 libgbm1 libgtk-3-0t64 libnss3 libxss1 libxtst6 \
-            gnome-keyring libsecret-tools python3-cryptography dbus-x11
+            libasound2t64 libgbm1 libgtk-3-0t64 libnss3 libxss1 libxtst6
           # Save newly downloaded debs for the next run
           mkdir -p ~/.cache/apt-archives
           find /var/cache/apt/archives -maxdepth 1 -name '*.deb' \
@@ -112,27 +111,6 @@ jobs:
           client-id: ${{ secrets.ARM_ACCESS_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           allow-no-subscriptions: true
-
-      - name: Setup Copilot Chat keyring
-        if: inputs.scenario == 'copilot-chat' || inputs.scenario == ''
-        run: |
-          # Start a D-Bus session so gnome-keyring can run headless
-          eval $(dbus-launch --sh-syntax)
-          echo "DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS}" >> $GITHUB_ENV
-          echo "DBUS_SESSION_BUS_PID=${DBUS_SESSION_BUS_PID}" >> $GITHUB_ENV
-
-          # Start gnome-keyring with a known fixed password
-          eval $(printf "barge-gif-key\n" | gnome-keyring-daemon \
-            --unlock --components=secrets --daemonize 2>/dev/null)
-          echo "GNOME_KEYRING_CONTROL=${GNOME_KEYRING_CONTROL}" >> $GITHUB_ENV
-          echo "SSH_AUTH_SOCK=${SSH_AUTH_SOCK}" >> $GITHUB_ENV
-
-          # Store the fixed password as "Code Safe Storage" — VS Code reads this
-          # via libsecret to derive the AES key for decrypting state.vscdb secrets
-          printf "barge-gif-key" | secret-tool store \
-            --label="Code Safe Storage" \
-            service "Code Safe Storage" \
-            account "Code"
 
       - name: Make recording script executable
         run: chmod +x scripts/record-gifs/record.sh

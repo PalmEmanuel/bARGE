@@ -16,9 +16,8 @@ FIXTURE_WORKSPACE="${SCRIPT_DIR}/fixtures/workspace"
 mkdir -p "${FIXTURE_WORKSPACE}"
 
 # ── Auth and layout prep ──────────────────────────────────────────────────────
-# Write the GitHub session and auxiliary bar layout into state.vscdb now, after
-# install_extension has initialised the user data dir.
-export KEYRING_PASSWORD="barge-gif-key"
+# Write the GitHub session into state.vscdb now, after install_extension has
+# initialised the user data dir.
 python3 "${SCRIPT_DIR}/setup-copilot-auth.py"
 
 # ── VS Code settings ──────────────────────────────────────────────────────────

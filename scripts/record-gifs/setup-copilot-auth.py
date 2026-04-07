@@ -1,51 +1,30 @@
 #!/usr/bin/env python3
 """
-Prepares VS Code's state.vscdb with:
-  - A GitHub auth session encrypted using Electron's safeStorage (v10 AES-128-CBC)
+Prepares VS Code's state.vscdb with a GitHub auth session for Copilot Chat.
+
+VS Code's EncryptionMainService.decrypt() explicitly handles values prefixed
+with "encryption-not-available-" by stripping the prefix and returning the
+plain text. This lets us inject a session without matching VS Code's safeStorage
+encryption (which requires the exact keyring key and safeStorage availability).
 
 Requires:
   - GH_COPILOT_CHAT env var: GitHub PAT with Copilot access
-  - KEYRING_PASSWORD env var: password stored in gnome-keyring under "Code Safe Storage"
   - VSCODE_USER_DATA_DIR env var (defaults to /tmp/barge-gif-recording/user-data)
-
-The KEYRING_PASSWORD must match what was stored via:
-  printf "$KEYRING_PASSWORD" | secret-tool store \
-    --label="Code Safe Storage" service "Code Safe Storage" account "Code"
 """
 
-import base64
 import json
 import os
 import sqlite3
-import subprocess
 import urllib.request
 
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-
 PAT = os.environ["GH_COPILOT_CHAT"]
-KEYRING_PASSWORD = os.environ.get("KEYRING_PASSWORD", "barge-gif-key")
 USER_DATA_DIR = os.environ.get("VSCODE_USER_DATA_DIR", "/tmp/barge-gif-recording/user-data")
 
-# Verify the keyring key is accessible (the same password VS Code will use to decrypt)
-try:
-    result = subprocess.run(
-        ["secret-tool", "lookup", "service", "Code Safe Storage", "account", "Code"],
-        capture_output=True,
-        text=True,
-        timeout=5,
-    )
-    retrieved = result.stdout.strip()
-    if retrieved == KEYRING_PASSWORD:
-        print("Keyring key verified: matches KEYRING_PASSWORD")
-    elif retrieved:
-        print(f"WARNING: keyring returned a different value than KEYRING_PASSWORD (len={len(retrieved)} vs {len(KEYRING_PASSWORD)})")
-    else:
-        print(f"WARNING: keyring lookup returned nothing (rc={result.returncode}). VS Code may use a different key and fail to decrypt the session.")
-except Exception as e:
-    print(f"WARNING: could not verify keyring key: {e}")
+# VS Code's EncryptionMainService prefixes secrets with this string when
+# encryption is not available and stores them as plain text. decrypt() checks
+# for this prefix before attempting safeStorage decryption, so injecting it
+# directly bypasses any keyring/safeStorage dependency entirely.
+ENCRYPTION_NOT_AVAILABLE_PREFIX = "encryption-not-available-"
 
 # Fetch the GitHub user identity for this PAT
 req = urllib.request.Request(
@@ -63,9 +42,8 @@ account_id = str(user["id"])
 print(f"Configuring VS Code session for GitHub user: {account_label}")
 
 # Build the session JSON that VS Code's github-authentication extension expects.
-# The scopes array must contain "copilot" so that Copilot Chat's
-# getSession(['read:user', 'copilot']) call finds a matching session and
-# does NOT trigger a browser OAuth flow.
+# Include "copilot" scope so Copilot Chat's getSession(['read:user', 'copilot'])
+# finds this session instead of triggering a browser OAuth flow.
 session = [
     {
         "id": "barge-copilot-session",
@@ -74,32 +52,8 @@ session = [
         "scopes": ["read:user", "user:email", "repo", "workflow", "copilot"],
     }
 ]
-session_bytes = json.dumps(session).encode()
 
-# Derive the AES-128 key using Electron's safeStorage v10 scheme (mirrors Chrome)
-kdf = PBKDF2HMAC(
-    algorithm=hashes.SHA1(),
-    length=16,
-    salt=b"saltysalt",
-    iterations=1003,
-    backend=default_backend(),
-)
-key = kdf.derive(KEYRING_PASSWORD.encode())
-
-# PKCS7-pad to AES block size (16 bytes)
-pad_len = 16 - (len(session_bytes) % 16)
-padded = session_bytes + bytes([pad_len] * pad_len)
-
-# Encrypt AES-128-CBC; IV is 16 space characters (Electron/Chrome convention)
-iv = b" " * 16
-cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
-ciphertext = b"v10" + cipher.encryptor().update(padded)
-
-# VS Code's EncryptionMainService stores the encrypted buffer as a Base64 string
-# (safeStorage.encryptString(value).toString('base64')).
-# Earlier attempts used a JSON Buffer object — that was wrong and caused VS Code
-# to read 0 sessions because it tried to base64-decode the JSON string.
-stored_value = base64.b64encode(ciphertext).decode()
+stored_value = ENCRYPTION_NOT_AVAILABLE_PREFIX + json.dumps(session)
 
 # Write to state.vscdb
 db_dir = os.path.join(USER_DATA_DIR, "User", "globalStorage")
@@ -111,8 +65,6 @@ db.execute(
     "CREATE TABLE IF NOT EXISTS ItemTable "
     "(key TEXT UNIQUE ON CONFLICT REPLACE, value BLOB)"
 )
-
-# GitHub auth session
 db.execute(
     "INSERT OR REPLACE INTO ItemTable VALUES (?, ?)",
     (
@@ -120,12 +72,11 @@ db.execute(
         stored_value,
     ),
 )
-
 db.commit()
 db.close()
 print("VS Code auth session written to state.vscdb")
 
-# Read back and decrypt to confirm the round-trip works
+# Quick sanity check: confirm the value round-trips correctly
 db = sqlite3.connect(db_path)
 row = db.execute(
     "SELECT value FROM ItemTable WHERE key = ?",
@@ -133,24 +84,12 @@ row = db.execute(
 ).fetchone()
 db.close()
 if row:
-    raw = base64.b64decode(row[0])
-    assert raw[:3] == b"v10", f"unexpected prefix: {raw[:3]}"
-    kdf2 = PBKDF2HMAC(
-        algorithm=hashes.SHA1(),
-        length=16,
-        salt=b"saltysalt",
-        iterations=1003,
-        backend=default_backend(),
-    )
-    key2 = kdf2.derive(KEYRING_PASSWORD.encode())
-    cipher2 = Cipher(algorithms.AES(key2), modes.CBC(iv), backend=default_backend())
-    decrypted = cipher2.decryptor().update(raw[3:])
-    # strip PKCS7 padding
-    pad = decrypted[-1]
-    decrypted = decrypted[:-pad]
-    parsed = json.loads(decrypted)
-    token_preview = parsed[0]["accessToken"][:8] + "..."
+    raw = row[0]
+    assert raw.startswith(ENCRYPTION_NOT_AVAILABLE_PREFIX), f"unexpected prefix: {raw[:40]}"
+    parsed = json.loads(raw[len(ENCRYPTION_NOT_AVAILABLE_PREFIX):])
     scopes = parsed[0]["scopes"]
+    token_preview = parsed[0]["accessToken"][:8] + "..."
     print(f"Session read-back OK: user={parsed[0]['account']['label']}, scopes={scopes}, token={token_preview}")
 else:
     print("ERROR: session key not found in state.vscdb after write!")
+
