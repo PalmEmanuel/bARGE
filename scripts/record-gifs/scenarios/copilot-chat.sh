@@ -35,6 +35,7 @@ code \
     --user-data-dir "${VSCODE_USER_DATA_DIR}" \
     --extensions-dir "${VSCODE_EXTENSIONS_DIR}" \
     --disable-gpu --use-gl=swiftshader --no-sandbox --disable-telemetry \
+    --password-store=basic \
     "${FIXTURE_WORKSPACE}" \
     > /dev/null 2>&1 &
 VSCODE_PID=$!

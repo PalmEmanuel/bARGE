@@ -320,6 +320,7 @@ install_extension() {
         --user-data-dir "${VSCODE_USER_DATA_DIR}" \
         --extensions-dir "${VSCODE_EXTENSIONS_DIR}" \
         --no-sandbox \
+        --password-store=basic \
         --install-extension "${vsix_path}" \
         --force \
         > /dev/null 2>&1
