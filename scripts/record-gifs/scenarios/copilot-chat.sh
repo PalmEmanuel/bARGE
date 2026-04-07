@@ -42,6 +42,11 @@ VSCODE_PID=$!
 
 wait_for_vscode_window
 
+# Debug: capture initial Chat panel state to verify Copilot auth status
+mkdir -p /tmp/barge-debug
+DISPLAY=":${DISPLAY_NUM}" xwd -root -silent 2>/dev/null \
+    | convert xwd:- /tmp/barge-debug/copilot-chat-initial.png 2>/dev/null || true
+
 # ── Copilot Chat input ────────────────────────────────────────────────────────
 # Auxiliary bar (right side, 500px wide): x=1420–1920, center x≈1670.
 # Chat input sits ~40px above the bottom of the content area.
@@ -76,5 +81,10 @@ sleep 35
 mkdir -p /tmp/barge-debug
 DISPLAY=":${DISPLAY_NUM}" xwd -root -silent 2>/dev/null \
     | convert xwd:- /tmp/barge-debug/copilot-chat-response.png 2>/dev/null || true
+
+# Capture VS Code extension host logs for auth debugging
+if [[ -d "${VSCODE_USER_DATA_DIR}/logs" ]]; then
+    cp -r "${VSCODE_USER_DATA_DIR}/logs" /tmp/barge-debug/vscode-logs 2>/dev/null || true
+fi
 
 close_vscode
