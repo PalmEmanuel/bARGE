@@ -2,24 +2,31 @@
 """
 Prepares VS Code's state.vscdb with a GitHub auth session for Copilot Chat.
 
-VS Code stores secrets in state.vscdb encrypted via Electron's safeStorage.
-When launched with --password-store=basic, VS Code calls
-safeStorage.setUsePlainTextEncryption(true), which makes:
-  - encryptString(text) → Buffer.from(text, 'utf8')  (no encryption)
-  - decryptString(buf)  → buf.toString('utf8')
+VS Code stores secrets in state.vscdb as JSON.stringify(Buffer) where Buffer
+contains the encrypted bytes from Electron's safeStorage.encryptString().
 
-VS Code then wraps the Buffer as JSON: JSON.stringify(buffer) produces
-{"type":"Buffer","data":[...utf8 bytes...]}. That is the exact format we
-must write to state.vscdb so decrypt() can reconstruct the session string.
+With --password-store=basic, Electron uses v10 AES-128-CBC encryption:
+  - key  = PBKDF2(password='peanuts', salt=b'saltysalt', iterations=1, keylen=16, hash=sha1)
+  - iv   = 16 bytes of 0x20 (space)
+  - data = b'v10' + AES-128-CBC(key, iv, PKCS7-padded plaintext)
+
+The JSON-serialised format that VS Code stores:
+  {"type":"Buffer","data":[118,49,48,...encrypted bytes...]}
+
+This is computed below via a Node.js subprocess (crypto module, built-in, no
+extra packages needed).
 
 Requires:
   - GH_COPILOT_CHAT env var: GitHub PAT with Copilot access
   - VSCODE_USER_DATA_DIR env var (defaults to /tmp/barge-gif-recording/user-data)
+  - node in PATH (present via the workflow's Node.js setup step)
 """
 
 import json
 import os
 import sqlite3
+import subprocess
+import sys
 import urllib.request
 
 PAT = os.environ["GH_COPILOT_CHAT"]
@@ -51,16 +58,35 @@ session = [
         "scopes": ["read:user", "user:email", "repo", "workflow", "copilot"],
     }
 ]
-
 session_json = json.dumps(session)
 
-# VS Code with --password-store=basic uses setUsePlainTextEncryption(true).
-# encrypt(text) returns JSON.stringify(Buffer.from(text, 'utf8')), which Node.js
-# serialises as {"type":"Buffer","data":[...utf8 byte values...]}.
-# decrypt() does: JSON.parse → Buffer.from(data) → safeStorage.decryptString()
-# which, in plain-text mode, just returns buffer.toString('utf8').
-utf8_bytes = list(session_json.encode("utf-8"))
-stored_value = json.dumps({"type": "Buffer", "data": utf8_bytes})
+# VS Code with --password-store=basic uses Electron's v10 AES-128-CBC encryption:
+#   key  = PBKDF2(password='peanuts', salt=b'saltysalt', iterations=1, keylen=16, sha1)
+#   iv   = 16 bytes of 0x20 (ASCII space)
+#   blob = b'v10' + AES-128-CBC(key, iv, PKCS7-padded plaintext)
+#
+# JSON.stringify(Buffer) produces {"type":"Buffer","data":[...byte values...]},
+# which is the exact format VS Code stores via EncryptionMainService.encrypt().
+NODE_ENCRYPT = r"""
+const crypto = require('crypto');
+const plaintext = process.argv[2];
+const key = crypto.pbkdf2Sync('peanuts', Buffer.from('saltysalt'), 1, 16, 'sha1');
+const iv = Buffer.alloc(16, 0x20);
+const cipher = crypto.createCipheriv('aes-128-cbc', key, iv);
+const enc = Buffer.concat([cipher.update(Buffer.from(plaintext, 'utf8')), cipher.final()]);
+const result = Buffer.concat([Buffer.from('v10'), enc]);
+process.stdout.write(JSON.stringify({type: 'Buffer', data: Array.from(result)}));
+"""
+
+proc = subprocess.run(
+    ["node", "-e", NODE_ENCRYPT, "--", session_json],
+    capture_output=True, text=True, check=True
+)
+stored_value = proc.stdout.strip()
+
+if not stored_value:
+    print("ERROR: Node.js encryption produced no output", file=sys.stderr)
+    sys.exit(1)
 
 # Write to state.vscdb
 db_dir = os.path.join(USER_DATA_DIR, "User", "globalStorage")
@@ -83,7 +109,7 @@ db.commit()
 db.close()
 print("VS Code auth session written to state.vscdb")
 
-# Quick sanity check: confirm the value round-trips correctly
+# Quick sanity check: round-trip verify
 db = sqlite3.connect(db_path)
 row = db.execute(
     "SELECT value FROM ItemTable WHERE key = ?",
@@ -91,14 +117,13 @@ row = db.execute(
 ).fetchone()
 db.close()
 if row:
-    raw = row[0]
-    parsed = json.loads(raw)
-    reconstructed = bytes(parsed["data"]).decode("utf-8")
-    sessions = json.loads(reconstructed)
-    scopes = sessions[0]["scopes"]
-    token_preview = sessions[0]["accessToken"][:8] + "..."
-    print(f"Session read-back OK: user={sessions[0]['account']['label']}, scopes={scopes}, token={token_preview}")
+    parsed = json.loads(row[0])
+    data_bytes = bytes(parsed["data"])
+    # v10 prefix (3 bytes) + encrypted payload
+    print(f"Session stored OK: format={data_bytes[:3]!r}, total_bytes={len(data_bytes)}")
 else:
     print("ERROR: session key not found in state.vscdb after write!")
+    sys.exit(1)
+
 
 
