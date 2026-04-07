@@ -96,23 +96,6 @@ db.execute(
     ),
 )
 
-# Make Copilot Chat visible in the auxiliary (right) sidebar
-db.execute(
-    "INSERT OR REPLACE INTO ItemTable VALUES (?, ?)",
-    (
-        "workbench.auxiliarybar.pinnedPanels",
-        '[{"id":"workbench.panel.chat","pinned":true,"visible":true,"order":1}]',
-    ),
-)
-db.execute(
-    "INSERT OR REPLACE INTO ItemTable VALUES (?, ?)",
-    ("workbench.auxiliaryBar.empty", "false"),
-)
-db.execute(
-    "INSERT OR REPLACE INTO ItemTable VALUES (?, ?)",
-    ("workbench.auxiliaryBar.size", "500"),
-)
-
 db.commit()
 db.close()
-print("VS Code auth and chat layout written to state.vscdb")
+print("VS Code auth session written to state.vscdb")

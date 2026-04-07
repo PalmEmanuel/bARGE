@@ -22,13 +22,12 @@ export KEYRING_PASSWORD="barge-gif-key"
 python3 "${SCRIPT_DIR}/setup-copilot-auth.py"
 
 # ── VS Code settings ──────────────────────────────────────────────────────────
-# Override the default sideBar.location so the auxiliary bar is on the RIGHT.
-# Default is "right" (primary sidebar on right), which pushes the auxiliary
-# bar to the left — the opposite of what we want here.
-add_setting "workbench.sideBar.location" '"left"'
-add_setting "workbench.auxiliaryBar.hidden" "false"
 add_setting "barge.autoAuthenticate" "true"
 add_setting "breadcrumbs.enabled" "false"
+
+# Tell wait_for_vscode_window to open Copilot Chat (ctrl+alt+i) instead of
+# closing the secondary sidebar, so Chat is already visible at the trim point.
+KEEP_SECONDARY_SIDEBAR=1
 
 # ── Launch VS Code ────────────────────────────────────────────────────────────
 code \
