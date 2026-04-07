@@ -56,6 +56,11 @@ CL2_RUN_Y=192
 CL2_NEWTAB_X=130
 CL2_NEWTAB_Y=192
 
+BARGE_TAB1_X=190
+BARGE_TAB1_Y=650
+BARGE_TAB2_X=190
+BARGE_TAB2_Y=650
+
 # x position of the word "contains" on line 6, measured via pixel scan
 CONTAINS_X=542
 CONTAINS_Y=227
@@ -100,7 +105,7 @@ sleep 0.3
 xdotool key Escape
 xdotool key Return
 sleep 0.1
-natural_type "| take 5"
+natural_type "| take 15"
 sleep 0.2
 xdotool key Escape
 xdotool key Return
@@ -112,7 +117,7 @@ DISPLAY=":${DISPLAY_NUM}" xwd -root -silent 2>/dev/null | convert xwd:- /tmp/bar
 
 # -- Step 3: Hover "contains" for operator documentation --
 move_mouse_smooth $EDITOR_X $EDITOR_Y $CONTAINS_X $CONTAINS_Y 700
-sleep 0.5
+sleep 0.3
 move_mouse_smooth $CONTAINS_X $CONTAINS_Y $CONTAINS_HOVER_X $CONTAINS_HOVER_Y 300
 
 # Scroll through hover content
@@ -134,7 +139,13 @@ move_mouse_smooth $CONTAINS_X $CONTAINS_Y $CL2_NEWTAB_X $CL2_NEWTAB_Y 700
 click_and_verify $CL2_NEWTAB_X $CL2_NEWTAB_Y "0.002" "1920x1000+0+0" \
     || { echo "Error: CodeLens 2 New Tab click produced no change" >&2; close_vscode; exit 1; }
 
-sleep 4  # Wait for keyvault query to return and new tab to open
+sleep 0.5  # Wait for keyvault query to return and new tab to open
+
+move_mouse_smooth $CL2_NEWTAB_X $CL2_NEWTAB_Y $BARGE_TAB1_X $BARGE_TAB1_Y 500
+click_and_verify $BARGE_TAB1_X $BARGE_TAB1_Y "0.002" "1920x1000+0+0" \
+    || { echo "Error: CodeLens 2 New Tab click produced no change" >&2; close_vscode; exit 1; }
+
+sleep 2
 
 stop_recording
 close_vscode
