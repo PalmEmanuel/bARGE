@@ -62,7 +62,7 @@ jobs:
       - name: Install system dependencies
         run: |
           # Seed apt archive with any previously cached debs to skip downloads
-          if ls ~/.cache/apt-archives/*.deb 2>/dev/null | head -1 >/dev/null; then
+          if find ~/.cache/apt-archives -maxdepth 1 -name '*.deb' 2>/dev/null | grep -q .; then
             sudo cp ~/.cache/apt-archives/*.deb /var/cache/apt/archives/
           fi
           sudo apt-get update -qq
