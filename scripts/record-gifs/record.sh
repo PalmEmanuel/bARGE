@@ -194,11 +194,11 @@ for i in range(1, steps+1):
 
 # natural_type TEXT [BASE_MS]
 # Types text character by character with deterministic variable delays,
-# simulating realistic human typing. BASE_MS is the average delay (default: 110ms).
+# simulating realistic human typing. BASE_MS is the average delay (default: 50ms).
 # Delays vary ±40% using a seeded LCG so output is deterministic across runs.
 natural_type() {
     local text="$1"
-    local base_ms="${2:-110}"
+    local base_ms="${2:-50}"
     local n=${#text}
     local seed=1337
     for (( i=0; i<n; i++ )); do

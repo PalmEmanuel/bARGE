@@ -28,6 +28,12 @@ code \
     > /dev/null 2>&1 &
 VSCODE_PID=$!
 
+# A safe click target in the editor body (avoid CodeLens rows)
+EDITOR_X=400
+EDITOR_Y=300
+
+xdotool mousemove $EDITOR_X $EDITOR_Y
+
 wait_for_vscode_window
 
 # --- Coordinate constants (1920×1080, sidebar right, no activity bar) ---
@@ -42,7 +48,6 @@ wait_for_vscode_window
 #   line 6: | where ... keyvaults   ← CONTAINS_Y
 #   line 7: | take 5
 #
-# Adjust these to match your display:
 CL1_RUN_X=70
 CL1_RUN_Y=100
 
@@ -57,11 +62,6 @@ CONTAINS_Y=227
 CONTAINS_HOVER_X=562
 CONTAINS_HOVER_Y=247
 
-# A safe click target in the editor body (avoid CodeLens rows)
-EDITOR_X=400
-EDITOR_Y=300
-
-xdotool mousemove $EDITOR_X $EDITOR_Y
 sleep 0.5
 
 # -- Step 1: Run storage accounts query via "► Run" --
@@ -87,7 +87,7 @@ sleep 0.3
 # Show IntelliSense for table name (visual), Escape to avoid wrong completion
 # (resourcechanges sorts before resources — don't accept)
 natural_type "resou"
-sleep 0.8
+sleep 0.6
 xdotool key Escape
 sleep 0.3
 natural_type "rces"   # finish "resources" without snippet
@@ -101,18 +101,17 @@ sleep 0.3
 natural_type '| where type == "/vaults'
 sleep 0.3  # Let IntelliSense show microsoft.keyvault/vaults
 xdotool key Return  # Accept completion
-sleep 0.2  # Longer wait after completion inserts text
+sleep 0.5  # Longer wait after completion inserts text
 natural_type '" and name contains "bARGE"'
-sleep 0.2
-xdotool key Return
 sleep 0.3
-natural_type "| take 5"
-sleep 0.5
 xdotool key Escape
-sleep 0.3
-
-# Scroll to top so CodeLens positions match calibrated coordinates
-xdotool key ctrl+Home
+xdotool key Return
+sleep 0.1
+natural_type "| take 5"
+sleep 0.2
+xdotool key Escape
+xdotool key Return
+xdotool key Escape
 sleep 0.3
 
 mkdir -p /tmp/barge-debug
