@@ -69,7 +69,7 @@ jobs:
           sudo apt-get install -y --no-install-recommends \
             xvfb xdotool ffmpeg imagemagick x11-apps \
             libasound2t64 libgbm1 libgtk-3-0t64 libnss3 libxss1 libxtst6 \
-            gnome-keyring libsecret-tools dbus-x11
+            dbus-x11
           # Save newly downloaded debs for the next run
           mkdir -p ~/.cache/apt-archives
           find /var/cache/apt/archives -maxdepth 1 -name '*.deb' \
@@ -112,18 +112,6 @@ jobs:
           client-id: ${{ secrets.ARM_ACCESS_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           allow-no-subscriptions: true
-
-      - name: Setup D-Bus and keyring for Copilot Chat
-        if: inputs.scenario == 'copilot-chat' || inputs.scenario == ''
-        run: |
-          # Start a D-Bus session so VS Code and secret-tool share the same bus
-          eval $(dbus-launch --sh-syntax)
-          echo "DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS}" >> $GITHUB_ENV
-          echo "DBUS_SESSION_BUS_PID=${DBUS_SESSION_BUS_PID}" >> $GITHUB_ENV
-          # Unlock gnome-keyring so VS Code can store/read secrets from it
-          eval $(printf "barge-gif-key\n" | gnome-keyring-daemon \
-            --unlock --components=secrets --daemonize 2>/dev/null) || true
-          echo "GNOME_KEYRING_CONTROL=${GNOME_KEYRING_CONTROL}" >> $GITHUB_ENV
 
       - name: Make recording script executable
         run: chmod +x scripts/record-gifs/record.sh

@@ -10,7 +10,7 @@
 #
 # Sourced by record.sh after start_recording. All record.sh helpers are available.
 #
-# Requires GH_COPILOT_CHAT env var (set via workflow secret) and gnome-keyring running.
+# Requires GH_COPILOT_CHAT env var (set via workflow secret).
 
 FIXTURE_WORKSPACE="${SCRIPT_DIR}/fixtures/workspace"
 mkdir -p "${FIXTURE_WORKSPACE}"
@@ -102,22 +102,5 @@ for table in [r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE typ
             print(f"MATCH val: {str(val)[:120]}")
 db.close()
 PYEOF
-
-# Dump gnome-libsecret contents to find VS Code's storage schema
-{
-    echo "=== gnome-libsecret dump ==="
-    echo "DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS:-unset}"
-    secret-tool search --all xdg:schema org.freedesktop.Secret.Generic 2>&1 \
-        || echo "secret-tool search failed"
-    echo "=== all entries ==="
-    python3 -c "
-import subprocess, os
-r = subprocess.run(['secret-tool', 'search', '--all', 'dummy', 'value'],
-    capture_output=True, text=True,
-    env={**os.environ, 'DBUS_SESSION_BUS_ADDRESS': os.environ.get('DBUS_SESSION_BUS_ADDRESS','')})
-print('stdout:', r.stdout[:500])
-print('stderr:', r.stderr[:500])
-" 2>&1
-} > /tmp/barge-debug/gnome-secrets.txt 2>&1
 
 close_vscode
