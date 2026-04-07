@@ -146,10 +146,10 @@ click_and_verify $BARGE_TAB1_X $BARGE_TAB1_Y "0.002" "1920x1000+0+0" \
 
 sleep 1
 
-# -- Step 6: Click the second tab again
-move_mouse_smooth $BARGE_TAB1_X $BARGE_TAB1_Y $BARGE_TAB2_X $BARGE_TAB2_Y 500
-click_and_verify $BARGE_TAB2_X $BARGE_TAB2_Y "0.002" "1920x1000+0+0" \
-    || { echo "Error: Clicking bARGE Tab 2 produced no change" >&2; close_vscode; exit 1; }
+# # -- Step 6: Click the second tab again
+# move_mouse_smooth $BARGE_TAB1_X $BARGE_TAB1_Y $BARGE_TAB2_X $BARGE_TAB2_Y 500
+# click_and_verify $BARGE_TAB2_X $BARGE_TAB2_Y "0.002" "1920x1000+0+0" \
+#     || { echo "Error: Clicking bARGE Tab 2 produced no change" >&2; close_vscode; exit 1; }
 
 sleep 2
 
