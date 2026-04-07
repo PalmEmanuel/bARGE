@@ -53,28 +53,13 @@ jobs:
           npm install -g @vscode/vsce
           vsce package --no-yarn
 
-      - name: Cache system dependencies
-        uses: actions/cache@v4
-        with:
-          path: /var/cache/apt/archives
-          key: apt-pkgs-v1-${{ hashFiles('.github/workflows/generate-readme-gifs.yml') }}
-          restore-keys: apt-pkgs-v1-
-
       - name: Install system dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends \
-            xvfb \
-            xdotool \
-            ffmpeg \
-            imagemagick \
-            x11-apps \
-            libasound2t64 \
-            libgbm1 \
-            libgtk-3-0t64 \
-            libnss3 \
-            libxss1 \
-            libxtst6
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: >-
+            xvfb xdotool ffmpeg imagemagick x11-apps
+            libasound2t64 libgbm1 libgtk-3-0t64 libnss3 libxss1 libxtst6
+          version: 1
 
       - name: Cache Posy cursor theme
         uses: actions/cache@v4
