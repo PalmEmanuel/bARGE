@@ -315,6 +315,7 @@ install_extension() {
     "extensions.autoUpdate": false,
     "telemetry.telemetryLevel": "off",
     "barge.hideLoginMessages": true,
+    "breadcrumbs.enabled": false,
     "git.openRepositoryInParentFolders": "never",
     "git.autoRepositoryDetection": false,
     "editor.minimap.enabled": false,

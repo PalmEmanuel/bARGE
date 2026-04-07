@@ -13,6 +13,7 @@ mkdir -p "${FIXTURE_WORKSPACE}"
 # Scenario-specific settings: show sign-in notification, disable auto-authenticate
 add_setting "barge.autoAuthenticate" "false"
 add_setting "barge.hideLoginMessages" "false"
+add_setting "breadcrumbs.enabled" "false"
 
 code \
     --user-data-dir "${VSCODE_USER_DATA_DIR}" \

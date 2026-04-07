@@ -17,6 +17,7 @@ add_setting "barge.autoAuthenticate" "true"
 # Disable auto-closing pairs so xdotool type produces clean output
 add_setting "editor.autoClosingQuotes" '"never"'
 add_setting "editor.autoClosingBrackets" '"never"'
+add_setting "breadcrumbs.enabled" "false"
 
 code \
     --user-data-dir "${VSCODE_USER_DATA_DIR}" \
@@ -119,7 +120,7 @@ move_mouse_smooth $CONTAINS_X $CONTAINS_Y $CONTAINS_HOVER_X $CONTAINS_HOVER_Y 30
 sleep 1.5
 
 # Scroll through hover content
-for i in {1..4}; do
+for i in {1..5}; do
     xdotool click 5
     sleep 0.4
 done
