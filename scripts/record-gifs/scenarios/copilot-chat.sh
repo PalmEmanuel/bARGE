@@ -88,26 +88,31 @@ if [[ -d "${VSCODE_USER_DATA_DIR}/logs" ]]; then
 fi
 
 # Dump state.vscdb structure so we can verify what VS Code actually stores
-mkdir -p /tmp/barge-debug
 GLOBAL_DB="${VSCODE_USER_DATA_DIR}/User/globalStorage/state.vscdb"
 echo "VSCODE_USER_DATA_DIR=${VSCODE_USER_DATA_DIR}" > /tmp/barge-debug/state-vscdb-dump.txt
-echo "Global state.vscdb: ${GLOBAL_DB}" >> /tmp/barge-debug/state-vscdb-dump.txt
 ls -la "${GLOBAL_DB}" >> /tmp/barge-debug/state-vscdb-dump.txt 2>&1
 python3 - "${GLOBAL_DB}" >> /tmp/barge-debug/state-vscdb-dump.txt 2>&1 <<'PYEOF'
 import sqlite3, sys
 db = sqlite3.connect(sys.argv[1])
-tables = [r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
-print("Tables:", tables)
-for table in tables:
-    print(f"\n--- {table} ---")
+for table in [r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()]:
     for row in db.execute(f"SELECT key, value FROM {table}").fetchall():
         key, val = row[0], row[1]
-        if any(w in key.lower() for w in ["github", "secret", "auth", "copilot"]):
-            print(f"  MATCH key: {key[:120]}")
-            print(f"  MATCH val: {str(val)[:120]}")
-        else:
-            print(f"  {key[:80]}")
+        if any(w in key.lower() for w in ["github", "secret", "auth", "copilot", "migration"]):
+            print(f"MATCH key: {key[:120]}")
+            print(f"MATCH val: {str(val)[:120]}")
 db.close()
 PYEOF
+
+# Dump gnome-libsecret contents to find VS Code's storage schema
+{
+    echo "=== gnome-libsecret dump (secret-tool search) ==="
+    # Start a D-Bus session for secret-tool
+    if [[ -z "${DBUS_SESSION_BUS_ADDRESS}" ]]; then
+        eval "$(dbus-launch --sh-syntax 2>/dev/null)" || true
+    fi
+    secret-tool search --all xdg:schema org.freedesktop.Secret.Generic 2>/dev/null \
+        || secret-tool search --all dummy dummy 2>&1 \
+        || echo "secret-tool not available or keyring not accessible"
+} > /tmp/barge-debug/gnome-secrets.txt 2>&1
 
 close_vscode

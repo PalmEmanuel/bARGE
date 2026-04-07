@@ -68,7 +68,8 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends \
             xvfb xdotool ffmpeg imagemagick x11-apps \
-            libasound2t64 libgbm1 libgtk-3-0t64 libnss3 libxss1 libxtst6
+            libasound2t64 libgbm1 libgtk-3-0t64 libnss3 libxss1 libxtst6 \
+            libsecret-tools dbus-x11
           # Save newly downloaded debs for the next run
           mkdir -p ~/.cache/apt-archives
           find /var/cache/apt/archives -maxdepth 1 -name '*.deb' \
