@@ -233,15 +233,16 @@ wait_for_vscode_window() {
     # Open Explorer in the primary sidebar and handle secondary sidebar.
     # By default, close the secondary sidebar (Chat panel) so all scenarios
     # start clean. Scenarios that need Chat open can set KEEP_SECONDARY_SIDEBAR=1
-    # to skip the close and open Copilot Chat instead, so it is already visible
-    # at the GIF trim point.
-    xdotool key --clearmodifiers ctrl+shift+e 2>/dev/null || true
+    # to skip opening Explorer (keeping the primary sidebar hidden) and open
+    # Copilot Chat in the auxiliary bar instead.
     if [[ "${KEEP_SECONDARY_SIDEBAR:-}" == "1" ]]; then
-        # Open Copilot Chat in the secondary sidebar before the trim point so
-        # it appears already loaded when the GIF begins.
+        # Skip ctrl+shift+e — leave the primary sidebar closed so the layout is
+        # editor + Chat only (no Explorer on the left).
+        # Open Copilot Chat before the trim point so it appears already loaded.
         xdotool key --clearmodifiers ctrl+alt+i 2>/dev/null || true
         sleep 6
     else
+        xdotool key --clearmodifiers ctrl+shift+e 2>/dev/null || true
         # Sent twice with a delay to prevent Copilot from re-opening the panel
         # after extension activation.
         xdotool key --clearmodifiers ctrl+alt+b 2>/dev/null || true
