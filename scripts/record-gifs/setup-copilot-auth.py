@@ -69,7 +69,7 @@ session_json = json.dumps(session)
 # which is the exact format VS Code stores via EncryptionMainService.encrypt().
 NODE_ENCRYPT = r"""
 const crypto = require('crypto');
-const plaintext = process.argv[2];
+const plaintext = process.argv[1];
 const key = crypto.pbkdf2Sync('peanuts', Buffer.from('saltysalt'), 1, 16, 'sha1');
 const iv = Buffer.alloc(16, 0x20);
 const cipher = crypto.createCipheriv('aes-128-cbc', key, iv);
