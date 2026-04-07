@@ -40,12 +40,12 @@ sleep 0.5
 # --- Scenario actions ---
 
 QP_X=917
-QP_ITEM1_Y=69
-QP_ITEM2_Y=119
-SB_Y=$((DISPLAY_HEIGHT - 31))
+QP_ITEM1_Y=89
+QP_ITEM2_Y=139
+SB_Y=$((DISPLAY_HEIGHT - 11))
 
 # Smoothly drag down to the status bar where the bARGE item lives
-move_mouse_smooth 960 480 1480 $SB_Y 800
+move_mouse_smooth 960 500 1480 $SB_Y 800
 
 # Click the bARGE status bar item, scanning nearby if not exact
 click_status_bar || { echo "Error: bARGE status bar item not found" >&2; close_vscode; exit 1; }

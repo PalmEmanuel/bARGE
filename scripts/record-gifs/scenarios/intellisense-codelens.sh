@@ -65,7 +65,7 @@ BARGE_TAB2_Y=560
 # x position of the word "contains" on line 6, measured via pixel scan
 CONTAINS_X=542
 CONTAINS_Y=207
-CONTAINS_HOVER_X=722
+CONTAINS_HOVER_X=802
 CONTAINS_HOVER_Y=227
 
 # -- Step 1: Run storage accounts query via "► Run" --
@@ -146,14 +146,14 @@ sleep 1
 click_and_verify $BARGE_TAB1_X $BARGE_TAB1_Y "0.002" "1920x1000+0+0" \
     || { echo "Error: Clicking bARGE Tab 1 produced no change" >&2; close_vscode; exit 1; }
 
-sleep 1
+sleep 0.3
 
 # # -- Step 6: Click the second tab again
-move_mouse_smooth $BARGE_TAB1_X $BARGE_TAB1_Y $BARGE_TAB2_X $BARGE_TAB2_Y 500
+move_mouse_smooth $BARGE_TAB1_X $BARGE_TAB1_Y $BARGE_TAB2_X $BARGE_TAB2_Y 400
 click_and_verify $BARGE_TAB2_X $BARGE_TAB2_Y "0.002" "1920x1000+0+0" \
     || { echo "Error: Clicking bARGE Tab 2 produced no change" >&2; close_vscode; exit 1; }
 
-sleep 2
+sleep 1
 
 stop_recording
 close_vscode
