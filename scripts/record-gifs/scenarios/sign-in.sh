@@ -28,22 +28,24 @@ code \
     > /dev/null 2>&1 &
 VSCODE_PID=$!
 
-# Waits for the window, sets up layout, and pauses 0.5s before actions start.
-wait_for_vscode_window
-
-# --- Scenario actions ---
-
-QP_X=917
-QP_ITEM1_Y=89
-QP_ITEM2_Y=139
-SB_Y=$((DISPLAY_HEIGHT - 11))
-
 # Start mouse in the editor area (natural resting position)
 xdotool mousemove 960 500
 sleep 0.3
 
+# Waits for the window, sets up layout, and pauses 0.5s before actions start.
+wait_for_vscode_window
+
+sleep 0.5
+
+# --- Scenario actions ---
+
+QP_X=917
+QP_ITEM1_Y=79
+QP_ITEM2_Y=129
+SB_Y=$((DISPLAY_HEIGHT - 21))
+
 # Smoothly drag down to the status bar where the bARGE item lives
-move_mouse_smooth 960 500 1480 $SB_Y 800
+move_mouse_smooth 960 490 1480 $SB_Y 800
 
 # Click the bARGE status bar item, scanning nearby if not exact
 click_status_bar || { echo "Error: bARGE status bar item not found" >&2; close_vscode; exit 1; }
