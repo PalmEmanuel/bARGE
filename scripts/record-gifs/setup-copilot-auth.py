@@ -55,7 +55,7 @@ session = [
         "id": "barge-copilot-session",
         "account": {"label": account_label, "id": account_id},
         "accessToken": PAT,
-        "scopes": ["read:user", "user:email", "repo", "workflow", "copilot"],
+        "scopes": ["read:user", "user:email", "repo", "workflow"],
     }
 ]
 session_json = json.dumps(session)
