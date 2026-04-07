@@ -13,6 +13,7 @@ The KEYRING_PASSWORD must match what was stored via:
     --label="Code Safe Storage" service "Code Safe Storage" account "Code"
 """
 
+import base64
 import json
 import os
 import sqlite3
@@ -94,8 +95,11 @@ iv = b" " * 16
 cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
 ciphertext = b"v10" + cipher.encryptor().update(padded)
 
-# VS Code stores encrypted blobs as JSON Buffer objects in SQLite
-buffer_json = json.dumps({"type": "Buffer", "data": list(ciphertext)})
+# VS Code's EncryptionMainService stores the encrypted buffer as a Base64 string
+# (safeStorage.encryptString(value).toString('base64')).
+# Earlier attempts used a JSON Buffer object — that was wrong and caused VS Code
+# to read 0 sessions because it tried to base64-decode the JSON string.
+stored_value = base64.b64encode(ciphertext).decode()
 
 # Write to state.vscdb
 db_dir = os.path.join(USER_DATA_DIR, "User", "globalStorage")
@@ -113,7 +117,7 @@ db.execute(
     "INSERT OR REPLACE INTO ItemTable VALUES (?, ?)",
     (
         'secret://{"extensionId":"vscode.github-authentication","key":"github.auth"}',
-        buffer_json,
+        stored_value,
     ),
 )
 
@@ -129,8 +133,7 @@ row = db.execute(
 ).fetchone()
 db.close()
 if row:
-    stored = json.loads(row[0])
-    raw = bytes(stored["data"])
+    raw = base64.b64decode(row[0])
     assert raw[:3] == b"v10", f"unexpected prefix: {raw[:3]}"
     kdf2 = PBKDF2HMAC(
         algorithm=hashes.SHA1(),
