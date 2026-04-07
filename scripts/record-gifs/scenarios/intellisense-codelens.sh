@@ -50,23 +50,23 @@ wait_for_vscode_window
 #   line 7: | take 5
 #
 CL1_RUN_X=70
-CL1_RUN_Y=90
+CL1_RUN_Y=80
 
 CL2_RUN_X=70
-CL2_RUN_Y=182
+CL2_RUN_Y=172
 CL2_NEWTAB_X=130
-CL2_NEWTAB_Y=182
+CL2_NEWTAB_Y=172
 
 BARGE_TAB1_X=170
-BARGE_TAB1_Y=560
+BARGE_TAB1_Y=550
 BARGE_TAB2_X=300
-BARGE_TAB2_Y=560
+BARGE_TAB2_Y=550
 
 # x position of the word "contains" on line 6, measured via pixel scan
 CONTAINS_X=542
-CONTAINS_Y=217
+CONTAINS_Y=207
 CONTAINS_HOVER_X=562
-CONTAINS_HOVER_Y=237
+CONTAINS_HOVER_Y=227
 
 # -- Step 1: Run storage accounts query via "► Run" --
 move_mouse_smooth $EDITOR_X $EDITOR_Y $CL1_RUN_X $CL1_RUN_Y 800
