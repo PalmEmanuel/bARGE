@@ -68,8 +68,6 @@ CONTAINS_HOVER_X=562
 CONTAINS_HOVER_Y=247
 
 # -- Step 1: Run storage accounts query via "► Run" --
-sleep 1  # Wait for CodeLens to render after file loads
-
 move_mouse_smooth $EDITOR_X $EDITOR_Y $CL1_RUN_X $CL1_RUN_Y 800
 click_and_verify $CL1_RUN_X $CL1_RUN_Y "0.003" "1920x1000+0+0" \
     || { echo "Error: CodeLens 1 click produced no visible change" >&2; close_vscode; exit 1; }
