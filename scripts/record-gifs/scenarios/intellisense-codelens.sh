@@ -54,6 +54,8 @@ CL2_NEWTAB_Y=192
 # x position of the word "contains" on line 6, measured via pixel scan
 CONTAINS_X=542
 CONTAINS_Y=227
+CONTAINS_HOVER_X=562
+CONTAINS_HOVER_Y=247
 
 # A safe click target in the editor body (avoid CodeLens rows)
 EDITOR_X=400
@@ -63,13 +65,13 @@ xdotool mousemove $EDITOR_X $EDITOR_Y
 sleep 0.5
 
 # -- Step 1: Run storage accounts query via "► Run" --
-sleep 4  # Wait for CodeLens to render after file loads
+sleep 1  # Wait for CodeLens to render after file loads
 
 move_mouse_smooth $EDITOR_X $EDITOR_Y $CL1_RUN_X $CL1_RUN_Y 800
 click_and_verify $CL1_RUN_X $CL1_RUN_Y "0.003" "1920x1000+0+0" \
     || { echo "Error: CodeLens 1 click produced no visible change" >&2; close_vscode; exit 1; }
 
-sleep 1.5
+sleep 0.5
 
 # -- Step 2: Smooth move back to editor, go to end of file, type key vault query live --
 move_mouse_smooth $CL1_RUN_X $CL1_RUN_Y $EDITOR_X $EDITOR_Y 600
@@ -97,15 +99,10 @@ sleep 0.3
 
 # Type | where manually, accept resource type completion with Enter
 natural_type '| where type == "/vaults'
-sleep 1.2  # Let IntelliSense show microsoft.keyvault/vaults
+sleep 0.3  # Let IntelliSense show microsoft.keyvault/vaults
 xdotool key Return  # Accept completion
-sleep 0.5  # Longer wait after completion inserts text
-natural_type '"'  # Completion doesn't add closing quote; add it manually
-natural_type ' and name contains "bARGE"'
-sleep 0.2
-xdotool key Escape
-sleep 0.3  # Longer wait
-xdotool key Escape   # second Escape
+sleep 0.2  # Longer wait after completion inserts text
+natural_type '" and name contains "bARGE"'
 sleep 0.2
 xdotool key Return
 sleep 0.3
@@ -123,7 +120,8 @@ DISPLAY=":${DISPLAY_NUM}" xwd -root -silent 2>/dev/null | convert xwd:- /tmp/bar
 
 # -- Step 3: Hover "contains" for operator documentation --
 move_mouse_smooth $EDITOR_X $EDITOR_Y $CONTAINS_X $CONTAINS_Y 700
-sleep 1.5
+sleep 0.5
+move_mouse_smooth $EDITOR_X $EDITOR_Y $CONTAINS_HOVER_X $CONTAINS_HOVER_Y 300
 
 # Scroll through hover content
 for i in {1..4}; do
