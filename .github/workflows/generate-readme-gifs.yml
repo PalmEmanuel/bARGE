@@ -53,6 +53,13 @@ jobs:
           npm install -g @vscode/vsce
           vsce package --no-yarn
 
+      - name: Cache system dependencies
+        uses: actions/cache@v4
+        with:
+          path: /var/cache/apt/archives
+          key: apt-pkgs-v1-${{ hashFiles('.github/workflows/generate-readme-gifs.yml') }}
+          restore-keys: apt-pkgs-v1-
+
       - name: Install system dependencies
         run: |
           sudo apt-get update -qq
