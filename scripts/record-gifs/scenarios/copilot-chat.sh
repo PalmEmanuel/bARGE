@@ -87,21 +87,27 @@ if [[ -d "${VSCODE_USER_DATA_DIR}/logs" ]]; then
 fi
 
 # Dump state.vscdb structure so we can verify what VS Code actually stores
-python3 - <<'PYEOF' > /tmp/barge-debug/state-vscdb-dump.txt 2>&1
-import os, sqlite3
-db_path = os.path.join(os.environ.get("VSCODE_USER_DATA_DIR", ""), "User", "globalStorage", "state.vscdb")
-db = sqlite3.connect(db_path)
+mkdir -p /tmp/barge-debug
+DB_PATH=$(find "${VSCODE_USER_DATA_DIR}" -name "state.vscdb" 2>/dev/null | head -1)
+echo "VSCODE_USER_DATA_DIR=${VSCODE_USER_DATA_DIR}" > /tmp/barge-debug/state-vscdb-dump.txt
+echo "state.vscdb found at: ${DB_PATH:-NOT FOUND}" >> /tmp/barge-debug/state-vscdb-dump.txt
+find "${VSCODE_USER_DATA_DIR}" -name "*.vscdb" -o -name "*.db" 2>/dev/null >> /tmp/barge-debug/state-vscdb-dump.txt
+if [[ -n "${DB_PATH}" ]]; then
+    python3 - "${DB_PATH}" >> /tmp/barge-debug/state-vscdb-dump.txt 2>&1 <<'PYEOF'
+import sqlite3, sys
+db = sqlite3.connect(sys.argv[1])
 tables = [r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
 print("Tables:", tables)
 for table in tables:
     print(f"\n--- {table} ---")
     for row in db.execute(f"SELECT key FROM {table}").fetchall():
         key = row[0]
-        if "github" in key.lower() or "secret" in key.lower() or "auth" in key.lower() or "copilot" in key.lower():
+        if any(w in key.lower() for w in ["github", "secret", "auth", "copilot"]):
             print(f"  MATCH: {key[:120]}")
         else:
             print(f"  {key[:80]}")
 db.close()
 PYEOF
+fi
 
 close_vscode
