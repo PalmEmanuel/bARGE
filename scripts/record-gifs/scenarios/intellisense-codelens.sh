@@ -30,7 +30,7 @@ VSCODE_PID=$!
 
 # A safe click target in the editor body (avoid CodeLens rows)
 EDITOR_X=900
-EDITOR_Y=250
+EDITOR_Y=200
 
 xdotool mousemove $EDITOR_X $EDITOR_Y
 
@@ -116,7 +116,7 @@ move_mouse_smooth $EDITOR_X $EDITOR_Y $CONTAINS_X $CONTAINS_Y 700
 sleep 0.3
 move_mouse_smooth $CONTAINS_X $CONTAINS_Y $CONTAINS_HOVER_X $CONTAINS_HOVER_Y 300
 
-sleep 0.5
+sleep 1.5
 
 # Scroll through hover content
 for i in {1..4}; do
