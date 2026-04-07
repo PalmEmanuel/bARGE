@@ -105,14 +105,19 @@ PYEOF
 
 # Dump gnome-libsecret contents to find VS Code's storage schema
 {
-    echo "=== gnome-libsecret dump (secret-tool search) ==="
-    # Start a D-Bus session for secret-tool
-    if [[ -z "${DBUS_SESSION_BUS_ADDRESS}" ]]; then
-        eval "$(dbus-launch --sh-syntax 2>/dev/null)" || true
-    fi
-    secret-tool search --all xdg:schema org.freedesktop.Secret.Generic 2>/dev/null \
-        || secret-tool search --all dummy dummy 2>&1 \
-        || echo "secret-tool not available or keyring not accessible"
+    echo "=== gnome-libsecret dump ==="
+    echo "DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS:-unset}"
+    secret-tool search --all xdg:schema org.freedesktop.Secret.Generic 2>&1 \
+        || echo "secret-tool search failed"
+    echo "=== all entries ==="
+    python3 -c "
+import subprocess, os
+r = subprocess.run(['secret-tool', 'search', '--all', 'dummy', 'value'],
+    capture_output=True, text=True,
+    env={**os.environ, 'DBUS_SESSION_BUS_ADDRESS': os.environ.get('DBUS_SESSION_BUS_ADDRESS','')})
+print('stdout:', r.stdout[:500])
+print('stderr:', r.stderr[:500])
+" 2>&1
 } > /tmp/barge-debug/gnome-secrets.txt 2>&1
 
 close_vscode
