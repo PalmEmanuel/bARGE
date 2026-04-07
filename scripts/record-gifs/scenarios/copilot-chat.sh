@@ -73,9 +73,24 @@ sleep 0.5
 # Submit
 xdotool key --clearmodifiers Return
 
+# If a browser window opened (Copilot "Finish setup" flow), close it and
+# refocus VS Code so the chat response remains visible in the recording.
+sleep 4
+CHROME_WID=$(xdotool search --onlyvisible --name "Google Chrome" 2>/dev/null | head -1 || true)
+if [[ -n "${CHROME_WID}" ]]; then
+    echo "Browser window detected — closing and refocusing VS Code" >&2
+    xdotool windowfocus "${CHROME_WID}"
+    sleep 0.3
+    xdotool key --clearmodifiers alt+F4
+    sleep 0.5
+fi
+# Refocus VS Code
+xdotool search --onlyvisible --class "code" | head -1 | xargs -I{} xdotool windowfocus {} 2>/dev/null || true
+sleep 0.5
+
 # Wait for Copilot to run the bARGE tools and stream a response.
 # The tool calls (run_query → filter_table → select_rows) take ~20–30s in total.
-sleep 35
+sleep 32
 
 # Save a debug screenshot so we can verify auth and response content
 mkdir -p /tmp/barge-debug
