@@ -2,10 +2,15 @@
 """
 Prepares VS Code's state.vscdb with a GitHub auth session for Copilot Chat.
 
-VS Code's EncryptionMainService.decrypt() explicitly handles values prefixed
-with "encryption-not-available-" by stripping the prefix and returning the
-plain text. This lets us inject a session without matching VS Code's safeStorage
-encryption (which requires the exact keyring key and safeStorage availability).
+VS Code stores secrets in state.vscdb encrypted via Electron's safeStorage.
+When launched with --password-store=basic, VS Code calls
+safeStorage.setUsePlainTextEncryption(true), which makes:
+  - encryptString(text) → Buffer.from(text, 'utf8')  (no encryption)
+  - decryptString(buf)  → buf.toString('utf8')
+
+VS Code then wraps the Buffer as JSON: JSON.stringify(buffer) produces
+{"type":"Buffer","data":[...utf8 bytes...]}. That is the exact format we
+must write to state.vscdb so decrypt() can reconstruct the session string.
 
 Requires:
   - GH_COPILOT_CHAT env var: GitHub PAT with Copilot access
@@ -19,12 +24,6 @@ import urllib.request
 
 PAT = os.environ["GH_COPILOT_CHAT"]
 USER_DATA_DIR = os.environ.get("VSCODE_USER_DATA_DIR", "/tmp/barge-gif-recording/user-data")
-
-# VS Code's EncryptionMainService prefixes secrets with this string when
-# encryption is not available and stores them as plain text. decrypt() checks
-# for this prefix before attempting safeStorage decryption, so injecting it
-# directly bypasses any keyring/safeStorage dependency entirely.
-ENCRYPTION_NOT_AVAILABLE_PREFIX = "encryption-not-available-"
 
 # Fetch the GitHub user identity for this PAT
 req = urllib.request.Request(
@@ -53,7 +52,15 @@ session = [
     }
 ]
 
-stored_value = ENCRYPTION_NOT_AVAILABLE_PREFIX + json.dumps(session)
+session_json = json.dumps(session)
+
+# VS Code with --password-store=basic uses setUsePlainTextEncryption(true).
+# encrypt(text) returns JSON.stringify(Buffer.from(text, 'utf8')), which Node.js
+# serialises as {"type":"Buffer","data":[...utf8 byte values...]}.
+# decrypt() does: JSON.parse → Buffer.from(data) → safeStorage.decryptString()
+# which, in plain-text mode, just returns buffer.toString('utf8').
+utf8_bytes = list(session_json.encode("utf-8"))
+stored_value = json.dumps({"type": "Buffer", "data": utf8_bytes})
 
 # Write to state.vscdb
 db_dir = os.path.join(USER_DATA_DIR, "User", "globalStorage")
@@ -72,18 +79,6 @@ db.execute(
         stored_value,
     ),
 )
-
-# Reset the gnome-libsecret migration flag so VS Code re-runs its migration on
-# next startup. During migration VS Code reads every secret:// key from
-# state.vscdb (decrypting via EncryptionMainService — which handles the
-# "encryption-not-available-" prefix), then writes the plain value into
-# gnome-libsecret. After migration the flag is set back to true and all
-# SecretStorage reads go to gnome-libsecret where our session now lives.
-db.execute(
-    "INSERT OR REPLACE INTO ItemTable VALUES (?, ?)",
-    ("encryption.migratedToGnomeLibsecret", "false"),
-)
-
 db.commit()
 db.close()
 print("VS Code auth session written to state.vscdb")
@@ -97,11 +92,13 @@ row = db.execute(
 db.close()
 if row:
     raw = row[0]
-    assert raw.startswith(ENCRYPTION_NOT_AVAILABLE_PREFIX), f"unexpected prefix: {raw[:40]}"
-    parsed = json.loads(raw[len(ENCRYPTION_NOT_AVAILABLE_PREFIX):])
-    scopes = parsed[0]["scopes"]
-    token_preview = parsed[0]["accessToken"][:8] + "..."
-    print(f"Session read-back OK: user={parsed[0]['account']['label']}, scopes={scopes}, token={token_preview}")
+    parsed = json.loads(raw)
+    reconstructed = bytes(parsed["data"]).decode("utf-8")
+    sessions = json.loads(reconstructed)
+    scopes = sessions[0]["scopes"]
+    token_preview = sessions[0]["accessToken"][:8] + "..."
+    print(f"Session read-back OK: user={sessions[0]['account']['label']}, scopes={scopes}, token={token_preview}")
 else:
     print("ERROR: session key not found in state.vscdb after write!")
+
 
