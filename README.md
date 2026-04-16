@@ -152,6 +152,6 @@ If the problem persists, please create an Issue and try to describe the unexpect
 - [Azure Resource Graph Query Language](https://learn.microsoft.com/en-us/azure/governance/resource-graph/concepts/query-language?wt.mc_id=DT-MVP-5005372)
 
 <!-- References -->
-[bARGEDownloads]: https://img.shields.io/visual-studio-marketplace/d/PalmEmanuel.barge-vscode?label=bARGE%20Downloads
+[bARGEDownloads]: https://flat.badgen.net/vs-marketplace/i/PalmEmanuel.barge-vscode?label=bARGE%20Installs
 [bARGEMarketplace]: https://marketplace.visualstudio.com/items?itemName=PalmEmanuel.barge-vscode
-[bARGE]: https://img.shields.io/visual-studio-marketplace/v/PalmEmanuel.barge-vscode?label=bARGE
+[bARGE]: https://flat.badgen.net/vs-marketplace/v/PalmEmanuel.barge-vscode?label=bARGE
