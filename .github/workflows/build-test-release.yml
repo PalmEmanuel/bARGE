@@ -214,7 +214,7 @@ jobs:
           Write-Host "Found VSIX file: $($vsixFile.Name)"
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: ${{ steps.vsix-file.outputs.filename }}
           body: ${{ steps.changelog.outputs.changes }}
