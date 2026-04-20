@@ -3,11 +3,18 @@
     "advisorresources": {
       "name": "advisorresources",
       "resourceTypes": [
+        "microsoft.advisor/advisorscore",
+        "microsoft.advisor/advisorscore/category",
+        "microsoft.advisor/advisorscore/subcategoryweightage",
         "microsoft.advisor/assessments",
         "microsoft.advisor/configurations",
+        "microsoft.advisor/criticalresources",
         "microsoft.advisor/recommendations",
         "microsoft.advisor/recommendations/suppressions",
         "microsoft.advisor/resiliencyreviews",
+        "microsoft.advisor/risks",
+        "microsoft.advisor/risktypes",
+        "microsoft.advisor/subcategoryweightage",
         "microsoft.advisor/suppressions",
         "microsoft.advisor/triagerecommendations",
         "microsoft.advisor/triageresources"
@@ -102,6 +109,15 @@
         }
       ],
       "description": "Related to Microsoft.AlertsManagement"
+    },
+    "apicenterresources": {
+      "name": "apicenterresources",
+      "resourceTypes": [
+        "microsoft.apicenter/services/workspaces/apis",
+        "microsoft.apicenter/services/workspaces/apis/versions",
+        "microsoft.apicenter/services/workspaces/apis/versions/definitions"
+      ],
+      "examples": []
     },
     "appserviceresources": {
       "name": "appserviceresources",
@@ -259,6 +275,14 @@
       "examples": [],
       "description": "Related to Microsoft.Chaos"
     },
+    "cognitiveservicesresources": {
+      "name": "cognitiveservicesresources",
+      "resourceTypes": [
+        "microsoft.cognitiveservices/accounts/connections",
+        "microsoft.cognitiveservices/accounts/projects/connections"
+      ],
+      "examples": []
+    },
     "communitygalleryresources": {
       "name": "communitygalleryresources",
       "resourceTypes": [
@@ -313,6 +337,8 @@
     "dnsresources": {
       "name": "dnsresources",
       "resourceTypes": [
+        "microsoft.network/dnsforwardingrulesets/forwardingrules",
+        "microsoft.network/dnsforwardingrulesets/virtualnetworklinks",
         "microsoft.network/dnszones/a",
         "microsoft.network/dnszones/aaaa",
         "microsoft.network/dnszones/caa",
@@ -390,15 +416,18 @@
     "gcpresources": {
       "name": "gcpresources",
       "resourceTypes": [
-        "microsoft.gcpconnector/computeinstances"
+        "microsoft.gcpconnector/computeinstances",
+        "microsoft.gcpconnector/containerclusters"
       ],
       "examples": []
     },
     "guestconfigurationresources": {
       "name": "guestconfigurationresources",
       "resourceTypes": [
+        "microsoft.guestconfiguration/groups",
         "microsoft.guestconfiguration/guestconfigurationassignments",
-        "microsoft.guestconfiguration/guestconfigurationassignments/reports"
+        "microsoft.guestconfiguration/guestconfigurationassignments/reports",
+        "microsoft.guestconfiguration/users"
       ],
       "examples": [
         {
@@ -652,8 +681,18 @@
     "migrateresources": {
       "name": "migrateresources",
       "resourceTypes": [
+        "microsoft.applicationmigration/codescanmappings",
+        "microsoft.applicationmigration/codescansites/codescanreports",
+        "microsoft.applicationmigration/codescansites/codescanreports/codescanissues",
+        "microsoft.applicationmigration/connectionhubs/githubconnections",
+        "microsoft.applicationmigration/connectionhubs/githubconnections/githubissues",
         "microsoft.applicationmigration/discoveryhubs/applications",
         "microsoft.applicationmigration/discoveryhubs/applications/members",
+        "microsoft.applicationmigration/mongosites/agents",
+        "microsoft.applicationmigration/mongosites/mongocollections",
+        "microsoft.applicationmigration/mongosites/mongodatabases",
+        "microsoft.applicationmigration/mongosites/mongoinstances",
+        "microsoft.applicationmigration/oraclesites/oracleinstances",
         "microsoft.applicationmigration/pgsqlsites/agents",
         "microsoft.applicationmigration/pgsqlsites/pgsqldatabases",
         "microsoft.applicationmigration/pgsqlsites/pgsqlinstances",
@@ -674,6 +713,9 @@
         "microsoft.migrate/assessmentprojects/avsassessments/summaries",
         "microsoft.migrate/assessmentprojects/businesscases",
         "microsoft.migrate/assessmentprojects/castconnections",
+        "microsoft.migrate/assessmentprojects/fileshareassessments",
+        "microsoft.migrate/assessmentprojects/fileshareassessments/assessedfileshares",
+        "microsoft.migrate/assessmentprojects/fileshareassessments/summaries",
         "microsoft.migrate/assessmentprojects/groups",
         "microsoft.migrate/assessmentprojects/groups/assessments",
         "microsoft.migrate/assessmentprojects/groups/assessments/assessedmachines",
@@ -692,6 +734,9 @@
         "microsoft.migrate/assessmentprojects/heterogeneousassessments",
         "microsoft.migrate/assessmentprojects/heterogeneousassessments/summaries",
         "microsoft.migrate/assessmentprojects/machineassessments/assessedmachines",
+        "microsoft.migrate/assessmentprojects/mongoassessments",
+        "microsoft.migrate/assessmentprojects/mongoassessments/assessedinstances",
+        "microsoft.migrate/assessmentprojects/mongoassessments/summaries",
         "microsoft.migrate/assessmentprojects/mysqlassessments",
         "microsoft.migrate/assessmentprojects/mysqlassessments/assessedinstances",
         "microsoft.migrate/assessmentprojects/mysqlassessments/summaries",
@@ -742,6 +787,14 @@
       "examples": [],
       "description": "Related to Microsoft.OffAzure"
     },
+    "monitorresources": {
+      "name": "monitorresources",
+      "resourceTypes": [
+        "microsoft.monitor/accounts/issues",
+        "microsoft.monitor/slis"
+      ],
+      "examples": []
+    },
     "networkresourcechanges": {
       "name": "networkresourcechanges",
       "resourceTypes": [
@@ -752,6 +805,8 @@
     "networkresources": {
       "name": "networkresources",
       "resourceTypes": [
+        "microsoft.network/dnsforwardingrulesets/forwardingrules",
+        "microsoft.network/dnsforwardingrulesets/virtualnetworklinks",
         "microsoft.network/effectiveconnectivityconfigurations",
         "microsoft.network/effectivesecurityadminrules",
         "microsoft.network/firewallpolicies/rulecollectiongroups",
@@ -795,7 +850,8 @@
         "microsoft.network/networksecurityperimeters/resourceassociations",
         "microsoft.network/rulecollectiongroups",
         "microsoft.network/virtualnetworks/subnets/effectiveroutingrules",
-        "microsoft.network/virtualnetworks/subnets/effectivesecurityuserrules"
+        "microsoft.network/virtualnetworks/subnets/effectivesecurityuserrules",
+        "microsoft.networkresourceprovider/publicipaddress"
       ],
       "examples": [],
       "description": "Related to Microsoft.Network"
@@ -820,12 +876,6 @@
         "microsoft.hybridcompute/machines/patchassessmentresults/softwarepatches"
       ],
       "examples": [
-        {
-          "code": "PatchAssessmentResources\n| where type has 'softwarepatches' and properties !has 'version'\n| extend machineName = tostring(split(id, '/', 8)), resourceType = tostring(split(type, '/', 0)), tostring(rgName = split(id, '/', 4)), tostring(RunID = split(id, '/', 10))\n| extend prop = parse_json(properties)\n| extend lTime = todatetime(prop.lastModifiedDateTime), patchName = tostring(prop.patchName), kbId = tostring(prop.kbId), installationState = tostring(prop.installationState), classifications = tostring(prop.classifications)\n| where lTime > ago(7d)\n| project lTime, RunID, machineName, rgName, resourceType, patchName, kbId, classifications, installationState\n| sort by RunID",
-          "source": "kql",
-          "length": 677,
-          "startsWithTable": true
-        },
         {
           "code": "PatchAssessmentResources\n| where type has 'softwarepatches' and properties has 'version'\n| extend machineName = tostring(split(id, '/', 8)), resourceType = tostring(split(type, '/', 0)), tostring(rgName = split(id, '/', 4)), tostring(RunID = split(id, '/', 10))\n| extend prop = parse_json(properties)\n| extend lTime = todatetime(prop.lastModifiedDateTime), patchName = tostring(prop.patchName), version = tostring(prop.version), installationState = tostring(prop.installationState), classifications = tostring(prop.classifications)\n| where lTime > ago(7d)\n| project lTime, RunID, machineName, rgName, resourceType, patchName, version, classifications, installationState\n| sort by RunID",
           "source": "kql",
@@ -857,7 +907,14 @@
         "microsoft.hybridcompute/machines/patchinstallationresults",
         "microsoft.hybridcompute/machines/patchinstallationresults/softwarepatches"
       ],
-      "examples": [],
+      "examples": [
+        {
+          "code": "PatchInstallationResources\n| where type has 'softwarepatches' and properties !has 'version'\n| extend machineName = tostring(split(id, '/', 8)), resourceType = tostring(split(type, '/', 0)), tostring(rgName = split(id, '/', 4)), tostring(RunID = split(id, '/', 10))\n| extend prop = parse_json(properties)\n| extend lTime = todatetime(prop.lastModifiedDateTime), patchName = tostring(prop.patchName), kbId = tostring(prop.kbId), installationState = tostring(prop.installationState), classifications = tostring(prop.classifications)\n| where lTime > ago(7d)\n| project lTime, RunID, machineName, rgName, resourceType, patchName, kbId, classifications, installationState\n| sort by RunID",
+          "source": "kql",
+          "length": 679,
+          "startsWithTable": true
+        }
+      ],
       "description": "Related to Azure Virtual Machines patch installation Microsoft.Compute and Microsoft.HybridCompute"
     },
     "policyresources": {
@@ -942,10 +999,13 @@
         "microsoft.dataprotection/backupvaults/backupjobs",
         "microsoft.dataprotection/backupvaults/backuppolicies",
         "microsoft.dataprotection/backupvaults/deletedbackupinstances",
+        "microsoft.dataprotection/locations/deletedvaults",
+        "microsoft.dataprotection/locations/deletedvaults/deletedbackupinstances",
         "microsoft.recoveryservices/locations/deletedvaults",
         "microsoft.recoveryservices/locations/deletedvaults/backupfabrics/protectioncontainers/protecteditems",
         "microsoft.recoveryservices/vaults",
         "microsoft.recoveryservices/vaults/alerts",
+        "microsoft.recoveryservices/vaults/backupfabrics/protectioncontainers",
         "microsoft.recoveryservices/vaults/backupfabrics/protectioncontainers/protectableitems",
         "microsoft.recoveryservices/vaults/backupfabrics/protectioncontainers/protecteditems",
         "microsoft.recoveryservices/vaults/backupjobs",
@@ -1072,6 +1132,8 @@
         "admincenter",
         "advancedthreatprotection.windows",
         "agents",
+        "anyscale.platform/clouds",
+        "anyscale.platform/clouds/cloudresources",
         "arizeai.observabilityeval/organizations",
         "assessmentplatform",
         "astronomer.astro/organizations",
@@ -1110,11 +1172,11 @@
         "mde.windows",
         "microsoft apps/connectedenvironments/certificates",
         "microsoft.aad/domainservices",
+        "microsoft.aad/resilienceservices",
         "microsoft.aadiam/azureadmetrics",
         "microsoft.aadiam/privatelinkforazuread",
         "microsoft.aadiam/tenants",
         "microsoft.agfoodplatform/farmbeats",
-        "microsoft.agricultureplatform/agriservices",
         "microsoft.alertsmanagement/actionrules",
         "microsoft.alertsmanagement/prometheusrulegroups",
         "microsoft.alertsmanagement/smartdetectoralertrules",
@@ -1128,6 +1190,7 @@
         "microsoft.anybuild/clusters",
         "microsoft.apicenter/catalogs",
         "microsoft.apicenter/services",
+        "microsoft.apimanagement/aigateways",
         "microsoft.apimanagement/gateways",
         "microsoft.apimanagement/service",
         "microsoft.app/agents",
@@ -1141,12 +1204,17 @@
         "microsoft.app/managedenvironments",
         "microsoft.app/managedenvironments/certificates",
         "microsoft.app/managedenvironments/managedcertificates",
+        "microsoft.app/sandboxgroups",
         "microsoft.app/sessionpools",
         "microsoft.app/spaces",
         "microsoft.appassessment/migrateprojects",
         "microsoft.appconfiguration/configurationstores",
         "microsoft.applicationmigration/codescansites",
+        "microsoft.applicationmigration/connectionhubs",
         "microsoft.applicationmigration/discoveryhubs",
+        "microsoft.applicationmigration/mongosites",
+        "microsoft.applicationmigration/networksites",
+        "microsoft.applicationmigration/oraclesites",
         "microsoft.applicationmigration/pgsqlsites",
         "microsoft.applicationmigration/storagesites",
         "microsoft.applink/applinks",
@@ -1179,6 +1247,12 @@
         "microsoft.awsconnector/apigatewaystages",
         "microsoft.awsconnector/appsyncgraphqlapis",
         "microsoft.awsconnector/autoscalingautoscalinggroups",
+        "microsoft.awsconnector/bedrockagentaliases",
+        "microsoft.awsconnector/bedrockagents",
+        "microsoft.awsconnector/bedrockdatasources",
+        "microsoft.awsconnector/bedrockguardrails",
+        "microsoft.awsconnector/bedrockknowledgebases",
+        "microsoft.awsconnector/bedrockprompts",
         "microsoft.awsconnector/cloudformationstacks",
         "microsoft.awsconnector/cloudformationstacksets",
         "microsoft.awsconnector/cloudfrontdistributions",
@@ -1285,6 +1359,7 @@
         "microsoft.awsconnector/wafwebaclsummaries",
         "microsoft.azureactivedirectory/b2cdirectories",
         "microsoft.azureactivedirectory/ciamdirectories",
+        "microsoft.azureactivedirectory/entratenants",
         "microsoft.azureactivedirectory/guestusages",
         "microsoft.azurearcdata/datacontrollers",
         "microsoft.azurearcdata/postgresinstances",
@@ -1302,12 +1377,14 @@
         "microsoft.azuredatatransfer/pipelines",
         "microsoft.azuredatatransfer/pipelines/flowprofiles",
         "microsoft.azurefleet/fleets",
+        "microsoft.azurefleet/virtualmachinescalesets",
         "microsoft.azureimagetestingforlinux/jobs",
         "microsoft.azureimagetestingforlinux/jobtemplates",
         "microsoft.azurelargeinstance/azurelargeinstances",
         "microsoft.azurelargeinstance/azurelargestorageinstances",
         "microsoft.azurepercept/accounts",
         "microsoft.azureplaywrightservice/accounts",
+        "microsoft.azureresiliencemanagement/usageplans",
         "microsoft.azurescan/scanningaccounts",
         "microsoft.azuresphere/catalogs",
         "microsoft.azuresphere/catalogs/products",
@@ -1318,10 +1395,14 @@
         "microsoft.azurestackhci/edgemachines",
         "microsoft.azurestackhci/edgenodepools",
         "microsoft.azurestackhci/galleryimages",
+        "microsoft.azurestackhci/loadbalancers",
         "microsoft.azurestackhci/logicalnetworks",
         "microsoft.azurestackhci/marketplacegalleryimages",
+        "microsoft.azurestackhci/natgateways",
         "microsoft.azurestackhci/networkinterfaces",
         "microsoft.azurestackhci/networksecuritygroups",
+        "microsoft.azurestackhci/publicipaddresses",
+        "microsoft.azurestackhci/snapshots",
         "microsoft.azurestackhci/storagecontainers",
         "microsoft.azurestackhci/virtualharddisks",
         "microsoft.azurestackhci/virtualmachines",
@@ -1333,12 +1414,16 @@
         "microsoft.baremetal/consoleconnections",
         "microsoft.baremetal/crayservers",
         "microsoft.baremetal/monitoringservers",
+        "microsoft.baremetal/networkinterfaceattachments",
         "microsoft.baremetal/peeringsettings",
         "microsoft.baremetalinfrastructure/baremetalinstances",
         "microsoft.baremetalinfrastructure/baremetalstorageinstances",
+        "microsoft.baremetalstorageinfrastructure/baremetalstorageinstances",
         "microsoft.batch/batchaccounts",
+        "microsoft.billingbenefits/conditionalcredits",
         "microsoft.billingbenefits/credits",
         "microsoft.billingbenefits/discounts",
+        "microsoft.billingbenefits/freeservices",
         "microsoft.billingbenefits/incentiveschedules",
         "microsoft.billingbenefits/maccs",
         "microsoft.bing/accounts",
@@ -1356,12 +1441,16 @@
         "microsoft.cdn/edgeactions/versions",
         "microsoft.cdn/profiles",
         "microsoft.cdn/profiles/afdendpoints",
+        "microsoft.cdn/profiles/agents",
         "microsoft.cdn/profiles/endpoints",
+        "microsoft.cdn/webagents",
+        "microsoft.cdn/webagents/knowledgesources",
         "microsoft.certificateregistration/certificateorders",
         "microsoft.chaos/applications",
         "microsoft.chaos/experiments",
         "microsoft.chaos/privateaccesses",
         "microsoft.chaos/resilienceprofiles",
+        "microsoft.chaos/workspaces",
         "microsoft.classiccompute/domainnames",
         "microsoft.classiccompute/virtualmachines",
         "microsoft.classicnetwork/networksecuritygroups",
@@ -1373,6 +1462,7 @@
         "microsoft.cleanroom/consortiums",
         "microsoft.cleanroom/microservices",
         "microsoft.clouddeviceplatform/delegatedidentities",
+        "microsoft.clouddeviceplatform/partnerbusinesses",
         "microsoft.cloudes/accounts",
         "microsoft.cloudhealth/healthmodels",
         "microsoft.cloudtest/accounts",
@@ -1414,6 +1504,7 @@
         "microsoft.compute/hostgroups",
         "microsoft.compute/hostgroups/hosts",
         "microsoft.compute/images",
+        "microsoft.compute/interconnectblocks",
         "microsoft.compute/proximityplacementgroups",
         "microsoft.compute/restorepointcollections",
         "microsoft.compute/sharedvmextensions",
@@ -1470,6 +1561,7 @@
         "microsoft.containerservice/managedclusters",
         "microsoft.containerservice/managedclusters/managednamespaces",
         "microsoft.containerservice/managedclustersnapshots",
+        "microsoft.containerservice/nodecustomizations",
         "microsoft.containerservice/snapshots",
         "microsoft.containerstorage/pools",
         "microsoft.contoso/clusters",
@@ -1478,6 +1570,8 @@
         "microsoft.contoso/installations",
         "microsoft.contoso/recipes",
         "microsoft.contoso/towers",
+        "microsoft.cosmic/namespaces",
+        "microsoft.cosmic/namespaces/environments",
         "microsoft.costmanagement/connectors",
         "microsoft.customproviders/resourceproviders",
         "microsoft.d365customerinsights/instances",
@@ -1583,12 +1677,15 @@
         "microsoft.discovery/datacontainers",
         "microsoft.discovery/datacontainers/dataassets",
         "microsoft.discovery/models",
+        "microsoft.discovery/storagecontainers",
+        "microsoft.discovery/storagecontainers/storageassets",
         "microsoft.discovery/storages",
         "microsoft.discovery/supercomputers",
         "microsoft.discovery/supercomputers/nodepools",
         "microsoft.discovery/tools",
         "microsoft.discovery/workflows",
         "microsoft.discovery/workspaces",
+        "microsoft.discovery/workspaces/chatmodeldeployments",
         "microsoft.discovery/workspaces/projects",
         "microsoft.dns/dnszones/cname",
         "microsoft.documentdb/cassandraclusters",
@@ -1617,6 +1714,7 @@
         "microsoft.edge/solutiontemplates",
         "microsoft.edge/targets",
         "microsoft.edge/winfields",
+        "microsoft.edge/workflows",
         "microsoft.edgeorder/addresses",
         "microsoft.edgeorder/bootstrapconfigurations",
         "microsoft.edgeorder/orderitems",
@@ -1626,7 +1724,9 @@
         "microsoft.elasticsan/elasticsans/volumegroups",
         "microsoft.energydataplatform/energyservices",
         "microsoft.enterprisesupport/enterprisesupports",
+        "microsoft.enterprisesupport/supportplans",
         "microsoft.entraidgovernance/guestgovernanceusage",
+        "microsoft.entraidgovernance/scimapiconsumptions",
         "microsoft.eventgrid/domains",
         "microsoft.eventgrid/namespaces",
         "microsoft.eventgrid/partnerconfigurations",
@@ -1651,15 +1751,22 @@
         "microsoft.fluidrelay/fluidrelayservers",
         "microsoft.footprintmonitoring/profiles",
         "microsoft.gaming/titles",
+        "microsoft.gcpconnector/bigquerydatasets",
         "microsoft.gcpconnector/cloudfunctions",
+        "microsoft.gcpconnector/sqladmininstances",
         "microsoft.gcpconnector/storagebuckets",
+        "microsoft.genome/accounts",
+        "microsoft.graduationtest/hats",
+        "microsoft.graduationtest/papers",
         "microsoft.graph/azureadapplication",
         "microsoft.graphservices/accounts",
         "microsoft.hanaonazure/hanainstances",
         "microsoft.hanaonazure/sapmonitors",
         "microsoft.hardware/orders",
+        "microsoft.hardware/returns",
         "microsoft.hardwaresecuritymodules/cloudhsmclusters",
         "microsoft.hardwaresecuritymodules/dedicatedhsms",
+        "microsoft.hardwaresecuritymodules/paymenthsmclusters",
         "microsoft.hdinsight/clusterpools",
         "microsoft.hdinsight/clusterpools/clusters",
         "microsoft.hdinsight/clusters",
@@ -1671,6 +1778,9 @@
         "microsoft.healthcareapis/workspaces/dicomservices",
         "microsoft.healthcareapis/workspaces/fhirservices",
         "microsoft.healthcareapis/workspaces/iotconnectors",
+        "microsoft.healthcareinterop/ddmsconnectors",
+        "microsoft.healthcareinterop/ddmsfhireventbatchchannels",
+        "microsoft.healthcareinterop/ddmsfhirflatfilebatchchannels",
         "microsoft.healthcareinterop/dicomconnectors",
         "microsoft.healthcareinterop/dicomdirectchannels",
         "microsoft.healthcareinterop/dicomedgeconnectors",
@@ -1684,6 +1794,7 @@
         "microsoft.healthdataaiservices/deidservices",
         "microsoft.healthmodel/healthmodels",
         "microsoft.healthplatform/accounts",
+        "microsoft.horizondb/clusters",
         "microsoft.hpcworkbench/instances",
         "microsoft.hpcworkbench/instances/chambers",
         "microsoft.hpcworkbench/instances/chambers/accessprofiles",
@@ -1694,6 +1805,7 @@
         "microsoft.hybridcompute/gateways",
         "microsoft.hybridcompute/licenses",
         "microsoft.hybridcompute/machines",
+        "microsoft.hybridcompute/machines/applications",
         "microsoft.hybridcompute/machines/extensions",
         "microsoft.hybridcompute/machines/licenseprofiles",
         "microsoft.hybridcompute/machines/runcommands",
@@ -1775,11 +1887,14 @@
         "microsoft.labservices/labaccounts",
         "microsoft.labservices/labplans",
         "microsoft.labservices/labs",
+        "microsoft.liftrpilot/agents",
         "microsoft.liftrpilot/organizations",
         "microsoft.liftrpilot/testtrackedresources",
         "microsoft.liftrpilot/testtrackedsyncresources",
         "microsoft.loadtestservice/loadtests",
         "microsoft.loadtestservice/playwrightworkspaces",
+        "microsoft.logic/automationprojects",
+        "microsoft.logic/automationprojects/applications",
         "microsoft.logic/businessprocesses",
         "microsoft.logic/integrationaccounts",
         "microsoft.logic/integrationserviceenvironments",
@@ -1815,6 +1930,7 @@
         "microsoft.managednetworkfabric/l2isolationdomains",
         "microsoft.managednetworkfabric/l3isolationdomains",
         "microsoft.managednetworkfabric/neighborgroups",
+        "microsoft.managednetworkfabric/networkbootstrapdevices",
         "microsoft.managednetworkfabric/networkdevices",
         "microsoft.managednetworkfabric/networkfabriccontrollers",
         "microsoft.managednetworkfabric/networkfabrics",
@@ -1825,7 +1941,6 @@
         "microsoft.managednetworkfabric/networktaps",
         "microsoft.managednetworkfabric/routepolicies",
         "microsoft.managedstorageclass/managedstorageclass",
-        "microsoft.manufacturingplatform/manufacturingdataservices",
         "microsoft.maps/accounts",
         "microsoft.maps/accounts/creators",
         "microsoft.messagingcatalog/catalogs",
@@ -1839,6 +1954,7 @@
         "microsoft.mission/catalogs",
         "microsoft.mission/communities",
         "microsoft.mission/communities/communityendpoints",
+        "microsoft.mission/communities/dedicatedhubs",
         "microsoft.mission/communities/transithubs",
         "microsoft.mission/enclaveconnections",
         "microsoft.mission/externalconnections",
@@ -1847,35 +1963,6 @@
         "microsoft.mission/virtualenclaves/enclaveendpoints",
         "microsoft.mission/virtualenclaves/endpoints",
         "microsoft.mission/virtualenclaves/workloads",
-        "microsoft.mixedreality/objectanchorsaccounts",
-        "microsoft.mixedreality/objectunderstandingaccounts",
-        "microsoft.mixedreality/remoterenderingaccounts",
-        "microsoft.mixedreality/spatialanchorsaccounts",
-        "microsoft.mixedreality/spatialmapsaccounts",
-        "microsoft.mobilenetwork/amfdeployments",
-        "microsoft.mobilenetwork/clusterservices",
-        "microsoft.mobilenetwork/mobilenetworks",
-        "microsoft.mobilenetwork/mobilenetworks/datanetworks",
-        "microsoft.mobilenetwork/mobilenetworks/edgenetworksecuritygroups",
-        "microsoft.mobilenetwork/mobilenetworks/services",
-        "microsoft.mobilenetwork/mobilenetworks/simpolicies",
-        "microsoft.mobilenetwork/mobilenetworks/sites",
-        "microsoft.mobilenetwork/mobilenetworks/slices",
-        "microsoft.mobilenetwork/mobilenetworks/wifissids",
-        "microsoft.mobilenetwork/nrfdeployments",
-        "microsoft.mobilenetwork/nssfdeployments",
-        "microsoft.mobilenetwork/observabilityservices",
-        "microsoft.mobilenetwork/packetcorecontrolplanes",
-        "microsoft.mobilenetwork/packetcorecontrolplanes/packetcoredataplanes",
-        "microsoft.mobilenetwork/packetcorecontrolplanes/packetcoredataplanes/attacheddatanetworks",
-        "microsoft.mobilenetwork/packetcorecontrolplanes/packetcoredataplanes/attachedwifissids",
-        "microsoft.mobilenetwork/packetcorecontrolplanes/packetcoredataplanes/edgevirtualnetworks",
-        "microsoft.mobilenetwork/radioaccessnetworks",
-        "microsoft.mobilenetwork/simgroups",
-        "microsoft.mobilenetwork/sims",
-        "microsoft.mobilenetwork/sims/simprofiles",
-        "microsoft.mobilenetwork/smfdeployments",
-        "microsoft.mobilenetwork/upfdeployments",
         "microsoft.mobilepacketcore/amfdeployments",
         "microsoft.mobilepacketcore/clusterservices",
         "microsoft.mobilepacketcore/mobilepacketcores",
@@ -1899,6 +1986,12 @@
         "microsoft.monitor/pipelinegroups",
         "microsoft.mysqldiscovery/mysqlsites",
         "microsoft.netapp/activedirectoryconfigs",
+        "microsoft.netapp/elasticaccounts",
+        "microsoft.netapp/elasticaccounts/elasticbackuppolicies",
+        "microsoft.netapp/elasticaccounts/elasticbackupvaults",
+        "microsoft.netapp/elasticaccounts/elasticcapacitypools",
+        "microsoft.netapp/elasticaccounts/elasticcapacitypools/elasticvolumes",
+        "microsoft.netapp/elasticaccounts/elasticsnapshotpolicies",
         "microsoft.netapp/netappaccounts",
         "microsoft.netapp/netappaccounts/backuppolicies",
         "microsoft.netapp/netappaccounts/backupvaults",
@@ -1914,6 +2007,7 @@
         "microsoft.network/applicationgatewaywebapplicationfirewallpolicies",
         "microsoft.network/applicationsecuritygroups",
         "microsoft.network/azurefirewalls",
+        "microsoft.network/azureserviceconnectioncontrollers",
         "microsoft.network/bastionhosts",
         "microsoft.network/connections",
         "microsoft.network/customipprefixes",
@@ -1935,12 +2029,14 @@
         "microsoft.network/expressroutecircuits",
         "microsoft.network/expressroutecrossconnections",
         "microsoft.network/expressroutegateways",
+        "microsoft.network/expressroutelags",
         "microsoft.network/expressrouteports",
         "microsoft.network/firewallpolicies",
         "microsoft.network/firewallpolicies/rulegroups",
         "microsoft.network/frontdoors",
         "microsoft.network/frontdoorwebapplicationfirewallpolicies",
         "microsoft.network/gatewayloadbalanceraliases",
+        "microsoft.network/interconnectgroups",
         "microsoft.network/ipallocations",
         "microsoft.network/ipgroups",
         "microsoft.network/loadbalancers",
@@ -1971,6 +2067,8 @@
         "microsoft.network/privateendpointredirectmaps",
         "microsoft.network/privateendpoints",
         "microsoft.network/privatelinkservices",
+        "microsoft.network/privatetrafficmanagerprofiles",
+        "microsoft.network/probinggateways",
         "microsoft.network/publicipaddresses",
         "microsoft.network/publicipprefixes",
         "microsoft.network/routefilters",
@@ -1979,6 +2077,7 @@
         "microsoft.network/securitypartnerproviders",
         "microsoft.network/serviceendpointpolicies",
         "microsoft.network/servicegateways",
+        "microsoft.network/topologymaps",
         "microsoft.network/trafficmanagerprofiles",
         "microsoft.network/virtualhubs",
         "microsoft.network/virtualhubs/bgpconnections",
@@ -1996,6 +2095,7 @@
         "microsoft.networkanalytics/datalakehouses",
         "microsoft.networkanalytics/dataproducts",
         "microsoft.networkanalytics/metricsingestionendpoints",
+        "microsoft.networkcloud/accessbridges",
         "microsoft.networkcloud/baremetalmachines",
         "microsoft.networkcloud/cloudservicesnetworks",
         "microsoft.networkcloud/clustermanagers",
@@ -2010,6 +2110,7 @@
         "microsoft.networkcloud/kubernetesclusters",
         "microsoft.networkcloud/kubernetesclusters/agentpools",
         "microsoft.networkcloud/kubernetesclusters/features",
+        "microsoft.networkcloud/kubernetesversions",
         "microsoft.networkcloud/l2networks",
         "microsoft.networkcloud/l3networks",
         "microsoft.networkcloud/racks",
@@ -2024,7 +2125,9 @@
         "microsoft.networkfunction/azuretrafficcollectors",
         "microsoft.networkfunction/azuretrafficcollectors/collectorpolicies",
         "microsoft.networkfunction/meshvpns",
+        "microsoft.networkfunction/meshvpns/connectionpolicies",
         "microsoft.networkfunction/vpnbranches",
+        "microsoft.networkfunction/vpnbranches/vpnbranchlinks",
         "microsoft.nexusidentity/identitycontrollers",
         "microsoft.nexusidentity/identitysets",
         "microsoft.notificationhubs/namespaces",
@@ -2049,7 +2152,6 @@
         "microsoft.operationalinsights/workspaces",
         "microsoft.operationsmanagement/solutions",
         "microsoft.operationsmanagement/views",
-        "microsoft.oraclediscovery/oraclesites",
         "microsoft.orbital/cloudaccessrouters",
         "microsoft.orbital/contactprofiles",
         "microsoft.orbital/edgesites",
@@ -2059,6 +2161,7 @@
         "microsoft.orbital/sdwancontrollers",
         "microsoft.orbital/spacecrafts",
         "microsoft.orbital/terminals",
+        "microsoft.oriondb/clusters",
         "microsoft.peering/peerings",
         "microsoft.peering/peeringservices",
         "microsoft.pki/pkis",
@@ -2066,6 +2169,7 @@
         "microsoft.playfab/titles",
         "microsoft.portal/dashboards",
         "microsoft.portalsdk/rootresources",
+        "microsoft.portalservices/copilots",
         "microsoft.portalservices/dashboards",
         "microsoft.portalservices/extensions",
         "microsoft.portalservices/extensions/deployments",
@@ -2086,6 +2190,7 @@
         "microsoft.programmableconnectivity/operatorapiconnections",
         "microsoft.programmableconnectivity/operatorconnections",
         "microsoft.proposal/proposals",
+        "microsoft.proposal/quotes",
         "microsoft.providerhub/providermonitorsettings",
         "microsoft.purview/accounts",
         "microsoft.quantum/provideraccounts",
@@ -2100,8 +2205,13 @@
         "microsoft.relay/namespaces",
         "microsoft.remoteapp/collections",
         "microsoft.resiliency/chaosexperiments",
+        "microsoft.resourcebuilder/workspaces",
         "microsoft.resourceconnector/appliances",
         "microsoft.resourcegraph/queries",
+        "microsoft.resourcegraph/resourceanalyzeragents",
+        "microsoft.resourceintelligence/agents",
+        "microsoft.resourceintelligence/agentteams",
+        "microsoft.resourcemover/discoveryagents",
         "microsoft.resources/deploymentscripts",
         "microsoft.resources/mobobrokers",
         "microsoft.resources/templatespecs",
@@ -2158,7 +2268,9 @@
         "microsoft.signalrservice/webpubsub/replicas",
         "microsoft.singularity/accounts",
         "microsoft.skytap/nodes",
+        "microsoft.softwareplan/softwarebenefits",
         "microsoft.softwareplan/softwarelicenses",
+        "microsoft.softwareplan/softwareperpetualproducts",
         "microsoft.softwareplan/softwaresubscriptions",
         "microsoft.solutions/appliancedefinitions",
         "microsoft.solutions/appliances",
@@ -2197,6 +2309,7 @@
         "microsoft.storsimple/managers",
         "microsoft.streamanalytics/clusters",
         "microsoft.streamanalytics/streamingjobs",
+        "microsoft.supercomputerinfrastructure/supercomputers",
         "microsoft.sustainabilityservices/calculations",
         "microsoft.swiftlet/virtualmachines",
         "microsoft.swiftlet/virtualmachinesnapshots",
@@ -2206,6 +2319,7 @@
         "microsoft.synapse/privatelinkhubs",
         "microsoft.synapse/workspaces",
         "microsoft.synapse/workspaces/bigdatapools",
+        "microsoft.synapse/workspaces/eventstreams",
         "microsoft.synapse/workspaces/kustopools",
         "microsoft.synapse/workspaces/sqlpools",
         "microsoft.syntex/accounts",
@@ -2234,6 +2348,8 @@
         "microsoft.updatemanager/inventoryconfigurations",
         "microsoft.updatemanager/updaterules",
         "microsoft.usagebilling/accounts",
+        "microsoft.validate/cloudvalidations",
+        "microsoft.validate/cloudvalidations/validationexecutionplans",
         "microsoft.verifiedid/authorities",
         "microsoft.videoindexer/accounts",
         "microsoft.virtualmachineimages/imagetemplates",
@@ -2252,11 +2368,13 @@
         "microsoft.voiceservices/operatorvoicemailinstances",
         "microsoft.vsonline/accounts",
         "microsoft.vsonline/plans",
+        "microsoft.web/aigateways",
         "microsoft.web/apimanagementaccounts",
         "microsoft.web/apimanagementaccounts/apis",
         "microsoft.web/certificates",
         "microsoft.web/connectiongateways",
         "microsoft.web/connections",
+        "microsoft.web/connectorgateways",
         "microsoft.web/containerapps",
         "microsoft.web/customapis",
         "microsoft.web/hostingenvironments",
@@ -2306,7 +2424,7 @@
         "microsoftdnsagent",
         "microsoftmonitoringagent",
         "mongodb.atlas/organizations",
-        "neon.postgres/organizations",
+        "napster.companionapi/organizations",
         "networkwatcheragentlinux",
         "networkwatcheragentwindows",
         "newrelic.observability/monitors",
@@ -2323,6 +2441,10 @@
         "paloaltonetworks.cloudngfw/firewalls",
         "paloaltonetworks.cloudngfw/localrulestacks",
         "pinecone.vectordb/organizations",
+        "providers.test/softdeletebydefaultresources",
+        "providers.test/softdeletebydefaultresources/softdeletebydefaultchildresources",
+        "providers.test/softdeletecascadesupportedresources",
+        "providers.test/softdeletecascadesupportedresources/softdeletesupportedchildresources",
         "providers.test/softdeletesupportedresources",
         "providers.test/statefulibizaengines",
         "providers.test/statefulresources",
@@ -2331,6 +2453,7 @@
         "providers.test/trackedresources",
         "purestorage.block/reservations",
         "purestorage.block/storagepools",
+        "purestorage.block/storagepools/volumegroups",
         "purestorage.block/volumepools",
         "qumulo.qaas/storages",
         "qumulo.storage/filesystems",
@@ -2492,6 +2615,12 @@
           "code": "Resources\n| join kind=leftouter (ResourceContainers | where type=='microsoft.resources/subscriptions' | project SubName=name, subscriptionId) on subscriptionId\n| where type == 'microsoft.keyvault/vaults'\n| project type, name, SubName",
           "source": "kql",
           "length": 233,
+          "startsWithTable": true
+        },
+        {
+          "code": "Resources\n| where type in ('microsoft.web/sites', 'microsoft.web/sites/slots', 'microsoft.web/serverfarms', 'microsoft.web/environment', 'microsoft.web/hostingenvironment')\n| project name, type, kind, location, resourceGroup, sku , properties",
+          "source": "kql",
+          "length": 242,
           "startsWithTable": true
         },
         {
@@ -2700,12 +2829,14 @@
       "resourceTypes": [
         "microsoft.authorization/locks/providers/assessments/governanceassignments",
         "microsoft.authorization/roleassignments/providers/assessments/governanceassignments",
+        "microsoft.security/advancedthreatprotectionsettings",
         "microsoft.security/apicollections",
         "microsoft.security/apicollections/apiendpoints",
         "microsoft.security/assessments",
         "microsoft.security/assessments/governanceassignments",
         "microsoft.security/assessments/subassessments",
         "microsoft.security/attackpaths",
+        "microsoft.security/defenderforstoragesettings",
         "microsoft.security/governancerules",
         "microsoft.security/healthreports",
         "microsoft.security/insights",
@@ -2907,7 +3038,11 @@
     "sharedgalleryresources": {
       "name": "sharedgalleryresources",
       "resourceTypes": [
-        "microsoft.compute/locations/sharedgalleries"
+        "microsoft.compute/locations/sharedgalleries",
+        "microsoft.compute/locations/sharedgalleries/images",
+        "microsoft.compute/locations/sharedgalleries/images/versions",
+        "microsoft.compute/locations/sharedgallerysubscriptions/sharedgalleries",
+        "microsoft.compute/locations/tenantlevelsharedgallerysubscriptions/sharedgalleries"
       ],
       "examples": []
     },
@@ -2933,6 +3068,24 @@
     }
   },
   "resourceTypes": {
+    "microsoft.advisor/advisorscore": {
+      "name": "microsoft.advisor/advisorscore",
+      "tables": [
+        "advisorresources"
+      ]
+    },
+    "microsoft.advisor/advisorscore/category": {
+      "name": "microsoft.advisor/advisorscore/category",
+      "tables": [
+        "advisorresources"
+      ]
+    },
+    "microsoft.advisor/advisorscore/subcategoryweightage": {
+      "name": "microsoft.advisor/advisorscore/subcategoryweightage",
+      "tables": [
+        "advisorresources"
+      ]
+    },
     "microsoft.advisor/assessments": {
       "name": "microsoft.advisor/assessments",
       "tables": [
@@ -2941,6 +3094,12 @@
     },
     "microsoft.advisor/configurations": {
       "name": "microsoft.advisor/configurations",
+      "tables": [
+        "advisorresources"
+      ]
+    },
+    "microsoft.advisor/criticalresources": {
+      "name": "microsoft.advisor/criticalresources",
       "tables": [
         "advisorresources"
       ]
@@ -2959,6 +3118,24 @@
     },
     "microsoft.advisor/resiliencyreviews": {
       "name": "microsoft.advisor/resiliencyreviews",
+      "tables": [
+        "advisorresources"
+      ]
+    },
+    "microsoft.advisor/risks": {
+      "name": "microsoft.advisor/risks",
+      "tables": [
+        "advisorresources"
+      ]
+    },
+    "microsoft.advisor/risktypes": {
+      "name": "microsoft.advisor/risktypes",
+      "tables": [
+        "advisorresources"
+      ]
+    },
+    "microsoft.advisor/subcategoryweightage": {
+      "name": "microsoft.advisor/subcategoryweightage",
       "tables": [
         "advisorresources"
       ]
@@ -3021,6 +3198,24 @@
       "name": "microsoft.alertsmanagement/alerts",
       "tables": [
         "alertsmanagementresources"
+      ]
+    },
+    "microsoft.apicenter/services/workspaces/apis": {
+      "name": "microsoft.apicenter/services/workspaces/apis",
+      "tables": [
+        "apicenterresources"
+      ]
+    },
+    "microsoft.apicenter/services/workspaces/apis/versions": {
+      "name": "microsoft.apicenter/services/workspaces/apis/versions",
+      "tables": [
+        "apicenterresources"
+      ]
+    },
+    "microsoft.apicenter/services/workspaces/apis/versions/definitions": {
+      "name": "microsoft.apicenter/services/workspaces/apis/versions/definitions",
+      "tables": [
+        "apicenterresources"
       ]
     },
     "microsoft.web/sites/config": {
@@ -3128,6 +3323,18 @@
         "chaosresources"
       ]
     },
+    "microsoft.cognitiveservices/accounts/connections": {
+      "name": "microsoft.cognitiveservices/accounts/connections",
+      "tables": [
+        "cognitiveservicesresources"
+      ]
+    },
+    "microsoft.cognitiveservices/accounts/projects/connections": {
+      "name": "microsoft.cognitiveservices/accounts/projects/connections",
+      "tables": [
+        "cognitiveservicesresources"
+      ]
+    },
     "microsoft.compute/locations/communitygalleries": {
       "name": "microsoft.compute/locations/communitygalleries",
       "tables": [
@@ -3194,6 +3401,20 @@
       "name": "microsoft.desktopvirtualization/hostpools/sessionhosts",
       "tables": [
         "desktopvirtualizationresources"
+      ]
+    },
+    "microsoft.network/dnsforwardingrulesets/forwardingrules": {
+      "name": "microsoft.network/dnsforwardingrulesets/forwardingrules",
+      "tables": [
+        "dnsresources",
+        "networkresources"
+      ]
+    },
+    "microsoft.network/dnsforwardingrulesets/virtualnetworklinks": {
+      "name": "microsoft.network/dnsforwardingrulesets/virtualnetworklinks",
+      "tables": [
+        "dnsresources",
+        "networkresources"
       ]
     },
     "microsoft.network/dnszones/a": {
@@ -3384,6 +3605,18 @@
         "gcpresources"
       ]
     },
+    "microsoft.gcpconnector/containerclusters": {
+      "name": "microsoft.gcpconnector/containerclusters",
+      "tables": [
+        "gcpresources"
+      ]
+    },
+    "microsoft.guestconfiguration/groups": {
+      "name": "microsoft.guestconfiguration/groups",
+      "tables": [
+        "guestconfigurationresources"
+      ]
+    },
     "microsoft.guestconfiguration/guestconfigurationassignments": {
       "name": "microsoft.guestconfiguration/guestconfigurationassignments",
       "tables": [
@@ -3392,6 +3625,12 @@
     },
     "microsoft.guestconfiguration/guestconfigurationassignments/reports": {
       "name": "microsoft.guestconfiguration/guestconfigurationassignments/reports",
+      "tables": [
+        "guestconfigurationresources"
+      ]
+    },
+    "microsoft.guestconfiguration/users": {
+      "name": "microsoft.guestconfiguration/users",
       "tables": [
         "guestconfigurationresources"
       ]
@@ -3660,6 +3899,36 @@
         "managedservicesresources"
       ]
     },
+    "microsoft.applicationmigration/codescanmappings": {
+      "name": "microsoft.applicationmigration/codescanmappings",
+      "tables": [
+        "migrateresources"
+      ]
+    },
+    "microsoft.applicationmigration/codescansites/codescanreports": {
+      "name": "microsoft.applicationmigration/codescansites/codescanreports",
+      "tables": [
+        "migrateresources"
+      ]
+    },
+    "microsoft.applicationmigration/codescansites/codescanreports/codescanissues": {
+      "name": "microsoft.applicationmigration/codescansites/codescanreports/codescanissues",
+      "tables": [
+        "migrateresources"
+      ]
+    },
+    "microsoft.applicationmigration/connectionhubs/githubconnections": {
+      "name": "microsoft.applicationmigration/connectionhubs/githubconnections",
+      "tables": [
+        "migrateresources"
+      ]
+    },
+    "microsoft.applicationmigration/connectionhubs/githubconnections/githubissues": {
+      "name": "microsoft.applicationmigration/connectionhubs/githubconnections/githubissues",
+      "tables": [
+        "migrateresources"
+      ]
+    },
     "microsoft.applicationmigration/discoveryhubs/applications": {
       "name": "microsoft.applicationmigration/discoveryhubs/applications",
       "tables": [
@@ -3668,6 +3937,36 @@
     },
     "microsoft.applicationmigration/discoveryhubs/applications/members": {
       "name": "microsoft.applicationmigration/discoveryhubs/applications/members",
+      "tables": [
+        "migrateresources"
+      ]
+    },
+    "microsoft.applicationmigration/mongosites/agents": {
+      "name": "microsoft.applicationmigration/mongosites/agents",
+      "tables": [
+        "migrateresources"
+      ]
+    },
+    "microsoft.applicationmigration/mongosites/mongocollections": {
+      "name": "microsoft.applicationmigration/mongosites/mongocollections",
+      "tables": [
+        "migrateresources"
+      ]
+    },
+    "microsoft.applicationmigration/mongosites/mongodatabases": {
+      "name": "microsoft.applicationmigration/mongosites/mongodatabases",
+      "tables": [
+        "migrateresources"
+      ]
+    },
+    "microsoft.applicationmigration/mongosites/mongoinstances": {
+      "name": "microsoft.applicationmigration/mongosites/mongoinstances",
+      "tables": [
+        "migrateresources"
+      ]
+    },
+    "microsoft.applicationmigration/oraclesites/oracleinstances": {
+      "name": "microsoft.applicationmigration/oraclesites/oracleinstances",
       "tables": [
         "migrateresources"
       ]
@@ -3792,6 +4091,24 @@
         "migrateresources"
       ]
     },
+    "microsoft.migrate/assessmentprojects/fileshareassessments": {
+      "name": "microsoft.migrate/assessmentprojects/fileshareassessments",
+      "tables": [
+        "migrateresources"
+      ]
+    },
+    "microsoft.migrate/assessmentprojects/fileshareassessments/assessedfileshares": {
+      "name": "microsoft.migrate/assessmentprojects/fileshareassessments/assessedfileshares",
+      "tables": [
+        "migrateresources"
+      ]
+    },
+    "microsoft.migrate/assessmentprojects/fileshareassessments/summaries": {
+      "name": "microsoft.migrate/assessmentprojects/fileshareassessments/summaries",
+      "tables": [
+        "migrateresources"
+      ]
+    },
     "microsoft.migrate/assessmentprojects/groups": {
       "name": "microsoft.migrate/assessmentprojects/groups",
       "tables": [
@@ -3896,6 +4213,24 @@
     },
     "microsoft.migrate/assessmentprojects/machineassessments/assessedmachines": {
       "name": "microsoft.migrate/assessmentprojects/machineassessments/assessedmachines",
+      "tables": [
+        "migrateresources"
+      ]
+    },
+    "microsoft.migrate/assessmentprojects/mongoassessments": {
+      "name": "microsoft.migrate/assessmentprojects/mongoassessments",
+      "tables": [
+        "migrateresources"
+      ]
+    },
+    "microsoft.migrate/assessmentprojects/mongoassessments/assessedinstances": {
+      "name": "microsoft.migrate/assessmentprojects/mongoassessments/assessedinstances",
+      "tables": [
+        "migrateresources"
+      ]
+    },
+    "microsoft.migrate/assessmentprojects/mongoassessments/summaries": {
+      "name": "microsoft.migrate/assessmentprojects/mongoassessments/summaries",
       "tables": [
         "migrateresources"
       ]
@@ -4176,6 +4511,18 @@
         "migrateresources"
       ]
     },
+    "microsoft.monitor/accounts/issues": {
+      "name": "microsoft.monitor/accounts/issues",
+      "tables": [
+        "monitorresources"
+      ]
+    },
+    "microsoft.monitor/slis": {
+      "name": "microsoft.monitor/slis",
+      "tables": [
+        "monitorresources"
+      ]
+    },
     "microsoft.network/effectiveconnectivityconfigurations": {
       "name": "microsoft.network/effectiveconnectivityconfigurations",
       "tables": [
@@ -4440,6 +4787,12 @@
         "networkresources"
       ]
     },
+    "microsoft.networkresourceprovider/publicipaddress": {
+      "name": "microsoft.networkresourceprovider/publicipaddress",
+      "tables": [
+        "networkresources"
+      ]
+    },
     "microsoft.orbital/spacecrafts/contacts": {
       "name": "microsoft.orbital/spacecrafts/contacts",
       "tables": [
@@ -4614,6 +4967,18 @@
         "recoveryservicesresources"
       ]
     },
+    "microsoft.dataprotection/locations/deletedvaults": {
+      "name": "microsoft.dataprotection/locations/deletedvaults",
+      "tables": [
+        "recoveryservicesresources"
+      ]
+    },
+    "microsoft.dataprotection/locations/deletedvaults/deletedbackupinstances": {
+      "name": "microsoft.dataprotection/locations/deletedvaults/deletedbackupinstances",
+      "tables": [
+        "recoveryservicesresources"
+      ]
+    },
     "microsoft.recoveryservices/locations/deletedvaults": {
       "name": "microsoft.recoveryservices/locations/deletedvaults",
       "tables": [
@@ -4635,6 +5000,12 @@
     },
     "microsoft.recoveryservices/vaults/alerts": {
       "name": "microsoft.recoveryservices/vaults/alerts",
+      "tables": [
+        "recoveryservicesresources"
+      ]
+    },
+    "microsoft.recoveryservices/vaults/backupfabrics/protectioncontainers": {
+      "name": "microsoft.recoveryservices/vaults/backupfabrics/protectioncontainers",
       "tables": [
         "recoveryservicesresources"
       ]
@@ -4737,6 +5108,18 @@
     },
     "agents": {
       "name": "agents",
+      "tables": [
+        "resources"
+      ]
+    },
+    "anyscale.platform/clouds": {
+      "name": "anyscale.platform/clouds",
+      "tables": [
+        "resources"
+      ]
+    },
+    "anyscale.platform/clouds/cloudresources": {
+      "name": "anyscale.platform/clouds/cloudresources",
       "tables": [
         "resources"
       ]
@@ -4969,6 +5352,12 @@
         "resources"
       ]
     },
+    "microsoft.aad/resilienceservices": {
+      "name": "microsoft.aad/resilienceservices",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.aadiam/azureadmetrics": {
       "name": "microsoft.aadiam/azureadmetrics",
       "tables": [
@@ -4989,12 +5378,6 @@
     },
     "microsoft.agfoodplatform/farmbeats": {
       "name": "microsoft.agfoodplatform/farmbeats",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.agricultureplatform/agriservices": {
-      "name": "microsoft.agricultureplatform/agriservices",
       "tables": [
         "resources"
       ]
@@ -5077,6 +5460,12 @@
         "resources"
       ]
     },
+    "microsoft.apimanagement/aigateways": {
+      "name": "microsoft.apimanagement/aigateways",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.apimanagement/gateways": {
       "name": "microsoft.apimanagement/gateways",
       "tables": [
@@ -5155,6 +5544,12 @@
         "resources"
       ]
     },
+    "microsoft.app/sandboxgroups": {
+      "name": "microsoft.app/sandboxgroups",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.app/sessionpools": {
       "name": "microsoft.app/sessionpools",
       "tables": [
@@ -5185,8 +5580,32 @@
         "resources"
       ]
     },
+    "microsoft.applicationmigration/connectionhubs": {
+      "name": "microsoft.applicationmigration/connectionhubs",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.applicationmigration/discoveryhubs": {
       "name": "microsoft.applicationmigration/discoveryhubs",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.applicationmigration/mongosites": {
+      "name": "microsoft.applicationmigration/mongosites",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.applicationmigration/networksites": {
+      "name": "microsoft.applicationmigration/networksites",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.applicationmigration/oraclesites": {
+      "name": "microsoft.applicationmigration/oraclesites",
       "tables": [
         "resources"
       ]
@@ -5379,6 +5798,42 @@
     },
     "microsoft.awsconnector/autoscalingautoscalinggroups": {
       "name": "microsoft.awsconnector/autoscalingautoscalinggroups",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.awsconnector/bedrockagentaliases": {
+      "name": "microsoft.awsconnector/bedrockagentaliases",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.awsconnector/bedrockagents": {
+      "name": "microsoft.awsconnector/bedrockagents",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.awsconnector/bedrockdatasources": {
+      "name": "microsoft.awsconnector/bedrockdatasources",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.awsconnector/bedrockguardrails": {
+      "name": "microsoft.awsconnector/bedrockguardrails",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.awsconnector/bedrockknowledgebases": {
+      "name": "microsoft.awsconnector/bedrockknowledgebases",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.awsconnector/bedrockprompts": {
+      "name": "microsoft.awsconnector/bedrockprompts",
       "tables": [
         "resources"
       ]
@@ -6019,6 +6474,12 @@
         "resources"
       ]
     },
+    "microsoft.azureactivedirectory/entratenants": {
+      "name": "microsoft.azureactivedirectory/entratenants",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.azureactivedirectory/guestusages": {
       "name": "microsoft.azureactivedirectory/guestusages",
       "tables": [
@@ -6121,6 +6582,12 @@
         "resources"
       ]
     },
+    "microsoft.azurefleet/virtualmachinescalesets": {
+      "name": "microsoft.azurefleet/virtualmachinescalesets",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.azureimagetestingforlinux/jobs": {
       "name": "microsoft.azureimagetestingforlinux/jobs",
       "tables": [
@@ -6153,6 +6620,12 @@
     },
     "microsoft.azureplaywrightservice/accounts": {
       "name": "microsoft.azureplaywrightservice/accounts",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.azureresiliencemanagement/usageplans": {
+      "name": "microsoft.azureresiliencemanagement/usageplans",
       "tables": [
         "resources"
       ]
@@ -6217,6 +6690,12 @@
         "resources"
       ]
     },
+    "microsoft.azurestackhci/loadbalancers": {
+      "name": "microsoft.azurestackhci/loadbalancers",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.azurestackhci/logicalnetworks": {
       "name": "microsoft.azurestackhci/logicalnetworks",
       "tables": [
@@ -6229,6 +6708,12 @@
         "resources"
       ]
     },
+    "microsoft.azurestackhci/natgateways": {
+      "name": "microsoft.azurestackhci/natgateways",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.azurestackhci/networkinterfaces": {
       "name": "microsoft.azurestackhci/networkinterfaces",
       "tables": [
@@ -6237,6 +6722,18 @@
     },
     "microsoft.azurestackhci/networksecuritygroups": {
       "name": "microsoft.azurestackhci/networksecuritygroups",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.azurestackhci/publicipaddresses": {
+      "name": "microsoft.azurestackhci/publicipaddresses",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.azurestackhci/snapshots": {
+      "name": "microsoft.azurestackhci/snapshots",
       "tables": [
         "resources"
       ]
@@ -6307,6 +6804,12 @@
         "resources"
       ]
     },
+    "microsoft.baremetal/networkinterfaceattachments": {
+      "name": "microsoft.baremetal/networkinterfaceattachments",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.baremetal/peeringsettings": {
       "name": "microsoft.baremetal/peeringsettings",
       "tables": [
@@ -6325,8 +6828,20 @@
         "resources"
       ]
     },
+    "microsoft.baremetalstorageinfrastructure/baremetalstorageinstances": {
+      "name": "microsoft.baremetalstorageinfrastructure/baremetalstorageinstances",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.batch/batchaccounts": {
       "name": "microsoft.batch/batchaccounts",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.billingbenefits/conditionalcredits": {
+      "name": "microsoft.billingbenefits/conditionalcredits",
       "tables": [
         "resources"
       ]
@@ -6339,6 +6854,12 @@
     },
     "microsoft.billingbenefits/discounts": {
       "name": "microsoft.billingbenefits/discounts",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.billingbenefits/freeservices": {
+      "name": "microsoft.billingbenefits/freeservices",
       "tables": [
         "resources"
       ]
@@ -6445,8 +6966,26 @@
         "resources"
       ]
     },
+    "microsoft.cdn/profiles/agents": {
+      "name": "microsoft.cdn/profiles/agents",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.cdn/profiles/endpoints": {
       "name": "microsoft.cdn/profiles/endpoints",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.cdn/webagents": {
+      "name": "microsoft.cdn/webagents",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.cdn/webagents/knowledgesources": {
+      "name": "microsoft.cdn/webagents/knowledgesources",
       "tables": [
         "resources"
       ]
@@ -6477,6 +7016,12 @@
     },
     "microsoft.chaos/resilienceprofiles": {
       "name": "microsoft.chaos/resilienceprofiles",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.chaos/workspaces": {
+      "name": "microsoft.chaos/workspaces",
       "tables": [
         "resources"
       ]
@@ -6543,6 +7088,12 @@
     },
     "microsoft.clouddeviceplatform/delegatedidentities": {
       "name": "microsoft.clouddeviceplatform/delegatedidentities",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.clouddeviceplatform/partnerbusinesses": {
+      "name": "microsoft.clouddeviceplatform/partnerbusinesses",
       "tables": [
         "resources"
       ]
@@ -6789,6 +7340,12 @@
     },
     "microsoft.compute/images": {
       "name": "microsoft.compute/images",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.compute/interconnectblocks": {
+      "name": "microsoft.compute/interconnectblocks",
       "tables": [
         "resources"
       ]
@@ -7123,6 +7680,12 @@
         "resources"
       ]
     },
+    "microsoft.containerservice/nodecustomizations": {
+      "name": "microsoft.containerservice/nodecustomizations",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.containerservice/snapshots": {
       "name": "microsoft.containerservice/snapshots",
       "tables": [
@@ -7167,6 +7730,18 @@
     },
     "microsoft.contoso/towers": {
       "name": "microsoft.contoso/towers",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.cosmic/namespaces": {
+      "name": "microsoft.cosmic/namespaces",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.cosmic/namespaces/environments": {
+      "name": "microsoft.cosmic/namespaces/environments",
       "tables": [
         "resources"
       ]
@@ -7801,6 +8376,18 @@
         "resources"
       ]
     },
+    "microsoft.discovery/storagecontainers": {
+      "name": "microsoft.discovery/storagecontainers",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.discovery/storagecontainers/storageassets": {
+      "name": "microsoft.discovery/storagecontainers/storageassets",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.discovery/storages": {
       "name": "microsoft.discovery/storages",
       "tables": [
@@ -7833,6 +8420,12 @@
     },
     "microsoft.discovery/workspaces": {
       "name": "microsoft.discovery/workspaces",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.discovery/workspaces/chatmodeldeployments": {
+      "name": "microsoft.discovery/workspaces/chatmodeldeployments",
       "tables": [
         "resources"
       ]
@@ -8005,6 +8598,12 @@
         "resources"
       ]
     },
+    "microsoft.edge/workflows": {
+      "name": "microsoft.edge/workflows",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.edgeorder/addresses": {
       "name": "microsoft.edgeorder/addresses",
       "tables": [
@@ -8047,8 +8646,20 @@
         "resources"
       ]
     },
+    "microsoft.enterprisesupport/supportplans": {
+      "name": "microsoft.enterprisesupport/supportplans",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.entraidgovernance/guestgovernanceusage": {
       "name": "microsoft.entraidgovernance/guestgovernanceusage",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.entraidgovernance/scimapiconsumptions": {
+      "name": "microsoft.entraidgovernance/scimapiconsumptions",
       "tables": [
         "resources"
       ]
@@ -8197,14 +8808,44 @@
         "resources"
       ]
     },
+    "microsoft.gcpconnector/bigquerydatasets": {
+      "name": "microsoft.gcpconnector/bigquerydatasets",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.gcpconnector/cloudfunctions": {
       "name": "microsoft.gcpconnector/cloudfunctions",
       "tables": [
         "resources"
       ]
     },
+    "microsoft.gcpconnector/sqladmininstances": {
+      "name": "microsoft.gcpconnector/sqladmininstances",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.gcpconnector/storagebuckets": {
       "name": "microsoft.gcpconnector/storagebuckets",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.genome/accounts": {
+      "name": "microsoft.genome/accounts",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.graduationtest/hats": {
+      "name": "microsoft.graduationtest/hats",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.graduationtest/papers": {
+      "name": "microsoft.graduationtest/papers",
       "tables": [
         "resources"
       ]
@@ -8239,6 +8880,12 @@
         "resources"
       ]
     },
+    "microsoft.hardware/returns": {
+      "name": "microsoft.hardware/returns",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.hardwaresecuritymodules/cloudhsmclusters": {
       "name": "microsoft.hardwaresecuritymodules/cloudhsmclusters",
       "tables": [
@@ -8247,6 +8894,12 @@
     },
     "microsoft.hardwaresecuritymodules/dedicatedhsms": {
       "name": "microsoft.hardwaresecuritymodules/dedicatedhsms",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.hardwaresecuritymodules/paymenthsmclusters": {
+      "name": "microsoft.hardwaresecuritymodules/paymenthsmclusters",
       "tables": [
         "resources"
       ]
@@ -8313,6 +8966,24 @@
     },
     "microsoft.healthcareapis/workspaces/iotconnectors": {
       "name": "microsoft.healthcareapis/workspaces/iotconnectors",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.healthcareinterop/ddmsconnectors": {
+      "name": "microsoft.healthcareinterop/ddmsconnectors",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.healthcareinterop/ddmsfhireventbatchchannels": {
+      "name": "microsoft.healthcareinterop/ddmsfhireventbatchchannels",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.healthcareinterop/ddmsfhirflatfilebatchchannels": {
+      "name": "microsoft.healthcareinterop/ddmsfhirflatfilebatchchannels",
       "tables": [
         "resources"
       ]
@@ -8395,6 +9066,12 @@
         "resources"
       ]
     },
+    "microsoft.horizondb/clusters": {
+      "name": "microsoft.horizondb/clusters",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.hpcworkbench/instances": {
       "name": "microsoft.hpcworkbench/instances",
       "tables": [
@@ -8451,6 +9128,12 @@
     },
     "microsoft.hybridcompute/machines": {
       "name": "microsoft.hybridcompute/machines",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.hybridcompute/machines/applications": {
+      "name": "microsoft.hybridcompute/machines/applications",
       "tables": [
         "resources"
       ]
@@ -8941,6 +9624,12 @@
         "resources"
       ]
     },
+    "microsoft.liftrpilot/agents": {
+      "name": "microsoft.liftrpilot/agents",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.liftrpilot/organizations": {
       "name": "microsoft.liftrpilot/organizations",
       "tables": [
@@ -8967,6 +9656,18 @@
     },
     "microsoft.loadtestservice/playwrightworkspaces": {
       "name": "microsoft.loadtestservice/playwrightworkspaces",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.logic/automationprojects": {
+      "name": "microsoft.logic/automationprojects",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.logic/automationprojects/applications": {
+      "name": "microsoft.logic/automationprojects/applications",
       "tables": [
         "resources"
       ]
@@ -9181,6 +9882,12 @@
         "resources"
       ]
     },
+    "microsoft.managednetworkfabric/networkbootstrapdevices": {
+      "name": "microsoft.managednetworkfabric/networkbootstrapdevices",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.managednetworkfabric/networkdevices": {
       "name": "microsoft.managednetworkfabric/networkdevices",
       "tables": [
@@ -9237,12 +9944,6 @@
     },
     "microsoft.managedstorageclass/managedstorageclass": {
       "name": "microsoft.managedstorageclass/managedstorageclass",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.manufacturingplatform/manufacturingdataservices": {
-      "name": "microsoft.manufacturingplatform/manufacturingdataservices",
       "tables": [
         "resources"
       ]
@@ -9325,6 +10026,12 @@
         "resources"
       ]
     },
+    "microsoft.mission/communities/dedicatedhubs": {
+      "name": "microsoft.mission/communities/dedicatedhubs",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.mission/communities/transithubs": {
       "name": "microsoft.mission/communities/transithubs",
       "tables": [
@@ -9369,180 +10076,6 @@
     },
     "microsoft.mission/virtualenclaves/workloads": {
       "name": "microsoft.mission/virtualenclaves/workloads",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mixedreality/objectanchorsaccounts": {
-      "name": "microsoft.mixedreality/objectanchorsaccounts",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mixedreality/objectunderstandingaccounts": {
-      "name": "microsoft.mixedreality/objectunderstandingaccounts",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mixedreality/remoterenderingaccounts": {
-      "name": "microsoft.mixedreality/remoterenderingaccounts",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mixedreality/spatialanchorsaccounts": {
-      "name": "microsoft.mixedreality/spatialanchorsaccounts",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mixedreality/spatialmapsaccounts": {
-      "name": "microsoft.mixedreality/spatialmapsaccounts",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mobilenetwork/amfdeployments": {
-      "name": "microsoft.mobilenetwork/amfdeployments",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mobilenetwork/clusterservices": {
-      "name": "microsoft.mobilenetwork/clusterservices",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mobilenetwork/mobilenetworks": {
-      "name": "microsoft.mobilenetwork/mobilenetworks",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mobilenetwork/mobilenetworks/datanetworks": {
-      "name": "microsoft.mobilenetwork/mobilenetworks/datanetworks",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mobilenetwork/mobilenetworks/edgenetworksecuritygroups": {
-      "name": "microsoft.mobilenetwork/mobilenetworks/edgenetworksecuritygroups",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mobilenetwork/mobilenetworks/services": {
-      "name": "microsoft.mobilenetwork/mobilenetworks/services",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mobilenetwork/mobilenetworks/simpolicies": {
-      "name": "microsoft.mobilenetwork/mobilenetworks/simpolicies",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mobilenetwork/mobilenetworks/sites": {
-      "name": "microsoft.mobilenetwork/mobilenetworks/sites",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mobilenetwork/mobilenetworks/slices": {
-      "name": "microsoft.mobilenetwork/mobilenetworks/slices",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mobilenetwork/mobilenetworks/wifissids": {
-      "name": "microsoft.mobilenetwork/mobilenetworks/wifissids",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mobilenetwork/nrfdeployments": {
-      "name": "microsoft.mobilenetwork/nrfdeployments",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mobilenetwork/nssfdeployments": {
-      "name": "microsoft.mobilenetwork/nssfdeployments",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mobilenetwork/observabilityservices": {
-      "name": "microsoft.mobilenetwork/observabilityservices",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mobilenetwork/packetcorecontrolplanes": {
-      "name": "microsoft.mobilenetwork/packetcorecontrolplanes",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mobilenetwork/packetcorecontrolplanes/packetcoredataplanes": {
-      "name": "microsoft.mobilenetwork/packetcorecontrolplanes/packetcoredataplanes",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mobilenetwork/packetcorecontrolplanes/packetcoredataplanes/attacheddatanetworks": {
-      "name": "microsoft.mobilenetwork/packetcorecontrolplanes/packetcoredataplanes/attacheddatanetworks",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mobilenetwork/packetcorecontrolplanes/packetcoredataplanes/attachedwifissids": {
-      "name": "microsoft.mobilenetwork/packetcorecontrolplanes/packetcoredataplanes/attachedwifissids",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mobilenetwork/packetcorecontrolplanes/packetcoredataplanes/edgevirtualnetworks": {
-      "name": "microsoft.mobilenetwork/packetcorecontrolplanes/packetcoredataplanes/edgevirtualnetworks",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mobilenetwork/radioaccessnetworks": {
-      "name": "microsoft.mobilenetwork/radioaccessnetworks",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mobilenetwork/simgroups": {
-      "name": "microsoft.mobilenetwork/simgroups",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mobilenetwork/sims": {
-      "name": "microsoft.mobilenetwork/sims",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mobilenetwork/sims/simprofiles": {
-      "name": "microsoft.mobilenetwork/sims/simprofiles",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mobilenetwork/smfdeployments": {
-      "name": "microsoft.mobilenetwork/smfdeployments",
-      "tables": [
-        "resources"
-      ]
-    },
-    "microsoft.mobilenetwork/upfdeployments": {
-      "name": "microsoft.mobilenetwork/upfdeployments",
       "tables": [
         "resources"
       ]
@@ -9685,6 +10218,42 @@
         "resources"
       ]
     },
+    "microsoft.netapp/elasticaccounts": {
+      "name": "microsoft.netapp/elasticaccounts",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.netapp/elasticaccounts/elasticbackuppolicies": {
+      "name": "microsoft.netapp/elasticaccounts/elasticbackuppolicies",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.netapp/elasticaccounts/elasticbackupvaults": {
+      "name": "microsoft.netapp/elasticaccounts/elasticbackupvaults",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.netapp/elasticaccounts/elasticcapacitypools": {
+      "name": "microsoft.netapp/elasticaccounts/elasticcapacitypools",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.netapp/elasticaccounts/elasticcapacitypools/elasticvolumes": {
+      "name": "microsoft.netapp/elasticaccounts/elasticcapacitypools/elasticvolumes",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.netapp/elasticaccounts/elasticsnapshotpolicies": {
+      "name": "microsoft.netapp/elasticaccounts/elasticsnapshotpolicies",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.netapp/netappaccounts": {
       "name": "microsoft.netapp/netappaccounts",
       "tables": [
@@ -9771,6 +10340,12 @@
     },
     "microsoft.network/azurefirewalls": {
       "name": "microsoft.network/azurefirewalls",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.network/azureserviceconnectioncontrollers": {
+      "name": "microsoft.network/azureserviceconnectioncontrollers",
       "tables": [
         "resources"
       ]
@@ -9901,6 +10476,12 @@
         "resources"
       ]
     },
+    "microsoft.network/expressroutelags": {
+      "name": "microsoft.network/expressroutelags",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.network/expressrouteports": {
       "name": "microsoft.network/expressrouteports",
       "tables": [
@@ -9933,6 +10514,12 @@
     },
     "microsoft.network/gatewayloadbalanceraliases": {
       "name": "microsoft.network/gatewayloadbalanceraliases",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.network/interconnectgroups": {
+      "name": "microsoft.network/interconnectgroups",
       "tables": [
         "resources"
       ]
@@ -10117,6 +10704,18 @@
         "resources"
       ]
     },
+    "microsoft.network/privatetrafficmanagerprofiles": {
+      "name": "microsoft.network/privatetrafficmanagerprofiles",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.network/probinggateways": {
+      "name": "microsoft.network/probinggateways",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.network/publicipaddresses": {
       "name": "microsoft.network/publicipaddresses",
       "tables": [
@@ -10161,6 +10760,12 @@
     },
     "microsoft.network/servicegateways": {
       "name": "microsoft.network/servicegateways",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.network/topologymaps": {
+      "name": "microsoft.network/topologymaps",
       "tables": [
         "resources"
       ]
@@ -10267,6 +10872,12 @@
         "resources"
       ]
     },
+    "microsoft.networkcloud/accessbridges": {
+      "name": "microsoft.networkcloud/accessbridges",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.networkcloud/baremetalmachines": {
       "name": "microsoft.networkcloud/baremetalmachines",
       "tables": [
@@ -10347,6 +10958,12 @@
     },
     "microsoft.networkcloud/kubernetesclusters/features": {
       "name": "microsoft.networkcloud/kubernetesclusters/features",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.networkcloud/kubernetesversions": {
+      "name": "microsoft.networkcloud/kubernetesversions",
       "tables": [
         "resources"
       ]
@@ -10435,8 +11052,20 @@
         "resources"
       ]
     },
+    "microsoft.networkfunction/meshvpns/connectionpolicies": {
+      "name": "microsoft.networkfunction/meshvpns/connectionpolicies",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.networkfunction/vpnbranches": {
       "name": "microsoft.networkfunction/vpnbranches",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.networkfunction/vpnbranches/vpnbranchlinks": {
+      "name": "microsoft.networkfunction/vpnbranches/vpnbranchlinks",
       "tables": [
         "resources"
       ]
@@ -10585,12 +11214,6 @@
         "resources"
       ]
     },
-    "microsoft.oraclediscovery/oraclesites": {
-      "name": "microsoft.oraclediscovery/oraclesites",
-      "tables": [
-        "resources"
-      ]
-    },
     "microsoft.orbital/cloudaccessrouters": {
       "name": "microsoft.orbital/cloudaccessrouters",
       "tables": [
@@ -10645,6 +11268,12 @@
         "resources"
       ]
     },
+    "microsoft.oriondb/clusters": {
+      "name": "microsoft.oriondb/clusters",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.peering/peerings": {
       "name": "microsoft.peering/peerings",
       "tables": [
@@ -10683,6 +11312,12 @@
     },
     "microsoft.portalsdk/rootresources": {
       "name": "microsoft.portalsdk/rootresources",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.portalservices/copilots": {
+      "name": "microsoft.portalservices/copilots",
       "tables": [
         "resources"
       ]
@@ -10807,6 +11442,12 @@
         "resources"
       ]
     },
+    "microsoft.proposal/quotes": {
+      "name": "microsoft.proposal/quotes",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.providerhub/providermonitorsettings": {
       "name": "microsoft.providerhub/providermonitorsettings",
       "tables": [
@@ -10885,6 +11526,12 @@
         "resources"
       ]
     },
+    "microsoft.resourcebuilder/workspaces": {
+      "name": "microsoft.resourcebuilder/workspaces",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.resourceconnector/appliances": {
       "name": "microsoft.resourceconnector/appliances",
       "tables": [
@@ -10893,6 +11540,30 @@
     },
     "microsoft.resourcegraph/queries": {
       "name": "microsoft.resourcegraph/queries",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.resourcegraph/resourceanalyzeragents": {
+      "name": "microsoft.resourcegraph/resourceanalyzeragents",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.resourceintelligence/agents": {
+      "name": "microsoft.resourceintelligence/agents",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.resourceintelligence/agentteams": {
+      "name": "microsoft.resourceintelligence/agentteams",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.resourcemover/discoveryagents": {
+      "name": "microsoft.resourcemover/discoveryagents",
       "tables": [
         "resources"
       ]
@@ -11234,8 +11905,20 @@
         "resources"
       ]
     },
+    "microsoft.softwareplan/softwarebenefits": {
+      "name": "microsoft.softwareplan/softwarebenefits",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.softwareplan/softwarelicenses": {
       "name": "microsoft.softwareplan/softwarelicenses",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.softwareplan/softwareperpetualproducts": {
+      "name": "microsoft.softwareplan/softwareperpetualproducts",
       "tables": [
         "resources"
       ]
@@ -11468,6 +12151,12 @@
         "resources"
       ]
     },
+    "microsoft.supercomputerinfrastructure/supercomputers": {
+      "name": "microsoft.supercomputerinfrastructure/supercomputers",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.sustainabilityservices/calculations": {
       "name": "microsoft.sustainabilityservices/calculations",
       "tables": [
@@ -11518,6 +12207,12 @@
     },
     "microsoft.synapse/workspaces/bigdatapools": {
       "name": "microsoft.synapse/workspaces/bigdatapools",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.synapse/workspaces/eventstreams": {
+      "name": "microsoft.synapse/workspaces/eventstreams",
       "tables": [
         "resources"
       ]
@@ -11690,6 +12385,18 @@
         "resources"
       ]
     },
+    "microsoft.validate/cloudvalidations": {
+      "name": "microsoft.validate/cloudvalidations",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.validate/cloudvalidations/validationexecutionplans": {
+      "name": "microsoft.validate/cloudvalidations/validationexecutionplans",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.verifiedid/authorities": {
       "name": "microsoft.verifiedid/authorities",
       "tables": [
@@ -11798,6 +12505,12 @@
         "resources"
       ]
     },
+    "microsoft.web/aigateways": {
+      "name": "microsoft.web/aigateways",
+      "tables": [
+        "resources"
+      ]
+    },
     "microsoft.web/apimanagementaccounts": {
       "name": "microsoft.web/apimanagementaccounts",
       "tables": [
@@ -11824,6 +12537,12 @@
     },
     "microsoft.web/connections": {
       "name": "microsoft.web/connections",
+      "tables": [
+        "resources"
+      ]
+    },
+    "microsoft.web/connectorgateways": {
+      "name": "microsoft.web/connectorgateways",
       "tables": [
         "resources"
       ]
@@ -12116,8 +12835,8 @@
         "resources"
       ]
     },
-    "neon.postgres/organizations": {
-      "name": "neon.postgres/organizations",
+    "napster.companionapi/organizations": {
+      "name": "napster.companionapi/organizations",
       "tables": [
         "resources"
       ]
@@ -12218,6 +12937,30 @@
         "resources"
       ]
     },
+    "providers.test/softdeletebydefaultresources": {
+      "name": "providers.test/softdeletebydefaultresources",
+      "tables": [
+        "resources"
+      ]
+    },
+    "providers.test/softdeletebydefaultresources/softdeletebydefaultchildresources": {
+      "name": "providers.test/softdeletebydefaultresources/softdeletebydefaultchildresources",
+      "tables": [
+        "resources"
+      ]
+    },
+    "providers.test/softdeletecascadesupportedresources": {
+      "name": "providers.test/softdeletecascadesupportedresources",
+      "tables": [
+        "resources"
+      ]
+    },
+    "providers.test/softdeletecascadesupportedresources/softdeletesupportedchildresources": {
+      "name": "providers.test/softdeletecascadesupportedresources/softdeletesupportedchildresources",
+      "tables": [
+        "resources"
+      ]
+    },
     "providers.test/softdeletesupportedresources": {
       "name": "providers.test/softdeletesupportedresources",
       "tables": [
@@ -12262,6 +13005,12 @@
     },
     "purestorage.block/storagepools": {
       "name": "purestorage.block/storagepools",
+      "tables": [
+        "resources"
+      ]
+    },
+    "purestorage.block/storagepools/volumegroups": {
+      "name": "purestorage.block/storagepools/volumegroups",
       "tables": [
         "resources"
       ]
@@ -12452,6 +13201,12 @@
         "securityresources"
       ]
     },
+    "microsoft.security/advancedthreatprotectionsettings": {
+      "name": "microsoft.security/advancedthreatprotectionsettings",
+      "tables": [
+        "securityresources"
+      ]
+    },
     "microsoft.security/apicollections": {
       "name": "microsoft.security/apicollections",
       "tables": [
@@ -12484,6 +13239,12 @@
     },
     "microsoft.security/attackpaths": {
       "name": "microsoft.security/attackpaths",
+      "tables": [
+        "securityresources"
+      ]
+    },
+    "microsoft.security/defenderforstoragesettings": {
+      "name": "microsoft.security/defenderforstoragesettings",
       "tables": [
         "securityresources"
       ]
@@ -12724,6 +13485,30 @@
     },
     "microsoft.compute/locations/sharedgalleries": {
       "name": "microsoft.compute/locations/sharedgalleries",
+      "tables": [
+        "sharedgalleryresources"
+      ]
+    },
+    "microsoft.compute/locations/sharedgalleries/images": {
+      "name": "microsoft.compute/locations/sharedgalleries/images",
+      "tables": [
+        "sharedgalleryresources"
+      ]
+    },
+    "microsoft.compute/locations/sharedgalleries/images/versions": {
+      "name": "microsoft.compute/locations/sharedgalleries/images/versions",
+      "tables": [
+        "sharedgalleryresources"
+      ]
+    },
+    "microsoft.compute/locations/sharedgallerysubscriptions/sharedgalleries": {
+      "name": "microsoft.compute/locations/sharedgallerysubscriptions/sharedgalleries",
+      "tables": [
+        "sharedgalleryresources"
+      ]
+    },
+    "microsoft.compute/locations/tenantlevelsharedgallerysubscriptions/sharedgalleries": {
+      "name": "microsoft.compute/locations/tenantlevelsharedgallerysubscriptions/sharedgalleries",
       "tables": [
         "sharedgalleryresources"
       ]
@@ -13318,7 +14103,7 @@
         "returnInfo": "The `externaldata` operator returns a data table of the given schema whose data was parsed from the specified storage artifact, indicated by the storage connection string.",
         "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *columnName*, *columnType* | `string` |  *True*| A list of column names and their types. This list defines the schema of the table. |\n| *storageConnectionString* | `string` |  *True*| A storage connection string of the storage artifact to query. |\n| *propertyName*, *propertyValue* | `string` | | A list of optional supported properties that determines how to interpret the data retrieved from storage.\n\n> [!WARN]\n> For security reasons, make sure that no credential is specified by  the *storageConnectionString* property.\n> If the query needs to specify credentials, use query parameters to specify the whole connection string.\n>\n> For example, assuming that the query includes a query parameter called `URI` whose value points at Blob Storage, the query would look like this:\n> ```kusto\n> declare query_parameters(URI:string);\n> externaldata(x:string)[URI]\n> ```\n>\n> If this is not possible (for example, you're using a client that does not support setting query parameters),\n> be sure to use obfuscated string literals.\n\n### Supported properties\n\n| Property | Type | Description |\n|:--|:--|:--|\n| format | `string` | The data format. If unspecified, an attempt is made to detect the data format from file extension. The default is `CSV`. All ingestion data formats are supported. |\n| ignoreFirstRecord | `bool` | If set to `true`, the first record in every file is ignored. This property is useful when querying CSV files with headers. |\n| ingestionMapping | `string` | Indicates how to map data from the source file to the actual columns in the operator result set. See data mappings. |\n\n> \n>\n> This operator doesn't accept any pipeline input.\n>\n> Standard query limits apply to external data queries as well.",
         "example": "Users\n| where UserID in ((externaldata (UserID:string) [\n    @\"https://storageaccount.blob.core.windows.net/storagecontainer/users.txt;managed_identity=...\"\n    ]))\n| ...\n\nexternaldata(Timestamp:datetime, ProductId:string, ProductDescription:string)\n[\n  h@\"https://mycompanystorage.blob.core.windows.net/archivedproducts/2019/01/01/part-00000-7e967c99-cf2b-4dbb-8c53-ce388389470d.csv.gz?...SAS...\",\n  h@\"https://mycompanystorage.blob.core.windows.net/archivedproducts/2019/01/02/part-00000-ba356fa4-f85f-430a-8b5a-afd64f128ca4.csv.gz?...SAS...\",\n  h@\"https://mycompanystorage.blob.core.windows.net/archivedproducts/2019/01/03/part-00000-acb644dc-2fc6-467c-ab80-d1590b23fc31.csv.gz?...SAS...\"\n]\nwith(format=\"csv\")\n| summarize count() by ProductId\n\nexternaldata(Timestamp: datetime, TenantId: guid, MethodName: string)\n[ \n   h@'https://mycompanystorage.blob.core.windows.net/events/2020/09/01/part-0000046c049c1-86e2-4e74-8583-506bda10cca8.json?...SAS...'\n]\nwith(format='multijson', ingestionMapping='[{\"Column\":\"Timestamp\",\"Properties\":{\"Path\":\"$.timestamp\"}},{\"Column\":\"TenantId\",\"Properties\":{\"Path\":\"$.data.tenant\"}},{\"Column\":\"MethodName\",\"Properties\":{\"Path\":\"$.data.method\"}}]')",
-        "sourceLength": 7714,
+        "sourceLength": 7743,
         "url": "https://learn.microsoft.com/en-us/kusto/query/externaldata-operator"
       }
     },
@@ -13598,7 +14383,7 @@
         "returnInfo": "The return schema and rows depend on the join flavor. The join flavor is specified with the *kind* keyword. The following table shows the supported join flavors. To see examples for a specific join flavor, select the link in the **Join flavor** column.\n\n| Join flavor | Returns | Illustration |\n| --- | --- | --- |\n| innerunique (default) | Inner join with left side deduplication<br />**Schema**: All columns from both tables, including the matching keys<br />**Rows**: All deduplicated rows from the left table that match rows from the right table |  |\n| inner | Standard inner join<br />**Schema**: All columns from both tables, including the matching keys<br />**Rows**: Only matching rows from both tables |  |\n| leftouter | Left outer join<br />**Schema**: All columns from both tables, including the matching keys<br />**Rows**: All records from the left table and only matching rows from the right table |  |\n| rightouter | Right outer join<br />**Schema**: All columns from both tables, including the matching keys<br />**Rows**: All records from the right table and only matching rows from the left table |  |\n| fullouter | Full outer join<br />**Schema**: All columns from both tables, including the matching keys<br />**Rows**: All records from both tables with unmatched cells populated with null |  |\n| leftsemi | Left semi join<br />**Schema**: All columns from the left table<br />**Rows**: All records from the left table that match records from the right table |  |\n| `leftanti`, `anti`, `leftantisemi` | Left anti join and semi variant<br />**Schema**: All columns from the left table<br />**Rows**: All records from the left table that don't match records from the right table |  |\n| rightsemi | Right semi join<br />**Schema**: All columns from the right table<br />**Rows**: All records from the right table that match records from the left table |  |\n| `rightanti`, `rightantisemi` | Right anti join and semi variant<br />**Schema**: All columns from the right table<br />**Rows**: All records from the right table that don't match records from the left table |  |\n\n### Cross-join\n\nKQL doesn't provide a cross-join flavor. However, you can achieve a cross-join effect by using a placeholder key approach.\n\nIn the following example, a placeholder key is added to both tables and then used for the inner join operation, effectively achieving a cross-join-like behavior:\n\n`X | extend placeholder=1 | join kind=inner (Y | extend placeholder=1) on placeholder`",
         "parametersTable": "|Name|Type|Required|Description|\n|:--|:--|:--|:--|\n|*LeftTable*| `string` | *True*|The left table or tabular expression, sometimes called the outer table, whose rows are to be merged. Denoted as `$left`.|\n|*JoinFlavor*| `string` ||The type of join to perform: `innerunique`, `inner`, `leftouter`, `rightouter`, `fullouter`, `leftanti`, `rightanti`, `leftsemi`, `rightsemi`. The default is `innerunique`. For more information about join flavors, see Returns.|\n|*Hints*| `string` ||Zero or more space-separated join hints in the form of *Name* `=` *Value* that control the behavior of the row-match operation and execution plan. For more information, see Hints.\n|*RightTable*| `string` | *True*|The right table or tabular expression, sometimes called the inner table, whose rows are to be merged. Denoted as `$right`.|\n|*Conditions*| `string` | *True*|Determines how rows from *LeftTable* are matched with rows from *RightTable*. If the columns you want to match have the same name in both tables, use the syntax `ON` *ColumnName*. Otherwise, use the syntax `ON $left.`*LeftColumn* `==` `$right.`*RightColumn*. To specify multiple conditions, you can either use the \"and\" keyword or separate them with commas. If you use commas, the conditions are evaluated using the \"and\" logical operator.|\n\n> \n> For best performance, if one table is always smaller than the other, use it as the left side of the join.\n\n### Hints\n\n> \n> The join hints don't change the semantic of `join` but may affect performance.",
         "example": "",
-        "sourceLength": 8288,
+        "sourceLength": 8267,
         "url": "https://learn.microsoft.com/en-us/kusto/query/join-operator"
       }
     },
@@ -13682,7 +14467,7 @@
         "returnInfo": "",
         "parametersTable": "|Name|Type|Required|Description|\n|:--|:--|:--|:--|\n|`ItemIndex`| `string` ||Indicates the name of a column of type `long` that's appended to the input as part of the array-expansion phase and indicates the 0-based array index of the expanded value.|\n|`Name`| `string` ||The name to assign the array-expanded values of each array-expanded expression. If not specified, the name of the column is used if available. A random name is generated if *ArrayExpression* isn't a simple column name.|\n|`ArrayExpression`| `dynamic` | *True*|The array whose values are array-expanded. If the expression is the name of a column in the input, the input column is removed from the input and a new column of the same name, or *ColumnName* if specified, appears in the output.|\n|`Typename`| `string` ||The name of the type that the individual elements of the `dynamic` array *ArrayExpression* take. Elements that don't conform to this type are replaced by a null value. If unspecified, `dynamic` is used by default.|\n|`RowLimit`| `int` ||A limit on the number of records to generate from each record of the input. If unspecified, 2147483647 is used.|\n|`SubQuery`| `string` ||A tabular query expression with an implicit tabular source that gets applied to each array-expanded subtable.|\n\n>\n> Unlike the `mv-expand` operator, the `mv-apply` operator doesn't support `bagexpand=array` expansion. If the expression to be expanded is a property bag and not an array, you can use an inner `mv-expand` operator (see the following example).",
         "example": "",
-        "sourceLength": 12767,
+        "sourceLength": 12877,
         "url": "https://learn.microsoft.com/en-us/kusto/query/mv-apply-operator"
       }
     },
@@ -14153,12 +14938,12 @@
       "category": "Operator",
       "documentation": {
         "title": "sample-distinct",
-        "description": "Returns a single column that contains up to the specified number of distinct values of the requested column.\n\nThe operator tries to return an answer as quickly as possible rather than trying to make a fair sample.",
+        "description": "Returns a single column that contains up to the specified number of distinct values of the requested column.\n\nThe operator is optimized for performance rather than fairness; the results may be heavily biased and should not be used for any purpose requiring statistical accuracy.",
         "syntax": "*T* `| sample-distinct` *NumberOfValues* `of` *ColumnName*",
         "returnInfo": "",
         "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *T*| `string` |  *True* | The input tabular expression. |\n| *NumberOfValues*| int, long, or real |  *True* | The number distinct values of *T* to return. You can specify any numeric expression.|\n| *ColumnName*| `string` |  *True* | The name of the column from which to sample.|\n\n> \n>\n> * Use the top-hitters operator to get the top values.\n> * Refer to the sample operator to sample data rows.",
         "example": "",
-        "sourceLength": 3052,
+        "sourceLength": 3117,
         "url": "https://learn.microsoft.com/en-us/kusto/query/sample-distinct-operator"
       }
     },
@@ -14186,7 +14971,7 @@
         "returnInfo": "A record for each match of a record from the input to a step. The schema of the output is the schema of the source extended with the column in the `declare` clause.\n\n`scan` goes over the serialized input data, record by record, comparing each record against each step’s condition while taking into account the current state of each step.\n\n### State\n\nThe underlying state of the `scan` operator can be thought of as a table with a row for each `step`. Each step maintains its own state with the latest values of the columns and declared variables from all of the previous steps and the current step. If relevant, it also holds the match ID for the ongoing sequence.\n\nIf a scan operator has *n* steps named *s_1*, *s_2*, ..., *s_n* then step *s_k* would have *k* records in its state corresponding to *s_1*, *s_2*, ..., *s_k*. The *StepName*.*ColumnName* format is used to reference a value in the state. For instance, `s_2.col1` would reference column `col1` that belongs to step *s_2* in the state of *s_k*. For a detailed example, see the scan logic walkthrough.\n\nThe state starts empty and updates whenever a scanned input record matches a step. When the state of the current step is nonempty, the step is referred to as having an *active sequence*.\n\n### Matching logic\n\nEach input record is evaluated against all of the steps in reverse order, from the last step to the first. When a record *r* is evaluated against some step *s_k*, the following logic is applied:\n\n* **Check 1:** If the state of the previous step (*s_k-1*) is nonempty, and *r* meets the *Condition* of *s_k*, then a match occurs. The match leads to the following actions:\n    1. The state of *s_k* is cleared.\n    1. The state of *s_k-1* is promoted to become the state of *s_k*.\n    1. The assignments of *s_k* are calculated and extend *r*.\n    1. The extended *r* is added to the output and to the state of *s_k*.\n\n    > \n    > If **Check 1** results in a match, **Check 2** is disregarded, and *r* moves on to be evaluated against *s_k-1*.\n\n* **Check 2:** If the state of *s_k* has an active sequence or *s_k* is the first step, and *r* meets the *Condition* of *s_k*, then a match occurs. The match leads to the following actions:\n    1. The assignments of *s_k* are calculated and extend *r*.\n    1. The values that represent *s_k* in the state of *s_k* are replaced with the values of the extended *r*.\n    1. If *s_k* is defined as `output=all`, the extended *r* is added to the output.\n    1. If *s_k* is the first step, a new sequence begins and the match ID increases by `1`. This only affects the output when `with_match_id` is used.\n\nOnce the checks for *s_k* are complete, *r* moves on to be evaluated against *s_k-1*.\n\nFor a detailed example of this logic, see the scan logic walkthrough.",
         "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n|*T*| `string` | *True*|The input tabular source.|\n| *MatchIdColumnName* | `string` | |  The name of a column of type `long` that is appended to the output as part of the scan execution. Indicates the 0-based index of the match for the record. |\n| *ColumnDeclarations* | `string` | | Declares an extension to the schema of *T*. These columns are assigned values in the steps. If not assigned, the *DefaultValue* is returned. Unless otherwise specified, *DefaultValue* is `null`.|\n| *StepName* | `string` |  *True* | Used to reference values in the state of scan for conditions and assignments. The step name must be unique.|\n| *Condition* | `string` |  *True* | An expression that evaluates to `true` or `false` that defines which records from the input match the step. A record matches the step when the condition is `true` with the step’s state or with the previous step’s state.|\n| *Assignment* | `string` | | A scalar expression that is assigned to the corresponding column when a record matches a step.|\n| `output` | `string` | | Controls the output logic of the step on repeated matches. `all` outputs all records matching the step, `last` outputs only the last record in a series of repeating matches for the step, and `none` doesn't output records matching the step. The default is `all`.|",
         "example": "",
-        "sourceLength": 26201,
+        "sourceLength": 26158,
         "url": "https://learn.microsoft.com/en-us/kusto/query/scan-operator"
       }
     },
@@ -15332,11 +16117,11 @@
       "documentation": {
         "title": "datetime_utc_to_local()",
         "description": "Converts UTC datetime to local datetime using a time-zone specification.",
-        "syntax": "`datetime_utc_to_local(`*from*`,`*timezone*`)`",
+        "syntax": "`datetime_utc_to_local(`*from*`,`*timezone*`)`\n\n> \n> `datetime_utc_to_local()` is a built-in Kusto function and does not require importing any additional libraries. If you receive an error that the function does not exist, confirm that you're running the query in a supported environment (Azure Data Explorer, Microsoft Sentinel, Azure Monitor, Microsoft Fabric).",
         "returnInfo": "Returns a local datetime in the *timezone* that corresponds the UTC datetime.",
         "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *from* | `datetime` |  *True* | The UTC datetime to convert.|\n| *timezone* | `string` |  *True* | The timezone to convert to. This value must be one of the supported timezones.|",
         "example": "print dt=now()\n| extend pacific_dt = datetime_utc_to_local(dt, 'US/Pacific'), canberra_dt = datetime_utc_to_local(dt, 'Australia/Canberra')\n| extend diff = pacific_dt - canberra_dt",
-        "sourceLength": 2318,
+        "sourceLength": 2642,
         "url": "https://learn.microsoft.com/en-us/kusto/query/datetime-utc-to-local-function"
       }
     },
@@ -15559,8 +16344,8 @@
         "syntax": "`extract(`*regex*`,` *captureGroup*`,` *source* [`,` *typeLiteral*]`)`",
         "returnInfo": "If *regex* finds a match in *source*: the substring matched against the indicated capture group *captureGroup*, optionally converted to *typeLiteral*.\n\nIf there's no match, or the type conversion fails: `null`.",
         "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *regex* | `string` |  *True* | A regular expression.|\n| *captureGroup* | `int` |  *True* | The capture group to extract. 0 stands for the entire match, 1 for the value matched by the first '('parenthesis')' in the regular expression, and 2 or more for subsequent parentheses.|\n| *source* | `string` |  *True*| The string to search.|\n| *typeLiteral* | `string` | | If provided, the extracted substring is converted to this type. For example, `typeof(long)`.",
-        "example": "let Text = \"User: JohnDoe, Email: johndoe@example.com, Age: 29\";\nprint UserName = extract(\"User: ([^,]+)\", 1, Text),\nEmailId = extract(@\"Email: (\\S+),\", 1, Text),\nAge = extract(@\"\\d+\", 0, Text)\n\nlet Dates = datatable(DateString: string)\n[\n    \"15-12-2024\",\n    \"21-07-2023\",\n    \"10-03-2022\"\n];\nDates\n| extend Month = extract(@\"-(\\d{2})-\", 1, DateString, typeof(int))\n| project DateString, Month",
-        "sourceLength": 3654,
+        "example": "let _data = datatable(Text: string)\n[\n\"User: James, Email: James@example.com, Age: 29\",\n\"User: David, Age: 35\"\n];\n_data |\nextend UserName = extract(\"User: ([^,]+)\", 1, Text),\n       EmailId = extract(@\"Email: (\\S+),\", 1, Text),\n       Age = extract(@\"\\d+\", 0, Text)\n\nlet Dates = datatable(DateString: string)\n[\n    \"15-12-2024\",\n    \"21-07-2023\",\n    \"10-03-2022\"\n];\nDates\n| extend Month = extract(@\"-(\\d{2})-\", 1, DateString, typeof(int))\n| project DateString, Month",
+        "sourceLength": 3897,
         "url": "https://learn.microsoft.com/en-us/kusto/query/extract-function"
       }
     },
@@ -15616,7 +16401,7 @@
         "returnInfo": "A string of *size* formatted as data size in bytes.",
         "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *size* | `real` |  *True* | The value to be formatted as data size in bytes.|\n| *precision* | `int` | | The number of digits the value will be rounded to after the decimal point. The default is 0.|\n| *units* | `string` | | The units of the target data size: `Bytes`, `KB`, `MB`, `GB`, `TB`, `PB`, or `EB`. If this parameter is empty, the units will be auto-selected based on input value.|",
         "example": "print \nv1 = format_bytes(564),\nv2 = format_bytes(10332, 1),\nv3 = format_bytes(20010332),\nv4 = format_bytes(20010332, 2),\nv5 = format_bytes(20010332, 0, \"KB\")",
-        "sourceLength": 2166,
+        "sourceLength": 2157,
         "url": "https://learn.microsoft.com/en-us/kusto/query/format-bytes-function"
       }
     },
@@ -15630,7 +16415,7 @@
         "returnInfo": "A string with *date* formatted as specified by *format*.",
         "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *date* | `datetime` |  *True* | The value to format.|\n| *format* | `string` |  *True*| The output format comprised of one or more of the supported format elements.\n\n### Supported format elements\n\nThe *format* parameter should include one or more of the following elements:\n\n|Format specifier| Description| Examples|\n|:--|:--|:--|\n|`d`| The day of the month, from 1 through 31.| 2009-06-01T13:45:30 -> 1, 2009-06-15T13:45:30 -> 15\n|`dd`| The day of the month, from 01 through 31.| 2009-06-01T13:45:30 -> 01, 2009-06-15T13:45:30 -> 15\n|`f`| The tenths of a second in a date and time value.| 2009-06-15T13:45:30.6170000 -> 6, 2009-06-15T13:45:30.05 -> 0\n|`ff`| The hundredths of a second in a date and time value.| 2009-06-15T13:45:30.6170000 -> 61, 2009-06-15T13:45:30.0050000 -> 00\n|`fff`| The milliseconds in a date and time value.| 6/15/2009 13:45:30.617 -> 617, 6/15/2009 13:45:30.0005 -> 000\n|`ffff`| The ten thousandths of a second in a date and time value.| 2009-06-15T13:45:30.6175000 -> 6175, 2009-06-15T13:45:30.0000500 -> 0000\n|`fffff`| The hundred thousandths of a second in a date and time value. |2009-06-15T13:45:30.6175400 -> 61754, 2009-06-15T13:45:30.000005 -> 00000\n|`ffffff`| The millionths of a second in a date and time value.| 2009-06-15T13:45:30.6175420 -> 617542, 2009-06-15T13:45:30.0000005 -> 000000\n|`fffffff`| The ten millionths of a second in a date and time value.| 2009-06-15T13:45:30.6175425 -> 6175425, 2009-06-15T13:45:30.0001150 -> 0001150\n|`F`| If non-zero, the tenths of a second in a date and time value.| 2009-06-15T13:45:30.6170000 -> 6, 2009-06-15T13:45:30.0500000 -> (no output)\n|`FF`| If non-zero, the hundredths of a second in a date and time value.| 2009-06-15T13:45:30.6170000 -> 61, 2009-06-15T13:45:30.0050000 -> (no output)\n|`FFF`| If non-zero, the milliseconds in a date and time value.| 2009-06-15T13:45:30.6170000 -> 617, 2009-06-15T13:45:30.0005000 -> (no output)\n|`FFFF`| If non-zero, the ten thousandths of a second in a date and time value.|2009-06-15T13:45:30.5275000 -> 5275, 2009-06-15T13:45:30.0000500 -> (no output)\n|`FFFFF`| If non-zero, the hundred thousandths of a second in a date and time value.| 2009-06-15T13:45:30.6175400 -> 61754, 2009-06-15T13:45:30.0000050 -> (no output)\n|`FFFFFF`| If non-zero, the millionths of a second in a date and time value.| 2009-06-15T13:45:30.6175420 -> 617542, 2009-06-15T13:45:30.0000005 -> (no output)\n|`FFFFFFF`| If non-zero, the ten millionths of a second in a date and time value.| 2009-06-15T13:45:30.6175425 -> 6175425, 2009-06-15T13:45:30.0001150 -> 000115\n|`h`| The hour, using a 12-hour clock from 1 to 12.| 2009-06-15T01:45:30 -> 1, 2009-06-15T13:45:30 -> 1\n|`hh`| The hour, using a 12-hour clock from 01 to 12.| 2009-06-15T01:45:30 -> 01, 2009-06-15T13:45:30 -> 01\n|`H`| The hour, using a 24-hour clock from 0 to 23.| 2009-06-15T01:45:30 -> 1, 2009-06-15T13:45:30 -> 13\n|`HH`| The hour, using a 24-hour clock from 00 to 23.| 2009-06-15T01:45:30 -> 01, 2009-06-15T13:45:30 -> 13\n|`m`| The minute, from 0 through 59.| 2009-06-15T01:09:30 -> 9, 2009-06-15T13:29:30 -> 29\n|`mm`| The minute, from 00 through 59.| 2009-06-15T01:09:30 -> 09, 2009-06-15T01:45:30 -> 45\n|`M`| The month, from 1 through 12.| 2009-06-15T13:45:30 -> 6\n|`MM`| The month, from 01 through 12.| 2009-06-15T13:45:30 -> 06\n|`s`| The second, from 0 through 59.| 2009-06-15T13:45:09 -> 9\n|`ss`| The second, from 00 through 59.| 2009-06-15T13:45:09 -> 09\n|`y`| The year, from 0 to 99.| 0001-01-01T00:00:00 -> 1, 0900-01-01T00:00:00 -> 0, 1900-01-01T00:00:00 -> 0, 2009-06-15T13:45:30 -> 9, 2019-06-15T13:45:30 -> 19\n|`yy`| The year, from 00 to 99.| 0001-01-01T00:00:00 -> 01, 0900-01-01T00:00:00 -> 00, 1900-01-01T00:00:00 -> 00, 2019-06-15T13:45:30 -> 19\n|`yyyy`| The year as a four-digit number.| 0001-01-01T00:00:00 -> 0001, 0900-01-01T00:00:00 -> 0900, 1900-01-01T00:00:00 -> 1900, 2009-06-15T13:45:30 -> 2009\n|`tt`| AM / PM hours| 2009-06-15T13:45:09 -> PM\n\n### Supported delimiters\n\nThe format specifier can include the following delimiters:\n\n|Delimiter|Comment|\n|:---------|:-------|\n|`' '`| Space|\n|`'/'`||\n|`'-'`|Dash|\n|`':'`||\n|`','`||\n|`'.'`||\n|`'_'`||\n|`'['`||\n|`']'`||",
         "example": "let dt = datetime(2017-01-29 09:00:05);\nprint \nv1=format_datetime(dt,'yy-MM-dd [HH:mm:ss]')\n\nlet dt = datetime(2017-01-29 09:00:05);\nprint \nv2=format_datetime(dt, 'yyyy-M-dd [H:mm:ss]')\n\nlet dt = datetime(2017-01-29 09:00:05);\nprint \nv3=format_datetime(dt, 'yy-MM-dd [hh:mm:ss tt]')",
-        "sourceLength": 7469,
+        "sourceLength": 7442,
         "url": "https://learn.microsoft.com/en-us/kusto/query/format-datetime-function"
       }
     },
@@ -15644,7 +16429,7 @@
         "returnInfo": "If conversion is successful, the result will be a string representing IPv4 address.\nIf conversion isn't successful, the result will be an empty string.",
         "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *ip* | `string` |  *True* | The IPv4 address. The format may be a string or number representation in big-endian order.|\n| *prefix* | `int` | | An integer from 0 to 32 representing the number of most-significant bits that are taken into account. If unspecified, all 32 bit-masks are used.|",
         "example": "datatable(address:string, mask:long)\n[\n '192.168.1.1', 24,          \n '192.168.1.1', 32,          \n '192.168.1.1/24', 32,       \n '192.168.1.1/24', long(-1), \n]\n| extend result = format_ipv4(address, mask), \n         result_mask = format_ipv4_mask(address, mask)",
-        "sourceLength": 2684,
+        "sourceLength": 2675,
         "url": "https://learn.microsoft.com/en-us/kusto/query/format-ipv4-function"
       }
     },
@@ -15685,8 +16470,8 @@
         "syntax": "`gamma(`*number*`)`",
         "returnInfo": "Gamma function of *number*.",
         "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *number* | `real` |  *True* | The number used to calculate the gamma function. |",
-        "example": "",
-        "sourceLength": 1006,
+        "example": "print result = gamma(5)",
+        "sourceLength": 1476,
         "url": "https://learn.microsoft.com/en-us/kusto/query/gamma-function"
       }
     },
@@ -16536,11 +17321,11 @@
       "documentation": {
         "title": "percentile_tdigest()",
         "description": "Calculates the percentile result from the `tdigest` results (which was generated by tdigest() or tdigest_merge())",
-        "syntax": "`percentile_tdigest(`*expr*`,` *percentile1* `,` *typeLiteral*`)`",
+        "syntax": "`percentile_tdigest(`*expr*`,` *percentile* [`,` *typeLiteral*]`)`",
         "returnInfo": "The percentile value of each value in *expr*.\n\n>\n>\n>* If the type was provided, the result will be a column of the same type provided with the results of the percentile. In this case, all `tdigest` functions must be of that type.\n>* If *expr* includes `tdigest` functions of different types, don't provide the type. The result will be of type dynamic. See below examples.",
-        "parametersTable": "|Name|Type|Required|Description|\n|:--|:--|:--|:--|\n|*expr*| `string` | *True*|An expression that was generated by `tdigest` or tdigest_merge().|\n|*percentile*| `real` | *True*|The value that specifies the percentile.|\n|*typeLiteral*| `string` ||A type literal. If provided, the result set will be of this type. For example, `typeof(long)` will cast all results to type `long`.",
+        "parametersTable": "|Name|Type|Required|Description|\n|:--|:--|:--|:--|\n|*expr*| `dynamic` | *True*|An expression that was generated by `tdigest` or tdigest_merge().|\n|*percentile*| `real` | *True*|The value that specifies the percentile.|\n|*typeLiteral*| `string` ||A type literal. If provided, the result set will be of this type. For example, `typeof(long)` will cast all results to type `long`.",
         "example": "",
-        "sourceLength": 3558,
+        "sourceLength": 3560,
         "url": "https://learn.microsoft.com/en-us/kusto/query/percentile-tdigest-function"
       }
     },
@@ -16788,11 +17573,11 @@
       "documentation": {
         "title": "row_rank_min()",
         "description": "Returns the current row's minimal rank in a serialized row set.\n\nThe rank is the minimal row number that the current row's *Term* appears in.",
-        "syntax": "`row_rank_min` `(` *Term* `)`",
+        "syntax": "`row_rank_min` `(` *Term*, [*restart*] `)`",
         "returnInfo": "Returns the row rank of the current row as a value of type `long`.",
         "parametersTable": "|Name|Type|Required|Description|\n|:--|:--|:--|:--|\n|*Term*| `string` | *True*|An expression indicating the value to consider for the rank. The rank is the minimal row number for *Term*.|\n| *restart*| `bool` | | Indicates when the numbering is to be restarted to the *StartingIndex* value. The default is `false`.|",
-        "example": "datatable (Airport:string, Airline:string, Departures:long)\n[\n  \"SEA\", \"LH\", 3,\n  \"SEA\", \"LY\", 100,\n  \"SEA\", \"UA\", 3,\n  \"SEA\", \"BA\", 2,\n  \"SEA\", \"EL\", 3\n]\n| sort by Departures asc\n| extend Rank=row_rank_min(Departures)",
-        "sourceLength": 2358,
+        "example": "datatable (Airport:string, Airline:string, Departures:long)\n[\n  \"SEA\", \"LH\", 3,\n  \"SEA\", \"LY\", 100,\n  \"SEA\", \"UA\", 3,\n  \"SEA\", \"BA\", 2,\n  \"SEA\", \"EL\", 3\n]\n| sort by Departures asc\n| extend Rank=row_rank_min(Departures)\n\ndatatable(Category:string, Item:string, Value:int)\n[\n    \"A\", \"item1\", 10,\n    \"A\",\"item2\", 10,\n    \"A\", \"item3\", 5,\n    \"A\", \"item4\", 20,\n    \"B\", \"item2\", 5,\n    \"B\", \"item1\", 7\n]\n| sort by Category asc, Value asc\n| extend rank = row_rank_min(Value, Category != prev(Category))",
+        "sourceLength": 2905,
         "url": "https://learn.microsoft.com/en-us/kusto/query/row-rank-min-function"
       }
     },
@@ -17100,7 +17885,7 @@
         "returnInfo": "A new dynamic array column containing the filtered output.",
         "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *series* | `dynamic` |  *True* | An array of numeric values.|\n| *filter* | `dynamic` |  *True* | An array of numeric values containing the coefficients of the filter.|\n| *normalize* | `bool` | | Indicates whether the filter should be normalized. That is, divided by the sum of the coefficients. If filter contains negative values, then *normalize* must be specified as `false`, otherwise result will be `null`. If not specified, then a default value of `true` is assumed, depending on the presence of negative values in the *filter*. If *filter* contains at least one negative value, then *normalize* is assumed to be `false`.|\n| *center* | `bool` | | Indicates whether the filter is applied symmetrically on a time window before and after the current point, or on a time window from the current point backwards. By default, center is `false`, which fits the scenario of streaming data so that we can only apply the filter on the current and older points. However, for ad-hoc processing you can set it to `true`, keeping it synchronized with the time series. See examples below. This parameter controls the filter’s group delay.|\n\n> \n> Normalization is a convenient way to make sure that the sum of the coefficients is 1. When *normalized* is `true`, the filter doesn't amplify or attenuate the series. For example, the moving average of four bins could be specified by *filter*=[1,1,1,1] and *normalized*=`true`, which is simpler than typing [0.25,0.25.0.25,0.25].",
         "example": "range t from bin(now(), 1h) - 23h to bin(now(), 1h) step 1h\n| summarize t=make_list(t)\n| project\n    id='TS',\n    val=dynamic([0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 20, 40, 100, 40, 20, 10, 0, 0, 0, 0, 0, 0, 0, 0]),\n    t\n| extend\n    5h_MovingAvg=series_fir(val, dynamic([1, 1, 1, 1, 1])),\n    5h_MovingAvg_centered=series_fir(val, dynamic([1, 1, 1, 1, 1]), true, true)\n| render timechart\n\nrange t from bin(now(), 1h) - 11h to bin(now(), 1h) step 1h\n| summarize t=make_list(t)\n| project id='TS', t, value=dynamic([0, 0, 0, 0, 2, 2, 2, 2, 3, 3, 3, 3])\n| extend diff=series_fir(value, dynamic([1, -1]), false, false)\n| render timechart",
-        "sourceLength": 5475,
+        "sourceLength": 5505,
         "url": "https://learn.microsoft.com/en-us/kusto/query/series-fir-function"
       }
     },
@@ -17128,7 +17913,7 @@
         "returnInfo": "",
         "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *series* | `dynamic` |  *True* | An array of numeric values.|\n\n> \n> The most convenient way of using this function is applying it to the results of the make-series operator.",
         "example": "print\n    id=' ',\n    x=range(bin(now(), 1h) - 11h, bin(now(), 1h), 1h),\n    y=dynamic([1, 2.2, 2.5, 4.7, 5.0, 12, 10.3, 10.3, 9, 8.3, 6.2])\n| extend\n    LineFit=series_fit_line_dynamic(y).line_fit,\n    LineFit2=series_fit_2lines_dynamic(y).line_fit\n| project id, x, y, LineFit, LineFit2\n| render timechart",
-        "sourceLength": 4637,
+        "sourceLength": 4667,
         "url": "https://learn.microsoft.com/en-us/kusto/query/series-fit-2lines-dynamic-function"
       }
     },
@@ -17156,7 +17941,7 @@
         "returnInfo": "",
         "parametersTable": "| Name | Type | Required | Description |\n|:--|:--|:--|:--|\n| *series* | `dynamic` |  *True* | An array of numeric values.|\n\n> \n> The most convenient way of using this function is by applying it to the results of make-series operator.",
         "example": "print\n    id=' ',\n    x=range(bin(now(), 1h) - 11h, bin(now(), 1h), 1h),\n    y=dynamic([2, 5, 6, 8, 11, 15, 17, 18, 25, 26, 30, 30])\n| extend fit=series_fit_line_dynamic(y)\n| extend\n    RSquare=fit.rsquare,\n    Slope=fit.slope,\n    Variance=fit.variance,\n    RVariance=fit.rvariance,\n    Interception=fit.interception,\n    LineFit=fit.line_fit\n| render timechart",
-        "sourceLength": 3804,
+        "sourceLength": 3834,
         "url": "https://learn.microsoft.com/en-us/kusto/query/series-fit-line-dynamic-function"
       }
     },
@@ -18885,5 +19670,5 @@
       "sortOrder": "12_joinkind"
     }
   ],
-  "lastUpdated": "2025-09-15T17:11:49.752Z"
+  "lastUpdated": "2026-04-20T16:11:34.803Z"
 }
