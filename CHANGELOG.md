@@ -4,6 +4,13 @@ All notable changes to the bARGE Visual Studio Code extension will be documented
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [v1.8.1] - 2026-05-03
+### New Features
+- [`17dfaca`](https://github.com/PalmEmanuel/bARGE/commit/17dfaca18ea8e2070b30a897b0d0bb0a5a5b50b5) - Update KQL syntax to include new tables and docs *(PR [#287](https://github.com/PalmEmanuel/bARGE/pull/287) by [@PalmEmanuel](https://github.com/PalmEmanuel))*
+- [`a317bcd`](https://github.com/PalmEmanuel/bARGE/commit/a317bcd555700cda4cab89302e8d5b3b8af73fc7) - **auth**: Allow account switching while sign-in is in progress *(PR [#262](https://github.com/PalmEmanuel/bARGE/pull/262) by [@Copilot](https://github.com/apps/copilot-swe-agent))*
+  - *addresses issue [#260](https://github.com/PalmEmanuel/bARGE/issues/260) opened by [@PalmEmanuel](https://github.com/PalmEmanuel)*
+
+
 ## [v1.8.0] - 2026-03-30
 ### New Features
 - [`39023fe`](https://github.com/PalmEmanuel/bARGE/commit/39023fe7c304d2fd64a4801b5816f8f396b379a7) - Add language model tools for Copilot integration *(PR [#255](https://github.com/PalmEmanuel/bARGE/pull/255) by [@Copilot](https://github.com/apps/copilot-swe-agent))*
@@ -240,3 +247,4 @@ Initial release of bARGE, supporting basic functionality for logging in using [D
 [v1.6.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.5.0...v1.6.0
 [v1.7.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.6.0...v1.7.0
 [v1.8.0]: https://github.com/PalmEmanuel/bARGE/compare/v1.7.0...v1.8.0
+[v1.8.1]: https://github.com/PalmEmanuel/bARGE/compare/v1.8.0...v1.8.1
