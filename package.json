@@ -522,7 +522,7 @@
   },
   "dependencies": {
     "@azure/identity": "^4.13.1",
-    "@azure/msal-node": "^5.1.3",
+    "@azure/msal-node": "^5.1.4",
     "@vscode/codicons": "^0.0.45",
     "lottie-web": "^5.13.0"
   }
