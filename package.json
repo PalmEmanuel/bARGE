@@ -502,7 +502,7 @@
     "prepare": "husky"
   },
   "devDependencies": {
-    "@commitlint/cli": "^20.5.0",
+    "@commitlint/cli": "^20.5.2",
     "@commitlint/config-conventional": "^20.5.0",
     "@kusto/language-service-next": "^12.3.2",
     "@types/mocha": "^10.0.10",
