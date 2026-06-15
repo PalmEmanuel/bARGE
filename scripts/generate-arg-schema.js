@@ -1065,6 +1065,9 @@ class ARGSchemaGenerator {
         // Write TextMate grammar
         await this.generateTextMateGrammar();
 
+        // Write language configuration
+        await this.generateLanguageConfiguration();
+
         console.log(`📁 Schema files written to: ${outputDir}`);
     }
 
@@ -1944,6 +1947,57 @@ class ARGSchemaGenerator {
         console.log(`   - ${operators.length} operators`);
         console.log(`   - ${functions.length} functions`);
         console.log(`   - ${Object.keys(this.schema.tables).length} tables`);
+    }
+
+    async generateLanguageConfiguration() {
+        const rootDir = path.join(__dirname, '..');
+
+        const languageConfiguration = {
+            "comments": {
+                "lineComment": "//",
+                "blockComment": ["/*", "*/"]
+            },
+            "brackets": [
+                ["{", "}"],
+                ["[", "]"],
+                ["(", ")"]
+            ],
+            "autoClosingPairs": [
+                ["{", "}"],
+                ["[", "]"],
+                ["(", ")"],
+                ["\"", "\""],
+                ["'", "'"]
+            ],
+            "surroundingPairs": [
+                ["{", "}"],
+                ["[", "]"],
+                ["(", ")"],
+                ["\"", "\""],
+                ["'", "'"]
+            ],
+            "indentationRules": {
+                "increaseIndentPattern": "^.*(\\{[^}\"']*|\\([^)\"']*|\\[[^\\]\"']*)$",
+                "decreaseIndentPattern": "^\\s*(\\}|\\)|\\])"
+            },
+            "onEnterRules": [
+                {
+                    "beforeText": "^[a-zA-Z_][a-zA-Z0-9_]*\\s*$",
+                    "action": { "indentAction": "None", "appendText": "| " }
+                },
+                {
+                    "beforeText": "^\\|\\s+\\w+.*$",
+                    "action": { "indentAction": "None", "appendText": "| " }
+                }
+            ]
+        };
+
+        await fs.writeFile(
+            path.join(rootDir, 'language-configuration.json'),
+            JSON.stringify(languageConfiguration, null, 4)
+        );
+
+        console.log('📝 Language configuration written with onEnterRules for pipe auto-insertion');
     }
 
     /**
