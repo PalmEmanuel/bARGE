@@ -258,7 +258,171 @@ npm run package
 - Build and linting work correctly in CI
 - VSIX packaging requires alignment between `engines.vscode` and `@types/vscode` versions
 
-## Troubleshooting
+## GIF Recording Scenarios
+
+Scenarios are Bash scripts in `scripts/record-gifs/scenarios/`. They are sourced by `record.sh` inside a running recording session — all helpers from `record.sh` are available.
+
+### How a Scenario Works
+
+```
+record.sh starts Xvfb → installs extension → calls run_scenario:
+  start_recording()        ← ffmpeg begins capturing
+  source scenario.sh       ← your script runs here
+  stop_recording()
+  convert_to_gif()         ← trims boot frames, encodes GIF
+```
+
+The GIF is trimmed to `VSCODE_BOOT_SECONDS` — the wall-clock elapsed from recording start until `wait_for_vscode_window` returns. Everything before that is cut; the GIF starts with VS Code fully loaded.
+
+**Critical**: Recording starts BEFORE VS Code launches. Delaying `start_recording` until after the window appears always produces black output.
+
+**Critical**: Everything that happens AFTER `wait_for_vscode_window` is visible in the final GIF, including any scanning/probing clicks. Keep visible actions clean.
+
+### Scenario Template
+
+```bash
+#!/usr/bin/env bash
+FIXTURE_WORKSPACE="${SCRIPT_DIR}/fixtures/workspace"
+mkdir -p "${FIXTURE_WORKSPACE}"
+
+# Inject scenario-specific VS Code settings before launching
+add_setting "barge.autoAuthenticate" "false"
+add_setting "barge.hideLoginMessages" "false"
+
+code \
+    --user-data-dir "${VSCODE_USER_DATA_DIR}" \
+    --extensions-dir "${VSCODE_EXTENSIONS_DIR}" \
+    --disable-gpu --use-gl=swiftshader --no-sandbox --disable-telemetry \
+    --disable-extension github.copilot \
+    --disable-extension github.copilot-chat \
+    "${FIXTURE_WORKSPACE}" \
+    > /dev/null 2>&1 &
+VSCODE_PID=$!
+
+# Sets up layout (sidebar right, Explorer open, Chat closed) and pauses 0.5s.
+wait_for_vscode_window
+
+# --- actions ---
+
+close_vscode
+```
+
+### Available Helpers
+
+| Helper | Description |
+|---|---|
+| `wait_for_vscode_window` | Waits for window, sizes it, opens Explorer, closes Chat, sleeps 0.5s |
+| `click_and_verify x y [threshold] [crop_region]` | Clicks at (x,y), screenshots before/after cropped region, returns 0 if screen changed |
+| `click_status_bar` | Scans outward from x=1480 to find bARGE item; validates by checking top 300px changed (auth picker opened); exports `BARGE_STATUS_BAR_X`; returns 1 on failure |
+| `move_mouse_smooth x1 y1 x2 y2 [ms]` | Moves mouse naturally via quadratic Bézier curve with ease-in/ease-out and micro-jitter over `ms` milliseconds (default 1000). Lands exactly on target. |
+| `add_setting key value` | Injects a JSON key/value into VS Code settings.json before launch (call before `code`) |
+| `close_vscode` | Sends Ctrl+Q, waits for process exit |
+| `screen_changed before.png after.png [threshold]` | Returns 0 if ImageMagick diff stddev exceeds threshold |
+
+### Click Verification Pattern
+
+Always use `click_and_verify` (or `click_status_bar`) for clicks that should trigger a visible UI change. If the screen does not change, the script fails before GIF conversion — no silent bad GIFs.
+
+**Use a `crop_region` to avoid false positives.** Full-screen diffs trigger on tooltips, hover states, and animations. Crop to only the region where the expected UI change should appear:
+
+```bash
+# Good: verified click with crop to quick-pick area (top 300px)
+click_and_verify 960 400 "0.005" "1920x300+0+0" || { echo "Error" >&2; close_vscode; exit 1; }
+
+# click_status_bar already uses the top-300px crop internally
+click_status_bar || { echo "Error: status bar item not found" >&2; close_vscode; exit 1; }
+```
+
+### Mouse Movement Pattern
+
+For natural-looking demos, always smooth-move the mouse from a starting position to the target. The glide **end position must match where the scan will confirm** — mismatches cause visible jumps:
+
+```bash
+SB_Y=$((DISPLAY_HEIGHT - 11))
+
+# Start mouse in editor, glide to status bar, then click
+xdotool mousemove 960 500
+move_mouse_smooth 960 500 1480 $SB_Y 800
+click_status_bar || { echo "Error" >&2; close_vscode; exit 1; }
+
+# Glide from confirmed click position up to quick pick
+move_mouse_smooth $BARGE_STATUS_BAR_X $SB_Y 917 89 700
+```
+
+### Known Coordinates at 1920×1080
+
+All scenarios run at a fixed `1920×1080` Xvfb display with VS Code at `0,0`. Coordinates are deterministic.
+
+| Element | x | y | Notes |
+|---|---|---|---|
+| bARGE status bar item | ~1480 | `DISPLAY_HEIGHT - 11` = 1069 | `click_status_bar` scans outward from 1480 |
+| Quick pick center | 917 | — | VS Code centers quick pick slightly left of screen center |
+| Quick pick item 1 (DefaultAzureCredential) | 917 | 89 | First non-separator item |
+| Quick pick item 2 | 917 | 139 | Second item |
+| Quick pick item height | — | ~50px | Add 50 per additional item |
+
+If quick pick positions feel off, add `sleep 0.2` before interacting to let the animation settle, then adjust y values by ±10.
+
+### Debugging Click Detection
+
+When `click_status_bar` or `click_and_verify` gives false positives or misses, add debug artifacts to see exactly what the image comparison is seeing. In `record.sh`, save before/after crops and upload them:
+
+```bash
+# In click_and_verify, after cropping:
+mkdir -p /tmp/barge-debug
+cp "$before_crop" "/tmp/barge-debug/before-x${x}.png"
+cp "$after_crop"  "/tmp/barge-debug/after-x${x}.png"
+```
+
+```yaml
+# In the workflow, after the Record GIFs step:
+- name: Upload debug screenshots
+  if: always()
+  uses: actions/upload-artifact@v4
+  with:
+    name: debug-screenshots
+    path: /tmp/barge-debug/
+    retention-days: 3
+    if-no-files-found: ignore
+```
+
+Remove after debugging. This pattern revealed that x=1480 was the correct bARGE status bar position and that the top-300px crop correctly detects the auth picker opening.
+
+### Per-Scenario Settings
+
+Use `add_setting key value` to override VS Code or bARGE settings for a specific scenario without affecting the shared base settings. Call it before launching `code`:
+
+```bash
+# Show sign-in notification and disable auto-authenticate for sign-in scenario
+add_setting "barge.autoAuthenticate" "false"
+add_setting "barge.hideLoginMessages" "false"
+```
+
+Common bARGE settings: `barge.autoAuthenticate` (default: `true`), `barge.hideLoginMessages` (default: `false`).
+
+### Cursor Theme
+
+The CI display uses the **Quintom Snow** cursor theme, installed from GitLab. Key notes:
+- Install the theme subdirectory (`Quintom_Snow Cursors/Quintom_Snow/`), not the parent folder
+- Needs both `index.theme` (for XCursor) and `~/.config/gtk-3.0/settings.ini` (for VS Code/Electron)
+- Set `XCURSOR_THEME` env var and `xrdb -merge` with `Xcursor.theme` after Xvfb starts
+- **Heredocs in YAML `run:` blocks break YAML parsing** if content isn't indented — use `printf` instead
+
+### CI Screenshot Capture
+
+Two concurrent `ffmpeg x11grab` instances on the same Xvfb display cause VS Code/Electron to stop painting — both frames become identical and diffs return 0. Use `xwd` (from `x11-apps` package) for single-frame captures instead; it uses the XGetImage protocol and doesn't conflict with the recording ffmpeg.
+
+### Adding a New Scenario
+
+1. Create `scripts/record-gifs/scenarios/<name>.sh`
+2. Follow the template above; use `add_setting` for any scenario-specific overrides
+3. Use `click_and_verify` / `click_status_bar` with appropriate `crop_region` for all meaningful clicks
+4. Glide the mouse smoothly to the target before clicking — match glide endpoint to expected scan confirmation point
+5. Run locally with `./scripts/record-gifs/record.sh <name>` (Linux/Xvfb required) or trigger CI
+6. The scenario name becomes the GIF filename: `media/readme/gifs/<name>.gif`
+7. If click detection is unreliable, add debug artifacts (see above) to inspect what the diff is seeing
+
+
 
 ### Build Issues
 - Ensure Node.js version compatibility (works with v20.19.4)

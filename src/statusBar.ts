@@ -3,6 +3,8 @@ import * as vscode from 'vscode';
 export class StatusBarManager {
     private statusBarItem: vscode.StatusBarItem;
     private sessionChangeListener: vscode.Disposable;
+    private tooltipSuppressed = false;
+    private lastTextBeforeSuppress: string | undefined;
 
     constructor(onAuthSessionChange?: () => Promise<void>) {
         // Create status bar item with compass icon on the right side
@@ -31,27 +33,51 @@ export class StatusBarManager {
         });
     }
 
+    private setTooltip(value: string): void {
+        if (this.tooltipSuppressed) {
+            // Lift suppression once the status bar text changes from what it
+            // was when suppression started (i.e. the auth state transitioned).
+            if (this.statusBarItem.text !== this.lastTextBeforeSuppress) {
+                this.tooltipSuppressed = false;
+            } else {
+                return;
+            }
+        }
+        this.statusBarItem.tooltip = value;
+    }
+
+    /**
+     * Suppress tooltip updates until the status bar text changes, preventing
+     * the tooltip from flashing when the item still has focus after a quick
+     * pick closes.
+     */
+    public suppressTooltip(): void {
+        this.statusBarItem.tooltip = '';
+        this.tooltipSuppressed = true;
+        this.lastTextBeforeSuppress = this.statusBarItem.text;
+    }
+
     public updateStatusAuthenticated(accountName: string): void {
         this.statusBarItem.text = `$(compass-active) ${accountName}`;
-        this.statusBarItem.tooltip = `bARGE: Authenticated as ${accountName}. Click to switch account`;
-        this.statusBarItem.backgroundColor = undefined; // Clear any error background
+        this.setTooltip(`bARGE: Authenticated as ${accountName}. Click to switch account`);
+        this.statusBarItem.backgroundColor = undefined;
     }
 
     public updateStatusNotAuthenticated(): void {
         this.statusBarItem.text = `$(compass) Not signed in`;
-        this.statusBarItem.tooltip = 'bARGE: Click to sign in';
-        this.statusBarItem.backgroundColor = undefined; // Clear any error background
+        this.setTooltip('bARGE: Click to sign in');
+        this.statusBarItem.backgroundColor = undefined;
     }
 
     public updateStatusLoading(message: string): void {
         this.statusBarItem.text = `$(loading~spin) ${message}`;
-        this.statusBarItem.tooltip = `bARGE: ${message}`;
-        this.statusBarItem.backgroundColor = undefined; // Clear any error background
+        this.setTooltip(`bARGE: ${message}`);
+        this.statusBarItem.backgroundColor = undefined;
     }
 
     public updateStatusError(message: string): void {
         this.statusBarItem.text = `$(compass-dot) Authentication Error`;
-        this.statusBarItem.tooltip = `bARGE: ${message}. Click to retry`;
+        this.setTooltip(`bARGE: ${message}. Click to retry`);
         this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground');
     }
 

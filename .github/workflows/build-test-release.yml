@@ -9,11 +9,17 @@ on:
     paths-ignore:
       - '**.md'
       - 'LICENSE'
+      - 'scripts/record-gifs/**'
+      - '.github/workflows/generate-readme-gifs.yml'
+      - 'media/readme/gifs/**'
   pull_request:
     branches: [main]
     paths-ignore:
       - '**.md'
       - 'LICENSE'
+      - 'scripts/record-gifs/**'
+      - '.github/workflows/generate-readme-gifs.yml'
+      - 'media/readme/gifs/**'
 
 env:
   NODE_VERSION: '22'
