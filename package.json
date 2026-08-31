@@ -38,6 +38,7 @@
     "Other"
   ],
   "activationEvents": [
+    "onStartupFinished",
     "onLanguageModel"
   ],
   "main": "./dist/extension.js",

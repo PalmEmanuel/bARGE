@@ -7,6 +7,10 @@ node_modules
 *.kql
 *.csv
 
+# Allow committed test fixtures
+!src/test/fixtures/
+!src/test/fixtures/*.kql
+
 # DS_Store
 .DS_Store
 

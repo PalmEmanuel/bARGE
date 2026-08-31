@@ -1,0 +1,22 @@
+// Example query that shows role assignments with principal IDs
+authorizationresources
+| where type == "microsoft.authorization/roleassignments" and
+    (properties.principalId startswith 'd87' or properties.principalId startswith '8d0' or properties.principalId startswith 'b5f' or properties.principalId startswith '6')
+| project roleDefinitionId = properties.roleDefinitionId,
+    principalId = properties.principalId,
+    principalType = properties.principalType
+| take 5
+
+resources
+| where type == "microsoft.keyvault/vaults" and name !contains 'not-bARGE' and name contains 'bARGE'
+| join kind=inner (
+    resourcecontainers
+    | where type == "microsoft.resources/subscriptions/resourcegroups"
+    | project resourceGroup = name, subscriptionId, location
+) on subscriptionId
+// | project vaultName = name, resourceGroup
+| take 100
+
+resourcecontainers
+| where type == 'microsoft.resources/subscriptions'
+| project subscriptionId, displayName = name, tenantId
